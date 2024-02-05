@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "ui/draft/App Version 2.md",
+                "file": "Guidelines/Code/Quality Assurence.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ui/draft/App Version 2.md",
+                "file": "Guidelines/Code/Quality Assurence.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ui/draft/App Version 2.md",
+                "file": "Guidelines/Code/Quality Assurence.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ui/draft/App Version 2.md"
+                "file": "Guidelines/Code/Quality Assurence.md"
               }
             }
           }
@@ -148,14 +148,14 @@
   },
   "active": "d2c2a82c60f3dc7d",
   "lastOpenFiles": [
+    "Guidelines/Code/Code Style.md",
+    "Feauture Requests/Ideas.md",
+    "ui/draft/App Version 2.md",
     "ui/draft/App_v2_SavingsManagerUI.png",
     "Diagram.svg",
-    "ui/draft/App Version 2.md",
     "ui/draft/App Version 1.md",
     "ui/draft/App_v1_SavingsManagerUI.png",
-    "Feauture Requests/Ideas.md",
     "Guidelines/Workflow.md",
-    "Guidelines/Code/Code Style.md",
     "Requirements/Requirement Analysis.md",
     "ui/draft/SavingsManagerUI_v1.png",
     "Guidelines/Code/Quality Assurence.md",
