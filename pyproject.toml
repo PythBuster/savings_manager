@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "savings-manager"
+version = "0.1.0"
+description = ""
+authors = ["'PythBuster' <'pythbuster@gmail.com'>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+alembic = "^1.13.1"
+sqlalchemy = "^2.0.25"
+pydantic = "^2.6.1"
+dictalchemy3 = "^1.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+black = "^24.1.1"
+isort = "^5.13.2"
+flake8-pyproject = "^1.2.3"
+pylint = "^3.0.3"
+pytest = "^8.0.0"
+pytest-dependency = "^0.6.0"
+pytest-ordering = "^0.6"
+pytest-coverage = "^0.0"
+sphinx = "^7.2.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
