@@ -1,3 +1,5 @@
+"""The MoneyBox ORM model."""
+
 from dictalchemy import make_class_dictable
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -14,32 +16,29 @@ meta = MetaData(
 
 
 # declarative base class
-class Base(DeclarativeBase):
+class Base(DeclarativeBase):  # pylint: disable=too-few-public-methods
     """The declarative Base model"""
 
 
 make_class_dictable(Base)
 
 
-class SqlBase(Base):
+class SqlBase(Base):  # pylint: disable=too-few-public-methods
     """An ORM declarative Base model with an ID as primary key"""
 
     __abstract__ = True
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True, comment="The primary ID of the row"
-    )
+    id: Mapped[int] = mapped_column(primary_key=True, comment="The primary ID of the row")
 
 
-class MoneyBox(SqlBase):
+class MoneyBox(SqlBase):  # pylint: disable=too-few-public-methods
     """The ORM model for MoneyBox"""
 
     __tablename__ = "moneybox"
 
-    name: Mapped[str] = mapped_column(
-        unique=True, comment="The unique name of a moneybox."
-    )
+    name: Mapped[str] = mapped_column(unique=True, comment="The unique name of a moneybox.")
 
     balance: Mapped[int] = mapped_column(
+        default=0,
         comment="The current balance of the moneybox.",
     )

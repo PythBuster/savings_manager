@@ -1,3 +1,49 @@
+[tool.black]
+line-length = 100
+exclude = '''
+/(
+  | __pycache__
+  | .mypy_cache
+  | alembic
+  | docs
+)/
+'''
+
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+max-line-length = 100
+exclude = '''
+/(
+  | __pycache__
+  | .mypy_cache
+  | alembic
+  | docs
+)/
+'''
+
+[tool.pylint]
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use.
+jobs=0
+max-line-length=100
+
+
+[tool.mypy]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_generics = true
+disallow_untyped_calls = true
+no_implicit_optional = true
+ignore_missing_imports = true
+no_site_packages = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unreachable = true
+strict_equality = true
+
+
 [tool.poetry]
 name = "savings-manager"
 version = "0.1.0"
@@ -11,6 +57,8 @@ alembic = "^1.13.1"
 sqlalchemy = "^2.0.25"
 pydantic = "^2.6.1"
 dictalchemy3 = "^1.0.0"
+pydantic-settings = "^2.1.0"
+aiosqlite = "^0.19.0"
 
 
 [tool.poetry.group.dev.dependencies]
