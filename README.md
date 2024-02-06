@@ -51,3 +51,18 @@ Just for documentation: `alembic init -t async alembic` in project root dir will
 - poetry build --> TODO
 - pytest check --> TODO
 - codestyle check --> TODO
+
+### Code Documentation
+Based on docstrings, sphinx will generate function documentation.
+
+#### Usage:
+
+##### 1. Create rst Files base on current project:
+
+In dir: `../sphinx` use command: `sphinx-apidoc -f -o source/ ../../src`
+
+##### 2. Create HTML dokumentation:
+
+In dir: `../sphinx` use command: `sphinx-build source build`
+
+For detailed description, see: [Generating documentation from docstring using Sphinx](https://stackoverflow.com/questions/63486612/generating-documentation-from-docstring-using-sphinx)
