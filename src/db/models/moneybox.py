@@ -30,6 +30,31 @@ class SqlBase(Base):  # pylint: disable=too-few-public-methods
 
     id: Mapped[int] = mapped_column(primary_key=True, comment="The primary ID of the row")
 
+    def asdict(
+        self,
+        exclude=None,
+        exclude_underscore=None,
+        exclude_pk=None,
+        follow=None,
+        include=None,
+        only=None,
+        **kwargs,
+    ):
+        if exclude is None:
+            exclude = ["is_active"]
+        else:
+            exclude.append("is_active")
+
+        return super().asdict(
+            exclude=exclude,
+            exclude_underscore=exclude_underscore,
+            exclude_pk=exclude_pk,
+            follow=follow,
+            include=include,
+            only=only,
+            **kwargs,
+        )
+
 
 class MoneyBox(SqlBase):  # pylint: disable=too-few-public-methods
     """The ORM model for MoneyBox"""

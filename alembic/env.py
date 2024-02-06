@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from src.db.models.moneybox import Base
-from src.utils import get_settings
+from src.utils import get_database_url
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,8 +29,7 @@ target_metadata = Base.metadata
 # my_important_option = envs.get_main_option("my_important_option")
 # ... etc.
 
-env = get_settings()
-database_url = f"{env.db_driver}:///{env.db_name}"
+database_url = get_database_url()
 config.set_main_option("sqlalchemy.url", database_url)
 
 
