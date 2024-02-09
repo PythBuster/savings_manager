@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     db_user: str
     db_password: SecretStr
     db_host: str
+    db_port: int
     db_name: str
 
     @model_validator(mode="before")

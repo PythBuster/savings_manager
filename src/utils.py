@@ -17,4 +17,8 @@ def get_database_url() -> str:
     """Create a database url based on env credentials."""
 
     env = get_settings()
-    return f"{env.db_driver}:///{env.db_name}"
+
+    if "sqlite" in env.db_driver:
+        return f"{env.db_driver}:///{env.db_name}"
+    elif "postgres" in env.db_driver:
+        return f"{env.db_driver}://{env.db_user}:{env.db_password.get_secret_value()}@{env.db_host}:{env.db_port}/{env.db_name}"
