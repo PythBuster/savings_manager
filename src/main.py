@@ -6,7 +6,9 @@ from pprint import pprint
 from src.singleton import db_manager
 
 
-async def main():
+async def main() -> None:
+    """The entry point of the app."""
+
     moneybox_data = {
         "name": "Notgroschen 4",
     }
