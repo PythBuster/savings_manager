@@ -13,10 +13,10 @@ Subpackages
 Submodules
 ----------
 
-src.config module
------------------
+src.custom\_types module
+------------------------
 
-.. automodule:: src.config
+.. automodule:: src.custom_types
    :members:
    :undoc-members:
    :show-inheritance:

@@ -66,3 +66,6 @@ In dir: `../sphinx` use command: `sphinx-apidoc -f -o source/ ../../src`
 In dir: `../sphinx` use command: `sphinx-build source build`
 
 For detailed description, see: [Generating documentation from docstring using Sphinx](https://stackoverflow.com/questions/63486612/generating-documentation-from-docstring-using-sphinx)
+
+An update sphinx documentation bash script is located in dir `script/`.
+It will automatically update the sphinx documentation.
