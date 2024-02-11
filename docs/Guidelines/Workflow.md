@@ -3,7 +3,7 @@
 - Versioning: [Github](https://github.com/PythBuster/savings_manager)
 - Issue Tracker: [Github](https://github.com/users/PythBuster/projects/1)
 - Communication Tools: [Discord Channel](https://discord.gg/GH5jrMXbMJ)
-- For detailed informations, see README.md in project root dir.
+- For detailed information, see README.md in project root dir.
 
 # Branching
 

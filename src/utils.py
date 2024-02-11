@@ -28,7 +28,7 @@ def get_database_url(db_settings: DBSettings) -> str:
     """Create a database connection string based on db_settings.
 
     :param db_settings: Includes the database credentials.
-    :param in_memory_db: If True, an in memory db url will be returned.
+    :type db_settings: DBSettings
     :return: A database connection string
     :rtype: str
     """

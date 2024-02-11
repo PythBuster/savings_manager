@@ -4,7 +4,7 @@
 ## Deployment / Contribution
 ### poetry
 
-[Poetry](https://python-poetry.org/) is used as deploymentd and dependency manager.
+[Poetry](https://python-poetry.org/) is used as deployment and dependency manager.
 
 #### Usage: 
 
