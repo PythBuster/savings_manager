@@ -110,7 +110,7 @@ omit = [
 
 [tool.vulture]
 ignore_decorators = ["@model_validator", "@pytest.fixture"]
-paths = ["tests", "src", "docs/vulture_whitelist.py"]
+paths = ["tests", "src", "docs/vulture_whitelist.def"]
 sort_by_size = true
 
 
