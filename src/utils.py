@@ -6,11 +6,11 @@ from src.custom_types import DBSettings
 
 
 def get_db_settings() -> DBSettings:
-    """A DBSettings spawner.
+    """A :class:`DBSettings` spawner.
 
-    :return: Creates a DBSettings by loading os.environ settings
-        and return a DBSettings instance.
-    :rtype: DBSettings
+    :return: Creates a :class:`DBSettings` by loading os.environ settings
+        and return a :class:`DBSettings` instance.
+    :rtype: :class:`DBSettings`
     """
 
     return DBSettings(
@@ -28,9 +28,9 @@ def get_database_url(db_settings: DBSettings) -> str:
     """Create a database connection string based on db_settings.
 
     :param db_settings: Includes the database credentials.
-    :type db_settings: DBSettings
+    :type db_settings: :class:`DBSettings`
     :return: A database connection string
-    :rtype: str
+    :rtype: :class:`str`
     """
 
     if "sqlite" in db_settings.db_driver:

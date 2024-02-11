@@ -61,7 +61,7 @@ Based on docstrings, sphinx will generate function documentation.
 
 In dir: `../sphinx` use command: `sphinx-apidoc -f -o source/ ../../src`
 
-##### 2. Create HTML dokumentation:
+##### 2. Create HTML documentation:
 
 In dir: `../sphinx` use command: `sphinx-build source build`
 

@@ -32,9 +32,9 @@ class DBManager:
         """Property to create a database connection string based on db driver.
 
         :return: A db connection string.
-        :rtype: str
+        :rtype: :class:`str`
 
-        :raises: ValueError: if self.db_settings.db_driver is not supported.
+        :raises: :class:`ValueError`: if self.db_settings.db_driver is not supported.
         """
 
         return get_database_url(db_settings=self.db_settings)
@@ -46,12 +46,12 @@ class DBManager:
         """DB Function to get a moneybox by moneybox_id.
 
         :param moneybox_id: The id of the moneybox.
-        :type moneybox_id: int
+        :type moneybox_id: :class:`int`
 
         :return: The requested moneybox data.
-        :rtype: dict[str, Any]
+        :rtype: :class:`dict[str, Any]`
 
-        :raises: MoneyboxNotFoundError: if given moneybox_id
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
             was not found in database.
         """
 
@@ -70,10 +70,10 @@ class DBManager:
         """DB Function to add a new moneybox into database.
 
         :param moneybox_data: The moneybox data.
-        :type moneybox_data: dict[str, Any]
+        :type moneybox_data: :class:`dict[str, Any]`
 
         :return: The added moneybox data.
-        :rtype: dict[str, Any]
+        :rtype: :class:`dict[str, Any]`
         """
 
         moneybox = await create_instance(
@@ -92,14 +92,14 @@ class DBManager:
         """DB Function to update a moneybox by moneybox_id.
 
         :param moneybox_id: The id of the moneybox.
-        :type moneybox_id: int
+        :type moneybox_id: :class:`int`
         :param moneybox_data: The moneybox data.
-        :type moneybox_data: dict[str, Any]
+        :type moneybox_data: :class:`dict[str, Any]`
 
         :return: The updated moneybox data.
-        :rtype: dict[str, Any]
+        :rtype: :class:`dict[str, Any]`
 
-        :raises: MoneyboxNotFoundError: if given moneybox_id
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
             was not found in database.
         """
 
@@ -119,9 +119,9 @@ class DBManager:
         """DB Function to delete a moneybox by given id.
 
         :param moneybox_id: The id of the moneybox.
-        :type moneybox_id: int
+        :type moneybox_id: :class:`int`
 
-        :raises: MoneyboxNotFoundError: if given moneybox_id
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
             was not found in database.
         """
 

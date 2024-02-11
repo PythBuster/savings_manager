@@ -16,13 +16,13 @@ async def create_instance(
     """The core CREATE db function.
 
     :param async_session: The current async_session of the database.
-    :type async_session: async_sessionmaker
+    :type async_session: :class:`async_sessionmaker`
     :param orm_model: The orm model to handle with (table).
-    :type orm_model: SqlBase
+    :type orm_model: :class:`SqlBase`
     :param data: The ORM model data.
-    :type data: dict[str, Any]
+    :type data: :class:`dict[str, Any]`
     :return: The created db instance.
-    :rtype: SqlBase
+    :rtype: :class:`SqlBase`
     """
 
     stmt = insert(orm_model).values(**data).returning(orm_model)
@@ -42,14 +42,14 @@ async def read_instance(
     """The core UPDATE db function.
 
     :param async_session: The current async_session of the database.
-    :type async_session: async_sessionmaker
+    :type async_session: :class:`async_sessionmaker`
     :param orm_model: The orm model to handle with (table).
-    :type orm_model: SqlBase
+    :type orm_model: :class:`SqlBase`
     :param record_id: The instance id.
-    :type record_id: int
+    :type record_id: :class:`int`
     :return: The requested db instance
         or None, if given record_id does not exist.
-    :rtype: SqlBase | None
+    :rtype: :class:`SqlBase | None`
     """
 
     stmt = select(orm_model).where(orm_model.id == record_id)
@@ -70,16 +70,16 @@ async def update_instance(
     """The core UPDATE db function.
 
     :param async_session: The current async_session of the database.
-    :type async_session: async_sessionmaker
+    :type async_session: :class:`async_sessionmaker`
     :param orm_model: The orm model to handle with (table).
-    :type orm_model: SqlBase
+    :type orm_model: :class:`SqlBase`
     :param record_id: The instance id.
-    :type record_id: int
+    :type record_id: :class:`int`
     :param data: The ORM updating model data.
-    :type data: dict[str, Any]
+    :type data: :class:`dict[str, Any]`
     :return: The updated db instance
         or None, if given record_id does not exist.
-    :rtype: SqlBase | None
+    :rtype: :class:`SqlBase | None`
     """
 
     stmt = update(orm_model).where(orm_model.id == record_id).values(**data).returning(orm_model)
@@ -99,13 +99,13 @@ async def delete_instance(
     """The core DELETE db function. Delete database record in orm_model by given id.
 
     :param async_session: The current async_session of the database.
-    :type async_session: async_sessionmaker
+    :type async_session: :class:`async_sessionmaker`
     :param orm_model: The orm model to handle with (table).
-    :type orm_model: SqlBase
+    :type orm_model: :class:`SqlBase`
     :param record_id: The instance id.
-    :type record_id: int
+    :type record_id: :class:`int`
     :return: Amount of deleted rows.
-    :rtype: int
+    :rtype: :class:`int`
     """
 
     stmt = delete(orm_model).where(orm_model.id == record_id)
