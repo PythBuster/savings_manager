@@ -2,6 +2,7 @@
 
 from dictalchemy import make_class_dictable
 from sqlalchemy import MetaData
+from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 meta = MetaData(
@@ -19,15 +20,16 @@ meta = MetaData(
 class Base(DeclarativeBase):  # pylint: disable=too-few-public-methods
     """The declarative Base model"""
 
+    metadata = meta
+
 
 make_class_dictable(Base)
 
 
-class SqlBase(Base):  # pylint: disable=too-few-public-methods
+class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-methods
     """An ORM declarative Base model with an ID as primary key"""
 
-    __abstract__ = True
-
+    strict_attrs = True
     id: Mapped[int] = mapped_column(primary_key=True, comment="The primary ID of the row")
 
 

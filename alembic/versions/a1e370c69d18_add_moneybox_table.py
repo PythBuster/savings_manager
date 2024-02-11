@@ -1,8 +1,8 @@
 """add_moneybox_table
 
-Revision ID: 2c5bac118e9e
+Revision ID: a1e370c69d18
 Revises: 
-Create Date: 2024-02-05 23:21:28.606239
+Create Date: 2024-02-11 01:37:50.226959
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '2c5bac118e9e'
+revision: str = 'a1e370c69d18'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,8 +24,8 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=False, comment='The unique name of a moneybox.'),
     sa.Column('balance', sa.Integer(), nullable=False, comment='The current balance of the moneybox.'),
     sa.Column('id', sa.Integer(), nullable=False, comment='The primary ID of the row'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_moneybox')),
+    sa.UniqueConstraint('name', name=op.f('uq_moneybox_name'))
     )
     # ### end Alembic commands ###
 

@@ -1,54 +1,48 @@
 """Pytest configurations and fixtures are located here."""
 
+import os
 from typing import AsyncGenerator
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch
-from pytest_asyncio.plugin import FixtureFunction, FixtureFunctionMarker
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.db.db_manager import DBManager
 from src.db.models import Base
-from src.singleton import db_manager
+from src.utils import get_db_settings
 
-TEST_DATABASE_URL = "sqlite+aiosqlite://"
-async_engine = create_async_engine(url=TEST_DATABASE_URL, echo=True)
+pytest_plugins = ("pytest_asyncio",)
 
 
-@pytest.fixture(scope="session")
-async def async_session() -> AsyncGenerator:
-    """Fixture to generate an async_session connected to
-    the test-database.
+TEST_DB_DRIVER = "sqlite+aiosqlite"
+os.environ["DB_DRIVER"] = TEST_DB_DRIVER
+os.environ["IN_MEMORY"] = "1"
 
-    Before yielding the async_session, the tables will be created in
-    the database.
 
-    :return: An async_session connected to the test-database.
-    :rtype: Generator
-    """
-
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        print("Database tables created.", flush=True)
-
-    yield async_sessionmaker(bind=async_engine, expire_on_commit=False)
-
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        print("Database tables dropped.", flush=True)
+db_settings = get_db_settings()
 
 
 @pytest.fixture(scope="session", name="db_manager")
-async def mocked_db_manager(
-    async_session: FixtureFunctionMarker | FixtureFunction,
-) -> AsyncGenerator:
-    """A fixture that patches the async_session of the db_manager.
+async def mocked_db_manager() -> AsyncGenerator:
+    """A fixture to create the db_manager.
 
-    :return: The mocked DBManager
+    :return: The DBManager connected to the test database.
     :rtype: Generator
     """
 
-    with MonkeyPatch.context() as m_patch:
-        m_patch.setattr("src.db.db_manager.async_session", async_session)
-        print("DB Manager created.", flush=True)
-        yield db_manager
-        print("DB Manager removed.", flush=True)
+    db_manager = DBManager(
+        db_settings=db_settings,
+        engine_args={"echo": True},
+    )
+
+    # create tables by using db_managers database async engine
+    async with db_manager.async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        print("Database tables created.", flush=True)
+
+    print("DB Manager created.", flush=True)
+    yield db_manager
+    print("DB Manager removed.", flush=True)
+
+    # drop tables by using db_managers database async engine
+    async with db_manager.async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        print("Database tables dropped.", flush=True)

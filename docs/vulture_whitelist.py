@@ -1,0 +1,7 @@
+cls  # unused variable (src\custom_types.py:28)
+model_config  # unused variable (src\custom_types.py:42)
+strict_attrs  # unused variable (src\db\models.py:32)
+id  # unused variable (src\db\models.py:33)
+name  # unused variable (src\db\models.py:41)
+balance  # unused variable (src\db\models.py:43)
+pytest_plugins  # unused variable (tests\conftest.py:12)

@@ -2,21 +2,36 @@
 
 from typing import Any
 
-from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from src.custom_types import DBSettings
+from src.db.core import create
 from src.db.models import MoneyBox
 from src.utils import get_database_url
 
-async_engine = create_async_engine(url=get_database_url())
-async_session = async_sessionmaker(bind=async_engine, expire_on_commit=False)
 
+class DBManager:
+    """All db manager logic are located here."""
 
-class DBManager:  # pylint: disable=too-few-public-methods
-    """The Database Manager with all CRUD methods."""
+    def __init__(self, db_settings: DBSettings, engine_args: dict[str, Any] | None = None) -> None:
+        if engine_args is None:
+            engine_args = {}
 
-    def __init__(self) -> None:
-        print("DB_Manager created.", flush=True)
+        self.db_settings = db_settings
+        self.async_engine = create_async_engine(url=self.db_connection_string, **engine_args)
+        self.async_session = async_sessionmaker(bind=self.async_engine, expire_on_commit=False)
+
+    @property
+    def db_connection_string(self) -> str:
+        """Property to create a database connection string based on db driver.
+
+        :return: A db connection string.
+        :rtype: str
+
+        :raises: ValueError: if self.db_settings.db_driver is not supported.
+        """
+
+        return get_database_url(db_settings=self.db_settings)
 
     async def add_moneybox(self, moneybox_data: dict[str, Any]) -> dict[str, Any]:
         """DB Function to add a new moneybox into database.
@@ -28,10 +43,10 @@ class DBManager:  # pylint: disable=too-few-public-methods
         :rtype: dict[str, Any]
         """
 
-        stmt = insert(MoneyBox).values(**moneybox_data).returning(MoneyBox)
+        moneybox = await create(
+            async_session=self.async_session,
+            orm_model=MoneyBox,  # type: ignore
+            data=moneybox_data,
+        )
 
-        async with async_session.begin() as session:
-            result = await session.execute(stmt)
-
-        moneybox = result.scalars().one()
         return moneybox.asdict()
