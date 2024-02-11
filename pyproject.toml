@@ -51,13 +51,10 @@ load-plugins=[
     "pylint_pytest",
 ]
 
-
-[tool.pylint.'MESSAGES CONTROL']
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
-per-file-ignores = [
-    "test_db_manager.py:missing-function-docstring",
-]
-
+[tool.pylint-per-file-ignores]
+"test_db_manager.py"="missing-function-docstring"
+"test_utils.py"="missing-function-docstring"
 
 [tool.poetry]
 name = "savings-manager"
@@ -83,7 +80,7 @@ pytest-cov = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
-black = "^24.1.1"
+black = {extras = ["jupyter"], version = "^24.1.1"}
 isort = "^5.13.2"
 flake8-pyproject = "^1.2.3"
 pylint = "^3.0.3"
@@ -104,6 +101,12 @@ addopts = "--maxfail=1 --cov=src --cov-report html"
 testpaths = [
     "tests",
 ]
+
+[tool.coverage.run]
+omit = [
+    # omit this single files
+    "src/main.py",
+    ]
 
 [tool.vulture]
 ignore_decorators = ["@model_validator", "@pytest.fixture"]

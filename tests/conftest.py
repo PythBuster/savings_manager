@@ -1,10 +1,13 @@
 """Pytest configurations and fixtures are located here."""
 
 import os
+from pathlib import Path
 from typing import AsyncGenerator
 
 import pytest
+from dotenv import load_dotenv
 
+from src.custom_types import DBSettings
 from src.db.db_manager import DBManager
 from src.db.models import Base
 from src.utils import get_db_settings
@@ -12,12 +15,31 @@ from src.utils import get_db_settings
 pytest_plugins = ("pytest_asyncio",)
 
 
-TEST_DB_DRIVER = "sqlite+aiosqlite"
-os.environ["DB_DRIVER"] = TEST_DB_DRIVER
-os.environ["IN_MEMORY"] = "1"
+dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
+load_dotenv(dotenv_path=dotenv_path)
+print(f"Loaded {dotenv_path}")
 
+TEST_DB_DRIVER = os.getenv("DB_DRIVER")
 
 db_settings = get_db_settings()
+
+
+@pytest.fixture(name="db_settings_1", scope="session")
+async def example_1_db_settings() -> AsyncGenerator:
+    """A fixture to create example db_settings data.
+
+    :return: db_settings example 1.
+    :rtype: AsyncGenerator
+    """
+
+    yield DBSettings(
+        db_user="test_user",
+        db_password="test_password",
+        db_host="1.2.3.4",
+        db_port=1234,
+        db_name="test_db",
+        db_driver="sqlite+aiosqlite",
+    )
 
 
 @pytest.fixture(scope="session", name="db_manager")
@@ -25,7 +47,7 @@ async def mocked_db_manager() -> AsyncGenerator:
     """A fixture to create the db_manager.
 
     :return: The DBManager connected to the test database.
-    :rtype: Generator
+    :rtype: AsyncGenerator
     """
 
     db_manager = DBManager(

@@ -4,6 +4,7 @@ import pytest
 import sqlalchemy
 from fastapi.encoders import jsonable_encoder
 
+from src.custom_types import DBSettings
 from src.db.db_manager import DBManager
 from src.db.exceptions import MoneyboxNotFoundError
 from tests.conftest import TEST_DB_DRIVER
@@ -12,6 +13,14 @@ from tests.conftest import TEST_DB_DRIVER
 @pytest.mark.first
 async def test_if_test_db_in_memory_is_used(db_manager: DBManager) -> None:
     assert db_manager.db_connection_string == f"{TEST_DB_DRIVER}://"
+
+
+async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> None:
+    db_manager = DBManager(db_settings=db_settings_1, engine_args={"echo": True})
+    assert db_manager is not None
+
+    db_manager = DBManager(db_settings=db_settings_1, engine_args=None)
+    assert db_manager is not None
 
 
 @pytest.mark.asyncio
@@ -78,7 +87,7 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
 @pytest.mark.asyncio
 @pytest.mark.dependency(depends=["test_add_moneybox"])
 async def test_delete_moneybox(db_manager: DBManager) -> None:
-    assert await db_manager.delete_moneybox(moneybox_id=1) is None
+    assert await db_manager.delete_moneybox(moneybox_id=1) is None  # type: ignore
 
     non_existing_moneybox_ids = [-42, -1, 0, 2, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:

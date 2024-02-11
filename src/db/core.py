@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sqlalchemy import delete, insert, update, select
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from src.db.models import SqlBase
@@ -33,6 +33,7 @@ async def create_instance(
     db_instance = result.scalars().one()
     return db_instance
 
+
 async def read_instance(
     async_session: async_sessionmaker,
     orm_model: SqlBase,
@@ -58,6 +59,7 @@ async def read_instance(
 
     db_instance = result.scalars().one_or_none()
     return db_instance
+
 
 async def update_instance(
     async_session: async_sessionmaker,
@@ -87,6 +89,7 @@ async def update_instance(
 
     db_instance = result.scalars().one_or_none()
     return db_instance
+
 
 async def delete_instance(
     async_session: async_sessionmaker,

@@ -5,7 +5,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from src.custom_types import DBSettings
-from src.db.core import create_instance, delete_instance, update_instance, read_instance
+from src.db.core import create_instance, delete_instance, read_instance, update_instance
 from src.db.exceptions import MoneyboxNotFoundError
 from src.db.models import MoneyBox
 from src.utils import get_database_url
@@ -40,8 +40,8 @@ class DBManager:
         return get_database_url(db_settings=self.db_settings)
 
     async def get_moneybox(
-            self,
-            moneybox_id: int,
+        self,
+        moneybox_id: int,
     ) -> dict[str, Any]:
         """DB Function to get a moneybox by moneybox_id.
 
@@ -85,9 +85,9 @@ class DBManager:
         return moneybox.asdict()
 
     async def update_moneybox(
-            self,
-            moneybox_id: int,
-            moneybox_data: dict[str, Any],
+        self,
+        moneybox_id: int,
+        moneybox_data: dict[str, Any],
     ) -> dict[str, Any]:
         """DB Function to update a moneybox by moneybox_id.
 
