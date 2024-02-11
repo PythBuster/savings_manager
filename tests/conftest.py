@@ -38,11 +38,11 @@ async def mocked_db_manager() -> AsyncGenerator:
         await conn.run_sync(Base.metadata.create_all)
         print("Database tables created.", flush=True)
 
-    print("DB Manager created.", flush=True)
     yield db_manager
-    print("DB Manager removed.", flush=True)
 
     # drop tables by using db_managers database async engine
     async with db_manager.async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         print("Database tables dropped.", flush=True)
+
+    print("DB Manager removed.", flush=True)
