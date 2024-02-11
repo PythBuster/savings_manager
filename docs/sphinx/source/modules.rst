@@ -4,4 +4,9 @@ src
 .. toctree::
    :maxdepth: 4
 
-   src
+   custom_types
+   data_classes
+   db
+   main
+   settings
+   utils

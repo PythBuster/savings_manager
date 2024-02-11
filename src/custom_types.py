@@ -5,7 +5,7 @@ from enum import StrEnum
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 
-class EnvironmentTypes(StrEnum):
+class EnvironmentType(StrEnum):
     """The Environment Types to handle env loading logic."""
 
     DEV = "dev"

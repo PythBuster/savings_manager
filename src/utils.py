@@ -1,8 +1,14 @@
 """All helper functions are located here."""
 
+import argparse
 import os
+import tomllib
+from pathlib import Path
+from typing import Any
 
-from src.custom_types import DBSettings
+from dotenv import load_dotenv
+
+from src.custom_types import DBSettings, EnvironmentType
 
 
 def get_db_settings() -> DBSettings:
@@ -47,3 +53,44 @@ def get_database_url(db_settings: DBSettings) -> str:
         )
 
     raise ValueError("Not supported database driver.")
+
+
+def get_app_data() -> dict[str, Any]:
+    """Extract app information from pyproject.toml.
+
+    :return: The app data section from pyproject.toml as dict
+    :rtype: :class:`dict[str, Any]`
+    """
+
+    pyproject_file_path = Path(__file__).resolve().parent.parent / "pyproject.toml"
+
+    with pyproject_file_path.open(mode="rb") as pyproject_file:
+        pyproject_data = tomllib.load(pyproject_file)
+
+    return pyproject_data["tool"]["poetry"]
+
+
+def load_environment() -> EnvironmentType | None:
+    """Helper function to load the current env file, depending on deploy environment.
+
+    :return: The detected environment type. If not set, None will be returned.
+    :rtype: :class:`EnvironmentType | None`
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--environment",
+        required=True,
+        help="Loads environment variables depending on this flag",
+        type=EnvironmentType,
+    )
+    args = parser.parse_args()
+
+    if args.environment == EnvironmentType.DEV:
+        dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+        load_dotenv(dotenv_path=dotenv_path)
+        print(f"Loaded {dotenv_path}")
+
+        return EnvironmentType.DEV
+
+    return None

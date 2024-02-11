@@ -39,8 +39,10 @@ class MoneyBox(SqlBase):  # pylint: disable=too-few-public-methods
     __tablename__ = "moneybox"
 
     name: Mapped[str] = mapped_column(unique=True, comment="The unique name of a moneybox.")
+    """The name of the Moneybox, which has to be unique."""
 
     balance: Mapped[int] = mapped_column(
         default=0,
         comment="The current balance of the moneybox.",
     )
+    """The balance as integer, """

@@ -1,10 +1,10 @@
-src.data\_classes package
-=========================
+data\_classes package
+=====================
 
 Module contents
 ---------------
 
-.. automodule:: src.data_classes
+.. automodule:: data_classes
    :members:
    :undoc-members:
    :show-inheritance:
