@@ -1,7 +1,7 @@
 """The MoneyBox ORM model."""
 
 from dictalchemy import make_class_dictable
-from sqlalchemy import MetaData
+from sqlalchemy import Index, MetaData, text
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -37,6 +37,10 @@ class MoneyBox(SqlBase):  # pylint: disable=too-few-public-methods
     """The ORM model for MoneyBox"""
 
     __tablename__ = "moneybox"
+    __table_args__ = (
+        # need this to reach a case insensitivity for name
+        Index("ix_moneybox_name", text("LOWER(name)"), unique=True),
+    )
 
     name: Mapped[str] = mapped_column(unique=True, comment="The unique name of a moneybox.")
     """The name of the Moneybox, which has to be unique."""

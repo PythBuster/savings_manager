@@ -25,8 +25,6 @@ class DBManager:
             expire_on_commit=False,
         )
 
-        print("DBManager created.", flush=True)
-
     @property
     def db_connection_string(self) -> str:
         """Property to create a database connection string based on db driver.

@@ -20,8 +20,10 @@
 # Banking API Connection
 - https://tink.com/de/blog/open-banking/einmaleins-des-api-banking/
 - PSD2 - Auth
+- --> "Auto Detection of Savings"- in der App bestimmten VERWENDUNGSZWECK speichert, der auf dem physik. Konto alle Eingänge beobachtet und Einzahlung mit dem festgelegenen Verwendungszweck automatisch als "Sparzyklus" betrachtet, statt in der App fest monatlich automatisch zu sparen (und davon auszugehen, dass die Summer tatsächlich auf dem physik. Konto gelandet ist.)
 
 
+# Different Concurrencies
 
 
 

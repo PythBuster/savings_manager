@@ -12,7 +12,6 @@ async def test_db_settings(db_settings_1: DBSettings) -> None:
     db_settings = DBSettings(
         db_driver="sqlite",
         db_name="test.db",
-        in_memory=False,
     )
 
     expected_database_url = "sqlite:///test.db"
@@ -22,11 +21,10 @@ async def test_db_settings(db_settings_1: DBSettings) -> None:
     # sqlite in memory
     db_settings = DBSettings(
         db_driver="sqlite",
-        db_name="test.db",
-        in_memory=True,
+        db_name=":memory:",
     )
 
-    expected_database_url = "sqlite://"
+    expected_database_url = "sqlite:///:memory:"
     result_database_url = get_database_url(db_settings)
     assert expected_database_url == result_database_url
 

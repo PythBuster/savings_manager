@@ -48,13 +48,16 @@ jobs=0
 max-line-length=100
 load-plugins=[
     "pylint_per_file_ignores",
-    "pylint_pytest",
+    #"pylint_pytest",
 ]
+
 
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
 [tool.pylint-per-file-ignores]
 "test_db_manager.py"="missing-function-docstring"
 "test_utils.py"="missing-function-docstring"
+"/routes/"="missing-function-docstring"
+
 
 [tool.poetry]
 name = "Savings Manager"

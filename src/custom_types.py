@@ -5,10 +5,19 @@ from enum import StrEnum
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 
+class EndpointRouteType(StrEnum):
+    """The endpoint names."""
+
+    APP_ROOT = "api"  # /app
+    MONEYBOX = "moneybox"  # /moneybox
+    MONEYBOXES = "moneyboxes"  # /moneyboxes
+
+
 class EnvironmentType(StrEnum):
     """The Environment Types to handle env loading logic."""
 
     DEV = "dev"
+    TEST = "test"
 
 
 class DBSettings(BaseModel):
@@ -20,6 +29,5 @@ class DBSettings(BaseModel):
     db_port: int | None = None
     db_name: str = ""
     db_driver: str
-    in_memory: bool = False
 
     model_config = ConfigDict(extra="forbid")

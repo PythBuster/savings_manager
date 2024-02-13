@@ -19,6 +19,8 @@ def get_db_settings() -> DBSettings:
     :rtype: :class:`DBSettings`
     """
 
+    load_environment()
+
     return DBSettings(
         db_user=os.getenv("DB_USER", ""),
         db_password=os.getenv("DB_PASSWORD", ""),
@@ -26,7 +28,6 @@ def get_db_settings() -> DBSettings:
         db_port=os.getenv("DB_PORT"),
         db_name=os.getenv("DB_NAME", ""),
         db_driver=os.getenv("DB_DRIVER"),
-        in_memory=os.getenv("IN_MEMORY"),
     )
 
 
@@ -40,9 +41,6 @@ def get_database_url(db_settings: DBSettings) -> str:
     """
 
     if "sqlite" in db_settings.db_driver:
-        if db_settings.in_memory:
-            return f"{db_settings.db_driver}://"
-
         return f"{db_settings.db_driver}:///{db_settings.db_name}"
 
     if "postgres" in db_settings.db_driver:
@@ -70,17 +68,18 @@ def get_app_data() -> dict[str, Any]:
     return pyproject_data["tool"]["poetry"]
 
 
-def load_environment() -> EnvironmentType | None:
+def load_environment() -> EnvironmentType:
     """Helper function to load the current env file, depending on deploy environment.
 
-    :return: The detected environment type. If not set, None will be returned.
-    :rtype: :class:`EnvironmentType | None`
+    :return: The detected environment type.
+    :rtype: :class:`EnvironmentType`
     """
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--environment",
-        required=True,
+        required=False,
+        default=EnvironmentType.TEST,
         help="Loads environment variables depending on this flag",
         type=EnvironmentType,
     )
@@ -91,6 +90,4 @@ def load_environment() -> EnvironmentType | None:
         load_dotenv(dotenv_path=dotenv_path)
         print(f"Loaded {dotenv_path}")
 
-        return EnvironmentType.DEV
-
-    return None
+    return args.environment

@@ -12,7 +12,7 @@ from tests.conftest import TEST_DB_DRIVER
 
 @pytest.mark.first
 async def test_if_test_db_in_memory_is_used(db_manager: DBManager) -> None:
-    assert db_manager.db_connection_string == f"{TEST_DB_DRIVER}://"
+    assert db_manager.db_connection_string == f"{TEST_DB_DRIVER}:///:memory:"
 
 
 async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> None:
@@ -34,7 +34,7 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
     with pytest.raises(sqlalchemy.exc.IntegrityError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data)
 
-    assert "UNIQUE constraint failed: moneybox.name" in ex_info.value.args[0]
+    assert "UNIQUE constraint failed: index 'ix_moneybox_name'" in ex_info.value.args[0]
 
 
 @pytest.mark.asyncio
