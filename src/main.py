@@ -28,10 +28,10 @@ author_name, author_mail = app_data["authors"][0].split()
 async def lifespan(fast_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
 
-    print(f"Initialize fastAPI app {id(fast_app)} ...", flush=True)
+    print(f"Initialize fastAPI app (id={id(fast_app)}) ...", flush=True)
     initialize_app(fastapi_app=app)
 
-    print(f"Register routers {id(fast_app)} ...", flush=True)
+    print(f"Register routers (id={id(fast_app)}) ...", flush=True)
     register_router(fastapi_app=app)
 
     yield

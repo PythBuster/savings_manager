@@ -14,7 +14,7 @@ GET_MONEYBOX_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
-                    details={
+                    detail={
                         "moneybox_id": 1,
                     },
                 ),
@@ -23,10 +23,23 @@ GET_MONEYBOX_RESPONSES = {
     },
     status.HTTP_422_UNPROCESSABLE_ENTITY: {
         "description": "Unprocessable Content",
-        "content": {"application/json": {"example": {}}},
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": [
+                        {
+                            "type": "string_type",
+                            "loc": ["body", "name"],
+                            "msg": "Input should be a valid string",
+                            "input": 123,
+                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                        }
+                    ]
+                }
+            }
+        },
     },
 }
-
 
 POST_MONEYBOX_RESPONSES = {
     status.HTTP_200_OK: {
@@ -38,7 +51,7 @@ POST_MONEYBOX_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="Moneybox with same name already exist.",
-                    details={
+                    detail={
                         "name": "Holiday",
                     },
                 ),
@@ -47,6 +60,107 @@ POST_MONEYBOX_RESPONSES = {
     },
     status.HTTP_422_UNPROCESSABLE_ENTITY: {
         "description": "Unprocessable Content",
-        "content": {"application/json": {"example": {}}},
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": [
+                        {
+                            "type": "string_type",
+                            "loc": ["body", "name"],
+                            "msg": "Input should be a valid string",
+                            "input": 123,
+                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                        }
+                    ]
+                }
+            },
+        },
+    },
+}
+
+PATCH_MONEYBOX_RESPONSES = {
+    status.HTTP_200_OK: {
+        "description": "OK",
+    },
+    status.HTTP_404_NOT_FOUND: {
+        "description": "Not Found",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="Moneybox not found.",
+                    detail={
+                        "moneybox_id": 1,
+                    },
+                ),
+            }
+        },
+    },
+    status.HTTP_405_METHOD_NOT_ALLOWED: {
+        "description": "Method Not Allowed",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="Moneybox with same name already exist.",
+                    detail={
+                        "name": "Holiday",
+                    },
+                ),
+            }
+        },
+    },
+    status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        "description": "Unprocessable Content",
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": [
+                        {
+                            "type": "string_type",
+                            "loc": ["body", "name"],
+                            "msg": "Input should be a valid string",
+                            "input": 123,
+                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                        }
+                    ]
+                }
+            },
+        },
+    },
+}
+
+DELETE_MONEYBOX_RESPONSES = {
+    status.HTTP_204_NO_CONTENT: {
+        "description": "No Content",
+    },
+    status.HTTP_404_NOT_FOUND: {
+        "description": "Not Found",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="Moneybox not found.",
+                    detail={
+                        "moneybox_id": 1,
+                    },
+                ),
+            }
+        },
+    },
+    status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        "description": "Unprocessable Content",
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": [
+                        {
+                            "type": "string_type",
+                            "loc": ["body", "name"],
+                            "msg": "Input should be a valid string",
+                            "input": 123,
+                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                        }
+                    ]
+                }
+            },
+        },
     },
 }

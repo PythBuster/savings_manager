@@ -9,7 +9,7 @@ class HTTPErrorResponse(BaseModel):
     """The http error response model"""
 
     message: str = Field(min_length=1)
-    details: dict[str, Any] | None = None
+    detail: dict[str, Any] | None = None
 
     model_config = ConfigDict(
         extra="forbid",
