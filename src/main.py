@@ -49,6 +49,7 @@ app = FastAPI(
         "email": author_mail[2:-2],
     },
     openapi_tags=tags_metadata,
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
 
 

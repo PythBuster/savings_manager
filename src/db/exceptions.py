@@ -11,7 +11,6 @@ class RecordNotFoundError(ABC, Exception):
         self.message = message
         self.details = {
             "id": record_id,
-            "message": message,
         }
         super().__init__(message)
 

@@ -2198,21 +2198,6 @@ files = [
 ]
 
 [[package]]
-name = "pylint-pytest"
-version = "1.1.7"
-description = "A Pylint plugin to suppress pytest-related false positives."
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "pylint-pytest-1.1.7.tar.gz", hash = "sha256:7a38be02c014eb6d98791eb978e79ed292f1904d3a518289c6d7ac4fb4122e98"},
-    {file = "pylint_pytest-1.1.7-py3-none-any.whl", hash = "sha256:5d687a2f4b17e85654fc2a8f04944761efb11cb15dc46d008f420c377b149151"},
-]
-
-[package.dependencies]
-pylint = ">=2"
-pytest = ">=4.6"
-
-[[package]]
 name = "pytest"
 version = "8.0.0"
 description = "pytest: simple powerful testing with Python"
@@ -3354,4 +3339,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a4ea90843a55fc99ba87c1d06e511d72b8e982af8b1ca79fa93da196d6a31ff5"
+content-hash = "64ab432c618f173929f9ac467cf4c96c36b9af5f7b1cce62af963afd08c914e8"
