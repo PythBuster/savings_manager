@@ -56,7 +56,9 @@ load-plugins=[
 "test_db_manager.py"="missing-function-docstring"
 "test_utils.py"="missing-function-docstring"
 "/routes/"="missing-function-docstring"
-
+"requests.py"="duplicate-code"
+"responses.py"="duplicate-code"
+"/routes/responses/__init__.py"="duplicate-code"
 
 [tool.poetry]
 name = "Savings Manager"
@@ -117,6 +119,7 @@ omit = [
 ignore_decorators = ["@model_validator", "@pytest.fixture"]
 paths = ["tests", "src", "docs/vulture_whitelist.def"]
 sort_by_size = true
+make_whitelist = false
 
 
 [build-system]

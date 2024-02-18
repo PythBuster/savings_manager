@@ -19,8 +19,6 @@ def get_db_settings() -> DBSettings:
     :rtype: :class:`DBSettings`
     """
 
-    load_environment()
-
     return DBSettings(
         db_user=os.getenv("DB_USER", ""),
         db_password=os.getenv("DB_PASSWORD", ""),

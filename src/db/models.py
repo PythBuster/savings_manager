@@ -1,7 +1,9 @@
 """The MoneyBox ORM model."""
 
+from typing import Any
+
 from dictalchemy import make_class_dictable
-from sqlalchemy import Index, MetaData, text
+from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -30,23 +32,56 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     """An ORM declarative Base model with an ID as primary key"""
 
     strict_attrs = True
-    id: Mapped[int] = mapped_column(primary_key=True, comment="The primary ID of the row")
-
-
-class MoneyBox(SqlBase):  # pylint: disable=too-few-public-methods
-    """The ORM model for MoneyBox"""
-
-    __tablename__ = "moneybox"
-    __table_args__ = (
-        # need this to reach a case insensitivity for name
-        Index("ix_moneybox_name", text("LOWER(name)"), unique=True),
+    id: Mapped[int] = mapped_column(primary_key=True, comment="The primary ID of the row.")
+    is_active: Mapped[bool] = mapped_column(
+        default=True,
+        nullable=False,
+        comment="Flag to mark instance as deleted.",
     )
 
-    name: Mapped[str] = mapped_column(unique=True, comment="The unique name of a moneybox.")
-    """The name of the Moneybox, which has to be unique."""
+    def asdict(  # type: ignore  # pylint: disable=too-many-arguments
+        self,
+        exclude=None,
+        exclude_underscore=None,
+        exclude_pk=None,
+        follow=None,
+        include=None,
+        only=None,
+        method="asdict",
+        **kwargs,
+    ) -> dict[str, Any]:
+        """Overloaded method from make_class_dictable()."""
+
+        if exclude is None:
+            exclude = []
+
+        if "is_active" not in exclude:
+            exclude.append("is_active")
+
+        return super().asdict(  # pylint: disable=no-member
+            exclude=exclude,
+            exclude_underscore=exclude_underscore,
+            exclude_pk=exclude_pk,
+            follow=follow,
+            include=include,
+            only=only,
+            method=method,
+            **kwargs,
+        )
+
+
+class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
+    """The ORM model for Moneybox"""
+
+    __tablename__ = "moneybox"
+
+    name: Mapped[str] = mapped_column(
+        comment="The name of a moneybox.",
+        nullable=False,
+    )
 
     balance: Mapped[int] = mapped_column(
         default=0,
         comment="The current balance of the moneybox.",
+        nullable=False,
     )
-    """The balance as integer, """

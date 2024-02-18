@@ -1,11 +1,46 @@
-"""DB core CRUD functionalities are located here."""
+"""DB core functionalities are located here."""
 
 from typing import Any
 
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import Sequence, delete, exists, insert, select, update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from src.db.exceptions import ColumnDoesNotExistError
 from src.db.models import SqlBase
+
+
+async def exists_instance(
+    async_session: async_sessionmaker,
+    orm_model: SqlBase,
+    values: dict[str, Any],
+) -> bool:
+    """Checks whether an instance exists in the database by given `values`.
+
+    :param async_session: The current async_session of the database.
+    :type async_session: :class:`async_sessionmaker`
+    :param orm_model: The orm model to handle with (table).
+    :type orm_model: :class:`SqlBase`
+    :param values: The key-values data used for the where-clausel.
+    :return: The created db instance.
+    :rtype: :class:`bool`
+    """
+
+    stmt = select(orm_model)
+
+    for column, value in values.items():
+        orm_field = getattr(orm_model, column, None)
+
+        if orm_field is None:
+            raise ColumnDoesNotExistError(table=orm_model.__name__, column=column)
+
+        stmt = stmt.where(orm_field == value)
+
+    exist_stmt = exists(stmt)
+    async with async_session() as session:
+        result = await session.execute(exist_stmt.select())
+
+    exist = result.scalar_one()
+    return exist
 
 
 async def create_instance(
@@ -30,8 +65,8 @@ async def create_instance(
     async with async_session.begin() as session:
         result = await session.execute(stmt)
 
-    db_instance = result.scalars().one()
-    return db_instance
+    instance = result.scalars().one()
+    return instance
 
 
 async def read_instance(
@@ -39,7 +74,7 @@ async def read_instance(
     orm_model: SqlBase,
     record_id: int,
 ) -> SqlBase | None:
-    """The core UPDATE db function.
+    """The core SELECT db function.
 
     :param async_session: The current async_session of the database.
     :type async_session: :class:`async_sessionmaker`
@@ -57,8 +92,32 @@ async def read_instance(
     async with async_session.begin() as session:
         result = await session.execute(stmt)
 
-    db_instance = result.scalars().one_or_none()
-    return db_instance
+    instance = result.scalars().one_or_none()
+    return instance
+
+
+async def read_instances(
+    async_session: async_sessionmaker,
+    orm_model: SqlBase,
+) -> Sequence[SqlBase]:
+    """The core multi SELECT db function.
+
+    :param async_session: The current async_session of the database.
+    :type async_session: :class:`async_sessionmaker`
+    :param orm_model: The orm model to handle with (table).
+    :type orm_model: :class:`SqlBase`
+    :return: The requested db instances as list
+        or None, if no instances available.
+    :rtype: :class:`Sequence[SqlBase]`
+    """
+
+    stmt = select(orm_model)
+
+    async with async_session.begin() as session:
+        result = await session.execute(stmt)
+
+    instances = result.scalars().all()
+    return instances
 
 
 async def update_instance(
@@ -87,8 +146,8 @@ async def update_instance(
     async with async_session.begin() as session:
         result = await session.execute(stmt)
 
-    db_instance = result.scalars().one_or_none()
-    return db_instance
+    instance = result.scalars().one_or_none()
+    return instance
 
 
 async def delete_instance(

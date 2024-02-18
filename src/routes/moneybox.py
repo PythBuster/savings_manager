@@ -17,7 +17,7 @@ from src.routes.responses.moneybox import (
 
 moneybox_router = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOX}",
-    tags=["moneybox"],
+    tags=[EndpointRouteType.MONEYBOX.lower()],
 )
 
 

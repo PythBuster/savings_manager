@@ -10,13 +10,18 @@ from starlette.staticfiles import StaticFiles
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.routes.moneybox import moneybox_router
+from src.routes.moneyboxes import moneyboxes_router
 from src.settings import SPHINX_DIRECTORY
-from src.utils import get_app_data, get_db_settings
+from src.utils import get_app_data, get_db_settings, load_environment
 
 tags_metadata = [
     {
         "name": "moneybox",
         "description": "All moneybox endpoints.",
+    },
+    {
+        "name": "moneyboxes",
+        "description": "All moneyboxes endpoints.",
     },
 ]
 
@@ -25,14 +30,14 @@ author_name, author_mail = app_data["authors"][0].split()
 
 
 @asynccontextmanager
-async def lifespan(fast_app: FastAPI) -> AsyncGenerator:
+async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
 
-    print(f"Initialize fastAPI app (id={id(fast_app)}) ...", flush=True)
-    initialize_app(fastapi_app=app)
+    print(f"Initialize fastAPI app (id={id(fastapi_app)}) ...", flush=True)
+    initialize_app(fastapi_app=fastapi_app)
 
-    print(f"Register routers (id={id(fast_app)}) ...", flush=True)
-    register_router(fastapi_app=app)
+    print(f"Register routers (id={id(fastapi_app)}) ...", flush=True)
+    register_router(fastapi_app=fastapi_app)
 
     yield
 
@@ -49,7 +54,7 @@ app = FastAPI(
         "email": author_mail[2:-2],
     },
     openapi_tags=tags_metadata,
-    swagger_ui_parameters={"defaultModelsExpandDepth": -1},
+    # swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
 
 
@@ -59,6 +64,8 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     :param fastapi_app: The fast api app.
     :rtype fastapi_app: FastAPI
     """
+
+    load_environment()
 
     fastapi_app.state.db_manager = DBManager(db_settings=get_db_settings())
 
@@ -80,6 +87,10 @@ def register_router(fastapi_app: FastAPI) -> None:
     # router registrations
     fastapi_app.include_router(
         moneybox_router,
+        prefix=f"/{EndpointRouteType.APP_ROOT}",
+    )
+    fastapi_app.include_router(
+        moneyboxes_router,
         prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
 
