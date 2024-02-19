@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
-from src.db.exceptions import MoneyboxNameExistError
+from src.db.exceptions import MoneyboxNameExistError, MoneyboxNotFoundError
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
@@ -88,3 +88,44 @@ async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
 
     assert "Moneybox name 'Test Box Endpoint Add 2' already exists." in ex_info.value.args[0]
     assert "Test Box Endpoint Add 2" == ex_info.value.details["name"]
+
+
+@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+async def test_endpoint_patch_moneybox(client: AsyncClient) -> None:
+    moneybox_data_1 = {"name": "Test Box Endpoint Add 1 - Updated"}
+
+    missing_id_response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
+    )
+    assert missing_id_response.status_code == 405
+
+    response_1 = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/5", json=moneybox_data_1
+    )
+    assert response_1.status_code == 200
+    assert response_1.json() == moneybox_data_1 | {"id": 5, "balance": 0}
+
+
+@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
+    missing_id_response = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}"
+    )
+    assert missing_id_response.status_code == 405
+
+    response_1 = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/5"
+    )
+    assert response_1.status_code == 204
+
+    with pytest.raises(MoneyboxNotFoundError) as ex_info:
+        await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/42")
+
+    assert "Moneybox with id 42 does not exist." in ex_info.value.args[0]
+    assert {"id": 42} == ex_info.value.details
+
+    with pytest.raises(MoneyboxNotFoundError) as ex_info:
+        await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/-1")
+
+    assert "Moneybox with id -1 does not exist." in ex_info.value.args[0]
+    assert {"id": -1} == ex_info.value.details
