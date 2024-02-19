@@ -104,6 +104,7 @@ vulture = "^2.11"
 jupyter = "^1.0.0"
 sphinx-rtd-theme = "^2.0.0"
 httpx = "^0.26.0"
+sqlalchemy-stubs = "^0.4"
 
 
 [tool.pytest.ini_options]
