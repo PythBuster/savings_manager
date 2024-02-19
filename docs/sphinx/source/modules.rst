@@ -8,5 +8,6 @@ src
    data_classes
    db
    main
+   routes
    settings
    utils
