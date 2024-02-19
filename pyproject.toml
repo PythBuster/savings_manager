@@ -59,6 +59,8 @@ load-plugins=[
 "requests.py"="duplicate-code"
 "responses.py"="duplicate-code"
 "/routes/responses/__init__.py"="duplicate-code"
+"src/db/__init__.py"="duplicate-code"
+
 
 [tool.poetry]
 name = "Savings Manager"
