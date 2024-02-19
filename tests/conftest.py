@@ -12,7 +12,7 @@ from pytest_dependency import DependencyManager
 from src.custom_types import DBSettings
 from src.db.db_manager import DBManager
 from src.db.models import Base
-from src.main import app
+from src.main import app, initialize_app, register_router
 from src.utils import get_db_settings
 
 
@@ -33,14 +33,17 @@ db_settings = get_db_settings()
 
 
 @pytest.fixture(scope="session", name="client")
-async def mocked_client() -> AsyncGenerator:
+async def mocked_client(db_manager) -> AsyncGenerator:
     """A fixture that creates a fastapi test client.
 
     :return: A test client.
     :rtype: AsyncGenerator
     """
 
-    async with AsyncClient(app=app, base_url="http://localhost:8000") as client:
+    register_router(fastapi_app=app)
+    app.state.db_manager = db_manager
+
+    async with AsyncClient(app=app, base_url="http://127.0.0.1:8000") as client:
         yield client
 
 
