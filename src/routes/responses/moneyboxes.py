@@ -1,4 +1,4 @@
-"""All moneyboxes SwaggerUI response codes and examples are located here"""
+"""All moneyboxes SwaggerUI response codes and examples are located here."""
 
 from starlette import status
 
@@ -28,3 +28,4 @@ GET_MONEYBOXES_RESPONSES = {
         },
     },
 }
+"""The possible responses for endpoint GET: /moneyboxes."""

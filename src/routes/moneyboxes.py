@@ -13,6 +13,7 @@ moneyboxes_router = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOXES}",
     tags=[EndpointRouteType.MONEYBOXES.lower()],
 )
+"""The moneyboxes router."""
 
 
 @moneyboxes_router.get(
@@ -23,6 +24,14 @@ moneyboxes_router = APIRouter(
 async def get_moneyboxes(
     request: Request,
 ) -> MoneyboxesResponse | Response:
+    """Endpoint for getting moneyboxes.
+
+    :param request: The current request.
+    :type request: :class:`Request`
+    :return: The moneyboxes.
+    :rtype: :class:`MoneyboxesResponse`
+    """
+
     moneyboxes_data = await request.app.state.db_manager.get_moneyboxes()
 
     if moneyboxes_data:

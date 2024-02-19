@@ -16,6 +16,7 @@ meta = MetaData(
         "pk": "pk_%(table_name)s",
     }
 )
+"""The database meta config."""
 
 
 # declarative base class
@@ -23,6 +24,7 @@ class Base(DeclarativeBase):  # pylint: disable=too-few-public-methods
     """The declarative Base model"""
 
     metadata = meta
+    """The database meta config."""
 
 
 make_class_dictable(Base)
@@ -32,12 +34,16 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     """An ORM declarative Base model with an ID as primary key"""
 
     strict_attrs = True
+
     id: Mapped[int] = mapped_column(primary_key=True, comment="The primary ID of the row.")
+    """The primary ID of the row."""
+
     is_active: Mapped[bool] = mapped_column(
         default=True,
         nullable=False,
         comment="Flag to mark instance as deleted.",
     )
+    """Flag to mark instance as deleted."""
 
     def asdict(  # type: ignore  # pylint: disable=too-many-arguments
         self,
@@ -74,14 +80,17 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
     """The ORM model for Moneybox"""
 
     __tablename__ = "moneybox"
+    """Moneybox table name."""
 
     name: Mapped[str] = mapped_column(
         comment="The name of a moneybox.",
         nullable=False,
     )
+    """The name of a moneybox."""
 
     balance: Mapped[int] = mapped_column(
         default=0,
         comment="The current balance of the moneybox.",
         nullable=False,
     )
+    """The current balance of the moneybox."""

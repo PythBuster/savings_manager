@@ -11,9 +11,12 @@ class MoneyboxPostRequest(BaseModel):
     name: Annotated[
         str, Field(min_length=1, description="The name of the moneybox. Has to be unique.")
     ]
+    """The name of the moneybox. Has to be unique."""
+
     balance: Annotated[
         int, Field(ge=0, default=0, description="The balance of the moneybox in CENTS.")
     ]
+    """The balance of the moneybox in CENTS."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -26,6 +29,7 @@ class MoneyboxPostRequest(BaseModel):
             ]
         },
     )
+    """The model config for the MoneyboxPostRequest model"""
 
 
 class MoneyboxPatchRequest(BaseModel):
@@ -37,9 +41,12 @@ class MoneyboxPatchRequest(BaseModel):
             default=None, min_length=1, description="The name of the moneybox. Has to be unique."
         ),
     ]
+    """The name of the moneybox. Has to be unique."""
+
     balance: Annotated[
         int | None, Field(default=None, ge=0, description="The balance of the moneybox in CENTS.")
     ]
+    """The balance of the moneybox in CENTS."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -52,3 +59,4 @@ class MoneyboxPatchRequest(BaseModel):
             ]
         },
     )
+    """The model config for the MoneyboxPatchRequest model."""

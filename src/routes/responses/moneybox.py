@@ -1,4 +1,4 @@
-"""All moneybox SwaggerUI response codes and examples are located here"""
+"""All moneybox SwaggerUI response codes and examples are located here."""
 
 from starlette import status
 
@@ -40,6 +40,7 @@ GET_MONEYBOX_RESPONSES = {
         },
     },
 }
+"""The possible responses for endpoint GET: /moneybox/{moneybox_id}."""
 
 POST_MONEYBOX_RESPONSES = {
     status.HTTP_200_OK: {
@@ -77,6 +78,7 @@ POST_MONEYBOX_RESPONSES = {
         },
     },
 }
+"""The possible responses for endpoint POST: /moneybox."""
 
 PATCH_MONEYBOX_RESPONSES = {
     status.HTTP_200_OK: {
@@ -127,6 +129,8 @@ PATCH_MONEYBOX_RESPONSES = {
         },
     },
 }
+"""The possible responses for endpoint PATCH: /moneybox/{moneybox_id}."""
+
 
 DELETE_MONEYBOX_RESPONSES = {
     status.HTTP_204_NO_CONTENT: {
@@ -164,3 +168,4 @@ DELETE_MONEYBOX_RESPONSES = {
         },
     },
 }
+"""The possible responses for endpoint DELETE: /moneybox/{moneybox_id}."""

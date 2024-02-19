@@ -24,9 +24,13 @@ tags_metadata = [
         "description": "All moneyboxes endpoints.",
     },
 ]
+"""Metadata about the endpoints."""
 
 app_data = get_app_data()
+"""Reference to the app data."""
+
 author_name, author_mail = app_data["authors"][0].split()
+"""Reference to the author's name and email address.'"""
 
 
 @asynccontextmanager
@@ -56,6 +60,7 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     # swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
+"""Reference to the fastapi app."""
 
 
 def initialize_app(fastapi_app: FastAPI) -> None:
