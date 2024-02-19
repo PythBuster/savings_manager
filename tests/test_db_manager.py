@@ -31,25 +31,49 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
 
 @pytest.mark.dependency
 async def test_add_moneybox(db_manager: DBManager) -> None:
-    moneybox_data = {"name": "Test Box 1"}
-    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data)
-    expected_moneybox_data = moneybox_data | {"id": 1, "balance": 0}
+    # moneybox 1
+    moneybox_data_1 = {"name": "Test Box 1"}
+    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
+    expected_moneybox_data = moneybox_data_1 | {"id": 1, "balance": 0}
     assert result_moneybox_data == expected_moneybox_data
 
     with pytest.raises(MoneyboxNameExistError) as ex_info:
-        await db_manager.add_moneybox(moneybox_data=moneybox_data)
+        await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
 
     assert "Moneybox name 'Test Box 1' already exists" in ex_info.value.args[0]
 
-    moneybox_data = {"name": "Test Box 2"}
-    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data)
-    expected_moneybox_data = moneybox_data | {"id": 2, "balance": 0}
+    # moneybox 2
+    moneybox_data_2 = {"name": "Test Box 2"}
+    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
+    expected_moneybox_data = moneybox_data_2 | {"id": 2, "balance": 0}
     assert result_moneybox_data == expected_moneybox_data
 
     with pytest.raises(MoneyboxNameExistError) as ex_info:
-        await db_manager.add_moneybox(moneybox_data=moneybox_data)
+        await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
 
     assert "Moneybox name 'Test Box 2' already exists" in ex_info.value.args[0]
+
+    # moneybox 3
+    moneybox_data_3: dict[str, str | int] = {"name": "Test Box 3", "balance": 333}
+    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
+    expected_moneybox_data = moneybox_data_3 | {"id": 3, "balance": 333}
+    assert result_moneybox_data == expected_moneybox_data
+
+    with pytest.raises(MoneyboxNameExistError) as ex_info:
+        await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
+
+    assert "Moneybox name 'Test Box 3' already exists" in ex_info.value.args[0]
+
+    # moneybox 4
+    moneybox_data_4 = {"name": "Test Box 4"}
+    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
+    expected_moneybox_data = moneybox_data_4 | {"id": 4, "balance": 0}
+    assert result_moneybox_data == expected_moneybox_data
+
+    with pytest.raises(MoneyboxNameExistError) as ex_info:
+        await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
+
+    assert "Moneybox name 'Test Box 4' already exists" in ex_info.value.args[0]
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
@@ -62,7 +86,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
     expected_moneybox_data = moneybox_data | {"id": 1, "balance": 0}
     assert result_moneybox_data == expected_moneybox_data
 
-    non_existing_moneybox_ids = [-42, -1, 0, 3, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 5, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.update_moneybox(
@@ -83,7 +107,7 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
     expected_moneybox_data = {"id": 1, "balance": 0, "name": "Test Box 1 - Updated"}
     assert result_moneybox_data == expected_moneybox_data
 
-    non_existing_moneybox_ids = [-42, -1, 0, 3, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 5, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.get_moneybox(moneybox_id=moneybox_id)
