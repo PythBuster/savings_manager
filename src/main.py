@@ -1,13 +1,16 @@
 """The start module of the savings manager app."""
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Callable
 
 import uvicorn
 from fastapi import FastAPI
+from requests import Response
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 from starlette.staticfiles import StaticFiles
 
+from src import exception_handler
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.routes.moneybox import moneybox_router
