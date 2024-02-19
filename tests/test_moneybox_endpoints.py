@@ -53,13 +53,23 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
 async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
-    response = await client.get(
+    response_1 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
     )
     expected_moneybox_data = {"name": "Test Box 1 - Updated", "id": 1, "balance": 0}
 
-    assert response.status_code == 200
-    assert response.json() == expected_moneybox_data
+    assert response_1.status_code == 200
+    assert response_1.json() == expected_moneybox_data
+
+    response_2 = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/0",
+    )
+
+    assert response_2.status_code == 422
+    content = response_2.json()
+    assert content["detail"][0]["type"] == "greater_than_equal"
+    assert content["detail"][0]["loc"][0] == "path"
+    assert content["detail"][0]["loc"][1] == "moneybox_id"
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
@@ -124,8 +134,12 @@ async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
     assert "Moneybox with id 42 does not exist." in ex_info.value.args[0]
     assert {"id": 42} == ex_info.value.details
 
-    with pytest.raises(MoneyboxNotFoundError) as ex_info:
-        await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/-1")
+    response_2 = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/-1"
+    )
 
-    assert "Moneybox with id -1 does not exist." in ex_info.value.args[0]
-    assert {"id": -1} == ex_info.value.details
+    assert response_2.status_code == 422
+    content = response_2.json()
+    assert content["detail"][0]["type"] == "greater_than_equal"
+    assert content["detail"][0]["loc"][0] == "path"
+    assert content["detail"][0]["loc"][1] == "moneybox_id"

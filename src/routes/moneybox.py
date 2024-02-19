@@ -32,7 +32,7 @@ moneybox_router = APIRouter(
 async def get_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to be retrieved.")
+        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be retrieved.")
     ],
 ) -> MoneyboxResponse:
     """Endpoint for getting moneybox by moneybox_id."""
@@ -68,7 +68,7 @@ async def add_moneybox(
 async def update_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to be updated.")
+        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be updated.")
     ],
     moneybox_patch_request: Annotated[
         MoneyboxPatchRequest, Body(title="Update Data", description="The updating moneybox data.")
@@ -89,7 +89,7 @@ async def update_moneybox(
 async def delete_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to be deleted.")
+        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be deleted.")
     ],
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id."""
