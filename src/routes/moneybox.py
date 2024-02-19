@@ -1,6 +1,8 @@
 """The moneybox routes."""
 
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Body, Path
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
@@ -29,7 +31,9 @@ moneybox_router = APIRouter(
 )
 async def get_moneybox(
     request: Request,
-    moneybox_id: int,
+    moneybox_id: Annotated[
+        int, Path(title="Moneybox ID", description="Moneybox ID to be retrieved.")
+    ],
 ) -> MoneyboxResponse:
     """Endpoint for getting moneybox by moneybox_id."""
 
@@ -44,7 +48,9 @@ async def get_moneybox(
 )
 async def add_moneybox(
     request: Request,
-    moneybox_post_request: MoneyboxPostRequest,
+    moneybox_post_request: Annotated[
+        MoneyboxPostRequest, Body(title="Post Data", description="The new moneybox data.")
+    ],
 ) -> MoneyboxResponse:
     """Endpoint for adding moneybox."""
 
@@ -61,8 +67,12 @@ async def add_moneybox(
 )
 async def update_moneybox(
     request: Request,
-    moneybox_id: int,
-    moneybox_patch_request: MoneyboxPatchRequest,
+    moneybox_id: Annotated[
+        int, Path(title="Moneybox ID", description="Moneybox ID to be updated.")
+    ],
+    moneybox_patch_request: Annotated[
+        MoneyboxPatchRequest, Body(title="Update Data", description="The updating moneybox data.")
+    ],
 ) -> MoneyboxResponse:
     """Endpoint for updating moneybox by moneybox_id."""
 
@@ -78,7 +88,9 @@ async def update_moneybox(
 )
 async def delete_moneybox(
     request: Request,
-    moneybox_id: int,
+    moneybox_id: Annotated[
+        int, Path(title="Moneybox ID", description="Moneybox ID to be deleted.")
+    ],
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id."""
 

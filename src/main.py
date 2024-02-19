@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 
 import uvicorn
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
 from src.custom_types import EndpointRouteType
@@ -62,6 +63,35 @@ app = FastAPI(
 )
 """Reference to the fastapi app."""
 
+# exception handler
+async def catch_exceptions_middleware(request: Request, call_next: Callable) -> Response:
+    """Custom exception handler as middleware.
+
+    :param request: The current request.
+    :param call_next: Callback to handle the request (route).
+    :return: The route response or a mapped exception.
+    :rtype: :class:`Response`
+    """
+
+    try:
+        return await call_next(request)
+    except Exception as ex:  # pylint:disable=broad-exception-caught
+        return await exception_handler.response_exception(exception=ex)
+
+
+# register/override middlewares
+print("Register/override middlewares ...", flush=True)
+app.middleware("http")(catch_exceptions_middleware)
+
+_origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 def initialize_app(fastapi_app: FastAPI) -> None:
     """Initialise the FastAPI app.
@@ -103,7 +133,7 @@ def register_router(fastapi_app: FastAPI) -> None:
 def main() -> None:
     """Entry point of the app."""
 
-    print("Start uvicorn server.", flush=True)
+    print("Start uvicorn server ...", flush=True)
     uvicorn.run(
         "src.main:app",
         host="localhost",
