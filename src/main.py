@@ -66,6 +66,7 @@ app = FastAPI(
 )
 """Reference to the fastapi app."""
 
+
 # exception handler
 async def catch_exceptions_middleware(request: Request, call_next: Callable) -> Response:
     """Custom exception handler as middleware.
