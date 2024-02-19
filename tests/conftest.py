@@ -6,22 +6,42 @@ from typing import AsyncGenerator
 
 import pytest
 from dotenv import load_dotenv
+from httpx import AsyncClient
+from pytest_dependency import DependencyManager
 
 from src.custom_types import DBSettings
 from src.db.db_manager import DBManager
 from src.db.models import Base
+from src.main import app
 from src.utils import get_db_settings
 
-pytest_plugins = ("pytest_asyncio",)
 
+pytest_plugins = ("pytest_asyncio",)
+"""The pytest plugins which should be used to run tests."""
 
 dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
+"""The test env file path."""
+
 load_dotenv(dotenv_path=dotenv_path)
 print(f"Loaded {dotenv_path}")
 
 TEST_DB_DRIVER = os.getenv("DB_DRIVER")
+"""The database test driver environment variable."""
 
 db_settings = get_db_settings()
+"""The database settings."""
+
+
+@pytest.fixture(scope="session", name="client")
+async def mocked_client() -> AsyncGenerator:
+    """A fixture that creates a fastapi test client.
+
+    :return: A test client.
+    :rtype: AsyncGenerator
+    """
+
+    async with AsyncClient(app=app, base_url="http://localhost:8000") as client:
+        yield client
 
 
 @pytest.fixture(name="db_settings_1", scope="session")
@@ -52,7 +72,7 @@ async def mocked_db_manager() -> AsyncGenerator:
 
     db_manager = DBManager(
         db_settings=db_settings,
-        engine_args={"echo": True},
+        engine_args={"echo": False},
     )
 
     # create tables by using db_managers database async engine
