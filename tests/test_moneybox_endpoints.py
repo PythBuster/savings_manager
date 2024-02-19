@@ -5,17 +5,7 @@ from httpx import AsyncClient
 
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
-
-
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
-async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
-    response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
-    )
-    expected_moneybox_data = {"name": "Test Box 1 - Updated", "id": 1, "balance": 0}
-
-    assert response.status_code == 200
-    assert response.json() == expected_moneybox_data
+from src.db.exceptions import MoneyboxNameExistError
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
@@ -59,3 +49,42 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     # test to ensure if moneyboxes were added
     assert response.status_code == 200
     assert response.json() == expected_moneyboxes
+
+
+@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+    )
+    expected_moneybox_data = {"name": "Test Box 1 - Updated", "id": 1, "balance": 0}
+
+    assert response.status_code == 200
+    assert response.json() == expected_moneybox_data
+
+
+@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
+    moneybox_data_1 = {"name": "Test Box Endpoint Add 1", "balance": 0}
+    moneybox_data_2 = {"name": "Test Box Endpoint Add 2", "balance": 1234}
+
+    response_1 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
+    )
+    assert response_1.status_code == 200
+    assert response_1.json() == moneybox_data_1 | {"id": 5}
+
+    response_2 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
+        json=moneybox_data_2,
+    )
+    assert response_2.status_code == 200
+    assert response_2.json() == moneybox_data_2 | {"id": 6}
+
+    with pytest.raises(MoneyboxNameExistError) as ex_info:
+        await client.post(
+            f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
+            json=moneybox_data_2,
+        )
+
+    assert "Moneybox name 'Test Box Endpoint Add 2' already exists." in ex_info.value.args[0]
+    assert "Test Box Endpoint Add 2" == ex_info.value.details["name"]
