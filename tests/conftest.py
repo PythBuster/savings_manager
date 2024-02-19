@@ -7,14 +7,12 @@ from typing import AsyncGenerator
 import pytest
 from dotenv import load_dotenv
 from httpx import AsyncClient
-from pytest_dependency import DependencyManager
 
 from src.custom_types import DBSettings
 from src.db.db_manager import DBManager
 from src.db.models import Base
-from src.main import app, initialize_app, register_router
+from src.main import app, register_router
 from src.utils import get_db_settings
-
 
 pytest_plugins = ("pytest_asyncio",)
 """The pytest plugins which should be used to run tests."""
@@ -33,7 +31,7 @@ db_settings = get_db_settings()
 
 
 @pytest.fixture(scope="session", name="client")
-async def mocked_client(db_manager) -> AsyncGenerator:
+async def mocked_client(db_manager: DBManager) -> AsyncGenerator:
     """A fixture that creates a fastapi test client.
 
     :return: A test client.
