@@ -7,6 +7,7 @@ src
    custom_types
    data_classes
    db
+   exception_handler
    main
    routes
    settings

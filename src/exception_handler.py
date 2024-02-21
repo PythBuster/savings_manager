@@ -11,7 +11,7 @@ from src.db.exceptions import CreateInstanceError, RecordNotFoundError
 
 
 async def response_exception(exception: Exception) -> JSONResponse:
-    """Maps got `exception` to a :class:`JSONResponse` and returns it.
+    """Maps `exception` to a :class:`JSONResponse` and returns it.
 
     :param exception: The caught exception.
     :type exception: :class:`Exception`

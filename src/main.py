@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from requests import Response
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src import exception_handler
@@ -68,13 +69,15 @@ app = FastAPI(
 
 
 # exception handler
-async def catch_exceptions_middleware(request: Request, call_next: Callable) -> Response:
+async def catch_exceptions_middleware(
+    request: Request, call_next: Callable
+) -> Response | JSONResponse:
     """Custom exception handler as middleware.
 
     :param request: The current request.
     :param call_next: Callback to handle the request (route).
     :return: The route response or a mapped exception.
-    :rtype: :class:`Response`
+    :rtype: :class:`Response`  | :class:`JSONResponse`
     """
 
     try:
