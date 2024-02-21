@@ -14,7 +14,7 @@ GET_MONEYBOX_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
-                    detail={
+                    details={
                         "moneybox_id": 1,
                     },
                 ),
@@ -52,7 +52,7 @@ POST_MONEYBOX_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="Moneybox with same name already exist.",
-                    detail={
+                    details={
                         "name": "Holiday",
                     },
                 ),
@@ -90,7 +90,7 @@ PATCH_MONEYBOX_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
-                    detail={
+                    details={
                         "moneybox_id": 1,
                     },
                 ),
@@ -103,7 +103,7 @@ PATCH_MONEYBOX_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="Moneybox with same name already exist.",
-                    detail={
+                    details={
                         "name": "Holiday",
                     },
                 ),
@@ -142,7 +142,7 @@ DELETE_MONEYBOX_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
-                    detail={
+                    details={
                         "moneybox_id": 1,
                     },
                 ),

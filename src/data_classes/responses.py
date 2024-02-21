@@ -11,7 +11,7 @@ class HTTPErrorResponse(BaseModel):
     message: Annotated[str, Field(min_length=1, description="The error message.")]
     """The error message."""
 
-    detail: Annotated[dict[str, Any] | None, Field(default=None, description="The error details.")]
+    details: Annotated[dict[str, Any] | None, Field(default=None, description="The error details.")]
     """The error details."""
 
     model_config = ConfigDict(
