@@ -5,7 +5,6 @@ from httpx import AsyncClient
 
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
-from src.db.exceptions import MoneyboxNameExistError, MoneyboxNotFoundError
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
@@ -128,10 +127,12 @@ async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
     )
     assert response_1.status_code == 204
 
-    response_2 = await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/42")
+    response_2 = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/42"
+    )
     content_2 = response_2.json()
     assert response_2.status_code == 404
-    assert content_2["message"] == 'Moneybox with id 42 does not exist.'
+    assert content_2["message"] == "Moneybox with id 42 does not exist."
     assert len(content_2["details"]) == 1
     assert content_2["details"]["id"] == 42
 

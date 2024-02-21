@@ -39,6 +39,9 @@ GET_MONEYBOX_RESPONSES = {
             }
         },
     },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        "description": "Internal Server Error",
+    },
 }
 """The possible responses for endpoint GET: /moneybox/{moneybox_id}."""
 
@@ -76,6 +79,9 @@ POST_MONEYBOX_RESPONSES = {
                 }
             },
         },
+    },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        "description": "Internal Server Error",
     },
 }
 """The possible responses for endpoint POST: /moneybox."""
@@ -128,6 +134,9 @@ PATCH_MONEYBOX_RESPONSES = {
             },
         },
     },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        "description": "Internal Server Error",
+    },
 }
 """The possible responses for endpoint PATCH: /moneybox/{moneybox_id}."""
 
@@ -166,6 +175,9 @@ DELETE_MONEYBOX_RESPONSES = {
                 }
             },
         },
+    },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        "description": "Internal Server Error",
     },
 }
 """The possible responses for endpoint DELETE: /moneybox/{moneybox_id}."""

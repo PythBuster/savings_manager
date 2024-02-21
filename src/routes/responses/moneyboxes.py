@@ -27,5 +27,8 @@ GET_MONEYBOXES_RESPONSES = {
             }
         },
     },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        "description": "Internal Server Error",
+    },
 }
 """The possible responses for endpoint GET: /moneyboxes."""
