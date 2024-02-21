@@ -13,13 +13,26 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Requirements/Requirement Analysis.md",
+                "file": "ui/draft/App Version 1.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "801ac4336b4a4143",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Guidelines/Workflow.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -85,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Requirements/Requirement Analysis.md",
+                "file": "Guidelines/Workflow.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Requirements/Requirement Analysis.md",
+                "file": "Guidelines/Workflow.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Requirements/Requirement Analysis.md"
+                "file": "Guidelines/Workflow.md"
               }
             }
           }
@@ -138,45 +151,47 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Schnellauswahl öffnen": false,
-      "graph:Graphen-Ansicht öffnen": false,
-      "canvas:Neuen Canvas erstellen": false,
-      "daily-notes:Heutige Notiz öffnen": false,
-      "templates:Vorlage einfügen": false,
-      "command-palette:Befehlspalette öffnen": false
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
     }
   },
-  "active": "d2c2a82c60f3dc7d",
+  "active": "801ac4336b4a4143",
   "lastOpenFiles": [
-    "Guidelines/Code/Code Style.md",
-    "Feauture Requests/Ideas.md",
-    "Requirements/Requirement Analysis.md",
-    "Guidelines/Workflow.md",
-    "Guidelines/Code/Quality Assurence.md",
+    "vulture_whitelist.def",
+    "sphinx/source/utils.rst",
+    "sphinx/source/settings.rst",
+    "sphinx/source/routes.rst",
+    "sphinx/source/routes.responses.rst",
+    "sphinx/source/modules.rst",
+    "sphinx/source/main.rst",
+    "sphinx/source/index.rst",
+    "sphinx/source/exception_handler.rst",
+    "sphinx/source/db.rst",
+    "sphinx/source/data_classes.rst",
+    "ui/draft/App Version 1.md",
     "ui/draft/App_v2_SavingsManagerUI.png",
     "ui/draft/App_v1_SavingsManagerUI.png",
-    "ui/draft/App Version 1.md",
+    "Requirements/Requirement Analysis.md",
+    "Guidelines/Code/Code Style.md",
+    "Feauture Requests/Ideas.md",
+    "Guidelines/Workflow.md",
+    "Guidelines/Code/Quality Assurence.md",
     "ui/draft/App Version 2.md",
     "Diagram.svg",
     "ui/draft/SavingsManagerUI_v1.png",
     "ui/draft/SavingsManagerUI_v2.png",
-    "Feauture Requests",
-    "Diagram.svg.xml",
     "Guidelines/Code/Deployment.md",
     "Guidelines/Deployment/Unbenannt.md",
-    "Guidelines/Deployment",
     "Guidelines/Code/Branching.md",
     "savings_manager repository.md",
-    "Guidelines/Code",
-    "Guidelines",
     "Welcome.md",
     "Diagram 2.svg",
     "Diagram 1.svg",
-    "Diagram 2.svg.xml",
-    "Diagram 1.svg.xml",
     "2024-01-27.md",
-    "Unbenannt.canvas",
-    "Unbenanntes Diagramm.drawio.xml",
-    "Requirements"
+    "Unbenannt.canvas"
   ]
 }
