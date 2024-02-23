@@ -25,14 +25,24 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Guidelines/Workflow.md",
+                "file": "ui/draft/App Version 1.md",
                 "mode": "source",
                 "source": false
               }
             }
+          },
+          {
+            "id": "622fbfe262218927",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "ui/draft/App_v1_SavingsManagerUI.png"
+              }
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -98,7 +108,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Guidelines/Workflow.md",
+                "file": "ui/draft/App_v1_SavingsManagerUI.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +125,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Guidelines/Workflow.md",
+                "file": "ui/draft/App_v1_SavingsManagerUI.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +148,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Guidelines/Workflow.md"
+                "file": "ui/draft/App_v1_SavingsManagerUI.png"
               }
             }
           }
@@ -159,8 +169,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "801ac4336b4a4143",
+  "active": "622fbfe262218927",
   "lastOpenFiles": [
+    "ui/draft/App Version 1.md",
+    "ui/draft/App_v1_SavingsManagerUI.png",
+    "Guidelines/Workflow.md",
     "vulture_whitelist.def",
     "sphinx/source/utils.rst",
     "sphinx/source/settings.rst",
@@ -171,14 +184,10 @@
     "sphinx/source/index.rst",
     "sphinx/source/exception_handler.rst",
     "sphinx/source/db.rst",
-    "sphinx/source/data_classes.rst",
-    "ui/draft/App Version 1.md",
     "ui/draft/App_v2_SavingsManagerUI.png",
-    "ui/draft/App_v1_SavingsManagerUI.png",
     "Requirements/Requirement Analysis.md",
     "Guidelines/Code/Code Style.md",
     "Feauture Requests/Ideas.md",
-    "Guidelines/Workflow.md",
     "Guidelines/Code/Quality Assurence.md",
     "ui/draft/App Version 2.md",
     "Diagram.svg",

@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, SecretStr
 class EndpointRouteType(StrEnum):
     """The endpoint names."""
 
-    APP_ROOT = "api"  # /app
+    APP_ROOT = "api"  # /api
     """Root endpoint path name."""
 
     MONEYBOX = "moneybox"  # /moneybox
