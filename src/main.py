@@ -143,7 +143,7 @@ def main() -> None:
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
         "src.main:app",
-        host="localhost",
+        host="0.0.0.0",
         port=8000,
         loop="asyncio",
         workers=1,
