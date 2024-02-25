@@ -5,8 +5,8 @@ LABEL maintainer="PythBuster <pythbuster@gmail.com>"
 RUN python3.11 -m pip install pipx
 RUN python3.11 -m pipx install poetry
 
-COPY src/ /savings_manager/src
-COPY scripts/ /savings_manager/scripts
+COPY src /savings_manager/src
+COPY scripts /savings_manager/scripts
 COPY docs/sphinx /savings_manager/docs/sphinx
 COPY alembic /savings_manager/alembic
 COPY alembic.ini /savings_manager/alembic.ini
