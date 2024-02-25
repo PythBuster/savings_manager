@@ -12,6 +12,8 @@ COPY alembic /savings_manager/alembic
 COPY alembic.ini /savings_manager/alembic.ini
 COPY poetry.lock /savings_manager/poetry.lock
 COPY pyproject.toml /savings_manager/pyproject.toml
+COPY README.md /savings_manager/README.md
+
 RUN mkdir /savings_manager/envs
 
 WORKDIR /savings_manager
