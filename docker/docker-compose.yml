@@ -1,13 +1,36 @@
 version: '3.11'
 
 services:
-  postgres:
+  postgres_database:
     image: postgres:16
     ports:
       - 5432:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=savings_manager
+
+  app:
+    container_name: savings_manager
+    build:
+      context: ../
+      dockerfile: docker/deploy-savings-manager.Dockerfile
+    depends_on:
+      postgres_database:
+        condition: service_started
+    links:
+      - postgres_database
+    ports:
+      - 8000:8000
+    environment:
+      - DB_DRIVER=postgresql+asyncpg
+      - DB_NAME=savings_manager
+      - DB_HOST=postgres_database
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+
+volumes:
+  postgres-data:
