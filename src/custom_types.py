@@ -64,5 +64,5 @@ class DBSettings(BaseModel):
         :rtype: :class:`dict[str, Any]
         """
 
-        data["db_port"] = int("db_port")
+        data["db_port"] = int(data["db_port"])
         return data
