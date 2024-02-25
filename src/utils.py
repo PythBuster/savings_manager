@@ -89,3 +89,15 @@ def load_environment() -> EnvironmentType:
         print(f"Loaded {dotenv_path}")
 
     return args.environment
+
+
+def create_envfile_from_envvars():
+    envfile_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+
+    with envfile_path.open(mode="w") as env_file:
+        env_file.write(f"DB_DRIVER={os.getenv('DB_DRIVER')}\n")
+        env_file.write(f"DB_NAME={os.getenv('DB_NAME')}\n")
+        env_file.write(f"DB_HOST={os.getenv('DB_HOST')}\n")
+        env_file.write(f"DB_PORT={os.getenv('DB_PORT')}\n")
+        env_file.write(f"DB_USER={os.getenv('DB_USER')}\n")
+        env_file.write(f"DB_PASSWORD={os.getenv('DB_PASSWORD')}\n")
