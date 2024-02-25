@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>routes package &mdash; Savings Manager  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Savings Manager
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">routes package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-routes.moneybox">routes.moneybox module</a><ul>
+<li><a class="reference internal" href="#routes.moneybox.add_moneybox"><code class="docutils literal notranslate"><span class="pre">add_moneybox()</span></code></a></li>
+<li><a class="reference internal" href="#routes.moneybox.delete_moneybox"><code class="docutils literal notranslate"><span class="pre">delete_moneybox()</span></code></a></li>
+<li><a class="reference internal" href="#routes.moneybox.get_moneybox"><code class="docutils literal notranslate"><span class="pre">get_moneybox()</span></code></a></li>
+<li><a class="reference internal" href="#routes.moneybox.moneybox_router"><code class="docutils literal notranslate"><span class="pre">moneybox_router</span></code></a></li>
+<li><a class="reference internal" href="#routes.moneybox.update_moneybox"><code class="docutils literal notranslate"><span class="pre">update_moneybox()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-routes.moneyboxes">routes.moneyboxes module</a><ul>
+<li><a class="reference internal" href="#routes.moneyboxes.get_moneyboxes"><code class="docutils literal notranslate"><span class="pre">get_moneyboxes()</span></code></a></li>
+<li><a class="reference internal" href="#routes.moneyboxes.moneyboxes_router"><code class="docutils literal notranslate"><span class="pre">moneyboxes_router</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-routes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Savings Manager</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">routes package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/routes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="routes-package">
+<h1>routes package<a class="headerlink" href="#routes-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="routes.responses.html">routes.responses package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routes.responses.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.responses.html#module-routes.responses.moneybox">routes.responses.moneybox module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="routes.responses.html#routes.responses.moneybox.DELETE_MONEYBOX_RESPONSES"><code class="docutils literal notranslate"><span class="pre">DELETE_MONEYBOX_RESPONSES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="routes.responses.html#routes.responses.moneybox.GET_MONEYBOX_RESPONSES"><code class="docutils literal notranslate"><span class="pre">GET_MONEYBOX_RESPONSES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="routes.responses.html#routes.responses.moneybox.PATCH_MONEYBOX_RESPONSES"><code class="docutils literal notranslate"><span class="pre">PATCH_MONEYBOX_RESPONSES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="routes.responses.html#routes.responses.moneybox.POST_MONEYBOX_RESPONSES"><code class="docutils literal notranslate"><span class="pre">POST_MONEYBOX_RESPONSES</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="routes.responses.html#module-routes.responses.moneyboxes">routes.responses.moneyboxes module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="routes.responses.html#routes.responses.moneyboxes.GET_MONEYBOXES_RESPONSES"><code class="docutils literal notranslate"><span class="pre">GET_MONEYBOXES_RESPONSES</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="routes.responses.html#module-routes.responses">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-routes.moneybox">
+<span id="routes-moneybox-module"></span><h2>routes.moneybox module<a class="headerlink" href="#module-routes.moneybox" title="Link to this heading"></a></h2>
+<p>The moneybox routes.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.moneybox.add_moneybox">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">routes.moneybox.</span></span><span class="sig-name descname"><span class="pre">add_moneybox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_post_request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MoneyboxPostRequest</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MoneyboxResponse</span></span></span><a class="headerlink" href="#routes.moneybox.add_moneybox" title="Link to this definition"></a></dt>
+<dd><p>Endpoint for adding moneybox.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.moneybox.delete_moneybox">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">routes.moneybox.</span></span><span class="sig-name descname"><span class="pre">delete_moneybox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="headerlink" href="#routes.moneybox.delete_moneybox" title="Link to this definition"></a></dt>
+<dd><p>Endpoint for deleting moneybox by moneybox_id.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.moneybox.get_moneybox">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">routes.moneybox.</span></span><span class="sig-name descname"><span class="pre">get_moneybox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MoneyboxResponse</span></span></span><a class="headerlink" href="#routes.moneybox.get_moneybox" title="Link to this definition"></a></dt>
+<dd><p>Endpoint for getting moneybox by moneybox_id.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="routes.moneybox.moneybox_router">
+<span class="sig-prename descclassname"><span class="pre">routes.moneybox.</span></span><span class="sig-name descname"><span class="pre">moneybox_router</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;fastapi.routing.APIRouter</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#routes.moneybox.moneybox_router" title="Link to this definition"></a></dt>
+<dd><p>The moneybox router.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.moneybox.update_moneybox">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">routes.moneybox.</span></span><span class="sig-name descname"><span class="pre">update_moneybox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_patch_request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MoneyboxPatchRequest</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MoneyboxResponse</span></span></span><a class="headerlink" href="#routes.moneybox.update_moneybox" title="Link to this definition"></a></dt>
+<dd><p>Endpoint for updating moneybox by moneybox_id.</p>
+</dd></dl>
+
+</section>
+<section id="module-routes.moneyboxes">
+<span id="routes-moneyboxes-module"></span><h2>routes.moneyboxes module<a class="headerlink" href="#module-routes.moneyboxes" title="Link to this heading"></a></h2>
+<p>The moneyboxes routes.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.moneyboxes.get_moneyboxes">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">routes.moneyboxes.</span></span><span class="sig-name descname"><span class="pre">get_moneyboxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MoneyboxesResponse</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Response</span></span></span><a class="headerlink" href="#routes.moneyboxes.get_moneyboxes" title="Link to this definition"></a></dt>
+<dd><p>Endpoint for getting moneyboxes.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="routes.moneyboxes.moneyboxes_router">
+<span class="sig-prename descclassname"><span class="pre">routes.moneyboxes.</span></span><span class="sig-name descname"><span class="pre">moneyboxes_router</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;fastapi.routing.APIRouter</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#routes.moneyboxes.moneyboxes_router" title="Link to this definition"></a></dt>
+<dd><p>The moneyboxes router.</p>
+</dd></dl>
+
+</section>
+<section id="module-routes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-routes" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, PythBuster.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
