@@ -46,6 +46,7 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">custom_types module</a><ul>
 <li><a class="reference internal" href="#custom_types.DBSettings"><code class="docutils literal notranslate"><span class="pre">DBSettings</span></code></a><ul>
+<li><a class="reference internal" href="#custom_types.DBSettings.convert_port"><code class="docutils literal notranslate"><span class="pre">DBSettings.convert_port()</span></code></a></li>
 <li><a class="reference internal" href="#custom_types.DBSettings.db_driver"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_driver</span></code></a></li>
 <li><a class="reference internal" href="#custom_types.DBSettings.db_host"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_host</span></code></a></li>
 <li><a class="reference internal" href="#custom_types.DBSettings.db_name"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_name</span></code></a></li>
@@ -104,6 +105,23 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">custom_types.</span></span><span class="sig-name descname"><span class="pre">DBSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SecretStr</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SecretStr('')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#custom_types.DBSettings" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>The database credentials.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="custom_types.DBSettings.convert_port">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#custom_types.DBSettings.convert_port" title="Link to this definition"></a></dt>
+<dd><p>Conert db_port as string to int.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>dict[str, Any]) – The model data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated model data:</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>:class:<a href="#id3"><span class="problematic" id="id4">`</span></a>dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="custom_types.DBSettings.db_driver">
 <span class="sig-name descname"><span class="pre">db_driver</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#custom_types.DBSettings.db_driver" title="Link to this definition"></a></dt>

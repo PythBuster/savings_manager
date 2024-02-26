@@ -57,22 +57,29 @@
 </li>
 <li><a class="reference internal" href="#module-db.db_manager">db.db_manager module</a><ul>
 <li><a class="reference internal" href="#db.db_manager.DBManager"><code class="docutils literal notranslate"><span class="pre">DBManager</span></code></a><ul>
+<li><a class="reference internal" href="#db.db_manager.DBManager.add_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.add_balance()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.add_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.add_moneybox()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.db_connection_string"><code class="docutils literal notranslate"><span class="pre">DBManager.db_connection_string</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.delete_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.delete_moneybox()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.get_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.get_moneybox()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.get_moneyboxes"><code class="docutils literal notranslate"><span class="pre">DBManager.get_moneyboxes()</span></code></a></li>
+<li><a class="reference internal" href="#db.db_manager.DBManager.sub_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.sub_balance()</span></code></a></li>
+<li><a class="reference internal" href="#db.db_manager.DBManager.transfer_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.transfer_balance()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.update_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.update_moneybox()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-db.exceptions">db.exceptions module</a><ul>
+<li><a class="reference internal" href="#db.exceptions.BalanceResultIsNegativeError"><code class="docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.ColumnDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">ColumnDoesNotExistError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.CreateInstanceError"><code class="docutils literal notranslate"><span class="pre">CreateInstanceError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.MoneyboxNameExistError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNameExistError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.MoneyboxNotFoundError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.NegativeBalanceError"><code class="docutils literal notranslate"><span class="pre">NegativeBalanceError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.NegativeTransferBalanceError"><code class="docutils literal notranslate"><span class="pre">NegativeTransferBalanceError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.RecordNotFoundError"><code class="docutils literal notranslate"><span class="pre">RecordNotFoundError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.UpdateInstanceError"><code class="docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-db.models">db.models module</a><ul>
@@ -282,6 +289,33 @@ or None, if given record_id does not exist.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>All db manager logic are located here.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="db.db_manager.DBManager.add_balance">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.add_balance" title="Link to this definition"></a></dt>
+<dd><p>DB Function to add balance to moneybox by moneybox_id.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the moneybox.</p></li>
+<li><p><strong>balance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The balance to add to given moneybox.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated moneybox data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Any]</span></code></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code>: if given moneybox_id</dt><dd><p>was not found in database.</p>
+</dd>
+</dl>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeBalanceError</span></code>: if balance to add is negative.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="db.db_manager.DBManager.add_moneybox">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_moneybox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.add_moneybox" title="Link to this definition"></a></dt>
 <dd><p>DB Function to add a new moneybox into database.</p>
@@ -366,6 +400,61 @@ was not found in database.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="db.db_manager.DBManager.sub_balance">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sub_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.sub_balance" title="Link to this definition"></a></dt>
+<dd><p>DB Function to sub balance from moneybox by moneybox_id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the moneybox.</p></li>
+<li><p><strong>balance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The balance to sub from given moneybox.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated moneybox data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Any]</span></code></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code>: if given moneybox_id</dt><dd><p>was not found in database.</p>
+</dd>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeBalanceError</span></code>:</dt><dd><p>if balance to sub  is negative.</p>
+</dd>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code>:</dt><dd><p>if result of withdraw is negative.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="db.db_manager.DBManager.transfer_balance">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transfer_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#db.db_manager.DBManager.transfer_balance" title="Link to this definition"></a></dt>
+<dd><p>DB Function to transfer <cite>balance</cite> from <cite>from_moneybox_id</cite>
+from <cite>to_moneybox_id</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The source id of the moneybox where the balance comes from.</p></li>
+<li><p><strong>to_moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The target id of the moneybox where the balance shall
+be transferred to.</p></li>
+<li><p><strong>balance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The balance to transfer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeTransferBalanceError</span></code>:</dt><dd><p>if balance to transfer is negative.</p>
+</dd>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code>:</dt><dd><p>if result of withdraws from_moneybox_id is negative.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="db.db_manager.DBManager.update_moneybox">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_moneybox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.update_moneybox" title="Link to this definition"></a></dt>
 <dd><p>DB Function to update a moneybox by moneybox_id.</p>
@@ -396,6 +485,13 @@ was not found in database.</p>
 <span id="db-exceptions-module"></span><h2>db.exceptions module<a class="headerlink" href="#module-db.exceptions" title="Link to this heading"></a></h2>
 <p>All database exceptions are located.</p>
 <dl class="py exception">
+<dt class="sig sig-object py" id="db.exceptions.BalanceResultIsNegativeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">BalanceResultIsNegativeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.BalanceResultIsNegativeError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#db.exceptions.UpdateInstanceError" title="db.exceptions.UpdateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></p>
+<p>Custom NegativeBalanceError Exception</p>
+</dd></dl>
+
+<dl class="py exception">
 <dt class="sig sig-object py" id="db.exceptions.ColumnDoesNotExistError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">ColumnDoesNotExistError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.ColumnDoesNotExistError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
@@ -424,10 +520,31 @@ was not found in database.</p>
 </dd></dl>
 
 <dl class="py exception">
+<dt class="sig sig-object py" id="db.exceptions.NegativeBalanceError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">NegativeBalanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.NegativeBalanceError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#db.exceptions.UpdateInstanceError" title="db.exceptions.UpdateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></p>
+<p>Custom NegativeBalanceError Exception</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="db.exceptions.NegativeTransferBalanceError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">NegativeTransferBalanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.NegativeTransferBalanceError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#db.exceptions.UpdateInstanceError" title="db.exceptions.UpdateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></p>
+<p>Custom NegativeBalanceError Exception</p>
+</dd></dl>
+
+<dl class="py exception">
 <dt class="sig sig-object py" id="db.exceptions.RecordNotFoundError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">RecordNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.RecordNotFoundError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Base RecordNotFound Exception Class</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="db.exceptions.UpdateInstanceError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">UpdateInstanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.UpdateInstanceError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Base UpdateInstanceError Exception Class</p>
 </dd></dl>
 
 </section>

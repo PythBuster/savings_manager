@@ -82,16 +82,18 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
- | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="db.html#db.db_manager.DBManager.add_balance">add_balance() (db.db_manager.DBManager method)</a>
+</li>
       <li><a href="db.html#db.db_manager.DBManager.add_moneybox">add_moneybox() (db.db_manager.DBManager method)</a>
 
       <ul>
@@ -114,10 +116,12 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.balance">balance (data_classes.requests.MoneyboxPatchRequest attribute)</a>
+      <li><a href="data_classes.html#data_classes.requests.DepositModel.balance">balance (data_classes.requests.DepositModel attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPostRequest.balance">(data_classes.requests.MoneyboxPostRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.TransferModel.balance">(data_classes.requests.TransferModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.balance">(data_classes.requests.WithdrawModel attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.balance">(data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
@@ -126,6 +130,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="db.html#db.exceptions.BalanceResultIsNegativeError">BalanceResultIsNegativeError</a>
+</li>
       <li><a href="db.html#db.models.Base">Base (class in db.models)</a>
 </li>
   </ul></td>
@@ -136,10 +142,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="db.html#db.exceptions.ColumnDoesNotExistError">ColumnDoesNotExistError</a>
 </li>
+      <li><a href="custom_types.html#custom_types.DBSettings.convert_port">convert_port() (custom_types.DBSettings class method)</a>
+</li>
+      <li><a href="utils.html#utils.create_envfile_from_envvars">create_envfile_from_envvars() (in module utils)</a>
+</li>
       <li><a href="db.html#db.core.create_instance">create_instance() (in module db.core)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="routes.responses.html#routes.responses.moneybox.CREATE_MONEYBOX_RESPONSES">CREATE_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+</li>
       <li><a href="db.html#db.exceptions.CreateInstanceError">CreateInstanceError</a>
 </li>
       <li>
@@ -215,12 +227,12 @@
 </li>
       <li><a href="custom_types.html#custom_types.DBSettings.db_driver">db_driver (custom_types.DBSettings attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="custom_types.html#custom_types.DBSettings.db_host">db_host (custom_types.DBSettings attribute)</a>
 </li>
       <li><a href="custom_types.html#custom_types.DBSettings.db_name">db_name (custom_types.DBSettings attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="custom_types.html#custom_types.DBSettings.db_password">db_password (custom_types.DBSettings attribute)</a>
 </li>
       <li><a href="custom_types.html#custom_types.DBSettings.db_port">db_port (custom_types.DBSettings attribute)</a>
@@ -240,6 +252,12 @@
 </li>
       </ul></li>
       <li><a href="routes.responses.html#routes.responses.moneybox.DELETE_MONEYBOX_RESPONSES">DELETE_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+</li>
+      <li><a href="routes.html#routes.moneybox.deposit_moneybox">deposit_moneybox() (in module routes.moneybox)</a>
+</li>
+      <li><a href="routes.responses.html#routes.responses.moneybox.DEPOSIT_MONEYBOX_RESPONSES">DEPOSIT_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.requests.DepositModel">DepositModel (class in data_classes.requests)</a>
 </li>
       <li><a href="data_classes.html#data_classes.responses.HTTPErrorResponse.details">details (data_classes.responses.HTTPErrorResponse attribute)</a>
 </li>
@@ -369,9 +387,15 @@
       <li><a href="custom_types.html#custom_types.DBSettings.model_computed_fields">model_computed_fields (custom_types.DBSettings attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.model_computed_fields">(data_classes.requests.MoneyboxPatchRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.DepositModel.model_computed_fields">(data_classes.requests.DepositModel attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPostRequest.model_computed_fields">(data_classes.requests.MoneyboxPostRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_computed_fields">(data_classes.requests.MoneyboxCreateModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_computed_fields">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.TransferModel.model_computed_fields">(data_classes.requests.TransferModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.model_computed_fields">(data_classes.requests.WithdrawModel attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.HTTPErrorResponse.model_computed_fields">(data_classes.responses.HTTPErrorResponse attribute)</a>
 </li>
@@ -383,9 +407,15 @@
       <li><a href="custom_types.html#custom_types.DBSettings.model_config">model_config (custom_types.DBSettings attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.model_config">(data_classes.requests.MoneyboxPatchRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.DepositModel.model_config">(data_classes.requests.DepositModel attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPostRequest.model_config">(data_classes.requests.MoneyboxPostRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_config">(data_classes.requests.MoneyboxCreateModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_config">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.TransferModel.model_config">(data_classes.requests.TransferModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.model_config">(data_classes.requests.WithdrawModel attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.HTTPErrorResponse.model_config">(data_classes.responses.HTTPErrorResponse attribute)</a>
 </li>
@@ -397,9 +427,15 @@
       <li><a href="custom_types.html#custom_types.DBSettings.model_fields">model_fields (custom_types.DBSettings attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.model_fields">(data_classes.requests.MoneyboxPatchRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.DepositModel.model_fields">(data_classes.requests.DepositModel attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPostRequest.model_fields">(data_classes.requests.MoneyboxPostRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_fields">(data_classes.requests.MoneyboxCreateModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_fields">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.TransferModel.model_fields">(data_classes.requests.TransferModel attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.model_fields">(data_classes.requests.WithdrawModel attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.HTTPErrorResponse.model_fields">(data_classes.responses.HTTPErrorResponse attribute)</a>
 </li>
@@ -408,6 +444,8 @@
         <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.model_fields">(data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -449,13 +487,13 @@
         <li><a href="utils.html#module-utils">utils</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="db.html#db.models.Moneybox">Moneybox (class in db.models)</a>
 </li>
       <li><a href="custom_types.html#custom_types.EndpointRouteType.MONEYBOX">MONEYBOX (custom_types.EndpointRouteType attribute)</a>
 </li>
       <li><a href="routes.html#routes.moneybox.moneybox_router">moneybox_router (in module routes.moneybox)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel">MoneyboxCreateModel (class in data_classes.requests)</a>
 </li>
       <li><a href="custom_types.html#custom_types.EndpointRouteType.MONEYBOXES">MONEYBOXES (custom_types.EndpointRouteType attribute)</a>
 </li>
@@ -469,11 +507,9 @@
 </li>
       <li><a href="db.html#db.exceptions.MoneyboxNotFoundError">MoneyboxNotFoundError</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.MoneyboxPatchRequest">MoneyboxPatchRequest (class in data_classes.requests)</a>
-</li>
-      <li><a href="data_classes.html#data_classes.requests.MoneyboxPostRequest">MoneyboxPostRequest (class in data_classes.requests)</a>
-</li>
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse">MoneyboxResponse (class in data_classes.responses)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel">MoneyboxUpdateModel (class in data_classes.requests)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -481,10 +517,10 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.name">name (data_classes.requests.MoneyboxPatchRequest attribute)</a>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.name">name (data_classes.requests.MoneyboxCreateModel attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxPostRequest.name">(data_classes.requests.MoneyboxPostRequest attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.name">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.name">(data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
@@ -492,16 +528,10 @@
 </li>
       </ul></li>
   </ul></td>
-</tr></table>
-
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.responses.html#routes.responses.moneybox.PATCH_MONEYBOX_RESPONSES">PATCH_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+      <li><a href="db.html#db.exceptions.NegativeBalanceError">NegativeBalanceError</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="routes.responses.html#routes.responses.moneybox.POST_MONEYBOX_RESPONSES">POST_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+      <li><a href="db.html#db.exceptions.NegativeTransferBalanceError">NegativeTransferBalanceError</a>
 </li>
   </ul></td>
 </tr></table>
@@ -576,13 +606,15 @@
         <li><a href="settings.html#module-settings">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="settings.html#settings.SPHINX_DIRECTORY">SPHINX_DIRECTORY (in module settings)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="db.html#db.models.SqlBase">SqlBase (class in db.models)</a>
 </li>
       <li><a href="db.html#db.models.SqlBase.strict_attrs">strict_attrs (db.models.SqlBase attribute)</a>
+</li>
+      <li><a href="db.html#db.db_manager.DBManager.sub_balance">sub_balance() (db.db_manager.DBManager method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -592,9 +624,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="custom_types.html#custom_types.EnvironmentType.TEST">TEST (custom_types.EnvironmentType attribute)</a>
 </li>
+      <li><a href="data_classes.html#data_classes.requests.TransferModel.to_moneybox_id">to_moneybox_id (data_classes.requests.TransferModel attribute)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.responses.MoneyboxesResponse.total">total (data_classes.responses.MoneyboxesResponse attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_classes.html#data_classes.responses.MoneyboxesResponse.total">total (data_classes.responses.MoneyboxesResponse attribute)</a>
+      <li><a href="db.html#db.db_manager.DBManager.transfer_balance">transfer_balance() (db.db_manager.DBManager method)</a>
+
+      <ul>
+        <li><a href="routes.html#routes.moneybox.transfer_balance">(in module routes.moneybox)</a>
+</li>
+      </ul></li>
+      <li><a href="routes.responses.html#routes.responses.moneybox.TRANSFER_MONEYBOX_RESPONSES">TRANSFER_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.requests.TransferModel">TransferModel (class in data_classes.requests)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -612,6 +656,10 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="routes.responses.html#routes.responses.moneybox.UPDATE_MONEYBOX_RESPONSES">UPDATE_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+</li>
+      <li><a href="db.html#db.exceptions.UpdateInstanceError">UpdateInstanceError</a>
+</li>
       <li>
     utils
 
@@ -619,6 +667,20 @@
         <li><a href="utils.html#module-utils">module</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="routes.html#routes.moneybox.withdraw_moneybox">withdraw_moneybox() (in module routes.moneybox)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="routes.responses.html#routes.responses.moneybox.WITHDRAW_MONEYBOX_RESPONSES">WITHDRAW_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.requests.WithdrawModel">WithdrawModel (class in data_classes.requests)</a>
+</li>
   </ul></td>
 </tr></table>
 

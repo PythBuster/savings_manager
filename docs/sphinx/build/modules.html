@@ -77,6 +77,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="custom_types.html">custom_types module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="custom_types.html#custom_types.DBSettings"><code class="docutils literal notranslate"><span class="pre">DBSettings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.convert_port"><code class="docutils literal notranslate"><span class="pre">DBSettings.convert_port()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_driver"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_driver</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_host"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_host</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_name"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_name</span></code></a></li>
@@ -104,20 +105,40 @@
 <li class="toctree-l1"><a class="reference internal" href="data_classes.html">data_classes package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="data_classes.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_classes.html#module-data_classes.requests">data_classes.requests module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPatchRequest"><code class="docutils literal notranslate"><span class="pre">MoneyboxPatchRequest</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.balance"><code class="docutils literal notranslate"><span class="pre">MoneyboxPatchRequest.balance</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxPatchRequest.model_computed_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.model_config"><code class="docutils literal notranslate"><span class="pre">MoneyboxPatchRequest.model_config</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.model_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxPatchRequest.model_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPatchRequest.name"><code class="docutils literal notranslate"><span class="pre">MoneyboxPatchRequest.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_classes.html#data_classes.requests.DepositModel"><code class="docutils literal notranslate"><span class="pre">DepositModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.DepositModel.balance"><code class="docutils literal notranslate"><span class="pre">DepositModel.balance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.DepositModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DepositModel.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.DepositModel.model_config"><code class="docutils literal notranslate"><span class="pre">DepositModel.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.DepositModel.model_fields"><code class="docutils literal notranslate"><span class="pre">DepositModel.model_fields</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPostRequest"><code class="docutils literal notranslate"><span class="pre">MoneyboxPostRequest</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPostRequest.balance"><code class="docutils literal notranslate"><span class="pre">MoneyboxPostRequest.balance</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPostRequest.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxPostRequest.model_computed_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPostRequest.model_config"><code class="docutils literal notranslate"><span class="pre">MoneyboxPostRequest.model_config</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPostRequest.model_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxPostRequest.model_fields</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxPostRequest.name"><code class="docutils literal notranslate"><span class="pre">MoneyboxPostRequest.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxCreateModel"><code class="docutils literal notranslate"><span class="pre">MoneyboxCreateModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxCreateModel.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_config"><code class="docutils literal notranslate"><span class="pre">MoneyboxCreateModel.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxCreateModel.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxCreateModel.name"><code class="docutils literal notranslate"><span class="pre">MoneyboxCreateModel.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxUpdateModel"><code class="docutils literal notranslate"><span class="pre">MoneyboxUpdateModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxUpdateModel.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_config"><code class="docutils literal notranslate"><span class="pre">MoneyboxUpdateModel.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxUpdateModel.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.name"><code class="docutils literal notranslate"><span class="pre">MoneyboxUpdateModel.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_classes.html#data_classes.requests.TransferModel"><code class="docutils literal notranslate"><span class="pre">TransferModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.TransferModel.balance"><code class="docutils literal notranslate"><span class="pre">TransferModel.balance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.TransferModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">TransferModel.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.TransferModel.model_config"><code class="docutils literal notranslate"><span class="pre">TransferModel.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.TransferModel.model_fields"><code class="docutils literal notranslate"><span class="pre">TransferModel.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.TransferModel.to_moneybox_id"><code class="docutils literal notranslate"><span class="pre">TransferModel.to_moneybox_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_classes.html#data_classes.requests.WithdrawModel"><code class="docutils literal notranslate"><span class="pre">WithdrawModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.WithdrawModel.balance"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.balance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.WithdrawModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.WithdrawModel.model_config"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_classes.html#data_classes.requests.WithdrawModel.model_fields"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.model_fields</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -166,22 +187,29 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="db.html#module-db.db_manager">db.db_manager module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.db_manager.DBManager"><code class="docutils literal notranslate"><span class="pre">DBManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.add_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.add_balance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.add_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.add_moneybox()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.db_connection_string"><code class="docutils literal notranslate"><span class="pre">DBManager.db_connection_string</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.delete_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.delete_moneybox()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.get_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.get_moneybox()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.get_moneyboxes"><code class="docutils literal notranslate"><span class="pre">DBManager.get_moneyboxes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.sub_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.sub_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.transfer_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.transfer_balance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.db_manager.DBManager.update_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.update_moneybox()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="db.html#module-db.exceptions">db.exceptions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.BalanceResultIsNegativeError"><code class="docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.ColumnDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">ColumnDoesNotExistError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.CreateInstanceError"><code class="docutils literal notranslate"><span class="pre">CreateInstanceError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.MoneyboxNameExistError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNameExistError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.MoneyboxNotFoundError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.NegativeBalanceError"><code class="docutils literal notranslate"><span class="pre">NegativeBalanceError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.NegativeTransferBalanceError"><code class="docutils literal notranslate"><span class="pre">NegativeTransferBalanceError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.RecordNotFoundError"><code class="docutils literal notranslate"><span class="pre">RecordNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.UpdateInstanceError"><code class="docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="db.html#module-db.models">db.models module</a><ul>
@@ -237,9 +265,12 @@
 <li class="toctree-l2"><a class="reference internal" href="routes.html#module-routes.moneybox">routes.moneybox module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.add_moneybox"><code class="docutils literal notranslate"><span class="pre">add_moneybox()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.delete_moneybox"><code class="docutils literal notranslate"><span class="pre">delete_moneybox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.deposit_moneybox"><code class="docutils literal notranslate"><span class="pre">deposit_moneybox()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.get_moneybox"><code class="docutils literal notranslate"><span class="pre">get_moneybox()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.moneybox_router"><code class="docutils literal notranslate"><span class="pre">moneybox_router</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.transfer_balance"><code class="docutils literal notranslate"><span class="pre">transfer_balance()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.update_moneybox"><code class="docutils literal notranslate"><span class="pre">update_moneybox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="routes.html#routes.moneybox.withdraw_moneybox"><code class="docutils literal notranslate"><span class="pre">withdraw_moneybox()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="routes.html#module-routes.moneyboxes">routes.moneyboxes module</a><ul>
@@ -255,6 +286,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">utils module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#utils.create_envfile_from_envvars"><code class="docutils literal notranslate"><span class="pre">create_envfile_from_envvars()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#utils.get_app_data"><code class="docutils literal notranslate"><span class="pre">get_app_data()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#utils.get_database_url"><code class="docutils literal notranslate"><span class="pre">get_database_url()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#utils.get_db_settings"><code class="docutils literal notranslate"><span class="pre">get_db_settings()</span></code></a></li>
