@@ -11,6 +11,9 @@ App will be exposed to: `localhost:8000`
 SwaggerUI: `localhost:8000/docs`
 Sphinx: `localhost:8000/sphinx`
 
+To get the newest repo, just pull it and rebuilt docker:
+`docker compose up --build`
+
 ### Manually
 #### poetry
 

@@ -171,8 +171,9 @@
   },
   "active": "622fbfe262218927",
   "lastOpenFiles": [
-    "ui/draft/App Version 1.md",
+    "ui/draft/App_v2_SavingsManagerUI.png",
     "ui/draft/App_v1_SavingsManagerUI.png",
+    "ui/draft/App Version 1.md",
     "Guidelines/Workflow.md",
     "vulture_whitelist.def",
     "sphinx/source/utils.rst",
@@ -184,7 +185,6 @@
     "sphinx/source/index.rst",
     "sphinx/source/exception_handler.rst",
     "sphinx/source/db.rst",
-    "ui/draft/App_v2_SavingsManagerUI.png",
     "Requirements/Requirement Analysis.md",
     "Guidelines/Code/Code Style.md",
     "Feauture Requests/Ideas.md",
