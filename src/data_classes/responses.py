@@ -17,7 +17,7 @@ class HTTPErrorResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    """The model config for the HTTPErrorResponse model."""
+    """The config of the model."""
 
 
 class MoneyboxResponse(BaseModel):
@@ -48,7 +48,7 @@ class MoneyboxResponse(BaseModel):
             ]
         },
     )
-    """The model config for the MoneyboxResponse model."""
+    """The config of the model."""
 
 
 class MoneyboxesResponse(BaseModel):
@@ -82,4 +82,4 @@ class MoneyboxesResponse(BaseModel):
             ]
         },
     )
-    """The model config for the MoneyboxesResponse model."""
+    """The config of the model."""

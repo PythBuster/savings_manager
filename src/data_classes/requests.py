@@ -5,18 +5,13 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class MoneyboxPostRequest(BaseModel):
-    """The pydantic moneybox POST request data model"""
+class MoneyboxCreateModel(BaseModel):
+    """The pydantic moneybox create data model."""
 
     name: Annotated[
         str, Field(min_length=1, description="The name of the moneybox. Has to be unique.")
     ]
     """The name of the moneybox. Has to be unique."""
-
-    balance: Annotated[
-        int, Field(ge=0, default=0, description="The balance of the moneybox in CENTS.")
-    ]
-    """The balance of the moneybox in CENTS."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -24,16 +19,15 @@ class MoneyboxPostRequest(BaseModel):
             "examples": [
                 {
                     "name": "Holiday",
-                    "balance": 1000,
                 }
             ]
         },
     )
-    """The model config for the MoneyboxPostRequest model"""
+    """The config of the model."""
 
 
-class MoneyboxPatchRequest(BaseModel):
-    """The pydantic moneybox PATCH request data model"""
+class MoneyboxUpdateModel(BaseModel):
+    """The pydantic moneybox update data model."""
 
     name: Annotated[
         str | None,
@@ -43,20 +37,58 @@ class MoneyboxPatchRequest(BaseModel):
     ]
     """The name of the moneybox. Has to be unique."""
 
-    balance: Annotated[
-        int | None, Field(default=None, ge=0, description="The balance of the moneybox in CENTS.")
-    ]
-    """The balance of the moneybox in CENTS."""
-
     model_config = ConfigDict(
         extra="forbid",
         json_schema_extra={
             "examples": [
                 {
                     "name": "Holiday",
-                    "balance": 1000,
                 }
             ]
         },
     )
-    """The model config for the MoneyboxPatchRequest model."""
+    """The config of the model."""
+
+
+class DepositModel(BaseModel):
+    """The pydantic moneybox deposit data model."""
+
+    balance: Annotated[
+        int,
+        Field(ge=0, description="The balance to add."),
+    ]
+    """The balance to add."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "balance": 100,
+                }
+            ]
+        },
+    )
+    """The config of the model."""
+
+
+class WithdrawModel(BaseModel):
+    """The pydantic moneybox withdraw data model."""
+
+    balance: Annotated[
+        int,
+        Field(ge=0, description="The balance to sub."),
+    ]
+    """The balance to sub."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "balance": 100,
+                }
+            ]
+        },
+    )
+    """The config of the model."""

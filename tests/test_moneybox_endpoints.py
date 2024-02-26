@@ -73,34 +73,33 @@ async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
 async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
-    moneybox_data_1 = {"name": "Test Box Endpoint Add 1", "balance": 0}
+    moneybox_data_1 = {"name": "Test Box Endpoint Add 1"}
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
     )
     assert response_1.status_code == 200
-    assert response_1.json() == moneybox_data_1 | {"id": 5}
+    assert response_1.json() == moneybox_data_1 | {"id": 5, "balance": 0}
 
     moneybox_data_2 = {"name": "Test Box Endpoint Add 2", "balance": 1234}
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
         json=moneybox_data_2,
     )
-    assert response_2.status_code == 200
-    assert response_2.json() == moneybox_data_2 | {"id": 6}
+    assert response_2.status_code == 422
 
     duplicate = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
-        json=moneybox_data_2,
+        json=moneybox_data_1,
     )
     content = duplicate.json()
     assert duplicate.status_code == 405
-    assert content["message"] == "Moneybox name 'Test Box Endpoint Add 2' already exists."
+    assert content["message"] == "Moneybox name 'Test Box Endpoint Add 1' already exists."
     assert len(content["details"]) == 1
-    assert content["details"]["name"] == "Test Box Endpoint Add 2"
+    assert content["details"]["name"] == "Test Box Endpoint Add 1"
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
-async def test_endpoint_patch_moneybox(client: AsyncClient) -> None:
+async def test_endpoint_update_moneybox(client: AsyncClient) -> None:
     moneybox_data_1 = {"name": "Test Box Endpoint Add 1 - Updated"}
 
     missing_id_response = await client.patch(
@@ -144,3 +143,51 @@ async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
     assert content_3["detail"][0]["type"] == "greater_than_equal"
     assert content_3["detail"][0]["loc"][0] == "path"
     assert content_3["detail"][0]["loc"][1] == "moneybox_id"
+
+
+@pytest.mark.dependency(depends=["test_endpoint_delete_moneybox"])
+async def test_endpoint_deposit_moneybox(client: AsyncClient) -> None:
+    moneybox_data = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+    )
+
+    deposit_data_1 = {"balance": 10}
+
+    response_1 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        json=deposit_data_1,
+    )
+    expected_data_1 = moneybox_data.json()
+    expected_data_1["balance"] += 10
+    assert expected_data_1 == response_1.json()
+
+    deposit_data_2 = {"balance": -1}
+    response_2 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        json=deposit_data_2,
+    )
+    assert response_2.status_code == 422
+
+
+@pytest.mark.dependency(depends=["test_endpoint_deposit_moneybox"])
+async def test_endpoint_withdraw_moneybox(client: AsyncClient) -> None:
+    moneybox_data = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+    )
+
+    withdraw_data_1 = {"balance": 10}
+
+    response_1 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        json=withdraw_data_1,
+    )
+    expected_data_1 = moneybox_data.json()
+    expected_data_1["balance"] -= 10
+    assert expected_data_1 == response_1.json()
+
+    deposit_data_2 = {"balance": -1}
+    response_2 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        json=deposit_data_2,
+    )
+    assert response_2.status_code == 422
