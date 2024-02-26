@@ -177,7 +177,7 @@ async def transfer_balance(
         ),
     ],
 ) -> Response:
-    """Endpoint to sub balance from moneybox by moneybox_id."""
+    """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`."""
 
     await request.app.state.db_manager.transfer_balance(
         from_moneybox_id=moneybox_id,
