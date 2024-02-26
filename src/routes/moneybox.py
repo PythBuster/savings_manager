@@ -118,7 +118,7 @@ async def delete_moneybox(
 async def deposit_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be updated.")
+        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID where balance shall be added to.")
     ],
     deposit: Annotated[
         DepositModel,
@@ -141,7 +141,7 @@ async def deposit_moneybox(
 async def withdraw_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be updated.")
+        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID where balance shall be withdrawn from.")
     ],
     withdraw: Annotated[
         WithdrawModel,
@@ -177,7 +177,7 @@ async def transfer_balance(
         ),
     ],
 ) -> Response:
-    """Endpoint to sub balance from moneybox by moneybox_id."""
+    """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`."""
 
     await request.app.state.db_manager.transfer_balance(
         from_moneybox_id=moneybox_id,

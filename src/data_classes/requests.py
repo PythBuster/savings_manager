@@ -105,7 +105,7 @@ class TransferModel(BaseModel):
 
     balance: Annotated[
         int,
-        Field(ge=0, description="The balance to sub."),
+        Field(ge=0, description="The balance to transfer."),
     ]
     """The balance to transfer."""
 
