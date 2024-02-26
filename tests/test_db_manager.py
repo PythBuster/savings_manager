@@ -7,9 +7,11 @@ from src.custom_types import DBSettings
 from src.db import core
 from src.db.db_manager import DBManager
 from src.db.exceptions import (
+    BalanceResultIsNegativeError,
     ColumnDoesNotExistError,
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
+    NegativeBalanceError,
 )
 from src.db.models import Moneybox
 from tests.conftest import TEST_DB_DRIVER
@@ -164,3 +166,81 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.details["id"] == moneybox_id
         assert ex_info.value.record_id == moneybox_id
+
+
+@pytest.mark.dependency(depends=["test_add_moneybox"])
+async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
+    moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+
+    result_moneybox_data_1 = await db_manager.add_balance(
+        moneybox_id=1,
+        balance=0,
+    )
+    assert moneybox_data == result_moneybox_data_1
+
+    result_moneybox_data_2 = await db_manager.add_balance(
+        moneybox_id=1,
+        balance=10,
+    )
+    moneybox_data["balance"] += 10
+    assert moneybox_data == result_moneybox_data_2
+
+    with pytest.raises(NegativeBalanceError) as ex_info:
+        await db_manager.add_balance(
+            moneybox_id=1,
+            balance=-1,
+        )
+
+    assert "Can't add or sub negative balance '-1' to Moneybox '1'." == ex_info.value.message
+    assert isinstance(ex_info.value.details, dict)
+    assert len(ex_info.value.details) == 2
+    assert ex_info.value.details["id"] == 1
+    assert ex_info.value.details["balance"] == -1
+    assert ex_info.value.record_id == 1
+
+
+@pytest.mark.dependency(depends=["test_add_balance_to_moneybox"])
+async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
+    moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+
+    result_moneybox_data_1 = await db_manager.sub_balance(
+        moneybox_id=1,
+        balance=0,
+    )
+    assert moneybox_data == result_moneybox_data_1
+
+    result_moneybox_data_2 = await db_manager.sub_balance(
+        moneybox_id=1,
+        balance=10,
+    )
+    moneybox_data["balance"] -= 10
+    assert moneybox_data == result_moneybox_data_2
+
+    with pytest.raises(NegativeBalanceError) as ex_info:
+        await db_manager.sub_balance(
+            moneybox_id=1,
+            balance=-1,
+        )
+
+    assert "Can't add or sub negative balance '-1' to Moneybox '1'." == ex_info.value.message
+    assert isinstance(ex_info.value.details, dict)
+    assert len(ex_info.value.details) == 2
+    assert ex_info.value.details["id"] == 1
+    assert ex_info.value.details["balance"] == -1
+    assert ex_info.value.record_id == 1
+
+    with pytest.raises(BalanceResultIsNegativeError) as ex_info:
+        await db_manager.sub_balance(
+            moneybox_id=1,
+            balance=1000,
+        )
+
+    assert (
+        "Can't sub balance '1000' from Moneybox '1'. Not enough balance to sub."
+        == ex_info.value.message
+    )
+    assert isinstance(ex_info.value.details, dict)
+    assert len(ex_info.value.details) == 2
+    assert ex_info.value.details["id"] == 1
+    assert ex_info.value.details["balance"] == 1000
+    assert ex_info.value.record_id == 1

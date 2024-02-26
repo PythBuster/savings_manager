@@ -91,7 +91,10 @@ def load_environment() -> EnvironmentType:
     return args.environment
 
 
-def create_envfile_from_envvars():
+def create_envfile_from_envvars() -> None:
+    """Helper function to create .env file for database credentials
+    in /envs dir by reading environment variables."""
+
     envfile_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
 
     with envfile_path.open(mode="w") as env_file:

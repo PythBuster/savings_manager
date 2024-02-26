@@ -64,5 +64,7 @@ class DBSettings(BaseModel):
         :rtype: :class:`dict[str, Any]
         """
 
-        data["db_port"] = int(data["db_port"])
+        if "db_port" in data and data["db_port"] is not None:
+            data["db_port"] = int(data["db_port"])
+
         return data

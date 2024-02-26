@@ -13,7 +13,12 @@ from src.db.core import (
     read_instances,
     update_instance,
 )
-from src.db.exceptions import MoneyboxNameExistError, MoneyboxNotFoundError
+from src.db.exceptions import (
+    BalanceResultIsNegativeError,
+    MoneyboxNameExistError,
+    MoneyboxNotFoundError,
+    NegativeBalanceError,
+)
 from src.db.models import Moneybox
 from src.utils import get_database_url
 
@@ -161,3 +166,103 @@ class DBManager:
 
         if deleted_rows == 0:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+    async def add_balance(
+        self,
+        moneybox_id: int,
+        balance: int,
+    ) -> dict[str, Any]:
+        """DB Function to add balance to moneybox by moneybox_id.
+
+        :param moneybox_id: The id of the moneybox.
+        :type moneybox_id: :class:`int`
+        :param balance: The balance to add to given moneybox.
+        :type balance: :class:`int`
+
+        :return: The updated moneybox data.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+                    was not found in database.
+                 :class:`NegativeBalanceError`: if balance to add is negative.
+        """
+
+        if balance < 0:
+            raise NegativeBalanceError(moneybox_id=moneybox_id, balance=balance)
+
+        moneybox = await read_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=moneybox_id,
+        )
+
+        if moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+        moneybox.balance += balance  # type: ignore
+
+        updated_moneybox = await update_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=moneybox_id,
+            data=moneybox.asdict(),
+        )
+
+        # should not be possible to reach this block
+        if updated_moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+        return updated_moneybox.asdict()
+
+    async def sub_balance(
+        self,
+        moneybox_id: int,
+        balance: int,
+    ) -> dict[str, Any]:
+        """DB Function to sub balance from moneybox by moneybox_id.
+
+        :param moneybox_id: The id of the moneybox.
+        :type moneybox_id: :class:`int`
+        :param balance: The balance to sub from given moneybox.
+        :type balance: :class:`int`
+
+        :return: The updated moneybox data.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+                    was not found in database.
+                 :class:`NegativeBalanceError`:
+                    if balance to sub  is negative.
+                 :class:`BalanceResultIsNegativeError`:
+                    if result of withdraw is negative.
+        """
+
+        if balance < 0:
+            raise NegativeBalanceError(moneybox_id=moneybox_id, balance=balance)
+
+        moneybox = await read_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=moneybox_id,
+        )
+
+        if moneybox is None:
+            raise NegativeBalanceError(moneybox_id=moneybox_id, balance=balance)
+
+        moneybox.balance -= balance  # type: ignore
+
+        if moneybox.balance < 0:  # type: ignore
+            raise BalanceResultIsNegativeError(moneybox_id=moneybox_id, balance=balance)
+
+        updated_moneybox = await update_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=moneybox_id,
+            data=moneybox.asdict(),
+        )
+
+        # should not be possible to reach this block
+        if updated_moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+        return updated_moneybox.asdict()
