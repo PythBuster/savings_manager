@@ -60,7 +60,7 @@ async def create_instance(
     :rtype: :class:`SqlBase`
     """
 
-    stmt = insert(orm_model).values(**data).returning(orm_model)
+    stmt = insert(orm_model).values(data).returning(orm_model)
 
     async with async_session.begin() as session:
         result = await session.execute(stmt)
@@ -141,7 +141,7 @@ async def update_instance(
     :rtype: :class:`SqlBase | None`
     """
 
-    stmt = update(orm_model).where(orm_model.id == record_id).values(**data).returning(orm_model)
+    stmt = update(orm_model).where(orm_model.id == record_id).values(data).returning(orm_model)
 
     async with async_session.begin() as session:
         result = await session.execute(stmt)

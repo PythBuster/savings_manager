@@ -12,6 +12,7 @@ from src.data_classes.requests import (
     DepositModel,
     MoneyboxCreateModel,
     MoneyboxUpdateModel,
+    TransferModel,
     WithdrawModel,
 )
 from src.data_classes.responses import MoneyboxResponse
@@ -20,6 +21,7 @@ from src.routes.responses.moneybox import (
     DELETE_MONEYBOX_RESPONSES,
     DEPOSIT_MONEYBOX_RESPONSES,
     GET_MONEYBOX_RESPONSES,
+    TRANSFER_MONEYBOX_RESPONSES,
     UPDATE_MONEYBOX_RESPONSES,
     WITHDRAW_MONEYBOX_RESPONSES,
 )
@@ -154,3 +156,32 @@ async def withdraw_moneybox(
         moneybox_id=moneybox_id, balance=withdraw.balance
     )
     return MoneyboxResponse(**moneybox_data)
+
+
+@moneybox_router.post(
+    "/{moneybox_id}/balance/transfer",
+    responses=TRANSFER_MONEYBOX_RESPONSES,
+)
+async def transfer_balance(
+    request: Request,
+    moneybox_id: Annotated[
+        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to transfer balance from.")
+    ],
+    transfer: Annotated[
+        TransferModel,
+        Body(
+            title="Transfer balance",
+            description=(
+                "The balance to transfer from moneybox_id to to_moneybox_id, balance has to be >=0."
+            ),
+        ),
+    ],
+) -> Response:
+    """Endpoint to sub balance from moneybox by moneybox_id."""
+
+    await request.app.state.db_manager.transfer_balance(
+        from_moneybox_id=moneybox_id,
+        to_moneybox_id=transfer.to_moneybox_id,
+        balance=transfer.balance,
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -19,7 +19,9 @@ class RecordNotFoundError(ABC, Exception):
 class UpdateInstanceError(ABC, Exception):
     """Base UpdateInstanceError Exception Class"""
 
-    def __init__(self, record_id: int, message: str, details: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self, record_id: int | None, message: str, details: dict[str, Any] | None = None
+    ) -> None:
         self.record_id = record_id
         self.message = message
 
@@ -79,6 +81,26 @@ class NegativeBalanceError(UpdateInstanceError):
         message = f"Can't add or sub negative balance '{balance}' to Moneybox '{moneybox_id}'."
         self.balance = balance
         super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
+
+
+class NegativeTransferBalanceError(UpdateInstanceError):
+    """Custom NegativeBalanceError Exception"""
+
+    def __init__(self, from_moneybox_id: int, to_moneybox_id: int, balance: int) -> None:
+        message = (
+            f"Can't transfer balance from moneybox '{from_moneybox_id}' "
+            f" to '{to_moneybox_id}'. Balance to transfer is negative: {balance}."
+        )
+        self.balance = balance
+        super().__init__(
+            record_id=None,
+            message=message,
+            details={
+                "balance": balance,
+                "from_moneybox_id": from_moneybox_id,
+                "to_moneybox_id": to_moneybox_id,
+            },
+        )
 
 
 class BalanceResultIsNegativeError(UpdateInstanceError):

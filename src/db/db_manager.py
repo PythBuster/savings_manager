@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from src.custom_types import DBSettings
@@ -18,6 +19,7 @@ from src.db.exceptions import (
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
     NegativeBalanceError,
+    NegativeTransferBalanceError,
 )
 from src.db.models import Moneybox
 from src.utils import get_database_url
@@ -266,3 +268,68 @@ class DBManager:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
         return updated_moneybox.asdict()
+
+    async def transfer_balance(
+        self,
+        from_moneybox_id: int,
+        to_moneybox_id: int,
+        balance: int,
+    ) -> None:
+        """DB Function to transfer `balance` from `from_moneybox_id`
+        from `to_moneybox_id`.
+
+        :param from_moneybox_id: The source id of the moneybox where the balance comes from.
+        :type from_moneybox_id: :class:`int`
+        :param to_moneybox_id: The target id of the moneybox where the balance shall
+            be transferred to.
+        :type to_moneybox_id: :class:`int`
+        :param balance: The balance to transfer.
+        :type balance: :class:`int`
+
+        :raises: :class:`NegativeTransferBalanceError`:
+                    if balance to transfer is negative.
+                 :class:`BalanceResultIsNegativeError`:
+                    if result of withdraws from_moneybox_id is negative.
+        """
+
+        if balance < 0:
+            raise NegativeTransferBalanceError(
+                from_moneybox_id=from_moneybox_id,
+                to_moneybox_id=to_moneybox_id,
+                balance=balance,
+            )
+
+        from_moneybox = await read_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=from_moneybox_id,
+        )
+
+        if from_moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=from_moneybox_id)
+
+        to_moneybox = await read_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=to_moneybox_id,
+        )
+
+        if to_moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=to_moneybox_id)
+
+        async with self.async_session.begin() as session:
+            new_from_moneybox_data = {"balance": from_moneybox.balance - balance}
+
+            if new_from_moneybox_data["balance"] < 0:
+                raise BalanceResultIsNegativeError(moneybox_id=from_moneybox_id, balance=balance)
+
+            new_to_moneybox_data = {"balance": to_moneybox.balance + balance}
+
+            await session.execute(
+                update(Moneybox)
+                .where(Moneybox.id == from_moneybox_id)
+                .values(new_from_moneybox_data)
+            )
+            await session.execute(
+                update(Moneybox).where(Moneybox.id == to_moneybox_id).values(new_to_moneybox_data)
+            )

@@ -92,3 +92,32 @@ class WithdrawModel(BaseModel):
         },
     )
     """The config of the model."""
+
+
+class TransferModel(BaseModel):
+    """The pydantic moneybox transfer balance data model."""
+
+    to_moneybox_id: Annotated[
+        int,
+        Field(ge=1, description="The id of the moneybox to transfer balance to."),
+    ]
+    """The id of the moneybox to transfer balance to."""
+
+    balance: Annotated[
+        int,
+        Field(ge=0, description="The balance to sub."),
+    ]
+    """The balance to transfer."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "to_moneybox_id": 1,
+                    "balance": 50,
+                }
+            ]
+        },
+    )
+    """The config of the model."""

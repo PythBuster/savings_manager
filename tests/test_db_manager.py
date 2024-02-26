@@ -12,6 +12,7 @@ from src.db.exceptions import (
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
     NegativeBalanceError,
+    NegativeTransferBalanceError,
 )
 from src.db.models import Moneybox
 from tests.conftest import TEST_DB_DRIVER
@@ -244,3 +245,60 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     assert ex_info.value.details["id"] == 1
     assert ex_info.value.details["balance"] == 1000
     assert ex_info.value.record_id == 1
+
+
+@pytest.mark.dependency(depends=["test_sub_balance_to_moneybox"])
+async def test_transfer_balance(db_manager: DBManager) -> None:
+    from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
+    to_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+
+    await db_manager.transfer_balance(
+        from_moneybox_id=from_moneybox_data["id"],
+        to_moneybox_id=to_moneybox_data["id"],
+        balance=33,
+    )
+
+    new_from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
+    new_to_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+
+    assert from_moneybox_data["balance"] - 33 == new_from_moneybox_data["balance"]
+    assert to_moneybox_data["balance"] + 33 == new_to_moneybox_data["balance"]
+
+    with pytest.raises(NegativeTransferBalanceError) as ex_info:
+        await db_manager.transfer_balance(
+            from_moneybox_id=from_moneybox_data["id"],
+            to_moneybox_id=to_moneybox_data["id"],
+            balance=-1,
+        )
+
+    assert (
+        f"Can't transfer balance from moneybox '{from_moneybox_data['id']}' "
+        f" to '{to_moneybox_data['id']}'. Balance to transfer is negative: -1."
+    ) == ex_info.value.message
+
+    with pytest.raises(MoneyboxNotFoundError):
+        await db_manager.transfer_balance(
+            from_moneybox_id=42,
+            to_moneybox_id=to_moneybox_data["id"],
+            balance=10,
+        )
+
+    with pytest.raises(MoneyboxNotFoundError):
+        await db_manager.transfer_balance(
+            from_moneybox_id=from_moneybox_data["id"],
+            to_moneybox_id=42,
+            balance=10,
+        )
+
+    with pytest.raises(BalanceResultIsNegativeError) as ex_info:
+        await db_manager.transfer_balance(
+            from_moneybox_id=from_moneybox_data["id"],
+            to_moneybox_id=to_moneybox_data["id"],
+            balance=1_000,
+        )
+
+    expected_exception_message = (
+        f"Can't sub balance '1000' from Moneybox '{from_moneybox_data['id']}'. "
+        "Not enough balance to sub."
+    )
+    assert ex_info.value.message == expected_exception_message

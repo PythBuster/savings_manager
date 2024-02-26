@@ -7,7 +7,9 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 
 
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+@pytest.mark.dependency(
+    depends=["tests/test_db_manager.py::test_transfer_balance"], scope="session"
+)
 async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClient) -> None:
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
@@ -15,8 +17,8 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     expected_moneyboxes = {
         "total": 3,
         "moneyboxes": [
-            {"name": "Test Box 1 - Updated", "id": 1, "balance": 0},
-            {"name": "Test Box 3", "id": 3, "balance": 333},
+            {"name": "Test Box 1 - Updated", "id": 1, "balance": 33},
+            {"name": "Test Box 3", "id": 3, "balance": 300},
             {"name": "Test Box 4", "id": 4, "balance": 0},
         ],
     }
@@ -47,12 +49,12 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     assert response.json() == expected_moneyboxes
 
 
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+@pytest.mark.dependency(depends=["test_endpoint_get_moneyboxes"])
 async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
     response_1 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
     )
-    expected_moneybox_data = {"name": "Test Box 1 - Updated", "id": 1, "balance": 0}
+    expected_moneybox_data = {"name": "Test Box 1 - Updated", "id": 1, "balance": 33}
     assert response_1.status_code == 200
     assert response_1.json() == expected_moneybox_data
 
@@ -71,7 +73,7 @@ async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
     assert response_3.status_code == 405
 
 
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+@pytest.mark.dependency(depends=["test_endpoint_get_moneybox"])
 async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
     moneybox_data_1 = {"name": "Test Box Endpoint Add 1"}
     response_1 = await client.post(
@@ -98,7 +100,7 @@ async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
     assert content["details"]["name"] == "Test Box Endpoint Add 1"
 
 
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+@pytest.mark.dependency(depends=["test_endpoint_add_moneybox"])
 async def test_endpoint_update_moneybox(client: AsyncClient) -> None:
     moneybox_data_1 = {"name": "Test Box Endpoint Add 1 - Updated"}
 
@@ -114,7 +116,7 @@ async def test_endpoint_update_moneybox(client: AsyncClient) -> None:
     assert response_1.json() == moneybox_data_1 | {"id": 5, "balance": 0}
 
 
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_delete_moneybox"], scope="session")
+@pytest.mark.dependency(depends=["test_endpoint_update_moneybox"])
 async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
     missing_id_response = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}"
