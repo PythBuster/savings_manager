@@ -3,7 +3,7 @@
 from typing import Any
 
 from sqlalchemy import Sequence, delete, exists, insert, select, update
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.db.exceptions import ColumnDoesNotExistError
 from src.db.models import SqlBase
@@ -121,7 +121,7 @@ async def read_instances(
 
 
 async def update_instance(
-    async_session: async_sessionmaker,
+    async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     record_id: int,
     data: dict[str, Any],
@@ -129,7 +129,7 @@ async def update_instance(
     """The core UPDATE db function.
 
     :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker`
+    :type async_session: :class:`async_sessionmaker` | :class:`AsyncSession`
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
     :param record_id: The instance id.
@@ -141,10 +141,22 @@ async def update_instance(
     :rtype: :class:`SqlBase | None`
     """
 
+    if "created_at" in data:
+        del data["created_at"]
+
+    if "modified_at" in data:
+        del data["modified_at"]
+
+    if "is_active" in data:
+        del data["is_active"]
+
     stmt = update(orm_model).where(orm_model.id == record_id).values(data).returning(orm_model)
 
-    async with async_session.begin() as session:
-        result = await session.execute(stmt)
+    if isinstance(async_session, AsyncSession):
+        result = await async_session.execute(stmt)
+    else:
+        async with async_session.begin() as session:
+            result = await session.execute(stmt)
 
     instance = result.scalars().one_or_none()
     return instance

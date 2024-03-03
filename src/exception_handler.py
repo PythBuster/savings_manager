@@ -23,6 +23,19 @@ async def response_exception(exception: Exception) -> JSONResponse:
     :rtype: :class:`JSONResponse`
     """
 
+    if isinstance(exception, ConnectionRefusedError):
+        _, arg_2 = exception.args
+
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message="No database connection.",  # type: ignore
+                    details={"message": arg_2},  # type: ignore
+                )
+            ),
+        )
+
     if issubclass(exception.__class__, RecordNotFoundError):
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,

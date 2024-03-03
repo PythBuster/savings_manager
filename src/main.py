@@ -109,7 +109,9 @@ def initialize_app(fastapi_app: FastAPI) -> None:
 
     load_environment()
 
-    fastapi_app.state.db_manager = DBManager(db_settings=get_db_settings())
+    fastapi_app.state.db_manager = DBManager(
+        db_settings=get_db_settings(),
+    )
 
 
 def register_router(fastapi_app: FastAPI) -> None:

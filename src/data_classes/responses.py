@@ -1,8 +1,9 @@
 """All response models are located here."""
 
-from typing import Annotated, Any
+from datetime import datetime
+from typing import Annotated, Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class HTTPErrorResponse(BaseModel):
@@ -31,10 +32,16 @@ class MoneyboxResponse(BaseModel):
     ]
     """The name of the moneybox. Has to be unique."""
 
-    balance: Annotated[
-        int, Field(ge=0, default=0, description="The balance of the moneybox in CENTS.")
-    ]
+    balance: Annotated[int, Field(ge=0, description="The balance of the moneybox in CENTS.")]
     """The balance of the moneybox in CENTS."""
+
+    created_at: Annotated[datetime, Field(description="The creation date of the moneybox.")]
+    """The creation date of the moneybox."""
+
+    modified_at: Annotated[
+        datetime | None, Field(description="The modification date of the moneybox.")
+    ]
+    """The modification date of the moneybox."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -44,11 +51,23 @@ class MoneyboxResponse(BaseModel):
                     "id": 1,
                     "name": "Holiday",
                     "balance": 0,
+                    "created_at": "2020-05-01T00:00:00Z",
+                    "modified_at": None,
                 }
             ]
         },
     )
     """The config of the model."""
+
+    @model_validator(mode="after")
+    def validate_date_order(self) -> Self:
+        """Check if 'modified_at' date is after 'created_at'."""
+
+        if self.modified_at is not None and self.created_at >= self.modified_at:
+            msg = "Error: 'created_at' comes after 'modified_at'."
+            raise ValueError(msg)
+
+        return self
 
 
 class MoneyboxesResponse(BaseModel):

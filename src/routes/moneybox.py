@@ -9,11 +9,11 @@ from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType
 from src.data_classes.requests import (
-    DepositModel,
+    DepositTransactionModel,
     MoneyboxCreateModel,
     MoneyboxUpdateModel,
-    TransferModel,
-    WithdrawModel,
+    TransferTransactionModel,
+    WithdrawTransactionModel,
 )
 from src.data_classes.responses import MoneyboxResponse
 from src.routes.responses.moneybox import (
@@ -118,17 +118,22 @@ async def delete_moneybox(
 async def deposit_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID where balance shall be added to.")
+        int,
+        Path(ge=1, title="Moneybox ID", description="Moneybox ID where balance shall be added to."),
     ],
-    deposit: Annotated[
-        DepositModel,
-        Body(title="Deposit balance", description="The balance to add to moneybox, has to be >=0."),
+    deposit_transaction: Annotated[
+        DepositTransactionModel,
+        Body(
+            title="Deposit amount",
+            description="The deposit transaction with amount to add to moneybox, has to be >=0.",
+        ),
     ],
 ) -> MoneyboxResponse:
-    """Endpoint to add balance to moneybox by moneybox_id."""
+    """Endpoint to add amount to moneybox by moneybox_id."""
 
-    moneybox_data = await request.app.state.db_manager.add_balance(
-        moneybox_id=moneybox_id, balance=deposit.balance
+    moneybox_data = await request.app.state.db_manager.add_amount(
+        moneybox_id=moneybox_id,
+        deposit_transaction_data=deposit_transaction.model_dump(),
     )
     return MoneyboxResponse(**moneybox_data)
 
@@ -141,19 +146,28 @@ async def deposit_moneybox(
 async def withdraw_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID where balance shall be withdrawn from.")
+        int,
+        Path(
+            ge=1,
+            title="Moneybox ID",
+            description="Moneybox ID where balance shall be withdrawn from.",
+        ),
     ],
-    withdraw: Annotated[
-        WithdrawModel,
+    withdraw_transaction: Annotated[
+        WithdrawTransactionModel,
         Body(
-            title="Withdraw balance", description="The balance to sub from moneybox, has to be >=0."
+            title="Withdraw amount",
+            description=(
+                "The withdrawal transaction with amount to sub from moneybox, has to be >=0.",
+            ),
         ),
     ],
 ) -> MoneyboxResponse:
     """Endpoint to sub balance from moneybox by moneybox_id."""
 
-    moneybox_data = await request.app.state.db_manager.sub_balance(
-        moneybox_id=moneybox_id, balance=withdraw.balance
+    moneybox_data = await request.app.state.db_manager.sub_amount(
+        moneybox_id=moneybox_id,
+        withdraw_transaction_data=withdraw_transaction.model_dump(),
     )
     return MoneyboxResponse(**moneybox_data)
 
@@ -167,21 +181,20 @@ async def transfer_balance(
     moneybox_id: Annotated[
         int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to transfer balance from.")
     ],
-    transfer: Annotated[
-        TransferModel,
+    transfer_transaction: Annotated[
+        TransferTransactionModel,
         Body(
-            title="Transfer balance",
+            title="Transfer amount",
             description=(
-                "The balance to transfer from moneybox_id to to_moneybox_id, balance has to be >=0."
+                "The amount to transfer from moneybox_id to to_moneybox_id, amount has to be >=0."
             ),
         ),
     ],
 ) -> Response:
     """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`."""
 
-    await request.app.state.db_manager.transfer_balance(
+    await request.app.state.db_manager.transfer_amount(
         from_moneybox_id=moneybox_id,
-        to_moneybox_id=transfer.to_moneybox_id,
-        balance=transfer.balance,
+        transfer_transaction_data=transfer_transaction.model_dump(),
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

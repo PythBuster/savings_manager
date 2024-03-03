@@ -3115,6 +3115,21 @@ mypy = ">=0.790"
 typing-extensions = ">=3.7.4"
 
 [[package]]
+name = "sqlalchemy-utc"
+version = "0.14.0"
+description = "SQLAlchemy type to store aware datetime values"
+optional = false
+python-versions = "*"
+files = [
+    {file = "SQLAlchemy-Utc-0.14.0.tar.gz", hash = "sha256:8e041624595b66d7b1d5ea8b6de486df5c1b9352697f3b24f862f0ded56cd7aa"},
+    {file = "SQLAlchemy_Utc-0.14.0-py2.py3-none-any.whl", hash = "sha256:d2379eed5cce372128b5e744ce382decd262b2c742ab31f7f22ca11c6647f60b"},
+]
+
+[package.dependencies]
+setuptools = "*"
+SQLAlchemy = ">=0.9.0"
+
+[[package]]
 name = "stack-data"
 version = "0.6.3"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -3395,4 +3410,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "ad22e2bb5be82fab9b0c020185aafdf4b99e32b2a66c5c791267a3570fe27c97"
+content-hash = "4885461ac66881f5234da034843c52dc11babf3bf2d510d430e8e790b092c241"

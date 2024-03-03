@@ -8,6 +8,19 @@ GET_MONEYBOX_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",
     },
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "No database connection.",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="No database connection.",
+                    details={
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                ),
+            }
+        },
+    },
     status.HTTP_404_NOT_FOUND: {
         "description": "Not Found",
         "content": {
@@ -49,6 +62,19 @@ CREATE_MONEYBOX_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",
     },
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "No database connection.",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="No database connection.",
+                    details={
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                ),
+            }
+        },
+    },
     status.HTTP_405_METHOD_NOT_ALLOWED: {
         "description": "Method Not Allowed",
         "content": {
@@ -89,6 +115,19 @@ CREATE_MONEYBOX_RESPONSES = {
 UPDATE_MONEYBOX_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",
+    },
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "No database connection.",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="No database connection.",
+                    details={
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                ),
+            }
+        },
     },
     status.HTTP_404_NOT_FOUND: {
         "description": "Not Found",
@@ -145,6 +184,19 @@ DELETE_MONEYBOX_RESPONSES = {
     status.HTTP_204_NO_CONTENT: {
         "description": "No Content",
     },
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "No database connection.",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="No database connection.",
+                    details={
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                ),
+            }
+        },
+    },
     status.HTTP_404_NOT_FOUND: {
         "description": "Not Found",
         "content": {
@@ -185,6 +237,19 @@ DELETE_MONEYBOX_RESPONSES = {
 DEPOSIT_MONEYBOX_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",
+    },
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "No database connection.",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="No database connection.",
+                    details={
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                ),
+            }
+        },
     },
     status.HTTP_404_NOT_FOUND: {
         "description": "Not Found",
@@ -242,6 +307,19 @@ WITHDRAW_MONEYBOX_RESPONSES = DEPOSIT_MONEYBOX_RESPONSES.copy()
 TRANSFER_MONEYBOX_RESPONSES = {
     status.HTTP_204_NO_CONTENT: {
         "description": "No Content",
+    },
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "No database connection.",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="No database connection.",
+                    details={
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                ),
+            }
+        },
     },
     status.HTTP_404_NOT_FOUND: {
         "description": "Not Found",

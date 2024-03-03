@@ -68,3 +68,23 @@ class DBSettings(BaseModel):
             data["db_port"] = int(data["db_port"])
 
         return data
+
+
+class TransactionTrigger(StrEnum):
+    """The transaction trigger."""
+
+    MANUALLY = "manually"
+    """Transaction was triggered manually."""
+
+    AUTOMATICALLY = "automatically"
+    """Transaction was triggered automatically."""
+
+
+class TransactionType(StrEnum):
+    """The transaction type."""
+
+    DIRECT = "direct"
+    """Transaction was made in this moneybox directly."""
+
+    DISTRIBUTION = "distribution"
+    """Transaction caused by distribution strategy."""

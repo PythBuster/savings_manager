@@ -61,7 +61,7 @@ load-plugins=[
 "responses.py"="duplicate-code"
 "/routes/responses/__init__.py"="duplicate-code"
 "src/db/__init__.py"="duplicate-code"
-
+"src/routes/responses/moneyboxes.py"="duplicate-code"
 
 [tool.poetry]
 name = "Savings Manager"
@@ -87,6 +87,7 @@ fastapi = "^0.109.2"
 pytest-cov = "^4.1.0"
 uvicorn = "^0.27.1"
 requests = "^2.31.0"
+sqlalchemy-utc = "^0.14.0"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,4 +1,5 @@
 """All db_manager and db core tests are located here."""
+from datetime import datetime
 
 import pytest
 from fastapi.encoders import jsonable_encoder
@@ -11,8 +12,8 @@ from src.db.exceptions import (
     ColumnDoesNotExistError,
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
-    NegativeBalanceError,
-    NegativeTransferBalanceError,
+    NegativeAmountError,
+    NegativeTransferAmountError,
 )
 from src.db.models import Moneybox
 from tests.conftest import TEST_DB_DRIVER
@@ -36,9 +37,16 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
 async def test_add_moneybox(db_manager: DBManager) -> None:
     # moneybox 1
     moneybox_data_1 = {"name": "Test Box 1"}
-    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
+    result_moneybox_data_1 = await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
+
+    assert isinstance(result_moneybox_data_1["created_at"], datetime)
+    assert result_moneybox_data_1["modified_at"] is None
+
+    del result_moneybox_data_1["created_at"]
+    del result_moneybox_data_1["modified_at"]
+
     expected_moneybox_data = moneybox_data_1 | {"id": 1, "balance": 0}
-    assert result_moneybox_data == expected_moneybox_data
+    assert result_moneybox_data_1 == expected_moneybox_data
 
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
@@ -47,9 +55,16 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
 
     # moneybox 2
     moneybox_data_2 = {"name": "Test Box 2"}
-    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
+    result_moneybox_data_2 = await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
+
+    assert isinstance(result_moneybox_data_2["created_at"], datetime)
+    assert result_moneybox_data_2["modified_at"] is None
+
+    del result_moneybox_data_2["created_at"]
+    del result_moneybox_data_2["modified_at"]
+
     expected_moneybox_data = moneybox_data_2 | {"id": 2, "balance": 0}
-    assert result_moneybox_data == expected_moneybox_data
+    assert result_moneybox_data_2 == expected_moneybox_data
 
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
@@ -58,9 +73,16 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
 
     # moneybox 3
     moneybox_data_3: dict[str, str | int] = {"name": "Test Box 3", "balance": 333}
-    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
+    result_moneybox_data_3 = await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
+
+    assert isinstance(result_moneybox_data_3["created_at"], datetime)
+    assert result_moneybox_data_3["modified_at"] is None
+
+    del result_moneybox_data_3["created_at"]
+    del result_moneybox_data_3["modified_at"]
+
     expected_moneybox_data = moneybox_data_3 | {"id": 3, "balance": 333}
-    assert result_moneybox_data == expected_moneybox_data
+    assert result_moneybox_data_3 == expected_moneybox_data
 
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
@@ -69,9 +91,16 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
 
     # moneybox 4
     moneybox_data_4 = {"name": "Test Box 4"}
-    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
+    result_moneybox_data_4 = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
+
+    assert isinstance(result_moneybox_data_4["created_at"], datetime)
+    assert result_moneybox_data_4["modified_at"] is None
+
+    del result_moneybox_data_4["created_at"]
+    del result_moneybox_data_4["modified_at"]
+
     expected_moneybox_data = moneybox_data_4 | {"id": 4, "balance": 0}
-    assert result_moneybox_data == expected_moneybox_data
+    assert result_moneybox_data_4 == expected_moneybox_data
 
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
@@ -86,6 +115,13 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
         moneybox_id=1,
         moneybox_data=moneybox_data,
     )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
     expected_moneybox_data = moneybox_data | {"id": 1, "balance": 0}
     assert result_moneybox_data == expected_moneybox_data
 
@@ -186,7 +222,7 @@ async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
     moneybox_data["balance"] += 10
     assert moneybox_data == result_moneybox_data_2
 
-    with pytest.raises(NegativeBalanceError) as ex_info:
+    with pytest.raises(NegativeAmountError) as ex_info:
         await db_manager.add_balance(
             moneybox_id=1,
             balance=-1,
@@ -204,23 +240,23 @@ async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
 async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
 
-    result_moneybox_data_1 = await db_manager.sub_balance(
+    result_moneybox_data_1 = await db_manager.sub_amount(
         moneybox_id=1,
-        balance=0,
+        amount=0,
     )
     assert moneybox_data == result_moneybox_data_1
 
-    result_moneybox_data_2 = await db_manager.sub_balance(
+    result_moneybox_data_2 = await db_manager.sub_amount(
         moneybox_id=1,
-        balance=10,
+        amount=10,
     )
     moneybox_data["balance"] -= 10
     assert moneybox_data == result_moneybox_data_2
 
-    with pytest.raises(NegativeBalanceError) as ex_info:
-        await db_manager.sub_balance(
+    with pytest.raises(NegativeAmountError) as ex_info:
+        await db_manager.sub_amount(
             moneybox_id=1,
-            balance=-1,
+            amount=-1,
         )
 
     assert "Can't add or sub negative balance '-1' to Moneybox '1'." == ex_info.value.message
@@ -231,9 +267,9 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     assert ex_info.value.record_id == 1
 
     with pytest.raises(BalanceResultIsNegativeError) as ex_info:
-        await db_manager.sub_balance(
+        await db_manager.sub_amount(
             moneybox_id=1,
-            balance=1000,
+            amount=1000,
         )
 
     assert (
@@ -252,10 +288,10 @@ async def test_transfer_balance(db_manager: DBManager) -> None:
     from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
     to_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
 
-    await db_manager.transfer_balance(
+    await db_manager.transfer_amount(
         from_moneybox_id=from_moneybox_data["id"],
         to_moneybox_id=to_moneybox_data["id"],
-        balance=33,
+        amount=33,
     )
 
     new_from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
@@ -264,11 +300,11 @@ async def test_transfer_balance(db_manager: DBManager) -> None:
     assert from_moneybox_data["balance"] - 33 == new_from_moneybox_data["balance"]
     assert to_moneybox_data["balance"] + 33 == new_to_moneybox_data["balance"]
 
-    with pytest.raises(NegativeTransferBalanceError) as ex_info:
-        await db_manager.transfer_balance(
+    with pytest.raises(NegativeTransferAmountError) as ex_info:
+        await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
             to_moneybox_id=to_moneybox_data["id"],
-            balance=-1,
+            amount=-1,
         )
 
     assert (
@@ -277,24 +313,24 @@ async def test_transfer_balance(db_manager: DBManager) -> None:
     ) == ex_info.value.message
 
     with pytest.raises(MoneyboxNotFoundError):
-        await db_manager.transfer_balance(
+        await db_manager.transfer_amount(
             from_moneybox_id=42,
             to_moneybox_id=to_moneybox_data["id"],
-            balance=10,
+            amount=10,
         )
 
     with pytest.raises(MoneyboxNotFoundError):
-        await db_manager.transfer_balance(
+        await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
             to_moneybox_id=42,
-            balance=10,
+            amount=10,
         )
 
     with pytest.raises(BalanceResultIsNegativeError) as ex_info:
-        await db_manager.transfer_balance(
+        await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
             to_moneybox_id=to_moneybox_data["id"],
-            balance=1_000,
+            amount=1_000,
         )
 
     expected_exception_message = (
