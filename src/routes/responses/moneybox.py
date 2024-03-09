@@ -370,3 +370,61 @@ TRANSFER_MONEYBOX_RESPONSES = {
     },
 }
 """The possible responses for endpoint (transfer) POST: /moneybox/{moneybox_id}/balance/transfer."""
+
+
+MONEYBOX_TRANSACTION_LOGS_RESPONSES = {
+    status.HTTP_200_OK: {
+        "description": "OK",
+    },
+    status.HTTP_204_NO_CONTENT: {
+        "description": "No Content",
+    },
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "No database connection.",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="No database connection.",
+                    details={
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                ),
+            }
+        },
+    },
+    status.HTTP_404_NOT_FOUND: {
+        "description": "Not Found",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="Moneybox not found.",
+                    details={
+                        "moneybox_id": 1,
+                    },
+                ),
+            }
+        },
+    },
+    status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        "description": "Unprocessable Content",
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": [
+                        {
+                            "type": "string_type",
+                            "loc": ["body", "name"],
+                            "msg": "Input should be a valid string",
+                            "input": 123,
+                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                        }
+                    ]
+                }
+            }
+        },
+    },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        "description": "Internal Server Error",
+    },
+}
+"""The possible responses for endpoint /moneybox/{moneybox_id}/transactions"""

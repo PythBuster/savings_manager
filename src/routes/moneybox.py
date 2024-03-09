@@ -15,12 +15,13 @@ from src.data_classes.requests import (
     TransferTransactionModel,
     WithdrawTransactionModel,
 )
-from src.data_classes.responses import MoneyboxResponse
+from src.data_classes.responses import MoneyboxResponse, TransactionLogs
 from src.routes.responses.moneybox import (
     CREATE_MONEYBOX_RESPONSES,
     DELETE_MONEYBOX_RESPONSES,
     DEPOSIT_MONEYBOX_RESPONSES,
     GET_MONEYBOX_RESPONSES,
+    MONEYBOX_TRANSACTION_LOGS_RESPONSES,
     TRANSFER_MONEYBOX_RESPONSES,
     UPDATE_MONEYBOX_RESPONSES,
     WITHDRAW_MONEYBOX_RESPONSES,
@@ -41,7 +42,7 @@ moneybox_router = APIRouter(
 async def get_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be retrieved.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be retrieved.")
     ],
 ) -> MoneyboxResponse:
     """Endpoint for getting moneybox by moneybox_id."""
@@ -77,7 +78,7 @@ async def add_moneybox(
 async def update_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be updated.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be updated.")
     ],
     moneybox_update_request: Annotated[
         MoneyboxUpdateModel, Body(title="Update Data", description="The updating moneybox data.")
@@ -98,7 +99,7 @@ async def update_moneybox(
 async def delete_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to be deleted.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be deleted.")
     ],
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id."""
@@ -119,7 +120,7 @@ async def deposit_moneybox(
     request: Request,
     moneybox_id: Annotated[
         int,
-        Path(ge=1, title="Moneybox ID", description="Moneybox ID where balance shall be added to."),
+        Path(title="Moneybox ID", description="Moneybox ID where balance shall be added to."),
     ],
     deposit_transaction: Annotated[
         DepositTransactionModel,
@@ -148,7 +149,6 @@ async def withdraw_moneybox(
     moneybox_id: Annotated[
         int,
         Path(
-            ge=1,
             title="Moneybox ID",
             description="Moneybox ID where balance shall be withdrawn from.",
         ),
@@ -179,7 +179,7 @@ async def withdraw_moneybox(
 async def transfer_balance(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(ge=1, title="Moneybox ID", description="Moneybox ID to transfer balance from.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to transfer balance from.")
     ],
     transfer_transaction: Annotated[
         TransferTransactionModel,
@@ -197,4 +197,32 @@ async def transfer_balance(
         from_moneybox_id=moneybox_id,
         transfer_transaction_data=transfer_transaction.model_dump(),
     )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@moneybox_router.get(
+    "/{moneybox_id}/transactions",
+    response_model=TransactionLogs,
+    responses=MONEYBOX_TRANSACTION_LOGS_RESPONSES,
+)
+async def get_moneybox_transaction_logs(
+    request: Request,
+    moneybox_id: Annotated[
+        int, Path(title="Moneybox ID", description="Moneybox ID to get transaction logs from.")
+    ],
+) -> TransactionLogs | Response:
+    """Endpoint for getting moneybox transaction logs."""
+
+    transaction_logs_data = await request.app.state.db_manager.get_transaction_logs(
+        moneybox_id=moneybox_id,
+    )
+
+    if transaction_logs_data:
+        transaction_logs_data = {
+            "total": len(transaction_logs_data),
+            "transaction_logs": transaction_logs_data,
+        }
+        transacion_logs = TransactionLogs(**transaction_logs_data)
+        return transacion_logs
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)

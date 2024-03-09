@@ -206,7 +206,7 @@ async def test_core_exists_instance__moneybox_name(db_manager: DBManager) -> Non
 async def test_delete_moneybox(db_manager: DBManager) -> None:
     assert await db_manager.delete_moneybox(moneybox_id=2) is None  # type: ignore
 
-    non_existing_moneybox_ids = [-42, -1, 0, 2, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.delete_moneybox(moneybox_id=moneybox_id)

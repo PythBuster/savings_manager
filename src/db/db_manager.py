@@ -2,17 +2,18 @@
 
 from typing import Any
 
-from sqlalchemy import insert, update
+from sqlalchemy import and_, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import joinedload
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
     create_instance,
-    delete_instance,
+    deactivate_instance,
     exists_instance,
     read_instance,
     read_instances,
-    update_instance,
+    update_instance, activate_instance,
 )
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
@@ -164,14 +165,34 @@ class DBManager:
             was not found in database.
         """
 
-        deleted_rows = await delete_instance(
+        deactivated: bool = await deactivate_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
             record_id=moneybox_id,
         )
 
-        if deleted_rows == 0:
+        if not deactivated:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+    async def restore_moneybox(self, moneybox_id: int) -> None:
+        """DB Function to restore a moneybox by given id.
+
+        :param moneybox_id: The id of the moneybox.
+        :type moneybox_id: :class:`int`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+            was not found in database.
+        """
+
+        activated: bool = await activate_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=moneybox_id,
+        )
+
+        if not activated:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
     #  sub_amount are almost identical, combine in one function?
@@ -457,3 +478,36 @@ class DBManager:
 
         stmt = insert(Transaction).values(transaction_log_data)
         await session.execute(stmt)
+
+    async def get_transaction_logs(self, moneybox_id: int) -> list[dict[str, Any]]:
+        """Get a list of transaction logs for the given moneybox id.
+
+        :param moneybox_id: The moneybox id.
+        :type moneybox_id: :class:`int`
+        :return: A list of transaction logs for the given moneybox id.
+        :rtype: :class:`list[dict[str, Any]]`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+            was not found in database.
+        """
+
+        stmt = (
+            select(Moneybox)
+            .options(joinedload(Moneybox.transactions_log))
+            .where(
+                and_(
+                    Moneybox.id == moneybox_id,
+                    Moneybox.is_active.is_(True),
+                )
+            )
+        )
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        moneybox = result.unique().scalars().one_or_none()
+
+        if moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+        return [transaction.asdict() for transaction in moneybox.transactions_log]

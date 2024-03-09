@@ -5,6 +5,8 @@ from typing import Annotated, Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from src.custom_types import TransactionTrigger, TransactionType
+
 
 class HTTPErrorResponse(BaseModel):
     """The http error response model"""
@@ -86,6 +88,102 @@ class MoneyboxesResponse(BaseModel):
                 {
                     "total": 2,
                     "moneyboxes": [
+                        {
+                            "id": 1,
+                            "name": "Holiday",
+                            "balance": 1255,
+                        },
+                        {
+                            "id": 2,
+                            "name": "Extra Bills",
+                            "balance": 250,
+                        },
+                    ],
+                }
+            ]
+        },
+    )
+    """The config of the model."""
+
+
+class TransactonLog(BaseModel):
+    """The transaction log response model."""
+
+    description: Annotated[str, Field(description="The description of the transaction action.")]
+    """The description of the transaction action."""
+
+    transaction_type: Annotated[
+        TransactionType,
+        Field(description="The type of the transaction. Possible values: direct or distribution."),
+    ]
+    """The type of the transaction. Possible values: direct or distribution."""
+
+    transaction_trigger: Annotated[
+        TransactionTrigger,
+        Field(
+            description=(
+                "The transaction trigger type, possible values: manually, automatically. "
+                "Says, if balance was deposit or withdrawn manually or automatically."
+            ),
+        ),
+    ]
+    """"The transaction type, possible values: manually, automatically.
+    Says, if balance was deposit or withdrawn manually or automatically."""
+
+    amount: Annotated[
+        int,
+        Field(
+            description=(
+                "The current amount of the transaction. "
+                "Can be negative, negative = withdraw, positive = deposit."
+            ),
+        ),
+    ]
+    """The current amount of the transaction.
+    Can be negative, negative = withdraw, positive = deposit."""
+
+    balance: Annotated[
+        int,
+        Field(
+            description="The balance of the moneybox at the time of the transaction.",
+        ),
+    ]
+    """The balance of the moneybox at the time of the transaction."""
+
+    counterparty_moneybox_id: Annotated[
+        int | None,
+        Field(
+            description=(
+                "Transaction is a transfer between moneybox_id and "
+                "counterparty_moneybox_id, if set."
+            ),
+        ),
+    ]
+    """Transaction is a transfer between moneybox_id and
+    counterparty_moneybox_id, if set."""
+
+    moneybox_id: Annotated[int, Field(description="The foreign key to moneybox.")]
+    """The foreign key to moneybox."""
+
+
+class TransactionLogs(BaseModel):
+    """The transaction logs response model."""
+
+    total: Annotated[int, Field(ge=0, description="The count of transaction logs.")]
+    """The count of transaction logs."""
+
+    transaction_logs: Annotated[
+        list[TransactonLog], Field(description="The list of transaction logs.")
+    ]
+    """The list of transaction logs."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "total": 2,
+                    "transaction_logs": [
                         {
                             "id": 1,
                             "name": "Holiday",
