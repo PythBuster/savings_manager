@@ -1,5 +1,8 @@
 """All moneybox endpoint tests are located here."""
 
+from datetime import datetime
+from typing import Any
+
 import pytest
 from httpx import AsyncClient
 
@@ -7,9 +10,13 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 
 
-@pytest.mark.dependency(
-    depends=["tests/test_db_manager.py::test_transfer_balance"], scope="session"
-)
+def remove_dates(moneybox: dict[str, Any]) -> dict[str, Any]:
+    del moneybox["created_at"]
+    del moneybox["modified_at"]
+    return moneybox
+
+
+@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
 async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClient) -> None:
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
@@ -23,6 +30,8 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
         ],
     }
     moneyboxes = response.json()
+
+    moneyboxes["moneyboxes"] = [remove_dates(moneybox) for moneybox in moneyboxes["moneyboxes"]]
     assert response.status_code == 200
     assert moneyboxes == expected_moneyboxes
 
@@ -44,9 +53,13 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
     )
+    moneyboxes = response.json()
+
+    moneyboxes["moneyboxes"] = [remove_dates(moneybox) for moneybox in moneyboxes["moneyboxes"]]
+
     # test to ensure if moneyboxes were added
     assert response.status_code == 200
-    assert response.json() == expected_moneyboxes
+    assert moneyboxes == expected_moneyboxes
 
 
 @pytest.mark.dependency(depends=["test_endpoint_get_moneyboxes"])
@@ -54,9 +67,13 @@ async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
     response_1 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
     )
+    moneybox = response_1.json()
+    moneybox = remove_dates(moneybox)
+
     expected_moneybox_data = {"name": "Test Box 1 - Updated", "id": 1, "balance": 33}
+
     assert response_1.status_code == 200
-    assert response_1.json() == expected_moneybox_data
+    assert moneybox == expected_moneybox_data
 
     response_2 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/0",
@@ -79,8 +96,11 @@ async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
     )
+    moneybox = response_1.json()
+    moneybox = remove_dates(moneybox)
+
     assert response_1.status_code == 200
-    assert response_1.json() == moneybox_data_1 | {"id": 5, "balance": 0}
+    assert moneybox == moneybox_data_1 | {"id": 5, "balance": 0}
 
     moneybox_data_2 = {"name": "Test Box Endpoint Add 2", "balance": 1234}
     response_2 = await client.post(
@@ -112,8 +132,11 @@ async def test_endpoint_update_moneybox(client: AsyncClient) -> None:
     response_1 = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/5", json=moneybox_data_1
     )
+    monneybox = response_1.json()
+    monneybox = remove_dates(monneybox)
+
     assert response_1.status_code == 200
-    assert response_1.json() == moneybox_data_1 | {"id": 5, "balance": 0}
+    assert monneybox == moneybox_data_1 | {"id": 5, "balance": 0}
 
 
 @pytest.mark.dependency(depends=["test_endpoint_update_moneybox"])
@@ -153,22 +176,55 @@ async def test_endpoint_deposit_moneybox(client: AsyncClient) -> None:
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
     )
 
-    deposit_data_1 = {"balance": 10}
+    deposit_data_1 = {
+        "deposit_data": {"amount": 10},
+        "transaction_data": {
+            "description": "Bonus.",
+            "transaction_trigger": "manually",
+            "transaction_type": "direct",
+        },
+    }
 
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
         json=deposit_data_1,
     )
-    expected_data_1 = moneybox_data.json()
-    expected_data_1["balance"] += 10
-    assert expected_data_1 == response_1.json()
+    moneybox = response_1.json()
+    moneybox = remove_dates(moneybox)
 
-    deposit_data_2 = {"balance": -1}
+    expected_data_1 = moneybox_data.json()
+    expected_data_1 = remove_dates(expected_data_1)
+
+    expected_data_1["balance"] += 10
+    assert expected_data_1 == moneybox
+
+    deposit_data_2 = {
+        "deposit_data": {"amount": 0},
+        "transaction_data": {
+            "description": "Bonus.",
+            "transaction_trigger": "manually",
+            "transaction_type": "direct",
+        },
+    }
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
         json=deposit_data_2,
     )
     assert response_2.status_code == 422
+
+    deposit_data_3 = {
+        "deposit_data": {"amount": -1},
+        "transaction_data": {
+            "description": "Bonus.",
+            "transaction_trigger": "manually",
+            "transaction_type": "direct",
+        },
+    }
+    response_3 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        json=deposit_data_3,
+    )
+    assert response_3.status_code == 422
 
 
 @pytest.mark.dependency(depends=["test_endpoint_deposit_moneybox"])
@@ -177,19 +233,114 @@ async def test_endpoint_withdraw_moneybox(client: AsyncClient) -> None:
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
     )
 
-    withdraw_data_1 = {"balance": 10}
+    withdraw_data_1 = {
+        "transaction_data": {
+            "description": "Unexpected expenses.",
+            "transaction_trigger": "manually",
+            "transaction_type": "direct",
+        },
+        "withdraw_data": {"amount": 10},
+    }
 
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
         json=withdraw_data_1,
     )
-    expected_data_1 = moneybox_data.json()
-    expected_data_1["balance"] -= 10
-    assert expected_data_1 == response_1.json()
+    moneybox = response_1.json()
+    moneybox = remove_dates(moneybox)
 
-    deposit_data_2 = {"balance": -1}
+    expected_data_1 = moneybox_data.json()
+    expected_data_1 = remove_dates(expected_data_1)
+
+    expected_data_1["balance"] -= 10
+    assert expected_data_1 == moneybox
+
+    deposit_data_2 = {
+        "transaction_data": {
+            "description": "Unexpected expenses.",
+            "transaction_trigger": "manually",
+            "transaction_type": "direct",
+        },
+        "withdraw_data": {"amount": 0},
+    }
     response_2 = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
         json=deposit_data_2,
     )
     assert response_2.status_code == 422
+
+    deposit_data_3 = {
+        "transaction_data": {
+            "description": "Unexpected expenses.",
+            "transaction_trigger": "manually",
+            "transaction_type": "direct",
+        },
+        "withdraw_data": {"amount": -1},
+    }
+    response_3 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        json=deposit_data_3,
+    )
+    assert response_3.status_code == 422
+
+
+@pytest.mark.dependency(depends=["test_endpoint_deposit_moneybox"])
+async def test_endpoint_transfer_amount_moneybox(client: AsyncClient) -> None:
+    response_moneybox_id_1_data = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+    )
+    moneybox_id_1_data = response_moneybox_id_1_data.json()
+
+    respose_moneybox_id_3_data = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3",
+    )
+    moneybox_id_3_data = respose_moneybox_id_3_data.json()
+
+    transfer_data_1 = {
+        "transaction_data": {
+            "description": "Transfer money.",
+            "transaction_trigger": "manually",
+            "transaction_type": "direct",
+        },
+        "transfer_data": {"amount": 50, "to_moneybox_id": 1},
+    }
+
+    response_1 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3/balance/transfer",
+        json=transfer_data_1,
+    )
+    assert response_1.status_code == 204
+
+    response_new_moneybox_id_1_data = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+    )
+    new_moneybox_id_1_data = response_new_moneybox_id_1_data.json()
+
+    assert moneybox_id_1_data["modified_at"] < new_moneybox_id_1_data["modified_at"]
+    moneybox_id_1_data["balance"] += 50
+    moneybox_id_1_data = remove_dates(moneybox_id_1_data)
+    new_moneybox_id_1_data = remove_dates(new_moneybox_id_1_data)
+    assert moneybox_id_1_data == new_moneybox_id_1_data
+
+    response_new_moneybox_id_3_data = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3",
+    )
+    new_moneybox_id_3_data = response_new_moneybox_id_3_data.json()
+
+    assert moneybox_id_3_data["modified_at"] is None
+
+    try:
+        datetime.fromisoformat(new_moneybox_id_3_data["modified_at"])
+    except:  # noqa: E722  # pylint: disable=bare-except
+        assert False, "Invalid datetime"
+
+    moneybox_id_3_data["balance"] -= 50
+    moneybox_id_3_data = remove_dates(moneybox_id_3_data)
+    new_moneybox_id_3_data = remove_dates(new_moneybox_id_3_data)
+    assert moneybox_id_3_data == new_moneybox_id_3_data
+
+    response_2 = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data_1,
+    )
+    assert response_2.status_code == 405

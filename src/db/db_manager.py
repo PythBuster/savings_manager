@@ -18,8 +18,8 @@ from src.db.exceptions import (
     BalanceResultIsNegativeError,
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
-    NegativeAmountError,
-    NegativeTransferAmountError,
+    NonPositiveAmountError,
+    NonPositiveTransferAmountError,
     TransferEqualMoneyboxError,
 )
 from src.db.models import Moneybox, Transaction
@@ -197,8 +197,8 @@ class DBManager:
 
         amount: int = deposit_transaction_data["deposit_data"]["amount"]
 
-        if amount < 0:
-            raise NegativeAmountError(moneybox_id=moneybox_id, amount=amount)
+        if amount <= 0:
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         moneybox = await read_instance(
             async_session=self.async_session,
@@ -207,7 +207,7 @@ class DBManager:
         )
 
         if moneybox is None:
-            raise NegativeAmountError(moneybox_id=moneybox_id, amount=amount)
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         moneybox.balance += amount  # type: ignore
 
@@ -261,8 +261,8 @@ class DBManager:
 
         amount: int = withdraw_transaction_data["withdraw_data"]["amount"]
 
-        if amount < 0:
-            raise NegativeAmountError(moneybox_id=moneybox_id, amount=amount)
+        if amount <= 0:
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         moneybox = await read_instance(
             async_session=self.async_session,
@@ -271,7 +271,7 @@ class DBManager:
         )
 
         if moneybox is None:
-            raise NegativeAmountError(moneybox_id=moneybox_id, amount=amount)
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         moneybox.balance -= amount  # type: ignore
 
@@ -335,8 +335,8 @@ class DBManager:
                 amount=amount,
             )
 
-        if amount < 0:
-            raise NegativeTransferAmountError(
+        if amount <= 0:
+            raise NonPositiveTransferAmountError(
                 from_moneybox_id=from_moneybox_id,
                 to_moneybox_id=transfer_transaction_data["transfer_data"]["to_moneybox_id"],
                 amount=amount,

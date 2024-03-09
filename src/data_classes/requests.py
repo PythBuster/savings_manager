@@ -59,9 +59,9 @@ class DepositModel(BaseModel):
 
     amount: Annotated[
         int,
-        Field(ge=0, description="The amount to add."),
+        Field(ge=1, description="The amount to add, value has to be at least 1."),
     ]
-    """The amount to add."""
+    """The amount to add, value has to be at least 1."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -82,9 +82,9 @@ class WithdrawModel(BaseModel):
 
     amount: Annotated[
         int,
-        Field(ge=0, description="The amount to sub."),
+        Field(ge=1, description="The amount to sub, value has to be at least 1."),
     ]
-    """The amount to sub."""
+    """The amount to sub, value has to be at least 1."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -105,15 +105,15 @@ class TransferModel(BaseModel):
 
     to_moneybox_id: Annotated[
         int,
-        Field(ge=1, description="The id of the moneybox to transfer balance to."),
+        Field(description="The id of the moneybox to transfer balance to."),
     ]
     """The id of the moneybox to transfer balance to."""
 
     amount: Annotated[
         int,
-        Field(ge=0, description="The amount to transfer."),
+        Field(ge=1, description="The amount to transfer, value has to be at least 1."),
     ]
-    """The amount to transfer."""
+    """The amount to transfer, value has to be at least 1."""
 
     model_config = ConfigDict(
         extra="forbid",
