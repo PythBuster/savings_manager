@@ -8,12 +8,13 @@ from sqlalchemy.orm import joinedload
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
+    activate_instance,
     create_instance,
     deactivate_instance,
     exists_instance,
     read_instance,
     read_instances,
-    update_instance, activate_instance,
+    update_instance,
 )
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
@@ -192,7 +193,6 @@ class DBManager:
 
         if not activated:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
-
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
     #  sub_amount are almost identical, combine in one function?

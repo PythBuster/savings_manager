@@ -109,7 +109,7 @@ def create_envfile_from_envvars() -> None:
 def equal_dict(
     dict_1: dict[Hashable, Any],
     dict_2: dict[Hashable, Any],
-    exclude_keys: list[Hashable],
+    exclude_keys: list[str],
 ) -> bool:
     """Compare two dictionaries by excluding keys specified in exclude_keys.
 
@@ -118,6 +118,7 @@ def equal_dict(
     :param dict_2: The second dictionary.
     :type dict_2: :class:`dict[Hashable, Any]`
     :param exclude_keys: List of keys to exclude from given dictionaries.
+    :type exclude_keys: :class:`list[str]`
     :return: True if the two dictionaries are equal, False otherwise.
     :rtype: :class:`bool`
     """
@@ -135,7 +136,7 @@ def equal_dict(
 def equal_list_of_dict(
     list_dict_1: list[dict[Hashable, Any]],
     list_dict_2: list[dict[Hashable, Any]],
-    exclude_keys: list[Hashable],
+    exclude_keys: list[str],
 ) -> bool:
     """Compare two dictionaries by excluding keys specified in exclude_keys.
 
@@ -144,6 +145,7 @@ def equal_list_of_dict(
     :param list_dict_2: The second list of dictionaries.
     :type list_dict_2: :class:`list[dict[Hashable, Any]]`
     :param exclude_keys: List of keys to exclude from given dictionaries.
+    :type exclude_keys: :class:`list[str]`
     :return: True if the two list of dictionaries are equal, False otherwise.
     :rtype: :class:`bool`
     """

@@ -7,7 +7,7 @@ from httpx import AsyncClient
 
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
-from src.utils import equal_list_of_dict, equal_dict
+from src.utils import equal_dict, equal_list_of_dict
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
@@ -30,7 +30,7 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
 
     assert equal_list_of_dict(
         list_dict_1=moneyboxes["moneyboxes"],
-        list_dict_2=expected_moneyboxes["moneyboxes"],
+        list_dict_2=expected_moneyboxes["moneyboxes"],  # type: ignore
         exclude_keys=["created_at", "modified_at", "id"],
     )
 
@@ -60,7 +60,7 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     assert moneyboxes["total"] == expected_moneyboxes["total"]
     assert equal_list_of_dict(
         list_dict_1=moneyboxes["moneyboxes"],
-        list_dict_2=expected_moneyboxes["moneyboxes"],
+        list_dict_2=expected_moneyboxes["moneyboxes"],  # type: ignore
         exclude_keys=["created_at", "modified_at", "id"],
     )
 
@@ -77,7 +77,7 @@ async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
     assert response_1.status_code == 200
     assert equal_dict(
         dict_1=moneybox,
-        dict_2=expected_moneybox_data,
+        dict_2=expected_moneybox_data,  # type: ignore
         exclude_keys=["created_at", "modified_at"],
     )
 
@@ -145,6 +145,7 @@ async def test_endpoint_update_moneybox(client: AsyncClient) -> None:
         dict_2=moneybox_data_1 | {"id": 5, "balance": 0},
         exclude_keys=["created_at", "modified_at"],
     )
+
 
 @pytest.mark.dependency(depends=["test_endpoint_update_moneybox"])
 async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
