@@ -106,7 +106,7 @@ class MoneyboxesResponse(BaseModel):
     """The config of the model."""
 
 
-class TransactonLog(BaseModel):
+class TransactionLog(BaseModel):
     """The transaction log response model."""
 
     description: Annotated[str, Field(description="The description of the transaction action.")]
@@ -173,7 +173,7 @@ class TransactionLogs(BaseModel):
     """The count of transaction logs."""
 
     transaction_logs: Annotated[
-        list[TransactonLog], Field(description="The list of transaction logs.")
+        list[TransactionLog], Field(description="The list of transaction logs.")
     ]
     """The list of transaction logs."""
 
