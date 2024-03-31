@@ -4,11 +4,17 @@
 
 ...
 
+## 0.8.0 (2024-04-01)
+
+### Changes:
+- simplify /balance/-add, -sub and -transfer endpoints
+- reduce transaction log data in request data
+
 ## 0.7.0 (2024-03-31)
 
 ### Fixes:
 - prevent updating moneybox name with existing name
-- 
+
 
 ## 0.6.0 (2024-03-31)
 
