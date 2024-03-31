@@ -563,7 +563,6 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     assert expected_transfer_dict_moneybox_1 == transaction_logs_moneybox_1[-1]
     assert expected_transfer_dict_moneybox_3 == transaction_logs_moneybox_3[-1]
 
-
     # expected exception tests
     with pytest.raises(ValidationError):
         await db_manager.transfer_amount(
