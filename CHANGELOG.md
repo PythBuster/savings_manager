@@ -4,6 +4,11 @@
 
 ...
 
+## 0.6.0 (2024-03-31)
+
+### Changes:
+- add counterparty_moneybox_name in transaction logs data
+
 ## 0.5.0 (2024-03-31)
 
 ### Changes:
