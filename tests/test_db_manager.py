@@ -270,7 +270,6 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
 
     for transaction_log in transaction_logs:
         del transaction_log["created_at"]
-        del transaction_log["modified_at"]
         del transaction_log["id"]
 
     expected_dict_1 = {
@@ -396,7 +395,6 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
 
     for transaction_log in transaction_logs:
         del transaction_log["created_at"]
-        del transaction_log["modified_at"]
         del transaction_log["id"]
 
     expected_withdraw_dict_1 = {
@@ -531,12 +529,10 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
 
     for transaction_log in transaction_logs_moneybox_1:
         del transaction_log["created_at"]
-        del transaction_log["modified_at"]
         del transaction_log["id"]
 
     for transaction_log in transaction_logs_moneybox_3:
         del transaction_log["created_at"]
-        del transaction_log["modified_at"]
         del transaction_log["id"]
 
     expected_transfer_dict_moneybox_1 = {
