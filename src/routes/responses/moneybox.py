@@ -210,6 +210,20 @@ DELETE_MONEYBOX_RESPONSES = {
             }
         },
     },
+    status.HTTP_405_METHOD_NOT_ALLOWED: {
+        "description": "Method Not Allowed",
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": (
+                        "Deleting moneyboxes with balance > 0 ist not allowed.Moneybox '1' "
+                        "has balance 4300."
+                    ),
+                    "details": {"balance": 4300, "id": 1},
+                }
+            }
+        },
+    },
     status.HTTP_422_UNPROCESSABLE_ENTITY: {
         "description": "Unprocessable Content",
         "content": {
