@@ -65,7 +65,7 @@ load-plugins=[
 
 [tool.poetry]
 name = "Savings Manager"
-version = "0.3.0"
+version = "0.4.0"
 description = "Manage your savings on your physical account via the app."
 authors = ["'PythBuster' <'pythbuster@gmail.com'>"]
 readme = "README.md"

@@ -4,6 +4,11 @@
 
 ...
 
+## 0.4.0 (2024-03-31)
+
+### Features:
+- add transaction logs for deposit, withdraw and transfer
+
 ## 0.3.0 (2024-02-27)
 
 ### Features:
