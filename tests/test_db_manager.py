@@ -133,6 +133,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
     expected_moneybox_data = moneybox_data | {"id": 1, "balance": 0}
     assert result_moneybox_data == expected_moneybox_data
 
+    moneybox_data["name"] = "new"
     non_existing_moneybox_ids = [-42, -1, 0, 5, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
