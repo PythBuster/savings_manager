@@ -521,6 +521,28 @@ class DBManager:
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
+        resolved_moneybox_names_cache = {}
+
+        async def resolve_moneybox_name(counterparty_moneybox_id_: int | None) -> str | None:
+            if counterparty_moneybox_id_ is None:
+                return None
+
+            if counterparty_moneybox_id_ not in resolved_moneybox_names_cache:
+                counterparty_moneybox_ = await self.get_moneybox(
+                    moneybox_id=counterparty_moneybox_id_
+                )
+                resolved_moneybox_names_cache[counterparty_moneybox_id_] = counterparty_moneybox_[
+                    "name"
+                ]
+
+            return resolved_moneybox_names_cache[counterparty_moneybox_id_]
+
         return [
-            transaction.asdict(exclude=["modified_at"]) for transaction in moneybox.transactions_log
+            transaction.asdict(exclude=["modified_at"])
+            | {
+                "counterparty_moneybox_name": await resolve_moneybox_name(
+                    counterparty_moneybox_id_=transaction.counterparty_moneybox_id
+                )
+            }
+            for transaction in moneybox.transactions_log
         ]

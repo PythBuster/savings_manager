@@ -218,7 +218,7 @@ async def get_moneybox_transaction_logs(
             "total": len(transaction_logs_data),
             "transaction_logs": transaction_logs_data,
         }
-        transacion_logs = TransactionLogs(**transaction_logs_data)
-        return transacion_logs
+        transaction_logs = TransactionLogs(**transaction_logs_data)
+        return transaction_logs
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

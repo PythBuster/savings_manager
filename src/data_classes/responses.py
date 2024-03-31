@@ -112,6 +112,11 @@ class TransactionLog(BaseModel):
     id: Annotated[int, Field(description="The ID of the transaction.")]
     """The ID of the transaction."""
 
+    counterparty_moneybox_name: Annotated[
+        str | None, Field(min_length=1, description="The name of the counterparty moneybox.")
+    ]
+    """The name of the counterparty moneybox."""
+
     description: Annotated[str, Field(description="The description of the transaction action.")]
     """The description of the transaction action."""
 
