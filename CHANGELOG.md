@@ -4,6 +4,12 @@
 
 ...
 
+## 0.7.0 (2024-03-31)
+
+### Fixes:
+- prevent updating moneybox name with existing name
+- 
+
 ## 0.6.0 (2024-03-31)
 
 ### Changes:
