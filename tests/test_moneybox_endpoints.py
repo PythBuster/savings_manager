@@ -193,12 +193,8 @@ async def test_endpoint_deposit_moneybox(client: AsyncClient) -> None:
     )
 
     deposit_data_1 = {
-        "deposit_data": {"amount": 10},
-        "transaction_data": {
-            "description": "Bonus.",
-            "transaction_trigger": "manually",
-            "transaction_type": "direct",
-        },
+        "amount": 10,
+        "description": "Bonus.",
     }
 
     response_1 = await client.post(
@@ -216,12 +212,8 @@ async def test_endpoint_deposit_moneybox(client: AsyncClient) -> None:
     )
 
     deposit_data_2 = {
-        "deposit_data": {"amount": 0},
-        "transaction_data": {
-            "description": "Bonus.",
-            "transaction_trigger": "manually",
-            "transaction_type": "direct",
-        },
+        "amount": 0,
+        "description": "Bonus.",
     }
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
@@ -251,12 +243,8 @@ async def test_endpoint_withdraw_moneybox(client: AsyncClient) -> None:
     )
 
     withdraw_data_1 = {
-        "transaction_data": {
-            "description": "Unexpected expenses.",
-            "transaction_trigger": "manually",
-            "transaction_type": "direct",
-        },
-        "withdraw_data": {"amount": 10},
+        "amount": 10,
+        "description": "Unexpected expenses.",
     }
 
     response_1 = await client.post(
@@ -274,12 +262,8 @@ async def test_endpoint_withdraw_moneybox(client: AsyncClient) -> None:
     )
 
     deposit_data_2 = {
-        "transaction_data": {
-            "description": "Unexpected expenses.",
-            "transaction_trigger": "manually",
-            "transaction_type": "direct",
-        },
-        "withdraw_data": {"amount": 0},
+        "amount": 0,
+        "description": "Unexpected expenses.",
     }
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
@@ -288,12 +272,8 @@ async def test_endpoint_withdraw_moneybox(client: AsyncClient) -> None:
     assert response_2.status_code == 422
 
     deposit_data_3 = {
-        "transaction_data": {
-            "description": "Unexpected expenses.",
-            "transaction_trigger": "manually",
-            "transaction_type": "direct",
-        },
-        "withdraw_data": {"amount": -1},
+        "amount": -1,
+        "description": "Unexpected expenses.",
     }
     response_3 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
@@ -315,12 +295,9 @@ async def test_endpoint_transfer_amount_moneybox(client: AsyncClient) -> None:
     moneybox_id_3_data = respose_moneybox_id_3_data.json()
 
     transfer_data_1 = {
-        "transaction_data": {
-            "description": "Transfer money.",
-            "transaction_trigger": "manually",
-            "transaction_type": "direct",
-        },
-        "transfer_data": {"amount": 50, "to_moneybox_id": 1},
+        "amount": 50,
+        "to_moneybox_id": 1,
+        "description": "Transfer money.",
     }
 
     response_1 = await client.post(
