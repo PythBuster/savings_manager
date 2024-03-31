@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Depends, Path
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
@@ -26,6 +26,7 @@ from src.routes.responses.moneybox import (
     UPDATE_MONEYBOX_RESPONSES,
     WITHDRAW_MONEYBOX_RESPONSES,
 )
+from src.utils import check_existence_of_moneybox_by_id
 
 moneybox_router = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOX}",
@@ -77,9 +78,7 @@ async def add_moneybox(
 )
 async def update_moneybox(
     request: Request,
-    moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to be updated.")
-    ],
+    moneybox_id: Annotated[int, Depends(check_existence_of_moneybox_by_id)],
     moneybox_update_request: Annotated[
         MoneyboxUpdateModel, Body(title="Update Data", description="The updating moneybox data.")
     ],
@@ -98,9 +97,7 @@ async def update_moneybox(
 )
 async def delete_moneybox(
     request: Request,
-    moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to be deleted.")
-    ],
+    moneybox_id: Annotated[int, Depends(check_existence_of_moneybox_by_id)],
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id."""
 
@@ -120,7 +117,7 @@ async def deposit_moneybox(
     request: Request,
     moneybox_id: Annotated[
         int,
-        Path(title="Moneybox ID", description="Moneybox ID where balance shall be added to."),
+        Depends(check_existence_of_moneybox_by_id),
     ],
     deposit_transaction: Annotated[
         DepositTransactionModel,
@@ -148,17 +145,14 @@ async def withdraw_moneybox(
     request: Request,
     moneybox_id: Annotated[
         int,
-        Path(
-            title="Moneybox ID",
-            description="Moneybox ID where balance shall be withdrawn from.",
-        ),
+        Depends(check_existence_of_moneybox_by_id),
     ],
     withdraw_transaction: Annotated[
         WithdrawTransactionModel,
         Body(
             title="Withdraw amount",
             description=(
-                "The withdrawal transaction with amount to sub from moneybox, has to be >=0.",
+                "The withdrawal transaction with amount to sub from moneybox, has to be >=0."
             ),
         ),
     ],
@@ -179,7 +173,8 @@ async def withdraw_moneybox(
 async def transfer_balance(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to transfer balance from.")
+        int,
+        Depends(check_existence_of_moneybox_by_id),
     ],
     transfer_transaction: Annotated[
         TransferTransactionModel,
@@ -208,7 +203,8 @@ async def transfer_balance(
 async def get_moneybox_transaction_logs(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to get transaction logs from.")
+        int,
+        Depends(check_existence_of_moneybox_by_id),
     ],
 ) -> TransactionLogs | Response:
     """Endpoint for getting moneybox transaction logs."""

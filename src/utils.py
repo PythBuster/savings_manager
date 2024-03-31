@@ -4,11 +4,32 @@ import argparse
 import os
 import tomllib
 from pathlib import Path
-from typing import Any, Hashable
+from typing import Annotated, Any, Hashable
 
 from dotenv import load_dotenv
+from starlette.requests import Request
 
 from src.custom_types import DBSettings, EnvironmentType
+
+
+async def check_existence_of_moneybox_by_id(
+    request: Request,
+    moneybox_id: Annotated[
+        int, Path(title="Moneybox ID", description="Moneybox ID to be processed.")
+    ],
+) -> int:
+    """FastAPI dependency for checking existence of moneybox by id.
+
+    :param request: The fastapi request object.
+    :type request: Request
+    :param moneybox_id: The id of the moneybox to check.
+    :type moneybox_id: int
+    :return: The moneybox id.
+    :rtype: int
+    """
+
+    _ = await request.app.state.db_manager.get_moneybox(moneybox_id=moneybox_id)
+    return moneybox_id
 
 
 def get_db_settings() -> DBSettings:
