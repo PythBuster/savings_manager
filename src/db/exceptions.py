@@ -43,6 +43,24 @@ class CreateInstanceError(ABC, Exception):
         super().__init__(message)
 
 
+class DeleteInstanceError(ABC, Exception):
+    """Base DeleteInstanceError Exception Class"""
+
+    def __init__(
+        self, record_id: int | None, message: str, details: dict[str, Any] | None = None
+    ) -> None:
+        self.record_id = record_id
+        self.message = message
+
+        if details is None:
+            details = {}
+
+        self.details = details | {
+            "id": record_id,
+        }
+        super().__init__(message)
+
+
 class ColumnDoesNotExistError(Exception):
     """Custom Exception ColumnDoesNotExistError"""
 
@@ -133,3 +151,15 @@ class BalanceResultIsNegativeError(UpdateInstanceError):
         )
         self.amount = amount
         super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
+
+
+class HasBalanceError(DeleteInstanceError):
+    """Custom HasBalanceError Exception"""
+
+    def __init__(self, moneybox_id: int, balance: int) -> None:
+        message = (
+            f"Deleting moneyboxes with balance > 0 ist not allowed."
+            f"Moneybox '{moneybox_id}' has balance {balance}."
+        )
+        self.balance = balance
+        super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})

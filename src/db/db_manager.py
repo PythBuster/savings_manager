@@ -18,6 +18,7 @@ from src.db.core import (
 )
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
+    HasBalanceError,
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
@@ -165,6 +166,11 @@ class DBManager:
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
             was not found in database.
         """
+
+        moneybox = await self.get_moneybox(moneybox_id=moneybox_id)
+
+        if moneybox["balance"] > 0:
+            raise HasBalanceError(moneybox_id=moneybox_id, balance=moneybox["balance"])
 
         deactivated: bool = await deactivate_instance(
             async_session=self.async_session,
