@@ -158,7 +158,7 @@ class HasBalanceError(DeleteInstanceError):
 
     def __init__(self, moneybox_id: int, balance: int) -> None:
         message = (
-            f"Deleting moneyboxes with balance > 0 ist not allowed."
+            f"Deleting moneyboxes with balance > 0 ist not allowed. "
             f"Moneybox '{moneybox_id}' has balance {balance}."
         )
         self.balance = balance

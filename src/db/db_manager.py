@@ -145,6 +145,16 @@ class DBManager:
             was not found in database.
         """
 
+        if "name" in moneybox_data:
+            name_exist = await exists_instance(
+                async_session=self.async_session,
+                orm_model=Moneybox,  # type: ignore
+                values={"name": moneybox_data["name"]},
+            )
+
+            if name_exist:
+                raise MoneyboxNameExistError(name=moneybox_data["name"])
+
         moneybox = await update_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
