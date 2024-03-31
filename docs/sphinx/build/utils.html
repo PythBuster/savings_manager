@@ -45,7 +45,10 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">utils module</a><ul>
+<li><a class="reference internal" href="#utils.check_existence_of_moneybox_by_id"><code class="docutils literal notranslate"><span class="pre">check_existence_of_moneybox_by_id()</span></code></a></li>
 <li><a class="reference internal" href="#utils.create_envfile_from_envvars"><code class="docutils literal notranslate"><span class="pre">create_envfile_from_envvars()</span></code></a></li>
+<li><a class="reference internal" href="#utils.equal_dict"><code class="docutils literal notranslate"><span class="pre">equal_dict()</span></code></a></li>
+<li><a class="reference internal" href="#utils.equal_list_of_dict"><code class="docutils literal notranslate"><span class="pre">equal_list_of_dict()</span></code></a></li>
 <li><a class="reference internal" href="#utils.get_app_data"><code class="docutils literal notranslate"><span class="pre">get_app_data()</span></code></a></li>
 <li><a class="reference internal" href="#utils.get_database_url"><code class="docutils literal notranslate"><span class="pre">get_database_url()</span></code></a></li>
 <li><a class="reference internal" href="#utils.get_db_settings"><code class="docutils literal notranslate"><span class="pre">get_db_settings()</span></code></a></li>
@@ -82,10 +85,72 @@
 <span id="utils-module"></span><h1>utils module<a class="headerlink" href="#module-utils" title="Link to this heading"></a></h1>
 <p>All helper functions are located here.</p>
 <dl class="py function">
+<dt class="sig sig-object py" id="utils.check_existence_of_moneybox_by_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">check_existence_of_moneybox_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#utils.check_existence_of_moneybox_by_id" title="Link to this definition"></a></dt>
+<dd><p>FastAPI dependency for checking existence of moneybox by id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>Request</em>) – The fastapi request object.</p></li>
+<li><p><strong>moneybox_id</strong> (<em>int</em>) – The id of the moneybox to check.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The moneybox id.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="utils.create_envfile_from_envvars">
 <span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">create_envfile_from_envvars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#utils.create_envfile_from_envvars" title="Link to this definition"></a></dt>
 <dd><p>Helper function to create .env file for database credentials
 in /envs dir by reading environment variables.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.equal_dict">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">equal_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#utils.equal_dict" title="Link to this definition"></a></dt>
+<dd><p>Compare two dictionaries by excluding keys specified in exclude_keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict_1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict[Hashable,</span> <span class="pre">Any]</span></code>) – The first dictionary.</p></li>
+<li><p><strong>dict_2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict[Hashable,</span> <span class="pre">Any]</span></code>) – The second dictionary.</p></li>
+<li><p><strong>exclude_keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[str]</span></code>) – List of keys to exclude from given dictionaries.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the two dictionaries are equal, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils.equal_list_of_dict">
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">equal_list_of_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_dict_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_dict_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#utils.equal_list_of_dict" title="Link to this definition"></a></dt>
+<dd><p>Compare two dictionaries by excluding keys specified in exclude_keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list_dict_1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[dict[Hashable,</span> <span class="pre">Any]]</span></code>) – The first list of dictionaries.</p></li>
+<li><p><strong>list_dict_2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[dict[Hashable,</span> <span class="pre">Any]]</span></code>) – The second list of dictionaries.</p></li>
+<li><p><strong>exclude_keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[str]</span></code>) – List of keys to exclude from given dictionaries.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the two list of dictionaries are equal, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

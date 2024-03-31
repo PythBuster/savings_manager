@@ -69,6 +69,16 @@
 <li><a class="reference internal" href="#custom_types.EnvironmentType.TEST"><code class="docutils literal notranslate"><span class="pre">EnvironmentType.TEST</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#custom_types.TransactionTrigger"><code class="docutils literal notranslate"><span class="pre">TransactionTrigger</span></code></a><ul>
+<li><a class="reference internal" href="#custom_types.TransactionTrigger.AUTOMATICALLY"><code class="docutils literal notranslate"><span class="pre">TransactionTrigger.AUTOMATICALLY</span></code></a></li>
+<li><a class="reference internal" href="#custom_types.TransactionTrigger.MANUALLY"><code class="docutils literal notranslate"><span class="pre">TransactionTrigger.MANUALLY</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#custom_types.TransactionType"><code class="docutils literal notranslate"><span class="pre">TransactionType</span></code></a><ul>
+<li><a class="reference internal" href="#custom_types.TransactionType.DIRECT"><code class="docutils literal notranslate"><span class="pre">TransactionType.DIRECT</span></code></a></li>
+<li><a class="reference internal" href="#custom_types.TransactionType.DISTRIBUTION"><code class="docutils literal notranslate"><span class="pre">TransactionType.DISTRIBUTION</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -220,6 +230,44 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 <dt class="sig sig-object py" id="custom_types.EnvironmentType.TEST">
 <span class="sig-name descname"><span class="pre">TEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'test'</span></em><a class="headerlink" href="#custom_types.EnvironmentType.TEST" title="Link to this definition"></a></dt>
 <dd><p>Testing Environment.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="custom_types.TransactionTrigger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">custom_types.</span></span><span class="sig-name descname"><span class="pre">TransactionTrigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#custom_types.TransactionTrigger" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StrEnum</span></code></p>
+<p>The transaction trigger.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="custom_types.TransactionTrigger.AUTOMATICALLY">
+<span class="sig-name descname"><span class="pre">AUTOMATICALLY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'automatically'</span></em><a class="headerlink" href="#custom_types.TransactionTrigger.AUTOMATICALLY" title="Link to this definition"></a></dt>
+<dd><p>Transaction was triggered automatically.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="custom_types.TransactionTrigger.MANUALLY">
+<span class="sig-name descname"><span class="pre">MANUALLY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'manually'</span></em><a class="headerlink" href="#custom_types.TransactionTrigger.MANUALLY" title="Link to this definition"></a></dt>
+<dd><p>Transaction was triggered manually.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="custom_types.TransactionType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">custom_types.</span></span><span class="sig-name descname"><span class="pre">TransactionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#custom_types.TransactionType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StrEnum</span></code></p>
+<p>The transaction type.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="custom_types.TransactionType.DIRECT">
+<span class="sig-name descname"><span class="pre">DIRECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'direct'</span></em><a class="headerlink" href="#custom_types.TransactionType.DIRECT" title="Link to this definition"></a></dt>
+<dd><p>Transaction was made in this moneybox directly.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="custom_types.TransactionType.DISTRIBUTION">
+<span class="sig-name descname"><span class="pre">DISTRIBUTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'distribution'</span></em><a class="headerlink" href="#custom_types.TransactionType.DISTRIBUTION" title="Link to this definition"></a></dt>
+<dd><p>Transaction caused by distribution strategy.</p>
 </dd></dl>
 
 </dd></dl>

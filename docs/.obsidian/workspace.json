@@ -11,13 +11,26 @@
             "id": "e6be4134403886cb",
             "type": "leaf",
             "state": {
+              "type": "markdown",
+              "state": {
+                "file": "ui/draft/App Version 1.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "96c60efb94d6f94d",
+            "type": "leaf",
+            "state": {
               "type": "image",
               "state": {
-                "file": "transaction_log/Final_Example_Transatcion_Log.png"
+                "file": "ui/draft/App_v2_SavingsManagerUI.png"
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -83,7 +96,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "transaction_log/Final_Example_Transatcion_Log.png",
+                "file": "ui/draft/App_v2_SavingsManagerUI.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +113,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "transaction_log/Final_Example_Transatcion_Log.png",
+                "file": "ui/draft/App_v2_SavingsManagerUI.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +136,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "transaction_log/Final_Example_Transatcion_Log.png"
+                "file": "ui/draft/App_v2_SavingsManagerUI.png"
               }
             }
           }
@@ -144,31 +157,32 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e6be4134403886cb",
+  "active": "96c60efb94d6f94d",
   "lastOpenFiles": [
+    "sphinx/build/searchindex.js.tmp",
+    "ui/draft/App_v1_SavingsManagerUI.png",
+    "ui/draft/App_v2_SavingsManagerUI.png",
+    "ui/draft/App Version 1.md",
+    "Guidelines/Workflow.md",
+    "Feauture Requests/Ideas.md",
+    "Requirements/Requirement Analysis.md",
+    "Guidelines/Code/Quality Assurence.md",
+    "Guidelines/Code/Code Style.md",
     "transaction_log/draft_moneybox_log.png",
     "transaction_log/Final_Example_Transatcion_Log.png",
+    "transaction_log/Final_Example_Transatcion_Log.ods",
+    "transaction_log",
     "transaction_log/Final_Example_Transatcion_Log.html",
-    "Requirements/Requirement Analysis.md",
-    "ui/draft/App Version 1.md",
     "Untitled.canvas",
     "transaction_log/Final_Example_Transatcion_Log.xlsx",
     "transaction_log/Untitled.md",
-    "ui/draft/App_v1_SavingsManagerUI.png",
-    "transaction_log/Final_Example_Transatcion_Log.ods",
-    "transaction_log",
     "ui/draft/draft_moneybox_log.png",
-    "ui/draft/App_v2_SavingsManagerUI.png",
-    "Guidelines/Workflow.md",
     "vulture_whitelist.def",
     "sphinx/source/utils.rst",
     "sphinx/source/settings.rst",
     "sphinx/source/routes.rst",
     "sphinx/source/routes.responses.rst",
     "sphinx/source/modules.rst",
-    "Guidelines/Code/Code Style.md",
-    "Feauture Requests/Ideas.md",
-    "Guidelines/Code/Quality Assurence.md",
     "ui/draft/App Version 2.md",
     "Diagram.svg",
     "ui/draft/SavingsManagerUI_v1.png",

@@ -47,7 +47,9 @@
 <li><a class="reference internal" href="#">db package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-db.core">db.core module</a><ul>
+<li><a class="reference internal" href="#db.core.activate_instance"><code class="docutils literal notranslate"><span class="pre">activate_instance()</span></code></a></li>
 <li><a class="reference internal" href="#db.core.create_instance"><code class="docutils literal notranslate"><span class="pre">create_instance()</span></code></a></li>
+<li><a class="reference internal" href="#db.core.deactivate_instance"><code class="docutils literal notranslate"><span class="pre">deactivate_instance()</span></code></a></li>
 <li><a class="reference internal" href="#db.core.delete_instance"><code class="docutils literal notranslate"><span class="pre">delete_instance()</span></code></a></li>
 <li><a class="reference internal" href="#db.core.exists_instance"><code class="docutils literal notranslate"><span class="pre">exists_instance()</span></code></a></li>
 <li><a class="reference internal" href="#db.core.read_instance"><code class="docutils literal notranslate"><span class="pre">read_instance()</span></code></a></li>
@@ -57,14 +59,15 @@
 </li>
 <li><a class="reference internal" href="#module-db.db_manager">db.db_manager module</a><ul>
 <li><a class="reference internal" href="#db.db_manager.DBManager"><code class="docutils literal notranslate"><span class="pre">DBManager</span></code></a><ul>
-<li><a class="reference internal" href="#db.db_manager.DBManager.add_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.add_balance()</span></code></a></li>
+<li><a class="reference internal" href="#db.db_manager.DBManager.add_amount"><code class="docutils literal notranslate"><span class="pre">DBManager.add_amount()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.add_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.add_moneybox()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.db_connection_string"><code class="docutils literal notranslate"><span class="pre">DBManager.db_connection_string</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.delete_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.delete_moneybox()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.get_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.get_moneybox()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.get_moneyboxes"><code class="docutils literal notranslate"><span class="pre">DBManager.get_moneyboxes()</span></code></a></li>
-<li><a class="reference internal" href="#db.db_manager.DBManager.sub_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.sub_balance()</span></code></a></li>
-<li><a class="reference internal" href="#db.db_manager.DBManager.transfer_balance"><code class="docutils literal notranslate"><span class="pre">DBManager.transfer_balance()</span></code></a></li>
+<li><a class="reference internal" href="#db.db_manager.DBManager.get_transaction_logs"><code class="docutils literal notranslate"><span class="pre">DBManager.get_transaction_logs()</span></code></a></li>
+<li><a class="reference internal" href="#db.db_manager.DBManager.sub_amount"><code class="docutils literal notranslate"><span class="pre">DBManager.sub_amount()</span></code></a></li>
+<li><a class="reference internal" href="#db.db_manager.DBManager.transfer_amount"><code class="docutils literal notranslate"><span class="pre">DBManager.transfer_amount()</span></code></a></li>
 <li><a class="reference internal" href="#db.db_manager.DBManager.update_moneybox"><code class="docutils literal notranslate"><span class="pre">DBManager.update_moneybox()</span></code></a></li>
 </ul>
 </li>
@@ -74,11 +77,14 @@
 <li><a class="reference internal" href="#db.exceptions.BalanceResultIsNegativeError"><code class="docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.ColumnDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">ColumnDoesNotExistError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.CreateInstanceError"><code class="docutils literal notranslate"><span class="pre">CreateInstanceError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.DeleteInstanceError"><code class="docutils literal notranslate"><span class="pre">DeleteInstanceError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.HasBalanceError"><code class="docutils literal notranslate"><span class="pre">HasBalanceError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.MoneyboxNameExistError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNameExistError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.MoneyboxNotFoundError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code></a></li>
-<li><a class="reference internal" href="#db.exceptions.NegativeBalanceError"><code class="docutils literal notranslate"><span class="pre">NegativeBalanceError</span></code></a></li>
-<li><a class="reference internal" href="#db.exceptions.NegativeTransferBalanceError"><code class="docutils literal notranslate"><span class="pre">NegativeTransferBalanceError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.NonPositiveAmountError"><code class="docutils literal notranslate"><span class="pre">NonPositiveAmountError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.NonPositiveTransferAmountError"><code class="docutils literal notranslate"><span class="pre">NonPositiveTransferAmountError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.RecordNotFoundError"><code class="docutils literal notranslate"><span class="pre">RecordNotFoundError</span></code></a></li>
+<li><a class="reference internal" href="#db.exceptions.TransferEqualMoneyboxError"><code class="docutils literal notranslate"><span class="pre">TransferEqualMoneyboxError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.UpdateInstanceError"><code class="docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></li>
 </ul>
 </li>
@@ -98,16 +104,37 @@
 </li>
 <li><a class="reference internal" href="#db.models.Moneybox"><code class="docutils literal notranslate"><span class="pre">Moneybox</span></code></a><ul>
 <li><a class="reference internal" href="#db.models.Moneybox.balance"><code class="docutils literal notranslate"><span class="pre">Moneybox.balance</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Moneybox.created_at"><code class="docutils literal notranslate"><span class="pre">Moneybox.created_at</span></code></a></li>
 <li><a class="reference internal" href="#db.models.Moneybox.id"><code class="docutils literal notranslate"><span class="pre">Moneybox.id</span></code></a></li>
 <li><a class="reference internal" href="#db.models.Moneybox.is_active"><code class="docutils literal notranslate"><span class="pre">Moneybox.is_active</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Moneybox.modified_at"><code class="docutils literal notranslate"><span class="pre">Moneybox.modified_at</span></code></a></li>
 <li><a class="reference internal" href="#db.models.Moneybox.name"><code class="docutils literal notranslate"><span class="pre">Moneybox.name</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Moneybox.transactions_log"><code class="docutils literal notranslate"><span class="pre">Moneybox.transactions_log</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#db.models.SqlBase"><code class="docutils literal notranslate"><span class="pre">SqlBase</span></code></a><ul>
 <li><a class="reference internal" href="#db.models.SqlBase.asdict"><code class="docutils literal notranslate"><span class="pre">SqlBase.asdict()</span></code></a></li>
+<li><a class="reference internal" href="#db.models.SqlBase.created_at"><code class="docutils literal notranslate"><span class="pre">SqlBase.created_at</span></code></a></li>
 <li><a class="reference internal" href="#db.models.SqlBase.id"><code class="docutils literal notranslate"><span class="pre">SqlBase.id</span></code></a></li>
 <li><a class="reference internal" href="#db.models.SqlBase.is_active"><code class="docutils literal notranslate"><span class="pre">SqlBase.is_active</span></code></a></li>
+<li><a class="reference internal" href="#db.models.SqlBase.modified_at"><code class="docutils literal notranslate"><span class="pre">SqlBase.modified_at</span></code></a></li>
 <li><a class="reference internal" href="#db.models.SqlBase.strict_attrs"><code class="docutils literal notranslate"><span class="pre">SqlBase.strict_attrs</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#db.models.Transaction"><code class="docutils literal notranslate"><span class="pre">Transaction</span></code></a><ul>
+<li><a class="reference internal" href="#db.models.Transaction.amount"><code class="docutils literal notranslate"><span class="pre">Transaction.amount</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.balance"><code class="docutils literal notranslate"><span class="pre">Transaction.balance</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.counterparty_moneybox"><code class="docutils literal notranslate"><span class="pre">Transaction.counterparty_moneybox</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.counterparty_moneybox_id"><code class="docutils literal notranslate"><span class="pre">Transaction.counterparty_moneybox_id</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.created_at"><code class="docutils literal notranslate"><span class="pre">Transaction.created_at</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.description"><code class="docutils literal notranslate"><span class="pre">Transaction.description</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.id"><code class="docutils literal notranslate"><span class="pre">Transaction.id</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.is_active"><code class="docutils literal notranslate"><span class="pre">Transaction.is_active</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.modified_at"><code class="docutils literal notranslate"><span class="pre">Transaction.modified_at</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.moneybox"><code class="docutils literal notranslate"><span class="pre">Transaction.moneybox</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.moneybox_id"><code class="docutils literal notranslate"><span class="pre">Transaction.moneybox_id</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.transaction_trigger"><code class="docutils literal notranslate"><span class="pre">Transaction.transaction_trigger</span></code></a></li>
+<li><a class="reference internal" href="#db.models.Transaction.transaction_type"><code class="docutils literal notranslate"><span class="pre">Transaction.transaction_type</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#db.models.meta"><code class="docutils literal notranslate"><span class="pre">meta</span></code></a></li>
@@ -151,6 +178,28 @@
 <span id="db-core-module"></span><h2>db.core module<a class="headerlink" href="#module-db.core" title="Link to this heading"></a></h2>
 <p>DB core functionalities are located here.</p>
 <dl class="py function">
+<dt class="sig sig-object py" id="db.core.activate_instance">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">activate_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#db.core.activate_instance" title="Link to this definition"></a></dt>
+<dd><p>The core activate db function. Specific update function to set <cite>ìs_active</cite>
+column to true.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>async_session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">async_sessionmaker</span></code>) – The current async_session of the database.</p></li>
+<li><p><strong>orm_model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code>) – The orm model to handle with (table).</p></li>
+<li><p><strong>record_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The instance id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If activated successfully, returns True, otherwise returns False.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="db.core.create_instance">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">create_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SqlBase</span></span></span><a class="headerlink" href="#db.core.create_instance" title="Link to this definition"></a></dt>
 <dd><p>The core CREATE db function.</p>
@@ -167,6 +216,28 @@
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="db.core.deactivate_instance">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">deactivate_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#db.core.deactivate_instance" title="Link to this definition"></a></dt>
+<dd><p>The core deactivate db function. Specific update function to set <cite>ìs_active</cite>
+column to false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>async_session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">async_sessionmaker</span></code>) – The current async_session of the database.</p></li>
+<li><p><strong>orm_model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code>) – The orm model to handle with (table).</p></li>
+<li><p><strong>record_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The instance id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>If deactivated successfully, returns True, otherwise returns False.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -201,7 +272,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>async_session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">async_sessionmaker</span></code>) – The current async_session of the database.</p></li>
 <li><p><strong>orm_model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code>) – The orm model to handle with (table).</p></li>
-<li><p><strong>values</strong> – The key-values data used for the where-clausel.</p></li>
+<li><p><strong>values</strong> – The key-values data used for the where-clause.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -215,7 +286,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="db.core.read_instance">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">read_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SqlBase</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#db.core.read_instance" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">read_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_active_instances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SqlBase</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#db.core.read_instance" title="Link to this definition"></a></dt>
 <dd><p>The core SELECT db function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -223,6 +294,8 @@
 <li><p><strong>async_session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">async_sessionmaker</span></code>) – The current async_session of the database.</p></li>
 <li><p><strong>orm_model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code>) – The orm model to handle with (table).</p></li>
 <li><p><strong>record_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The instance id.</p></li>
+<li><p><strong>only_active_instances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If true, only active instances will be returned (is_active=True).
+If false, inclusive inactive instances will be returned (is_active=False).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -237,13 +310,15 @@ or None, if given record_id does not exist.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="db.core.read_instances">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">read_instances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span></span></span><a class="headerlink" href="#db.core.read_instances" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">read_instances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_active_instances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Sequence</span></span></span><a class="headerlink" href="#db.core.read_instances" title="Link to this definition"></a></dt>
 <dd><p>The core multi SELECT db function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>async_session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">async_sessionmaker</span></code>) – The current async_session of the database.</p></li>
 <li><p><strong>orm_model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code>) – The orm model to handle with (table).</p></li>
+<li><p><strong>only_active_instances</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If true, only active instances will be returned (is_active=True).
+If false, inclusive inactive instances will be returned (is_active=False).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -258,12 +333,12 @@ or None, if no instances available.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="db.core.update_instance">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">update_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SqlBase</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#db.core.update_instance" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.core.</span></span><span class="sig-name descname"><span class="pre">update_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">async_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">async_sessionmaker</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AsyncSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orm_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SqlBase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SqlBase</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#db.core.update_instance" title="Link to this definition"></a></dt>
 <dd><p>The core UPDATE db function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>async_session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">async_sessionmaker</span></code>) – The current async_session of the database.</p></li>
+<li><p><strong>async_session</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">async_sessionmaker</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncSession</span></code>) – The current async_session of the database.</p></li>
 <li><p><strong>orm_model</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code>) – The orm model to handle with (table).</p></li>
 <li><p><strong>record_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The instance id.</p></li>
 <li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Any]</span></code>) – The ORM updating model data.</p></li>
@@ -289,14 +364,14 @@ or None, if given record_id does not exist.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>All db manager logic are located here.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="db.db_manager.DBManager.add_balance">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.add_balance" title="Link to this definition"></a></dt>
-<dd><p>DB Function to add balance to moneybox by moneybox_id.</p>
+<dt class="sig sig-object py" id="db.db_manager.DBManager.add_amount">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deposit_transaction_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.add_amount" title="Link to this definition"></a></dt>
+<dd><p>DB Function to add amount to moneybox by moneybox_id.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the moneybox.</p></li>
-<li><p><strong>balance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The balance to add to given moneybox.</p></li>
+<li><p><strong>deposit_transaction_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Any]</span></code>) – The deposit transaction data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -310,7 +385,7 @@ or None, if given record_id does not exist.</p>
 <dt><code class="xref py py-class docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code>: if given moneybox_id</dt><dd><p>was not found in database.</p>
 </dd>
 </dl>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeBalanceError</span></code>: if balance to add is negative.</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeAmountError</span></code>: if balance to add is negative.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -400,14 +475,35 @@ was not found in database.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="db.db_manager.DBManager.sub_balance">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sub_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.sub_balance" title="Link to this definition"></a></dt>
-<dd><p>DB Function to sub balance from moneybox by moneybox_id.</p>
+<dt class="sig sig-object py" id="db.db_manager.DBManager.get_transaction_logs">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_transaction_logs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.get_transaction_logs" title="Link to this definition"></a></dt>
+<dd><p>Get a list of transaction logs for the given moneybox id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The moneybox id.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of transaction logs for the given moneybox id.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list[dict[str,</span> <span class="pre">Any]]</span></code></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code>: if given moneybox_id
+was not found in database.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="db.db_manager.DBManager.sub_amount">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sub_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withdraw_transaction_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.db_manager.DBManager.sub_amount" title="Link to this definition"></a></dt>
+<dd><p>DB Function to sub given amount from moneybox by moneybox_id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The id of the moneybox.</p></li>
-<li><p><strong>balance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The balance to sub from given moneybox.</p></li>
+<li><p><strong>withdraw_transaction_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Any]</span></code>) – The withdrawal transaction data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -420,7 +516,7 @@ was not found in database.</p>
 <dd class="field-even"><dl class="simple">
 <dt><code class="xref py py-class docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code>: if given moneybox_id</dt><dd><p>was not found in database.</p>
 </dd>
-<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeBalanceError</span></code>:</dt><dd><p>if balance to sub  is negative.</p>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeAmountError</span></code>:</dt><dd><p>if balance to sub  is negative.</p>
 </dd>
 <dt><code class="xref py py-class docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code>:</dt><dd><p>if result of withdraw is negative.</p>
 </dd>
@@ -430,24 +526,28 @@ was not found in database.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="db.db_manager.DBManager.transfer_balance">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transfer_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#db.db_manager.DBManager.transfer_balance" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="db.db_manager.DBManager.transfer_amount">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transfer_amount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_transaction_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#db.db_manager.DBManager.transfer_amount" title="Link to this definition"></a></dt>
 <dd><p>DB Function to transfer <cite>balance</cite> from <cite>from_moneybox_id</cite>
 from <cite>to_moneybox_id</cite>.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>from_moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The source id of the moneybox where the balance comes from.</p></li>
-<li><p><strong>to_moneybox_id</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The target id of the moneybox where the balance shall
-be transferred to.</p></li>
-<li><p><strong>balance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The balance to transfer.</p></li>
+<li><p><strong>transfer_transaction_data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Any]</span></code>) – The transfer transaction data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeTransferBalanceError</span></code>:</dt><dd><p>if balance to transfer is negative.</p>
-</dd>
+<dd class="field-even"><dl>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">NegativeTransferAmountError</span></code>:</dt><dd><blockquote>
+<div><p>if balance to transfer is negative.</p>
+</div></blockquote>
+<dl class="simple">
 <dt><code class="xref py py-class docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code>:</dt><dd><p>if result of withdraws from_moneybox_id is negative.</p>
+</dd>
+</dl>
+</dd>
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">TransferEqualMoneyboxError</span></code>:</dt><dd><p>if transfer shall happen within the same moneybox.</p>
 </dd>
 </dl>
 </dd>
@@ -486,9 +586,9 @@ was not found in database.</p>
 <p>All database exceptions are located.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="db.exceptions.BalanceResultIsNegativeError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">BalanceResultIsNegativeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.BalanceResultIsNegativeError" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">BalanceResultIsNegativeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.BalanceResultIsNegativeError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#db.exceptions.UpdateInstanceError" title="db.exceptions.UpdateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></p>
-<p>Custom NegativeBalanceError Exception</p>
+<p>Custom BalanceResultIsNegativeError Exception</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -506,6 +606,20 @@ was not found in database.</p>
 </dd></dl>
 
 <dl class="py exception">
+<dt class="sig sig-object py" id="db.exceptions.DeleteInstanceError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">DeleteInstanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.DeleteInstanceError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Base DeleteInstanceError Exception Class</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="db.exceptions.HasBalanceError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">HasBalanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.HasBalanceError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#db.exceptions.DeleteInstanceError" title="db.exceptions.DeleteInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeleteInstanceError</span></code></a></p>
+<p>Custom HasBalanceError Exception</p>
+</dd></dl>
+
+<dl class="py exception">
 <dt class="sig sig-object py" id="db.exceptions.MoneyboxNameExistError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">MoneyboxNameExistError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.MoneyboxNameExistError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#db.exceptions.CreateInstanceError" title="db.exceptions.CreateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateInstanceError</span></code></a></p>
@@ -520,17 +634,17 @@ was not found in database.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="db.exceptions.NegativeBalanceError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">NegativeBalanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.NegativeBalanceError" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="db.exceptions.NonPositiveAmountError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">NonPositiveAmountError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.NonPositiveAmountError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#db.exceptions.UpdateInstanceError" title="db.exceptions.UpdateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></p>
-<p>Custom NegativeBalanceError Exception</p>
+<p>Custom NonPositiveAmountError Exception</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="db.exceptions.NegativeTransferBalanceError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">NegativeTransferBalanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.NegativeTransferBalanceError" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="db.exceptions.NonPositiveTransferAmountError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">NonPositiveTransferAmountError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.NonPositiveTransferAmountError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#db.exceptions.UpdateInstanceError" title="db.exceptions.UpdateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></p>
-<p>Custom NegativeBalanceError Exception</p>
+<p>Custom NonPositiveTransferAmountError Exception</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -538,6 +652,13 @@ was not found in database.</p>
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">RecordNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.RecordNotFoundError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
 <p>Base RecordNotFound Exception Class</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="db.exceptions.TransferEqualMoneyboxError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">TransferEqualMoneyboxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.TransferEqualMoneyboxError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#db.exceptions.UpdateInstanceError" title="db.exceptions.UpdateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateInstanceError</span></code></a></p>
+<p>Custom TransferEqualMoneyboxError Exception</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -679,6 +800,12 @@ will not create missing instances or update collections.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Moneybox.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Moneybox.created_at" title="Link to this definition"></a></dt>
+<dd><p>The created utc datetime.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="db.models.Moneybox.id">
 <span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Moneybox.id" title="Link to this definition"></a></dt>
 <dd><p>The primary ID of the row.</p>
@@ -691,10 +818,21 @@ will not create missing instances or update collections.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Moneybox.modified_at">
+<span class="sig-name descname"><span class="pre">modified_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Moneybox.modified_at" title="Link to this definition"></a></dt>
+<dd><p>The modified utc datetime.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="db.models.Moneybox.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Moneybox.name" title="Link to this definition"></a></dt>
 <dd><p>The name of a moneybox.</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Moneybox.transactions_log">
+<span class="sig-name descname"><span class="pre">transactions_log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Transaction'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Moneybox.transactions_log" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -710,6 +848,12 @@ will not create missing instances or update collections.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.SqlBase.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;sqlalchemy.orm.properties.MappedColumn</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#db.models.SqlBase.created_at" title="Link to this definition"></a></dt>
+<dd><p>The created utc datetime.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="db.models.SqlBase.id">
 <span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;sqlalchemy.orm.properties.MappedColumn</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#db.models.SqlBase.id" title="Link to this definition"></a></dt>
 <dd><p>The primary ID of the row.</p>
@@ -722,9 +866,102 @@ will not create missing instances or update collections.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.SqlBase.modified_at">
+<span class="sig-name descname"><span class="pre">modified_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;sqlalchemy.orm.properties.MappedColumn</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#db.models.SqlBase.modified_at" title="Link to this definition"></a></dt>
+<dd><p>The modified utc datetime.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="db.models.SqlBase.strict_attrs">
 <span class="sig-name descname"><span class="pre">strict_attrs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#db.models.SqlBase.strict_attrs" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="db.models.Transaction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.models.</span></span><span class="sig-name descname"><span class="pre">Transaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.models.Transaction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#db.models.SqlBase" title="db.models.SqlBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SqlBase</span></code></a></p>
+<p>The moneybox ORM Transaction log.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.amount" title="Link to this definition"></a></dt>
+<dd><p>The current amount of the transaction.
+Can be negative, negative = withdraw, positive = deposit.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.balance">
+<span class="sig-name descname"><span class="pre">balance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.balance" title="Link to this definition"></a></dt>
+<dd><p>The balance of the moneybox at the time of the transaction.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.counterparty_moneybox">
+<span class="sig-name descname"><span class="pre">counterparty_moneybox</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#db.models.Moneybox" title="db.models.Moneybox"><span class="pre">Moneybox</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.counterparty_moneybox" title="Link to this definition"></a></dt>
+<dd><p>The foreign key to moneybox as counterparty relation, which can be None.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.counterparty_moneybox_id">
+<span class="sig-name descname"><span class="pre">counterparty_moneybox_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.counterparty_moneybox_id" title="Link to this definition"></a></dt>
+<dd><p>Transaction is a transfer between moneybox_id and
+counterparty_moneybox_id, if set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.created_at" title="Link to this definition"></a></dt>
+<dd><p>The created utc datetime.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.description" title="Link to this definition"></a></dt>
+<dd><p>The description of the transaction action.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.id" title="Link to this definition"></a></dt>
+<dd><p>The primary ID of the row.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.is_active">
+<span class="sig-name descname"><span class="pre">is_active</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.is_active" title="Link to this definition"></a></dt>
+<dd><p>Flag to mark instance as deleted.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.modified_at">
+<span class="sig-name descname"><span class="pre">modified_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.modified_at" title="Link to this definition"></a></dt>
+<dd><p>The modified utc datetime.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.moneybox">
+<span class="sig-name descname"><span class="pre">moneybox</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Moneybox'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.moneybox" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.moneybox_id">
+<span class="sig-name descname"><span class="pre">moneybox_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.moneybox_id" title="Link to this definition"></a></dt>
+<dd><p>The foreign key to moneybox.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.transaction_trigger">
+<span class="sig-name descname"><span class="pre">transaction_trigger</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="custom_types.html#custom_types.TransactionTrigger" title="custom_types.TransactionTrigger"><span class="pre">TransactionTrigger</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.transaction_trigger" title="Link to this definition"></a></dt>
+<dd><p>“The transaction type, possible values: manually, automatically.
+Says, if balance was deposit or withdrawn manually or automatically.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="db.models.Transaction.transaction_type">
+<span class="sig-name descname"><span class="pre">transaction_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="custom_types.html#custom_types.TransactionType" title="custom_types.TransactionType"><span class="pre">TransactionType</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Transaction.transaction_type" title="Link to this definition"></a></dt>
+<dd><p>The type of the transaction. Possible values: direct or distribution.</p>
+</dd></dl>
 
 </dd></dl>
 

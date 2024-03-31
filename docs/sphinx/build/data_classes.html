@@ -48,10 +48,18 @@
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-data_classes.requests">data_classes.requests module</a><ul>
 <li><a class="reference internal" href="#data_classes.requests.DepositModel"><code class="docutils literal notranslate"><span class="pre">DepositModel</span></code></a><ul>
-<li><a class="reference internal" href="#data_classes.requests.DepositModel.balance"><code class="docutils literal notranslate"><span class="pre">DepositModel.balance</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.DepositModel.amount"><code class="docutils literal notranslate"><span class="pre">DepositModel.amount</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.DepositModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DepositModel.model_computed_fields</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.DepositModel.model_config"><code class="docutils literal notranslate"><span class="pre">DepositModel.model_config</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.DepositModel.model_fields"><code class="docutils literal notranslate"><span class="pre">DepositModel.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_classes.requests.DepositTransactionModel"><code class="docutils literal notranslate"><span class="pre">DepositTransactionModel</span></code></a><ul>
+<li><a class="reference internal" href="#data_classes.requests.DepositTransactionModel.deposit_data"><code class="docutils literal notranslate"><span class="pre">DepositTransactionModel.deposit_data</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.DepositTransactionModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DepositTransactionModel.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.DepositTransactionModel.model_config"><code class="docutils literal notranslate"><span class="pre">DepositTransactionModel.model_config</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.DepositTransactionModel.model_fields"><code class="docutils literal notranslate"><span class="pre">DepositTransactionModel.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.DepositTransactionModel.transaction_data"><code class="docutils literal notranslate"><span class="pre">DepositTransactionModel.transaction_data</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_classes.requests.MoneyboxCreateModel"><code class="docutils literal notranslate"><span class="pre">MoneyboxCreateModel</span></code></a><ul>
@@ -68,19 +76,44 @@
 <li><a class="reference internal" href="#data_classes.requests.MoneyboxUpdateModel.name"><code class="docutils literal notranslate"><span class="pre">MoneyboxUpdateModel.name</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#data_classes.requests.TransactionMetaModel"><code class="docutils literal notranslate"><span class="pre">TransactionMetaModel</span></code></a><ul>
+<li><a class="reference internal" href="#data_classes.requests.TransactionMetaModel.description"><code class="docutils literal notranslate"><span class="pre">TransactionMetaModel.description</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransactionMetaModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">TransactionMetaModel.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransactionMetaModel.model_config"><code class="docutils literal notranslate"><span class="pre">TransactionMetaModel.model_config</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransactionMetaModel.model_fields"><code class="docutils literal notranslate"><span class="pre">TransactionMetaModel.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransactionMetaModel.transaction_trigger"><code class="docutils literal notranslate"><span class="pre">TransactionMetaModel.transaction_trigger</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransactionMetaModel.transaction_type"><code class="docutils literal notranslate"><span class="pre">TransactionMetaModel.transaction_type</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#data_classes.requests.TransferModel"><code class="docutils literal notranslate"><span class="pre">TransferModel</span></code></a><ul>
-<li><a class="reference internal" href="#data_classes.requests.TransferModel.balance"><code class="docutils literal notranslate"><span class="pre">TransferModel.balance</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransferModel.amount"><code class="docutils literal notranslate"><span class="pre">TransferModel.amount</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.TransferModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">TransferModel.model_computed_fields</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.TransferModel.model_config"><code class="docutils literal notranslate"><span class="pre">TransferModel.model_config</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.TransferModel.model_fields"><code class="docutils literal notranslate"><span class="pre">TransferModel.model_fields</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.TransferModel.to_moneybox_id"><code class="docutils literal notranslate"><span class="pre">TransferModel.to_moneybox_id</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#data_classes.requests.TransferTransactionModel"><code class="docutils literal notranslate"><span class="pre">TransferTransactionModel</span></code></a><ul>
+<li><a class="reference internal" href="#data_classes.requests.TransferTransactionModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">TransferTransactionModel.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransferTransactionModel.model_config"><code class="docutils literal notranslate"><span class="pre">TransferTransactionModel.model_config</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransferTransactionModel.model_fields"><code class="docutils literal notranslate"><span class="pre">TransferTransactionModel.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransferTransactionModel.transaction_data"><code class="docutils literal notranslate"><span class="pre">TransferTransactionModel.transaction_data</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.TransferTransactionModel.transfer_data"><code class="docutils literal notranslate"><span class="pre">TransferTransactionModel.transfer_data</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#data_classes.requests.WithdrawModel"><code class="docutils literal notranslate"><span class="pre">WithdrawModel</span></code></a><ul>
-<li><a class="reference internal" href="#data_classes.requests.WithdrawModel.balance"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.balance</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.WithdrawModel.amount"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.amount</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.WithdrawModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.model_computed_fields</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.WithdrawModel.model_config"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.model_config</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.requests.WithdrawModel.model_fields"><code class="docutils literal notranslate"><span class="pre">WithdrawModel.model_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_classes.requests.WithdrawTransactionModel"><code class="docutils literal notranslate"><span class="pre">WithdrawTransactionModel</span></code></a><ul>
+<li><a class="reference internal" href="#data_classes.requests.WithdrawTransactionModel.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">WithdrawTransactionModel.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.WithdrawTransactionModel.model_config"><code class="docutils literal notranslate"><span class="pre">WithdrawTransactionModel.model_config</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.WithdrawTransactionModel.model_fields"><code class="docutils literal notranslate"><span class="pre">WithdrawTransactionModel.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.WithdrawTransactionModel.transaction_data"><code class="docutils literal notranslate"><span class="pre">WithdrawTransactionModel.transaction_data</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.requests.WithdrawTransactionModel.withdraw_data"><code class="docutils literal notranslate"><span class="pre">WithdrawTransactionModel.withdraw_data</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -96,11 +129,14 @@
 </li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse</span></code></a><ul>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.balance"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.balance</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.created_at"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.created_at</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.id"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.id</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.model_computed_fields</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.model_config"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.model_config</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.modified_at"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.modified_at</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.name"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.name</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.MoneyboxResponse.validate_date_order"><code class="docutils literal notranslate"><span class="pre">MoneyboxResponse.validate_date_order()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxesResponse"><code class="docutils literal notranslate"><span class="pre">MoneyboxesResponse</span></code></a><ul>
@@ -109,6 +145,30 @@
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxesResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">MoneyboxesResponse.model_fields</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxesResponse.moneyboxes"><code class="docutils literal notranslate"><span class="pre">MoneyboxesResponse.moneyboxes</span></code></a></li>
 <li><a class="reference internal" href="#data_classes.responses.MoneyboxesResponse.total"><code class="docutils literal notranslate"><span class="pre">MoneyboxesResponse.total</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog"><code class="docutils literal notranslate"><span class="pre">TransactionLog</span></code></a><ul>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.amount"><code class="docutils literal notranslate"><span class="pre">TransactionLog.amount</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.balance"><code class="docutils literal notranslate"><span class="pre">TransactionLog.balance</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.counterparty_moneybox_id"><code class="docutils literal notranslate"><span class="pre">TransactionLog.counterparty_moneybox_id</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.counterparty_moneybox_name"><code class="docutils literal notranslate"><span class="pre">TransactionLog.counterparty_moneybox_name</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.created_at"><code class="docutils literal notranslate"><span class="pre">TransactionLog.created_at</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.description"><code class="docutils literal notranslate"><span class="pre">TransactionLog.description</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.id"><code class="docutils literal notranslate"><span class="pre">TransactionLog.id</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">TransactionLog.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.model_config"><code class="docutils literal notranslate"><span class="pre">TransactionLog.model_config</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.model_fields"><code class="docutils literal notranslate"><span class="pre">TransactionLog.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.moneybox_id"><code class="docutils literal notranslate"><span class="pre">TransactionLog.moneybox_id</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.transaction_trigger"><code class="docutils literal notranslate"><span class="pre">TransactionLog.transaction_trigger</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLog.transaction_type"><code class="docutils literal notranslate"><span class="pre">TransactionLog.transaction_type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLogs"><code class="docutils literal notranslate"><span class="pre">TransactionLogs</span></code></a><ul>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLogs.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">TransactionLogs.model_computed_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLogs.model_config"><code class="docutils literal notranslate"><span class="pre">TransactionLogs.model_config</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLogs.model_fields"><code class="docutils literal notranslate"><span class="pre">TransactionLogs.model_fields</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLogs.total"><code class="docutils literal notranslate"><span class="pre">TransactionLogs.total</span></code></a></li>
+<li><a class="reference internal" href="#data_classes.responses.TransactionLogs.transaction_logs"><code class="docutils literal notranslate"><span class="pre">TransactionLogs.transaction_logs</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -152,13 +212,13 @@
 <p>All request models are located here.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_classes.requests.DepositModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">DepositModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.DepositModel" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">DepositModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.DepositModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>The pydantic moneybox deposit data model.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_classes.requests.DepositModel.balance">
-<span class="sig-name descname"><span class="pre">balance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.requests.DepositModel.balance" title="Link to this definition"></a></dt>
-<dd><p>The balance to add.</p>
+<dt class="sig sig-object py" id="data_classes.requests.DepositModel.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.requests.DepositModel.amount" title="Link to this definition"></a></dt>
+<dd><p>The amount to add, value has to be at least 1.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -169,16 +229,55 @@
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.DepositModel.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'balance':</span> <span class="pre">100}]}}</span></em><a class="headerlink" href="#data_classes.requests.DepositModel.model_config" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'amount':</span> <span class="pre">100}]}}</span></em><a class="headerlink" href="#data_classes.requests.DepositModel.model_config" title="Link to this definition"></a></dt>
 <dd><p>The config of the model.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.DepositModel.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'balance':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">balance</span> <span class="pre">to</span> <span class="pre">add.',</span> <span class="pre">metadata=[Ge(ge=0)])}</span></em><a class="headerlink" href="#data_classes.requests.DepositModel.model_fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'amount':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">amount</span> <span class="pre">to</span> <span class="pre">add,</span> <span class="pre">value</span> <span class="pre">has</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">at</span> <span class="pre">least</span> <span class="pre">1.',</span> <span class="pre">metadata=[Ge(ge=1)])}</span></em><a class="headerlink" href="#data_classes.requests.DepositModel.model_fields" title="Link to this definition"></a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_classes.requests.DepositTransactionModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">DepositTransactionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deposit_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_classes.requests.DepositModel" title="data_classes.requests.DepositModel"><span class="pre">DepositModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_classes.requests.TransactionMetaModel" title="data_classes.requests.TransactionMetaModel"><span class="pre">TransactionMetaModel</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.DepositTransactionModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The deposit transaction pydantic model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.DepositTransactionModel.deposit_data">
+<span class="sig-name descname"><span class="pre">deposit_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#data_classes.requests.DepositModel" title="data_classes.requests.DepositModel"><span class="pre">DepositModel</span></a></em><a class="headerlink" href="#data_classes.requests.DepositTransactionModel.deposit_data" title="Link to this definition"></a></dt>
+<dd><p>The deposit data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.DepositTransactionModel.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#data_classes.requests.DepositTransactionModel.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.DepositTransactionModel.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'deposit_data':</span> <span class="pre">{'amount':</span> <span class="pre">100},</span> <span class="pre">'transaction_data':</span> <span class="pre">{'description':</span> <span class="pre">'Bonus.',</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT}}]}}</span></em><a class="headerlink" href="#data_classes.requests.DepositTransactionModel.model_config" title="Link to this definition"></a></dt>
+<dd><p>The config of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.DepositTransactionModel.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'deposit_data':</span> <span class="pre">FieldInfo(annotation=DepositModel,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">deposit</span> <span class="pre">data.'),</span> <span class="pre">'transaction_data':</span> <span class="pre">FieldInfo(annotation=TransactionMetaModel,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">transaction</span> <span class="pre">meta</span> <span class="pre">data.')}</span></em><a class="headerlink" href="#data_classes.requests.DepositTransactionModel.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.DepositTransactionModel.transaction_data">
+<span class="sig-name descname"><span class="pre">transaction_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#data_classes.requests.TransactionMetaModel" title="data_classes.requests.TransactionMetaModel"><span class="pre">TransactionMetaModel</span></a></em><a class="headerlink" href="#data_classes.requests.DepositTransactionModel.transaction_data" title="Link to this definition"></a></dt>
+<dd><p>The transaction data.</p>
 </dd></dl>
 
 </dd></dl>
@@ -196,7 +295,7 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.MoneyboxCreateModel.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'name':</span> <span class="pre">'Holiday'}]}}</span></em><a class="headerlink" href="#data_classes.requests.MoneyboxCreateModel.model_config" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'name':</span> <span class="pre">'Holiday'}]}}</span></em><a class="headerlink" href="#data_classes.requests.MoneyboxCreateModel.model_config" title="Link to this definition"></a></dt>
 <dd><p>The config of the model.</p>
 </dd></dl>
 
@@ -229,7 +328,7 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.MoneyboxUpdateModel.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'name':</span> <span class="pre">'Holiday'}]}}</span></em><a class="headerlink" href="#data_classes.requests.MoneyboxUpdateModel.model_config" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'name':</span> <span class="pre">'Holiday'}]}}</span></em><a class="headerlink" href="#data_classes.requests.MoneyboxUpdateModel.model_config" title="Link to this definition"></a></dt>
 <dd><p>The config of the model.</p>
 </dd></dl>
 
@@ -250,14 +349,59 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="data_classes.requests.TransactionMetaModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">TransactionMetaModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_trigger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TransactionTrigger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TransactionType</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.TransactionMetaModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The transaction meta pydantic model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransactionMetaModel.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#data_classes.requests.TransactionMetaModel.description" title="Link to this definition"></a></dt>
+<dd><p>The description of the withdraw transaction.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransactionMetaModel.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#data_classes.requests.TransactionMetaModel.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransactionMetaModel.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'description':</span> <span class="pre">'Bonus.',</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT},</span> <span class="pre">{'description':</span> <span class="pre">'Unexpected</span> <span class="pre">expenses.',</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT},</span> <span class="pre">{'description':</span> <span class="pre">'Transfer</span> <span class="pre">money.',</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT}]}}</span></em><a class="headerlink" href="#data_classes.requests.TransactionMetaModel.model_config" title="Link to this definition"></a></dt>
+<dd><p>The config of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransactionMetaModel.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'description':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">description</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">withdraw</span> <span class="pre">transaction.'),</span> <span class="pre">'transaction_trigger':</span> <span class="pre">FieldInfo(annotation=TransactionTrigger,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">transaction</span> <span class="pre">trigger,</span> <span class="pre">defaults</span> <span class="pre">to</span> <span class="pre">`manually`.'),</span> <span class="pre">'transaction_type':</span> <span class="pre">FieldInfo(annotation=TransactionType,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">transaction</span> <span class="pre">type,</span> <span class="pre">defaults</span> <span class="pre">to</span> <span class="pre">`direct`.')}</span></em><a class="headerlink" href="#data_classes.requests.TransactionMetaModel.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransactionMetaModel.transaction_trigger">
+<span class="sig-name descname"><span class="pre">transaction_trigger</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">TransactionTrigger</span></em><a class="headerlink" href="#data_classes.requests.TransactionMetaModel.transaction_trigger" title="Link to this definition"></a></dt>
+<dd><p>The transaction trigger, defaults to <cite>manually</cite>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransactionMetaModel.transaction_type">
+<span class="sig-name descname"><span class="pre">transaction_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">TransactionType</span></em><a class="headerlink" href="#data_classes.requests.TransactionMetaModel.transaction_type" title="Link to this definition"></a></dt>
+<dd><p>The transaction type, defaults to <cite>direct</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="data_classes.requests.TransferModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">TransferModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.TransferModel" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">TransferModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.TransferModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>The pydantic moneybox transfer balance data model.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_classes.requests.TransferModel.balance">
-<span class="sig-name descname"><span class="pre">balance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.requests.TransferModel.balance" title="Link to this definition"></a></dt>
-<dd><p>The balance to transfer.</p>
+<dt class="sig sig-object py" id="data_classes.requests.TransferModel.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.requests.TransferModel.amount" title="Link to this definition"></a></dt>
+<dd><p>The amount to transfer, value has to be at least 1.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -268,13 +412,13 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.TransferModel.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'balance':</span> <span class="pre">50,</span> <span class="pre">'to_moneybox_id':</span> <span class="pre">1}]}}</span></em><a class="headerlink" href="#data_classes.requests.TransferModel.model_config" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'amount':</span> <span class="pre">50,</span> <span class="pre">'to_moneybox_id':</span> <span class="pre">1}]}}</span></em><a class="headerlink" href="#data_classes.requests.TransferModel.model_config" title="Link to this definition"></a></dt>
 <dd><p>The config of the model.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.TransferModel.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'balance':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">balance</span> <span class="pre">to</span> <span class="pre">sub.',</span> <span class="pre">metadata=[Ge(ge=0)]),</span> <span class="pre">'to_moneybox_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">id</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox</span> <span class="pre">to</span> <span class="pre">transfer</span> <span class="pre">balance</span> <span class="pre">to.',</span> <span class="pre">metadata=[Ge(ge=1)])}</span></em><a class="headerlink" href="#data_classes.requests.TransferModel.model_fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'amount':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">amount</span> <span class="pre">to</span> <span class="pre">transfer,</span> <span class="pre">value</span> <span class="pre">has</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">at</span> <span class="pre">least</span> <span class="pre">1.',</span> <span class="pre">metadata=[Ge(ge=1)]),</span> <span class="pre">'to_moneybox_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">id</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox</span> <span class="pre">to</span> <span class="pre">transfer</span> <span class="pre">balance</span> <span class="pre">to.')}</span></em><a class="headerlink" href="#data_classes.requests.TransferModel.model_fields" title="Link to this definition"></a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
@@ -289,14 +433,53 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="data_classes.requests.TransferTransactionModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">TransferTransactionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_classes.requests.TransferModel" title="data_classes.requests.TransferModel"><span class="pre">TransferModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_classes.requests.TransactionMetaModel" title="data_classes.requests.TransactionMetaModel"><span class="pre">TransactionMetaModel</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.TransferTransactionModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The transfer transaction pydantic model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransferTransactionModel.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#data_classes.requests.TransferTransactionModel.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransferTransactionModel.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'transaction_data':</span> <span class="pre">{'description':</span> <span class="pre">'Transfer</span> <span class="pre">money.',</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT},</span> <span class="pre">'transfer_data':</span> <span class="pre">{'amount':</span> <span class="pre">50,</span> <span class="pre">'to_moneybox_id':</span> <span class="pre">1}}]}}</span></em><a class="headerlink" href="#data_classes.requests.TransferTransactionModel.model_config" title="Link to this definition"></a></dt>
+<dd><p>The config of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransferTransactionModel.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'transaction_data':</span> <span class="pre">FieldInfo(annotation=TransactionMetaModel,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">transaction</span> <span class="pre">meta</span> <span class="pre">data.'),</span> <span class="pre">'transfer_data':</span> <span class="pre">FieldInfo(annotation=TransferModel,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">transfer</span> <span class="pre">data.')}</span></em><a class="headerlink" href="#data_classes.requests.TransferTransactionModel.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransferTransactionModel.transaction_data">
+<span class="sig-name descname"><span class="pre">transaction_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#data_classes.requests.TransactionMetaModel" title="data_classes.requests.TransactionMetaModel"><span class="pre">TransactionMetaModel</span></a></em><a class="headerlink" href="#data_classes.requests.TransferTransactionModel.transaction_data" title="Link to this definition"></a></dt>
+<dd><p>The transaction data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.TransferTransactionModel.transfer_data">
+<span class="sig-name descname"><span class="pre">transfer_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#data_classes.requests.TransferModel" title="data_classes.requests.TransferModel"><span class="pre">TransferModel</span></a></em><a class="headerlink" href="#data_classes.requests.TransferTransactionModel.transfer_data" title="Link to this definition"></a></dt>
+<dd><p>The transfer data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="data_classes.requests.WithdrawModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">WithdrawModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.WithdrawModel" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">WithdrawModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.WithdrawModel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>The pydantic moneybox withdraw data model.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_classes.requests.WithdrawModel.balance">
-<span class="sig-name descname"><span class="pre">balance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.requests.WithdrawModel.balance" title="Link to this definition"></a></dt>
-<dd><p>The balance to sub.</p>
+<dt class="sig sig-object py" id="data_classes.requests.WithdrawModel.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.requests.WithdrawModel.amount" title="Link to this definition"></a></dt>
+<dd><p>The amount to sub, value has to be at least 1.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -307,16 +490,55 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.WithdrawModel.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'balance':</span> <span class="pre">100}]}}</span></em><a class="headerlink" href="#data_classes.requests.WithdrawModel.model_config" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'amount':</span> <span class="pre">100}]}}</span></em><a class="headerlink" href="#data_classes.requests.WithdrawModel.model_config" title="Link to this definition"></a></dt>
 <dd><p>The config of the model.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.requests.WithdrawModel.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'balance':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">balance</span> <span class="pre">to</span> <span class="pre">sub.',</span> <span class="pre">metadata=[Ge(ge=0)])}</span></em><a class="headerlink" href="#data_classes.requests.WithdrawModel.model_fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'amount':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">amount</span> <span class="pre">to</span> <span class="pre">sub,</span> <span class="pre">value</span> <span class="pre">has</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">at</span> <span class="pre">least</span> <span class="pre">1.',</span> <span class="pre">metadata=[Ge(ge=1)])}</span></em><a class="headerlink" href="#data_classes.requests.WithdrawModel.model_fields" title="Link to this definition"></a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_classes.requests.WithdrawTransactionModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.requests.</span></span><span class="sig-name descname"><span class="pre">WithdrawTransactionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withdraw_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_classes.requests.WithdrawModel" title="data_classes.requests.WithdrawModel"><span class="pre">WithdrawModel</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#data_classes.requests.TransactionMetaModel" title="data_classes.requests.TransactionMetaModel"><span class="pre">TransactionMetaModel</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.requests.WithdrawTransactionModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The withdrawal transaction pydantic model</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.WithdrawTransactionModel.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#data_classes.requests.WithdrawTransactionModel.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.WithdrawTransactionModel.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'frozen':</span> <span class="pre">True,</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'transaction_data':</span> <span class="pre">{'description':</span> <span class="pre">'Unexpected</span> <span class="pre">expenses.',</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT},</span> <span class="pre">'withdraw_data':</span> <span class="pre">{'amount':</span> <span class="pre">100}}]}}</span></em><a class="headerlink" href="#data_classes.requests.WithdrawTransactionModel.model_config" title="Link to this definition"></a></dt>
+<dd><p>The config of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.WithdrawTransactionModel.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'transaction_data':</span> <span class="pre">FieldInfo(annotation=TransactionMetaModel,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">transaction</span> <span class="pre">meta</span> <span class="pre">data.'),</span> <span class="pre">'withdraw_data':</span> <span class="pre">FieldInfo(annotation=WithdrawModel,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">withdraw</span> <span class="pre">data.')}</span></em><a class="headerlink" href="#data_classes.requests.WithdrawTransactionModel.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.WithdrawTransactionModel.transaction_data">
+<span class="sig-name descname"><span class="pre">transaction_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#data_classes.requests.TransactionMetaModel" title="data_classes.requests.TransactionMetaModel"><span class="pre">TransactionMetaModel</span></a></em><a class="headerlink" href="#data_classes.requests.WithdrawTransactionModel.transaction_data" title="Link to this definition"></a></dt>
+<dd><p>The transaction data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.requests.WithdrawTransactionModel.withdraw_data">
+<span class="sig-name descname"><span class="pre">withdraw_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#data_classes.requests.WithdrawModel" title="data_classes.requests.WithdrawModel"><span class="pre">WithdrawModel</span></a></em><a class="headerlink" href="#data_classes.requests.WithdrawTransactionModel.withdraw_data" title="Link to this definition"></a></dt>
+<dd><p>The withdraw data.</p>
 </dd></dl>
 
 </dd></dl>
@@ -366,13 +588,19 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.responses.</span></span><span class="sig-name descname"><span class="pre">MoneyboxResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.responses.MoneyboxResponse" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.responses.</span></span><span class="sig-name descname"><span class="pre">MoneyboxResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modified_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.responses.MoneyboxResponse" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>The pydantic moneybox response data model</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse.balance">
 <span class="sig-name descname"><span class="pre">balance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.balance" title="Link to this definition"></a></dt>
 <dd><p>The balance of the moneybox in CENTS.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.created_at" title="Link to this definition"></a></dt>
+<dd><p>The creation date of the moneybox.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -389,22 +617,34 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'balance':</span> <span class="pre">0,</span> <span class="pre">'id':</span> <span class="pre">1,</span> <span class="pre">'name':</span> <span class="pre">'Holiday'}]}}</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.model_config" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'balance':</span> <span class="pre">0,</span> <span class="pre">'created_at':</span> <span class="pre">'2020-05-01T00:00:00Z',</span> <span class="pre">'id':</span> <span class="pre">1,</span> <span class="pre">'modified_at':</span> <span class="pre">None,</span> <span class="pre">'name':</span> <span class="pre">'Holiday'}]}}</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.model_config" title="Link to this definition"></a></dt>
 <dd><p>The config of the model.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse.model_fields">
-<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'balance':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=0,</span> <span class="pre">description='The</span> <span class="pre">balance</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox</span> <span class="pre">in</span> <span class="pre">CENTS.',</span> <span class="pre">metadata=[Ge(ge=0)]),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">id</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox.',</span> <span class="pre">metadata=[Ge(ge=1)]),</span> <span class="pre">'name':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">name</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox.</span> <span class="pre">Has</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">unique.',</span> <span class="pre">metadata=[MinLen(min_length=1)])}</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.model_fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'balance':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">balance</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox</span> <span class="pre">in</span> <span class="pre">CENTS.',</span> <span class="pre">metadata=[Ge(ge=0)]),</span> <span class="pre">'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">creation</span> <span class="pre">date</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox.'),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">id</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox.',</span> <span class="pre">metadata=[Ge(ge=1)]),</span> <span class="pre">'modified_at':</span> <span class="pre">FieldInfo(annotation=Union[datetime,</span> <span class="pre">NoneType],</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">modification</span> <span class="pre">date</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox.'),</span> <span class="pre">'name':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">name</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox.</span> <span class="pre">Has</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">unique.',</span> <span class="pre">metadata=[MinLen(min_length=1)])}</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.model_fields" title="Link to this definition"></a></dt>
 <dd><p>Metadata about the fields defined on the model,
 mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
 <p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse.modified_at">
+<span class="sig-name descname"><span class="pre">modified_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.modified_at" title="Link to this definition"></a></dt>
+<dd><p>The modification date of the moneybox.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.name" title="Link to this definition"></a></dt>
 <dd><p>The name of the moneybox. Has to be unique.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_classes.responses.MoneyboxResponse.validate_date_order">
+<span class="sig-name descname"><span class="pre">validate_date_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#data_classes.responses.MoneyboxResponse.validate_date_order" title="Link to this definition"></a></dt>
+<dd><p>Check if ‘modified_at’ date is after ‘created_at’.</p>
 </dd></dl>
 
 </dd></dl>
@@ -444,6 +684,135 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</
 <dt class="sig sig-object py" id="data_classes.responses.MoneyboxesResponse.total">
 <span class="sig-name descname"><span class="pre">total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.responses.MoneyboxesResponse.total" title="Link to this definition"></a></dt>
 <dd><p>The count of moneyboxes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.responses.</span></span><span class="sig-name descname"><span class="pre">TransactionLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counterparty_moneybox_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TransactionType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_trigger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TransactionTrigger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counterparty_moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.responses.TransactionLog" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The transaction log response model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.amount" title="Link to this definition"></a></dt>
+<dd><p>The current amount of the transaction.
+Can be negative, negative = withdraw, positive = deposit.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.balance">
+<span class="sig-name descname"><span class="pre">balance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.balance" title="Link to this definition"></a></dt>
+<dd><p>The balance of the moneybox at the time of the transaction.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.counterparty_moneybox_id">
+<span class="sig-name descname"><span class="pre">counterparty_moneybox_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.counterparty_moneybox_id" title="Link to this definition"></a></dt>
+<dd><p>Transaction is a transfer between moneybox_id and
+counterparty_moneybox_id, if set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.counterparty_moneybox_name">
+<span class="sig-name descname"><span class="pre">counterparty_moneybox_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.counterparty_moneybox_name" title="Link to this definition"></a></dt>
+<dd><p>The name of the counterparty moneybox.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.created_at" title="Link to this definition"></a></dt>
+<dd><p>The creation date of the transaction log.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.description" title="Link to this definition"></a></dt>
+<dd><p>The description of the transaction action.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.id" title="Link to this definition"></a></dt>
+<dd><p>The ID of the transaction.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'amount':</span> <span class="pre">50,</span> <span class="pre">'balance':</span> <span class="pre">50,</span> <span class="pre">'counterparty_moneybox_id':</span> <span class="pre">3,</span> <span class="pre">'created_at':</span> <span class="pre">datetime.datetime(2024,</span> <span class="pre">3,</span> <span class="pre">31,</span> <span class="pre">5,</span> <span class="pre">13,</span> <span class="pre">47,</span> <span class="pre">178659,</span> <span class="pre">tzinfo=datetime.timezone.utc),</span> <span class="pre">'description':</span> <span class="pre">'Transfer</span> <span class="pre">Money.',</span> <span class="pre">'id':</span> <span class="pre">1,</span> <span class="pre">'moneybox_id':</span> <span class="pre">1,</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT}]}}</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.model_config" title="Link to this definition"></a></dt>
+<dd><p>The config of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'amount':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">current</span> <span class="pre">amount</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">transaction.</span> <span class="pre">Can</span> <span class="pre">be</span> <span class="pre">negative,</span> <span class="pre">negative</span> <span class="pre">=</span> <span class="pre">withdraw,</span> <span class="pre">positive</span> <span class="pre">=</span> <span class="pre">deposit.'),</span> <span class="pre">'balance':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">balance</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">moneybox</span> <span class="pre">at</span> <span class="pre">the</span> <span class="pre">time</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">transaction.'),</span> <span class="pre">'counterparty_moneybox_id':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=True,</span> <span class="pre">description='Transaction</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">transfer</span> <span class="pre">between</span> <span class="pre">moneybox_id</span> <span class="pre">and</span> <span class="pre">counterparty_moneybox_id,</span> <span class="pre">if</span> <span class="pre">set.'),</span> <span class="pre">'counterparty_moneybox_name':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">name</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">counterparty</span> <span class="pre">moneybox.',</span> <span class="pre">metadata=[MinLen(min_length=1)]),</span> <span class="pre">'created_at':</span> <span class="pre">FieldInfo(annotation=datetime,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">creation</span> <span class="pre">date</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">transaction</span> <span class="pre">log.'),</span> <span class="pre">'description':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">description</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">transaction</span> <span class="pre">action.'),</span> <span class="pre">'id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">ID</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">transaction.'),</span> <span class="pre">'moneybox_id':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">foreign</span> <span class="pre">key</span> <span class="pre">to</span> <span class="pre">moneybox.'),</span> <span class="pre">'transaction_trigger':</span> <span class="pre">FieldInfo(annotation=TransactionTrigger,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">transaction</span> <span class="pre">trigger</span> <span class="pre">type,</span> <span class="pre">possible</span> <span class="pre">values:</span> <span class="pre">manually,</span> <span class="pre">automatically.</span> <span class="pre">Says,</span> <span class="pre">if</span> <span class="pre">balance</span> <span class="pre">was</span> <span class="pre">deposit</span> <span class="pre">or</span> <span class="pre">withdrawn</span> <span class="pre">manually</span> <span class="pre">or</span> <span class="pre">automatically.'),</span> <span class="pre">'transaction_type':</span> <span class="pre">FieldInfo(annotation=TransactionType,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">type</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">transaction.</span> <span class="pre">Possible</span> <span class="pre">values:</span> <span class="pre">direct</span> <span class="pre">or</span> <span class="pre">distribution.')}</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.moneybox_id">
+<span class="sig-name descname"><span class="pre">moneybox_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.moneybox_id" title="Link to this definition"></a></dt>
+<dd><p>The foreign key to moneybox.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.transaction_trigger">
+<span class="sig-name descname"><span class="pre">transaction_trigger</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">TransactionTrigger</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.transaction_trigger" title="Link to this definition"></a></dt>
+<dd><p>“The transaction type, possible values: manually, automatically.
+Says, if balance was deposit or withdrawn manually or automatically.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLog.transaction_type">
+<span class="sig-name descname"><span class="pre">transaction_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">TransactionType</span></em><a class="headerlink" href="#data_classes.responses.TransactionLog.transaction_type" title="Link to this definition"></a></dt>
+<dd><p>The type of the transaction. Possible values: direct or distribution.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLogs">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_classes.responses.</span></span><span class="sig-name descname"><span class="pre">TransactionLogs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transaction_logs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data_classes.responses.TransactionLog" title="data_classes.responses.TransactionLog"><span class="pre">TransactionLog</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_classes.responses.TransactionLogs" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>The transaction logs response model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLogs.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#data_classes.responses.TransactionLogs.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLogs.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid',</span> <span class="pre">'json_schema_extra':</span> <span class="pre">{'examples':</span> <span class="pre">[{'total':</span> <span class="pre">1,</span> <span class="pre">'transaction_logs':</span> <span class="pre">[{'amount':</span> <span class="pre">50,</span> <span class="pre">'balance':</span> <span class="pre">50,</span> <span class="pre">'counterparty_moneybox_id':</span> <span class="pre">3,</span> <span class="pre">'created_at':</span> <span class="pre">datetime.datetime(2024,</span> <span class="pre">3,</span> <span class="pre">31,</span> <span class="pre">5,</span> <span class="pre">13,</span> <span class="pre">47,</span> <span class="pre">178659,</span> <span class="pre">tzinfo=datetime.timezone.utc),</span> <span class="pre">'description':</span> <span class="pre">'Transfer</span> <span class="pre">Money.',</span> <span class="pre">'id':</span> <span class="pre">1,</span> <span class="pre">'moneybox_id':</span> <span class="pre">1,</span> <span class="pre">'transaction_trigger':</span> <span class="pre">TransactionTrigger.MANUALLY,</span> <span class="pre">'transaction_type':</span> <span class="pre">TransactionType.DIRECT}]}]}}</span></em><a class="headerlink" href="#data_classes.responses.TransactionLogs.model_config" title="Link to this definition"></a></dt>
+<dd><p>The config of the model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLogs.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'total':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">count</span> <span class="pre">of</span> <span class="pre">transaction</span> <span class="pre">logs.',</span> <span class="pre">metadata=[Ge(ge=0)]),</span> <span class="pre">'transaction_logs':</span> <span class="pre">FieldInfo(annotation=list[TransactionLog],</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">list</span> <span class="pre">of</span> <span class="pre">transaction</span> <span class="pre">logs.')}</span></em><a class="headerlink" href="#data_classes.responses.TransactionLogs.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo].</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLogs.total">
+<span class="sig-name descname"><span class="pre">total</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#data_classes.responses.TransactionLogs.total" title="Link to this definition"></a></dt>
+<dd><p>The count of transaction logs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_classes.responses.TransactionLogs.transaction_logs">
+<span class="sig-name descname"><span class="pre">transaction_logs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#data_classes.responses.TransactionLog" title="data_classes.responses.TransactionLog"><span class="pre">TransactionLog</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#data_classes.responses.TransactionLogs.transaction_logs" title="Link to this definition"></a></dt>
+<dd><p>The list of transaction logs.</p>
 </dd></dl>
 
 </dd></dl>
