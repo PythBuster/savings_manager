@@ -4,6 +4,11 @@
 
 ...
 
+## 0.4.1 (2024-03-31)
+
+### Changes:
+- prevent deleting moneyboxes with a balance > 0
+
 ## 0.4.0 (2024-03-31)
 
 ### Features:
