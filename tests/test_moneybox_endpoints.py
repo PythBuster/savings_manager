@@ -35,6 +35,9 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     )
 
     # delete money all boxes
+    await db_manager.update_moneybox(moneybox_id=1, moneybox_data={"balance": 0})
+    await db_manager.update_moneybox(moneybox_id=3, moneybox_data={"balance": 0})
+
     await db_manager.delete_moneybox(moneybox_id=1)
     await db_manager.delete_moneybox(moneybox_id=3)
     await db_manager.delete_moneybox(moneybox_id=4)
@@ -48,6 +51,9 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     await db_manager._restore_moneybox(moneybox_id=1)  # pylint: disable=protected-access
     await db_manager._restore_moneybox(moneybox_id=3)  # pylint: disable=protected-access
     await db_manager._restore_moneybox(moneybox_id=4)  # pylint: disable=protected-access
+
+    await db_manager.update_moneybox(moneybox_id=1, moneybox_data={"balance": 33})
+    await db_manager.update_moneybox(moneybox_id=3, moneybox_data={"balance": 300})
 
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
@@ -172,6 +178,12 @@ async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/-1"
     )
     assert response_3.status_code == 404
+
+    # can't delete moneybox 1, because balance > 0, expected 405 not allowed
+    response_4 = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1"
+    )
+    assert response_4.status_code == 405
 
 
 @pytest.mark.dependency(depends=["test_endpoint_delete_moneybox"])
