@@ -7,7 +7,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
 
-from src.custom_types import EndpointRouteType
+from src.custom_types import EndpointRouteType, TransactionTrigger, TransactionType
 from src.data_classes.requests import (
     DepositTransactionModel,
     MoneyboxCreateModel,
@@ -132,6 +132,8 @@ async def deposit_moneybox(
     moneybox_data = await request.app.state.db_manager.add_amount(
         moneybox_id=moneybox_id,
         deposit_transaction_data=deposit_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
     )
     return MoneyboxResponse(**moneybox_data)
 
@@ -162,6 +164,8 @@ async def withdraw_moneybox(
     moneybox_data = await request.app.state.db_manager.sub_amount(
         moneybox_id=moneybox_id,
         withdraw_transaction_data=withdraw_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
     )
     return MoneyboxResponse(**moneybox_data)
 
@@ -191,6 +195,8 @@ async def transfer_balance(
     await request.app.state.db_manager.transfer_amount(
         from_moneybox_id=moneybox_id,
         transfer_transaction_data=transfer_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

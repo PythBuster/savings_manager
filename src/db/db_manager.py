@@ -219,6 +219,8 @@ class DBManager:
         self,
         moneybox_id: int,
         deposit_transaction_data: dict[str, Any],
+        transaction_type: TransactionType,
+        transaction_trigger: TransactionTrigger,
     ) -> dict[str, Any]:
         """DB Function to add amount to moneybox by moneybox_id.
 
@@ -226,6 +228,10 @@ class DBManager:
         :type moneybox_id: :class:`int`
         :param deposit_transaction_data: The deposit transaction data.
         :type deposit_transaction_data: :class:`dict[str, Any]`
+        :param transaction_type: The transaction type of the transaction.
+        :type transaction_type: :class:`TransactionType`
+        :param transaction_trigger: The transaction trigger for the transaction.
+        :type transaction_trigger: :class:`TransactionTrigger`
 
         :return: The updated moneybox data.
         :rtype: :class:`dict[str, Any]`
@@ -235,7 +241,7 @@ class DBManager:
                  :class:`NegativeAmountError`: if balance to add is negative.
         """
 
-        amount: int = deposit_transaction_data["deposit_data"]["amount"]
+        amount = deposit_transaction_data["amount"]
 
         if amount <= 0:
             raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
@@ -265,11 +271,9 @@ class DBManager:
 
             await self._add_transfer_log(
                 moneybox_id=moneybox_id,
-                description=deposit_transaction_data["transaction_data"]["description"],
-                transaction_type=deposit_transaction_data["transaction_data"]["transaction_type"],
-                transaction_trigger=deposit_transaction_data["transaction_data"][
-                    "transaction_trigger"
-                ],
+                description=deposit_transaction_data["description"],
+                transaction_type=transaction_type,
+                transaction_trigger=transaction_trigger,
                 amount=amount,
                 balance=updated_moneybox.balance,  # type: ignore
                 session=session,
@@ -281,6 +285,8 @@ class DBManager:
         self,
         moneybox_id: int,
         withdraw_transaction_data: dict[str, Any],
+        transaction_type: TransactionType,
+        transaction_trigger: TransactionTrigger,
     ) -> dict[str, Any]:
         """DB Function to sub given amount from moneybox by moneybox_id.
 
@@ -288,6 +294,10 @@ class DBManager:
         :type moneybox_id: :class:`int`
         :param withdraw_transaction_data: The withdrawal transaction data.
         :type withdraw_transaction_data: :class:`dict[str, Any]`
+        :param transaction_type: The transaction type of the transaction.
+        :type transaction_type: :class:`TransactionType`
+        :param transaction_trigger: The transaction trigger for the transaction.
+        :type transaction_trigger: :class:`TransactionTrigger`
         :return: The updated moneybox data.
         :rtype: :class:`dict[str, Any]`
 
@@ -299,7 +309,7 @@ class DBManager:
                     if result of withdraw is negative.
         """
 
-        amount: int = withdraw_transaction_data["withdraw_data"]["amount"]
+        amount = withdraw_transaction_data["amount"]
 
         if amount <= 0:
             raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
@@ -332,11 +342,9 @@ class DBManager:
 
             await self._add_transfer_log(
                 moneybox_id=moneybox_id,
-                description=withdraw_transaction_data["transaction_data"]["description"],
-                transaction_type=withdraw_transaction_data["transaction_data"]["transaction_type"],
-                transaction_trigger=withdraw_transaction_data["transaction_data"][
-                    "transaction_trigger"
-                ],
+                description=withdraw_transaction_data["description"],
+                transaction_type=transaction_type,
+                transaction_trigger=transaction_trigger,
                 amount=-amount,  # negate, withdrawals need to be negative in log data
                 balance=updated_moneybox.balance,  # type: ignore
                 session=session,
@@ -344,10 +352,12 @@ class DBManager:
 
         return updated_moneybox.asdict()
 
-    async def transfer_amount(
+    async def transfer_amount(  # pylint: disable=too-many-locals
         self,
         from_moneybox_id: int,
         transfer_transaction_data: dict[str, Any],
+        transaction_type: TransactionType,
+        transaction_trigger: TransactionTrigger,
     ) -> None:
         """DB Function to transfer `balance` from `from_moneybox_id`
         from `to_moneybox_id`.
@@ -356,6 +366,10 @@ class DBManager:
         :type from_moneybox_id: :class:`int`
         :param transfer_transaction_data: The transfer transaction data.
         :type transfer_transaction_data: :class:`dict[str, Any]`
+        :param transaction_type: The transaction type of the transaction.
+        :type transaction_type: :class:`TransactionType`
+        :param transaction_trigger: The transaction trigger for the transaction.
+        :type transaction_trigger: :class:`TransactionTrigger`
 
         :raises: :class:`NegativeTransferAmountError`:
                     if balance to transfer is negative.
@@ -365,8 +379,8 @@ class DBManager:
                     if transfer shall happen within the same moneybox.
         """
 
-        to_moneybox_id: int = transfer_transaction_data["transfer_data"]["to_moneybox_id"]
-        amount: int = transfer_transaction_data["transfer_data"]["amount"]
+        to_moneybox_id = transfer_transaction_data["to_moneybox_id"]
+        amount = transfer_transaction_data["amount"]
 
         if from_moneybox_id == to_moneybox_id:
             raise TransferEqualMoneyboxError(
@@ -378,7 +392,7 @@ class DBManager:
         if amount <= 0:
             raise NonPositiveTransferAmountError(
                 from_moneybox_id=from_moneybox_id,
-                to_moneybox_id=transfer_transaction_data["transfer_data"]["to_moneybox_id"],
+                to_moneybox_id=transfer_transaction_data["to_moneybox_id"],
                 amount=amount,
             )
 
@@ -428,11 +442,9 @@ class DBManager:
             await self._add_transfer_log(
                 moneybox_id=from_moneybox_id,
                 counterparty_moneybox_id=to_moneybox_id,
-                description=transfer_transaction_data["transaction_data"]["description"],
-                transaction_type=transfer_transaction_data["transaction_data"]["transaction_type"],
-                transaction_trigger=transfer_transaction_data["transaction_data"][
-                    "transaction_trigger"
-                ],
+                description=transfer_transaction_data["description"],
+                transaction_type=transaction_type,
+                transaction_trigger=transaction_trigger,
                 amount=-amount,  # negate, withdrawals need to be negative in log data
                 balance=updated_from_moneybox.balance,  # type: ignore
                 session=session,
@@ -442,11 +454,9 @@ class DBManager:
             await self._add_transfer_log(
                 moneybox_id=to_moneybox_id,
                 counterparty_moneybox_id=from_moneybox_id,
-                description=transfer_transaction_data["transaction_data"]["description"],
-                transaction_type=transfer_transaction_data["transaction_data"]["transaction_type"],
-                transaction_trigger=transfer_transaction_data["transaction_data"][
-                    "transaction_trigger"
-                ],
+                description=transfer_transaction_data["description"],
+                transaction_type=transaction_type,
+                transaction_trigger=transaction_trigger,
                 amount=amount,
                 balance=updated_to_moneybox.balance,  # type: ignore
                 session=session,
