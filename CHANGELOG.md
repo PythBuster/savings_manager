@@ -4,6 +4,11 @@
 
 ...
 
+## 0.5.0 (2024-03-31)
+
+### Changes:
+- check moneybox id existence before validation request data in endpoints
+
 ## 0.4.1 (2024-03-31)
 
 ### Changes:
