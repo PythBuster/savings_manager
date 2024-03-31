@@ -2,13 +2,15 @@
 
 from typing import Any
 
-from sqlalchemy import update
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy import and_, insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import joinedload
 
-from src.custom_types import DBSettings
+from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
+    activate_instance,
     create_instance,
-    delete_instance,
+    deactivate_instance,
     exists_instance,
     read_instance,
     read_instances,
@@ -18,10 +20,11 @@ from src.db.exceptions import (
     BalanceResultIsNegativeError,
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
-    NegativeBalanceError,
-    NegativeTransferBalanceError,
+    NonPositiveAmountError,
+    NonPositiveTransferAmountError,
+    TransferEqualMoneyboxError,
 )
-from src.db.models import Moneybox
+from src.db.models import Moneybox, Transaction
 from src.utils import get_database_url
 
 
@@ -33,7 +36,10 @@ class DBManager:
             engine_args = {}
 
         self.db_settings = db_settings
-        self.async_engine = create_async_engine(url=self.db_connection_string, **engine_args)
+        self.async_engine = create_async_engine(
+            url=self.db_connection_string,
+            **engine_args,
+        )
         self.async_session = async_sessionmaker(
             bind=self.async_engine,
             expire_on_commit=False,
@@ -160,37 +166,63 @@ class DBManager:
             was not found in database.
         """
 
-        deleted_rows = await delete_instance(
+        deactivated: bool = await deactivate_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
             record_id=moneybox_id,
         )
 
-        if deleted_rows == 0:
+        if not deactivated:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-    async def add_balance(
-        self,
-        moneybox_id: int,
-        balance: int,
-    ) -> dict[str, Any]:
-        """DB Function to add balance to moneybox by moneybox_id.
+    async def _restore_moneybox(self, moneybox_id: int) -> None:
+        """DB Function to restore a moneybox by given id.
+
+        Note: Function should not be used directly, but for test cases it helps to reactivate
+            specific states.
 
         :param moneybox_id: The id of the moneybox.
         :type moneybox_id: :class:`int`
-        :param balance: The balance to add to given moneybox.
-        :type balance: :class:`int`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+            was not found in database.
+        """
+
+        activated: bool = await activate_instance(
+            async_session=self.async_session,
+            orm_model=Moneybox,  # type: ignore
+            record_id=moneybox_id,
+        )
+
+        if not activated:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+    # TODO refactor: add_amount and  # pylint: disable=fixme
+    #  sub_amount are almost identical, combine in one function?
+    async def add_amount(
+        self,
+        moneybox_id: int,
+        deposit_transaction_data: dict[str, Any],
+    ) -> dict[str, Any]:
+        """DB Function to add amount to moneybox by moneybox_id.
+
+        :param moneybox_id: The id of the moneybox.
+        :type moneybox_id: :class:`int`
+        :param deposit_transaction_data: The deposit transaction data.
+        :type deposit_transaction_data: :class:`dict[str, Any]`
 
         :return: The updated moneybox data.
         :rtype: :class:`dict[str, Any]`
 
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
                     was not found in database.
-                 :class:`NegativeBalanceError`: if balance to add is negative.
+                 :class:`NegativeAmountError`: if balance to add is negative.
         """
 
-        if balance < 0:
-            raise NegativeBalanceError(moneybox_id=moneybox_id, balance=balance)
+        amount: int = deposit_transaction_data["deposit_data"]["amount"]
+
+        if amount <= 0:
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         moneybox = await read_instance(
             async_session=self.async_session,
@@ -199,48 +231,62 @@ class DBManager:
         )
 
         if moneybox is None:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
-        moneybox.balance += balance  # type: ignore
+        moneybox.balance += amount  # type: ignore
 
-        updated_moneybox = await update_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=moneybox_id,
-            data=moneybox.asdict(),
-        )
+        async with self.async_session.begin() as session:
+            updated_moneybox = await update_instance(
+                async_session=session,
+                orm_model=Moneybox,  # type: ignore
+                record_id=moneybox_id,
+                data=moneybox.asdict(),
+            )
 
-        # should not be possible to reach this block
-        if updated_moneybox is None:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+            # should not be possible to reach this block
+            if updated_moneybox is None:
+                raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+            await self._add_transfer_log(
+                moneybox_id=moneybox_id,
+                description=deposit_transaction_data["transaction_data"]["description"],
+                transaction_type=deposit_transaction_data["transaction_data"]["transaction_type"],
+                transaction_trigger=deposit_transaction_data["transaction_data"][
+                    "transaction_trigger"
+                ],
+                amount=amount,
+                balance=updated_moneybox.balance,  # type: ignore
+                session=session,
+            )
 
         return updated_moneybox.asdict()
 
-    async def sub_balance(
+    async def sub_amount(  # pylint: disable=too-many-arguments
         self,
         moneybox_id: int,
-        balance: int,
+        withdraw_transaction_data: dict[str, Any],
     ) -> dict[str, Any]:
-        """DB Function to sub balance from moneybox by moneybox_id.
+        """DB Function to sub given amount from moneybox by moneybox_id.
 
         :param moneybox_id: The id of the moneybox.
         :type moneybox_id: :class:`int`
-        :param balance: The balance to sub from given moneybox.
-        :type balance: :class:`int`
-
+        :param withdraw_transaction_data: The withdrawal transaction data.
+        :type withdraw_transaction_data: :class:`dict[str, Any]`
         :return: The updated moneybox data.
         :rtype: :class:`dict[str, Any]`
 
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
                     was not found in database.
-                 :class:`NegativeBalanceError`:
+                 :class:`NegativeAmountError`:
                     if balance to sub  is negative.
                  :class:`BalanceResultIsNegativeError`:
                     if result of withdraw is negative.
         """
 
-        if balance < 0:
-            raise NegativeBalanceError(moneybox_id=moneybox_id, balance=balance)
+        amount: int = withdraw_transaction_data["withdraw_data"]["amount"]
+
+        if amount <= 0:
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         moneybox = await read_instance(
             async_session=self.async_session,
@@ -249,54 +295,75 @@ class DBManager:
         )
 
         if moneybox is None:
-            raise NegativeBalanceError(moneybox_id=moneybox_id, balance=balance)
+            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
-        moneybox.balance -= balance  # type: ignore
+        moneybox.balance -= amount  # type: ignore
 
         if moneybox.balance < 0:  # type: ignore
-            raise BalanceResultIsNegativeError(moneybox_id=moneybox_id, balance=balance)
+            raise BalanceResultIsNegativeError(moneybox_id=moneybox_id, amount=amount)
 
-        updated_moneybox = await update_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=moneybox_id,
-            data=moneybox.asdict(),
-        )
+        async with self.async_session.begin() as session:
+            updated_moneybox = await update_instance(
+                async_session=session,
+                orm_model=Moneybox,  # type: ignore
+                record_id=moneybox_id,
+                data=moneybox.asdict(),
+            )
 
-        # should not be possible to reach this block
-        if updated_moneybox is None:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+            # should not be possible to reach this block
+            if updated_moneybox is None:
+                raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+            await self._add_transfer_log(
+                moneybox_id=moneybox_id,
+                description=withdraw_transaction_data["transaction_data"]["description"],
+                transaction_type=withdraw_transaction_data["transaction_data"]["transaction_type"],
+                transaction_trigger=withdraw_transaction_data["transaction_data"][
+                    "transaction_trigger"
+                ],
+                amount=-amount,  # negate, withdrawals need to be negative in log data
+                balance=updated_moneybox.balance,  # type: ignore
+                session=session,
+            )
 
         return updated_moneybox.asdict()
 
-    async def transfer_balance(
+    async def transfer_amount(
         self,
         from_moneybox_id: int,
-        to_moneybox_id: int,
-        balance: int,
+        transfer_transaction_data: dict[str, Any],
     ) -> None:
         """DB Function to transfer `balance` from `from_moneybox_id`
         from `to_moneybox_id`.
 
         :param from_moneybox_id: The source id of the moneybox where the balance comes from.
         :type from_moneybox_id: :class:`int`
-        :param to_moneybox_id: The target id of the moneybox where the balance shall
-            be transferred to.
-        :type to_moneybox_id: :class:`int`
-        :param balance: The balance to transfer.
-        :type balance: :class:`int`
+        :param transfer_transaction_data: The transfer transaction data.
+        :type transfer_transaction_data: :class:`dict[str, Any]`
 
-        :raises: :class:`NegativeTransferBalanceError`:
+        :raises: :class:`NegativeTransferAmountError`:
                     if balance to transfer is negative.
                  :class:`BalanceResultIsNegativeError`:
                     if result of withdraws from_moneybox_id is negative.
+                :class:`TransferEqualMoneyboxError`:
+                    if transfer shall happen within the same moneybox.
         """
 
-        if balance < 0:
-            raise NegativeTransferBalanceError(
+        to_moneybox_id: int = transfer_transaction_data["transfer_data"]["to_moneybox_id"]
+        amount: int = transfer_transaction_data["transfer_data"]["amount"]
+
+        if from_moneybox_id == to_moneybox_id:
+            raise TransferEqualMoneyboxError(
                 from_moneybox_id=from_moneybox_id,
                 to_moneybox_id=to_moneybox_id,
-                balance=balance,
+                amount=amount,
+            )
+
+        if amount <= 0:
+            raise NonPositiveTransferAmountError(
+                from_moneybox_id=from_moneybox_id,
+                to_moneybox_id=transfer_transaction_data["transfer_data"]["to_moneybox_id"],
+                amount=amount,
             )
 
         from_moneybox = await read_instance(
@@ -318,18 +385,136 @@ class DBManager:
             raise MoneyboxNotFoundError(moneybox_id=to_moneybox_id)
 
         async with self.async_session.begin() as session:
-            new_from_moneybox_data = {"balance": from_moneybox.balance - balance}
+            new_from_moneybox_data = {"balance": from_moneybox.balance - amount}  # type: ignore
 
             if new_from_moneybox_data["balance"] < 0:
-                raise BalanceResultIsNegativeError(moneybox_id=from_moneybox_id, balance=balance)
+                raise BalanceResultIsNegativeError(moneybox_id=from_moneybox_id, amount=amount)
 
-            new_to_moneybox_data = {"balance": to_moneybox.balance + balance}
+            new_to_moneybox_data = {"balance": to_moneybox.balance + amount}  # type: ignore
 
-            await session.execute(
+            result_1 = await session.execute(
                 update(Moneybox)
                 .where(Moneybox.id == from_moneybox_id)
                 .values(new_from_moneybox_data)
+                .returning(Moneybox)
             )
-            await session.execute(
-                update(Moneybox).where(Moneybox.id == to_moneybox_id).values(new_to_moneybox_data)
+            updated_from_moneybox = result_1.scalar_one()
+
+            result_2 = await session.execute(
+                update(Moneybox)
+                .where(Moneybox.id == to_moneybox_id)
+                .values(new_to_moneybox_data)
+                .returning(Moneybox)
             )
+            updated_to_moneybox = result_2.scalar_one()
+
+            # log in `from_moneybox`instance (withdraw)
+            await self._add_transfer_log(
+                moneybox_id=from_moneybox_id,
+                counterparty_moneybox_id=to_moneybox_id,
+                description=transfer_transaction_data["transaction_data"]["description"],
+                transaction_type=transfer_transaction_data["transaction_data"]["transaction_type"],
+                transaction_trigger=transfer_transaction_data["transaction_data"][
+                    "transaction_trigger"
+                ],
+                amount=-amount,  # negate, withdrawals need to be negative in log data
+                balance=updated_from_moneybox.balance,  # type: ignore
+                session=session,
+            )
+
+            # log in `to_moneybox`instance (deposit)
+            await self._add_transfer_log(
+                moneybox_id=to_moneybox_id,
+                counterparty_moneybox_id=from_moneybox_id,
+                description=transfer_transaction_data["transaction_data"]["description"],
+                transaction_type=transfer_transaction_data["transaction_data"]["transaction_type"],
+                transaction_trigger=transfer_transaction_data["transaction_data"][
+                    "transaction_trigger"
+                ],
+                amount=amount,
+                balance=updated_to_moneybox.balance,  # type: ignore
+                session=session,
+            )
+
+    async def _add_transfer_log(  # pylint: disable=too-many-arguments
+        self,
+        moneybox_id: int,
+        description: str,
+        transaction_type: TransactionType,
+        transaction_trigger: TransactionTrigger,
+        amount: int,
+        balance: int,
+        session: AsyncSession,
+        counterparty_moneybox_id: int | None = None,
+    ) -> None:
+        """DB Function to add transfer log to moneybox by moneybox_id.
+
+        :param moneybox_id: The id of the moneybox.
+        :type moneybox_id: :class:`int`
+        :param description: The description of the transaction action.
+        :type description: :class:`str`
+        :param transaction_type: The type of the transaction, possible values:
+            direct, distribution.
+        :type transaction_type: :class:`TransactionType`
+        :param transaction_trigger: The transaction trigger type, possible values:
+            manually, automatically.
+        :type transaction_trigger: :class:`TransactionTrigger`
+        :param amount: The amount of the transaction, positive value = deposit,
+            negative value = withdrawal.
+        :type amount: :class:`int`
+        :param balance: The balance of the moneybox at the time of the transaction.
+        :type balance: :class:`ìnt`
+        :param session: The current session of the db creation.
+        :type session: :class:`AsyncSession`
+        :param counterparty_moneybox_id: The counterparty moneybox id of the transaction,
+            defaults to None.
+        :type counterparty_moneybox_id: :class:`int` | :class:`None`
+        """
+
+        transaction_log_data = {
+            "moneybox_id": moneybox_id,
+            "description": description,
+            "transaction_type": transaction_type,
+            "transaction_trigger": transaction_trigger,
+            "amount": amount,
+            "balance": balance,
+            "counterparty_moneybox_id": counterparty_moneybox_id,
+        }
+
+        stmt = insert(Transaction).values(transaction_log_data)
+        await session.execute(stmt)
+
+    async def get_transaction_logs(self, moneybox_id: int) -> list[dict[str, Any]]:
+        """Get a list of transaction logs for the given moneybox id.
+
+        :param moneybox_id: The moneybox id.
+        :type moneybox_id: :class:`int`
+        :return: A list of transaction logs for the given moneybox id.
+        :rtype: :class:`list[dict[str, Any]]`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+            was not found in database.
+        """
+
+        stmt = (
+            select(Moneybox)
+            .options(joinedload(Moneybox.transactions_log))
+            .where(
+                and_(
+                    Moneybox.id == moneybox_id,
+                    Moneybox.is_active.is_(True),
+                )
+            )
+        )
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        moneybox = result.unique().scalars().one_or_none()
+
+        if moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+        return [
+            transaction.asdict(exclude=["modified_at"]) for transaction in moneybox.transactions_log
+        ]

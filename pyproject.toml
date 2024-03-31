@@ -61,7 +61,7 @@ load-plugins=[
 "responses.py"="duplicate-code"
 "/routes/responses/__init__.py"="duplicate-code"
 "src/db/__init__.py"="duplicate-code"
-
+"src/routes/responses/moneyboxes.py"="duplicate-code"
 
 [tool.poetry]
 name = "Savings Manager"
@@ -76,7 +76,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.11"
 alembic = "^1.13.1"
-sqlalchemy = "^2.0.25"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.27"}
 pydantic = {extras = ["email"], version = "^2.6.1"}
 dictalchemy3 = "^1.0.0"
 pydantic-settings = "^2.1.0"
@@ -87,11 +87,12 @@ fastapi = "^0.109.2"
 pytest-cov = "^4.1.0"
 uvicorn = "^0.27.1"
 requests = "^2.31.0"
+sqlalchemy-utc = "^0.14.0"
 
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
-black = {extras = ["jupyter"], version = "^24.1.1"}
+black = {extras = ["jupyter"], version = ">=24.3.0"}
 isort = "^5.13.2"
 flake8-pyproject = "^1.2.3"
 pylint = "^3.0.3"

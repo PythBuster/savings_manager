@@ -73,7 +73,7 @@ async def mocked_db_manager() -> AsyncGenerator:
 
     db_manager = DBManager(
         db_settings=db_settings,
-        engine_args={"echo": False},
+        engine_args={"echo": True},
     )
 
     # create tables by using db_managers database async engine

@@ -4,7 +4,7 @@ import argparse
 import os
 import tomllib
 from pathlib import Path
-from typing import Any
+from typing import Any, Hashable
 
 from dotenv import load_dotenv
 
@@ -104,3 +104,59 @@ def create_envfile_from_envvars() -> None:
         env_file.write(f"DB_PORT={os.getenv('DB_PORT')}\n")
         env_file.write(f"DB_USER={os.getenv('DB_USER')}\n")
         env_file.write(f"DB_PASSWORD={os.getenv('DB_PASSWORD')}\n")
+
+
+def equal_dict(
+    dict_1: dict[Hashable, Any],
+    dict_2: dict[Hashable, Any],
+    exclude_keys: list[str],
+) -> bool:
+    """Compare two dictionaries by excluding keys specified in exclude_keys.
+
+    :param dict_1: The first dictionary.
+    :type dict_1: :class:`dict[Hashable, Any]`
+    :param dict_2: The second dictionary.
+    :type dict_2: :class:`dict[Hashable, Any]`
+    :param exclude_keys: List of keys to exclude from given dictionaries.
+    :type exclude_keys: :class:`list[str]`
+    :return: True if the two dictionaries are equal, False otherwise.
+    :rtype: :class:`bool`
+    """
+
+    for key in exclude_keys:
+        if key in dict_1:
+            del dict_1[key]
+
+        if key in dict_2:
+            del dict_2[key]
+
+    return dict_1 == dict_2
+
+
+def equal_list_of_dict(
+    list_dict_1: list[dict[Hashable, Any]],
+    list_dict_2: list[dict[Hashable, Any]],
+    exclude_keys: list[str],
+) -> bool:
+    """Compare two dictionaries by excluding keys specified in exclude_keys.
+
+    :param list_dict_1: The first list of dictionaries.
+    :type list_dict_1: :class:`list[dict[Hashable, Any]]`
+    :param list_dict_2: The second list of dictionaries.
+    :type list_dict_2: :class:`list[dict[Hashable, Any]]`
+    :param exclude_keys: List of keys to exclude from given dictionaries.
+    :type exclude_keys: :class:`list[str]`
+    :return: True if the two list of dictionaries are equal, False otherwise.
+    :rtype: :class:`bool`
+    """
+
+    for key in exclude_keys:
+        for item in list_dict_1:
+            if key in item:
+                del item[key]
+
+        for item in list_dict_2:
+            if key in item:
+                del item[key]
+
+    return list_dict_1 == list_dict_2

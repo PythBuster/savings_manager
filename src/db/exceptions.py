@@ -74,42 +74,62 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         super().__init__(record_id=moneybox_id, message=message)
 
 
-class NegativeBalanceError(UpdateInstanceError):
-    """Custom NegativeBalanceError Exception"""
+class NonPositiveAmountError(UpdateInstanceError):
+    """Custom NonPositiveAmountError Exception"""
 
-    def __init__(self, moneybox_id: int, balance: int) -> None:
-        message = f"Can't add or sub negative balance '{balance}' to Moneybox '{moneybox_id}'."
-        self.balance = balance
-        super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
+    def __init__(self, moneybox_id: int, amount: int) -> None:
+        message = f"Can't add or sub amount less than 1 '{amount}' to Moneybox '{moneybox_id}'."
+        self.amount = amount
+        super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
 
 
-class NegativeTransferBalanceError(UpdateInstanceError):
-    """Custom NegativeBalanceError Exception"""
+class NonPositiveTransferAmountError(UpdateInstanceError):
+    """Custom NonPositiveTransferAmountError Exception"""
 
-    def __init__(self, from_moneybox_id: int, to_moneybox_id: int, balance: int) -> None:
+    def __init__(self, from_moneybox_id: int, to_moneybox_id: int, amount: int) -> None:
         message = (
-            f"Can't transfer balance from moneybox '{from_moneybox_id}' "
-            f" to '{to_moneybox_id}'. Balance to transfer is negative: {balance}."
+            f"Can't transfer amount from moneybox '{from_moneybox_id}' "
+            f" to '{to_moneybox_id}'. Amount to transfer has to be greater than 0: {amount=}."
         )
-        self.balance = balance
+        self.amount = amount
         super().__init__(
             record_id=None,
             message=message,
             details={
-                "balance": balance,
+                "amount": amount,
                 "from_moneybox_id": from_moneybox_id,
                 "to_moneybox_id": to_moneybox_id,
             },
         )
 
+        del self.details["id"]
+
+
+class TransferEqualMoneyboxError(UpdateInstanceError):
+    """Custom TransferEqualMoneyboxError Exception"""
+
+    def __init__(self, from_moneybox_id: int, to_moneybox_id: int, amount: int) -> None:
+        self.amount = amount
+        super().__init__(
+            record_id=None,
+            message="Can't transfer within the same moneybox",
+            details={
+                "amount": amount,
+                "from_moneybox_id": from_moneybox_id,
+                "to_moneybox_id": to_moneybox_id,
+            },
+        )
+
+        del self.details["id"]
+
 
 class BalanceResultIsNegativeError(UpdateInstanceError):
-    """Custom NegativeBalanceError Exception"""
+    """Custom BalanceResultIsNegativeError Exception"""
 
-    def __init__(self, moneybox_id: int, balance: int) -> None:
+    def __init__(self, moneybox_id: int, amount: int) -> None:
         message = (
-            f"Can't sub balance '{balance}' from Moneybox '{moneybox_id}'. "
+            f"Can't sub amount '{amount}' from Moneybox '{moneybox_id}'. "
             "Not enough balance to sub."
         )
-        self.balance = balance
-        super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
+        self.amount = amount
+        super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
