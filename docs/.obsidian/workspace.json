@@ -25,12 +25,22 @@
             "state": {
               "type": "image",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png"
+                "file": "ui/draft/App_v1_SavingsManagerUI.png"
+              }
+            }
+          },
+          {
+            "id": "40d4a509a568a2ac",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "ui/draft/App_v1_SavingsManagerUI.png"
               }
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -96,7 +106,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png",
+                "file": "ui/draft/App_v1_SavingsManagerUI.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,7 +123,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png",
+                "file": "ui/draft/App_v1_SavingsManagerUI.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -136,7 +146,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png"
+                "file": "ui/draft/App_v1_SavingsManagerUI.png"
               }
             }
           }
@@ -157,11 +167,13 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "96c60efb94d6f94d",
+  "active": "40d4a509a568a2ac",
   "lastOpenFiles": [
     "sphinx/build/searchindex.js.tmp",
-    "ui/draft/App_v1_SavingsManagerUI.png",
     "ui/draft/App_v2_SavingsManagerUI.png",
+    "ui/draft/App_v1_SavingsManagerUI.png",
+    "TransactionLog_Creation.png",
+    "Diagram.svg",
     "ui/draft/App Version 1.md",
     "Guidelines/Workflow.md",
     "Feauture Requests/Ideas.md",
@@ -182,9 +194,7 @@
     "sphinx/source/settings.rst",
     "sphinx/source/routes.rst",
     "sphinx/source/routes.responses.rst",
-    "sphinx/source/modules.rst",
     "ui/draft/App Version 2.md",
-    "Diagram.svg",
     "ui/draft/SavingsManagerUI_v1.png",
     "ui/draft/SavingsManagerUI_v2.png",
     "Guidelines/Code/Deployment.md",
@@ -193,7 +203,6 @@
     "savings_manager repository.md",
     "Welcome.md",
     "Diagram 2.svg",
-    "Diagram 1.svg",
     "2024-01-27.md",
     "Unbenannt.canvas"
   ]
