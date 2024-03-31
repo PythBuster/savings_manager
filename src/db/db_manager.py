@@ -515,4 +515,6 @@ class DBManager:
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-        return [transaction.asdict() for transaction in moneybox.transactions_log]
+        return [
+            transaction.asdict(exclude=["modified_at"]) for transaction in moneybox.transactions_log
+        ]

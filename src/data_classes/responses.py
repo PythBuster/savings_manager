@@ -1,6 +1,6 @@
 """All response models are located here."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated, Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -109,6 +109,9 @@ class MoneyboxesResponse(BaseModel):
 class TransactionLog(BaseModel):
     """The transaction log response model."""
 
+    id: Annotated[int, Field(description="The ID of the transaction.")]
+    """The ID of the transaction."""
+
     description: Annotated[str, Field(description="The description of the transaction action.")]
     """The description of the transaction action."""
 
@@ -165,6 +168,29 @@ class TransactionLog(BaseModel):
     moneybox_id: Annotated[int, Field(description="The foreign key to moneybox.")]
     """The foreign key to moneybox."""
 
+    created_at: Annotated[datetime, Field(description="The creation date of the transaction log.")]
+    """The creation date of the transaction log."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "id": 1,
+                    "moneybox_id": 1,
+                    "description": "Transfer Money.",
+                    "transaction_type": TransactionType.DIRECT,
+                    "transaction_trigger": TransactionTrigger.MANUALLY,
+                    "amount": 50,
+                    "balance": 50,
+                    "counterparty_moneybox_id": 3,
+                    "created_at": datetime.now(tz=timezone.utc),
+                }
+            ]
+        },
+    )
+    """The config of the model."""
+
 
 class TransactionLogs(BaseModel):
     """The transaction logs response model."""
@@ -182,18 +208,9 @@ class TransactionLogs(BaseModel):
         json_schema_extra={
             "examples": [
                 {
-                    "total": 2,
+                    "total": 1,
                     "transaction_logs": [
-                        {
-                            "id": 1,
-                            "name": "Holiday",
-                            "balance": 1255,
-                        },
-                        {
-                            "id": 2,
-                            "name": "Extra Bills",
-                            "balance": 250,
-                        },
+                        TransactionLog.model_config["json_schema_extra"]["examples"][0],
                     ],
                 }
             ]
