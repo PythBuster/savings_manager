@@ -265,6 +265,38 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
     del result_moneybox_data_2["modified_at"]
     assert moneybox_data == result_moneybox_data_2
 
+    # check for add logs
+    transaction_logs = await db_manager.get_transaction_logs(moneybox_id=1)
+
+    for transaction_log in transaction_logs:
+        del transaction_log["created_at"]
+        del transaction_log["modified_at"]
+        del transaction_log["id"]
+
+    expected_dict_1 = {
+        "description": "Bonus.",
+        "transaction_type": TransactionType.DIRECT,
+        "transaction_trigger": TransactionTrigger.MANUALLY,
+        "amount": 1,
+        "balance": 1,
+        "counterparty_moneybox_id": None,
+        "moneybox_id": 1,
+    }
+    expected_dict_2 = {
+        "description": "Bonus.",
+        "transaction_type": TransactionType.DIRECT,
+        "transaction_trigger": TransactionTrigger.MANUALLY,
+        "amount": 10,
+        "balance": 11,
+        "counterparty_moneybox_id": None,
+        "moneybox_id": 1,
+    }
+
+    assert len(transaction_logs) == 2
+    assert transaction_logs[0] == expected_dict_1
+    assert transaction_logs[1] == expected_dict_2
+
+    # expected exception tests
     with pytest.raises(ValidationError):
         await db_manager.add_amount(
             moneybox_id=1,
@@ -359,6 +391,39 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     moneybox_data["balance"] -= 10
     assert moneybox_data == result_moneybox_data_2
 
+    # test sub transaction logs
+    transaction_logs = await db_manager.get_transaction_logs(moneybox_id=1)
+
+    for transaction_log in transaction_logs:
+        del transaction_log["created_at"]
+        del transaction_log["modified_at"]
+        del transaction_log["id"]
+
+    expected_withdraw_dict_1 = {
+        "description": "",
+        "transaction_type": TransactionType.DIRECT,
+        "transaction_trigger": TransactionTrigger.MANUALLY,
+        "amount": -1,
+        "balance": 10,
+        "counterparty_moneybox_id": None,
+        "moneybox_id": 1,
+    }
+
+    expected_withdraw_dict_2 = {
+        "description": "",
+        "transaction_type": TransactionType.DIRECT,
+        "transaction_trigger": TransactionTrigger.MANUALLY,
+        "amount": -10,
+        "balance": 0,
+        "counterparty_moneybox_id": None,
+        "moneybox_id": 1,
+    }
+
+    assert len(transaction_logs) == 4
+    assert transaction_logs[2] == expected_withdraw_dict_1
+    assert transaction_logs[3] == expected_withdraw_dict_2
+
+    # expected exception tests
     with pytest.raises(ValidationError):
         await db_manager.sub_amount(
             moneybox_id=1,
@@ -460,6 +525,46 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     assert from_moneybox_data["balance"] - 33 == new_from_moneybox_data["balance"]
     assert to_moneybox_data["balance"] + 33 == new_to_moneybox_data["balance"]
 
+    # test sub transaction logs
+    transaction_logs_moneybox_1 = await db_manager.get_transaction_logs(moneybox_id=1)
+    transaction_logs_moneybox_3 = await db_manager.get_transaction_logs(moneybox_id=3)
+
+    for transaction_log in transaction_logs_moneybox_1:
+        del transaction_log["created_at"]
+        del transaction_log["modified_at"]
+        del transaction_log["id"]
+
+    for transaction_log in transaction_logs_moneybox_3:
+        del transaction_log["created_at"]
+        del transaction_log["modified_at"]
+        del transaction_log["id"]
+
+    expected_transfer_dict_moneybox_1 = {
+        "description": "",
+        "transaction_type": TransactionType.DIRECT,
+        "transaction_trigger": TransactionTrigger.MANUALLY,
+        "amount": 33,
+        "balance": 33,
+        "counterparty_moneybox_id": 3,
+        "moneybox_id": 1,
+    }
+    expected_transfer_dict_moneybox_3 = {
+        "description": "",
+        "transaction_type": TransactionType.DIRECT,
+        "transaction_trigger": TransactionTrigger.MANUALLY,
+        "amount": -33,
+        "balance": 300,
+        "counterparty_moneybox_id": 1,
+        "moneybox_id": 3,
+    }
+
+    assert len(transaction_logs_moneybox_1) == 5
+    assert len(transaction_logs_moneybox_3) == 1
+    assert expected_transfer_dict_moneybox_1 == transaction_logs_moneybox_1[-1]
+    assert expected_transfer_dict_moneybox_3 == transaction_logs_moneybox_3[-1]
+
+
+    # expected exception tests
     with pytest.raises(ValidationError):
         await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],

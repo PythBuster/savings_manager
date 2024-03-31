@@ -45,9 +45,9 @@ async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClien
     assert response.status_code == 204
 
     # restore deleted moneyboxes
-    await db_manager.restore_moneybox(moneybox_id=1)
-    await db_manager.restore_moneybox(moneybox_id=3)
-    await db_manager.restore_moneybox(moneybox_id=4)
+    await db_manager._restore_moneybox(moneybox_id=1)
+    await db_manager._restore_moneybox(moneybox_id=3)
+    await db_manager._restore_moneybox(moneybox_id=4)
 
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",

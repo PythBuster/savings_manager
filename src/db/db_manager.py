@@ -175,8 +175,11 @@ class DBManager:
         if not deactivated:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-    async def restore_moneybox(self, moneybox_id: int) -> None:
+    async def _restore_moneybox(self, moneybox_id: int) -> None:
         """DB Function to restore a moneybox by given id.
+
+        Note: Function should not be used directly, but for test cases it helps to reactivate
+            specific states.
 
         :param moneybox_id: The id of the moneybox.
         :type moneybox_id: :class:`int`
@@ -408,6 +411,7 @@ class DBManager:
             # log in `from_moneybox`instance (withdraw)
             await self._add_transfer_log(
                 moneybox_id=from_moneybox_id,
+                counterparty_moneybox_id=to_moneybox_id,
                 description=transfer_transaction_data["transaction_data"]["description"],
                 transaction_type=transfer_transaction_data["transaction_data"]["transaction_type"],
                 transaction_trigger=transfer_transaction_data["transaction_data"][
@@ -421,6 +425,7 @@ class DBManager:
             # log in `to_moneybox`instance (deposit)
             await self._add_transfer_log(
                 moneybox_id=to_moneybox_id,
+                counterparty_moneybox_id=from_moneybox_id,
                 description=transfer_transaction_data["transaction_data"]["description"],
                 transaction_type=transfer_transaction_data["transaction_data"]["transaction_type"],
                 transaction_trigger=transfer_transaction_data["transaction_data"][

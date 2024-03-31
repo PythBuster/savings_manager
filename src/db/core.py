@@ -20,7 +20,7 @@ async def exists_instance(
     :type async_session: :class:`async_sessionmaker`
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
-    :param values: The key-values data used for the where-clausel.
+    :param values: The key-values data used for the where-clause.
     :return: The created db instance.
     :rtype: :class:`bool`
     """
