@@ -279,6 +279,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
         "amount": 1,
         "balance": 1,
         "counterparty_moneybox_id": None,
+        "counterparty_moneybox_name": None,
         "moneybox_id": 1,
     }
     expected_dict_2 = {
@@ -288,6 +289,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
         "amount": 10,
         "balance": 11,
         "counterparty_moneybox_id": None,
+        "counterparty_moneybox_name": None,
         "moneybox_id": 1,
     }
 
@@ -404,6 +406,7 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
         "amount": -1,
         "balance": 10,
         "counterparty_moneybox_id": None,
+        "counterparty_moneybox_name": None,
         "moneybox_id": 1,
     }
 
@@ -414,6 +417,7 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
         "amount": -10,
         "balance": 0,
         "counterparty_moneybox_id": None,
+        "counterparty_moneybox_name": None,
         "moneybox_id": 1,
     }
 
@@ -543,6 +547,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         "balance": 33,
         "counterparty_moneybox_id": 3,
         "moneybox_id": 1,
+        "counterparty_moneybox_name": "Test Box 3",
     }
     expected_transfer_dict_moneybox_3 = {
         "description": "",
@@ -552,6 +557,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         "balance": 300,
         "counterparty_moneybox_id": 1,
         "moneybox_id": 3,
+        "counterparty_moneybox_name": "Test Box 1 - Updated",
     }
 
     assert len(transaction_logs_moneybox_1) == 5
