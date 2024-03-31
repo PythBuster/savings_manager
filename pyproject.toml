@@ -92,7 +92,7 @@ sqlalchemy-utc = "^0.14.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
-black = {extras = ["jupyter"], version = "^24.1.1"}
+black = {extras = ["jupyter"], version = ">=24.3.0"}
 isort = "^5.13.2"
 flake8-pyproject = "^1.2.3"
 pylint = "^3.0.3"
