@@ -77,7 +77,7 @@ async def catch_exceptions_middleware(
     :param request: The current request.
     :param call_next: Callback to handle the request (route).
     :return: The route response or a mapped exception.
-    :rtype: :class:`Response`  | :class:`JSONResponse`
+    :rtype: :class:`Response` | :class:`JSONResponse`
     """
 
     try:
