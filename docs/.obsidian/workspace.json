@@ -4,43 +4,20 @@
     "type": "split",
     "children": [
       {
-        "id": "4f83372656cf7c7a",
+        "id": "d2e1abe358fd942e",
         "type": "tabs",
         "children": [
           {
-            "id": "e6be4134403886cb",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "ui/draft/App Version 1.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "96c60efb94d6f94d",
+            "id": "1bdf787dcc5f54b4",
             "type": "leaf",
             "state": {
               "type": "image",
               "state": {
-                "file": "ui/draft/App_v1_SavingsManagerUI.png"
-              }
-            }
-          },
-          {
-            "id": "40d4a509a568a2ac",
-            "type": "leaf",
-            "state": {
-              "type": "image",
-              "state": {
-                "file": "ui/draft/App_v1_SavingsManagerUI.png"
+                "file": "ui/draft/App_v1_SavingsManagerUI__UPDATED.png"
               }
             }
           }
-        ],
-        "currentTab": 2
+        ]
       }
     ],
     "direction": "vertical"
@@ -106,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ui/draft/App_v1_SavingsManagerUI.png",
+                "file": "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -123,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ui/draft/App_v1_SavingsManagerUI.png",
+                "file": "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -146,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ui/draft/App_v1_SavingsManagerUI.png"
+                "file": "ui/draft/App_v1_SavingsManagerUI__UPDATED.png"
               }
             }
           }
@@ -167,17 +144,21 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "40d4a509a568a2ac",
+  "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
-    "sphinx/build/searchindex.js.tmp",
+    "Requirements/Requirement Analysis.md",
+    "ui/draft/date-filter-animation-.gif",
+    "ui/draft/FullTransactionLogs_v1.png",
+    "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
     "ui/draft/App_v2_SavingsManagerUI.png",
+    "ui/draft/App Version 1.md",
+    "ui/draft/FullTransactionLogs.png",
     "ui/draft/App_v1_SavingsManagerUI.png",
     "TransactionLog_Creation.png",
+    "sphinx/build/searchindex.js.tmp",
     "Diagram.svg",
-    "ui/draft/App Version 1.md",
     "Guidelines/Workflow.md",
     "Feauture Requests/Ideas.md",
-    "Requirements/Requirement Analysis.md",
     "Guidelines/Code/Quality Assurence.md",
     "Guidelines/Code/Code Style.md",
     "transaction_log/draft_moneybox_log.png",
@@ -188,21 +169,17 @@
     "Untitled.canvas",
     "transaction_log/Final_Example_Transatcion_Log.xlsx",
     "transaction_log/Untitled.md",
-    "ui/draft/draft_moneybox_log.png",
     "vulture_whitelist.def",
     "sphinx/source/utils.rst",
     "sphinx/source/settings.rst",
     "sphinx/source/routes.rst",
     "sphinx/source/routes.responses.rst",
     "ui/draft/App Version 2.md",
-    "ui/draft/SavingsManagerUI_v1.png",
-    "ui/draft/SavingsManagerUI_v2.png",
     "Guidelines/Code/Deployment.md",
     "Guidelines/Deployment/Unbenannt.md",
     "Guidelines/Code/Branching.md",
     "savings_manager repository.md",
     "Welcome.md",
-    "Diagram 2.svg",
     "2024-01-27.md",
     "Unbenannt.canvas"
   ]
