@@ -13,6 +13,7 @@ async def exists_instance(
     async_session: async_sessionmaker,
     orm_model: SqlBase,
     values: dict[str, Any],
+    exclude_ids: list[int] = None,
 ) -> bool:
     """Checks whether an instance exists in the database by given `values`.
 
@@ -21,11 +22,22 @@ async def exists_instance(
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
     :param values: The key-values data used for the where-clause.
+    :type values: :class:`dict[str, Any]`
+    :param exclude_ids: The list of record ids to exclude from the exist query.
+    :type exclude_ids: :class:`list[int]`
     :return: The created db instance.
     :rtype: :class:`bool`
     """
 
-    stmt = select(orm_model).where(orm_model.is_active.is_(True))
+    if exclude_ids is None:
+        exclude_ids = []
+
+    stmt = select(orm_model).where(
+        and_(
+            orm_model.is_active.is_(True),
+            orm_model.id.notin_(exclude_ids),
+        )
+    )
 
     for column, value in values.items():
         orm_field = getattr(orm_model, column, None)
