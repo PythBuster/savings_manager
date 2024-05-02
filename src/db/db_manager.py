@@ -76,11 +76,15 @@ class DBManager:
     async def get_moneybox(
         self,
         moneybox_id: int,
+        only_active_instances: bool = True,
     ) -> dict[str, Any]:
         """DB Function to get a moneybox by moneybox_id.
 
         :param moneybox_id: The id of the moneybox.
         :type moneybox_id: :class:`int`
+        :param only_active_instances: If True, only active moneyboxes will be
+            returned, default to True.
+        :type only_active_instances: :class:`bool`
         :return: The requested moneybox data.
         :rtype: :class:`dict[str, Any]`
 
@@ -92,6 +96,7 @@ class DBManager:
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
             record_id=moneybox_id,
+            only_active_instances=only_active_instances,
         )
 
         if moneybox is None:
@@ -550,7 +555,8 @@ class DBManager:
 
             if counterparty_moneybox_id_ not in resolved_moneybox_names_cache:
                 counterparty_moneybox_ = await self.get_moneybox(
-                    moneybox_id=counterparty_moneybox_id_
+                    moneybox_id=counterparty_moneybox_id_,
+                    only_active_instances=False,
                 )
                 resolved_moneybox_names_cache[counterparty_moneybox_id_] = counterparty_moneybox_[
                     "name"
