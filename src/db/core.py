@@ -13,7 +13,7 @@ async def exists_instance(
     async_session: async_sessionmaker,
     orm_model: SqlBase,
     values: dict[str, Any],
-    exclude_ids: list[int] = None,
+    exclude_ids: list[int] | None = None,
 ) -> bool:
     """Checks whether an instance exists in the database by given `values`.
 
@@ -24,7 +24,7 @@ async def exists_instance(
     :param values: The key-values data used for the where-clause.
     :type values: :class:`dict[str, Any]`
     :param exclude_ids: The list of record ids to exclude from the exist query.
-    :type exclude_ids: :class:`list[int]`
+    :type exclude_ids: :class:`list[int] | None`
     :return: The created db instance.
     :rtype: :class:`bool`
     """
@@ -235,7 +235,7 @@ async def deactivate_instance(
     :rtype: :class:`bool`
     """
 
-    active_moneybox = read_instance(
+    active_moneybox = await read_instance(
         async_session=async_session,
         orm_model=orm_model,
         record_id=record_id,
