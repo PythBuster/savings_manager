@@ -79,7 +79,7 @@ class MoneyboxNameExistError(CreateInstanceError):
         details = {"name": name}
 
         super().__init__(
-            message=f"Moneybox name '{name}' already exists.",
+            message=f"Creation Error: Please choose another name, '{name}' is already in use (case insensitive).",
             details=details,
         )
 
@@ -158,7 +158,7 @@ class HasBalanceError(DeleteInstanceError):
 
     def __init__(self, moneybox_id: int, balance: int) -> None:
         message = (
-            f"Deleting moneyboxes with balance > 0 ist not allowed. "
+            f"Deleting moneyboxes with balance > 0 is not allowed. "
             f"Moneybox '{moneybox_id}' has balance {balance}."
         )
         self.balance = balance

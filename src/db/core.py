@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sqlalchemy import Sequence, and_, delete, exists, insert, select, update
+from sqlalchemy import Sequence, and_, delete, exists, insert, select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.db.exceptions import ColumnDoesNotExistError
@@ -45,7 +45,10 @@ async def exists_instance(
         if orm_field is None:
             raise ColumnDoesNotExistError(table=orm_model.__name__, column=column)
 
-        stmt = stmt.where(orm_field == value)
+        if orm_field == "name":
+            stmt = stmt.where(orm_field == value)
+
+        stmt = stmt.where(func.lower(orm_field) == func.lower(value))
 
     exist_stmt = exists(stmt)
     async with async_session() as session:
