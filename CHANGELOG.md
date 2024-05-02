@@ -4,6 +4,14 @@
 
 ...
 
+## 1.0.0 (2024-05-03)
+### Changes:
+- fix divers bugs
+- reduce db migration scripts (breaking change!) NOTE: v1.0.0 is not compatible to older databases!
+- clean code
+- case insensitivity for moneybox names
+
+
 ## 0.8.0 (2024-04-01)
 
 ### Changes:
