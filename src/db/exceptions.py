@@ -79,7 +79,10 @@ class MoneyboxNameExistError(CreateInstanceError):
         details = {"name": name}
 
         super().__init__(
-            message=f"Creation Error: Please choose another name, '{name}' is already in use (case insensitive).",
+            message=(
+                f"Creation Error: Please choose another name, '{name}' "
+                "is already in use (case insensitive)."
+            ),
             details=details,
         )
 

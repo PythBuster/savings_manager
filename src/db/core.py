@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from sqlalchemy import Sequence, and_, delete, exists, insert, select, update, func
+from sqlalchemy import Sequence, and_, delete, exists, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.db.exceptions import ColumnDoesNotExistError
