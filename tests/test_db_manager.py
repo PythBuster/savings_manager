@@ -102,7 +102,7 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
 
     assert (
-        "Creation Error: Please choose another name, 'Test Box 3'"
+        "Creation Error: Please choose another name, 'Test Box 3' "
         "is already in use (case insensitive)."
     ) in ex_info.value.args[0]
 
@@ -636,3 +636,60 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
 
     assert ex_info.value.message == "Can't transfer within the same moneybox"
     assert ex_info.value.details == {"amount": 123, "from_moneybox_id": 1, "to_moneybox_id": 1}
+
+
+@pytest.mark.dependency(depends=["test_sub_balance_to_moneybox"])
+async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(db_manager: DBManager) -> None:
+    # moneybox 4
+    moneybox_data_4 = {"name": "4-Test Box"}
+    result_moneybox_data_4 = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
+
+    # moneybox 5
+    moneybox_data_5 = {"name": "5-Test Box"}
+    result_moneybox_data_5 = await db_manager.add_moneybox(moneybox_data=moneybox_data_5)
+
+    deposit_transaction = DepositTransactionModel(
+        amount=100,
+        description="Bonus.",
+    )
+    await db_manager.add_amount(
+        moneybox_id=result_moneybox_data_4["id"],
+        deposit_transaction_data=deposit_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    transfer_transaction = TransferTransactionModel(
+        to_moneybox_id=result_moneybox_data_5["id"],
+        amount=20,
+    )
+
+    await db_manager.transfer_amount(
+        from_moneybox_id=result_moneybox_data_4["id"],
+        transfer_transaction_data=transfer_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    withdraw_transaction = WithdrawTransactionModel(amount=20)
+    await db_manager.sub_amount(
+        moneybox_id=result_moneybox_data_5["id"],
+        withdraw_transaction_data=withdraw_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    await db_manager.delete_moneybox(result_moneybox_data_5["id"])
+
+    # should able to get transaction logs without getting an exception
+    assert await db_manager.get_transaction_logs(result_moneybox_data_4["id"])
+
+    withdraw_transaction = WithdrawTransactionModel(amount=80)
+    await db_manager.sub_amount(
+        moneybox_id=result_moneybox_data_4["id"],
+        withdraw_transaction_data=withdraw_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    await db_manager.delete_moneybox(result_moneybox_data_4["id"])

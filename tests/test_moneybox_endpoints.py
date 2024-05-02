@@ -109,7 +109,7 @@ async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
     assert response_1.status_code == 200
     assert equal_dict(
         dict_1=moneybox,
-        dict_2=moneybox_data_1 | {"id": 5, "balance": 0},
+        dict_2=moneybox_data_1 | {"id": 7, "balance": 0},
         exclude_keys=["created_at", "modified_at"],
     )
 
@@ -127,7 +127,7 @@ async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
     content = duplicate.json()
     assert duplicate.status_code == 405
     assert content["message"] == (
-        "Creation Error: Please choose another name, 'Test Box Endpoint Add 1'"
+        "Creation Error: Please choose another name, 'Test Box Endpoint Add 1' "
         "is already in use (case insensitive)."
     )
     assert len(content["details"]) == 1
@@ -144,14 +144,14 @@ async def test_endpoint_update_moneybox(client: AsyncClient) -> None:
     assert missing_id_response.status_code == 405
 
     response_1 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/5", json=moneybox_data_1
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/7", json=moneybox_data_1
     )
     monneybox = response_1.json()
 
     assert response_1.status_code == 200
     assert equal_dict(
         dict_1=monneybox,
-        dict_2=moneybox_data_1 | {"id": 5, "balance": 0},
+        dict_2=moneybox_data_1 | {"id": 7, "balance": 0},
         exclude_keys=["created_at", "modified_at"],
     )
 
@@ -164,7 +164,7 @@ async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
     assert missing_id_response.status_code == 405
 
     response_1 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/5"
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/7"
     )
     assert response_1.status_code == 204
 
