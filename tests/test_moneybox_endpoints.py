@@ -126,7 +126,10 @@ async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
     )
     content = duplicate.json()
     assert duplicate.status_code == 405
-    assert content["message"] == "Moneybox name 'Test Box Endpoint Add 1' already exists."
+    assert content["message"] == (
+        "Creation Error: Please choose another name, 'Test Box Endpoint Add 1'"
+        "is already in use (case insensitive)."
+    )
     assert len(content["details"]) == 1
     assert content["details"]["name"] == "Test Box Endpoint Add 1"
 

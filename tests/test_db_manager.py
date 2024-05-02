@@ -59,7 +59,10 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
 
-    assert "Moneybox name 'Test Box 1' already exists" in ex_info.value.args[0]
+    assert (
+        "Creation Error: Please choose another name, 'Test Box 1' "
+        "is already in use (case insensitive)."
+    ) in ex_info.value.args[0]
 
     # moneybox 2
     moneybox_data_2 = {"name": "Test Box 2"}
@@ -77,7 +80,10 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
 
-    assert "Moneybox name 'Test Box 2' already exists" in ex_info.value.args[0]
+    assert (
+        "Creation Error: Please choose another name, 'Test Box 2' "
+        "is already in use (case insensitive)."
+    ) in ex_info.value.args[0]
 
     # moneybox 3
     moneybox_data_3: dict[str, str | int] = {"name": "Test Box 3", "balance": 333}
@@ -95,7 +101,10 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
 
-    assert "Moneybox name 'Test Box 3' already exists" in ex_info.value.args[0]
+    assert (
+        "Creation Error: Please choose another name, 'Test Box 3'"
+        "is already in use (case insensitive)."
+    ) in ex_info.value.args[0]
 
     # moneybox 4
     moneybox_data_4 = {"name": "Test Box 4"}
@@ -113,7 +122,10 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
     with pytest.raises(MoneyboxNameExistError) as ex_info:
         await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
 
-    assert "Moneybox name 'Test Box 4' already exists" in ex_info.value.args[0]
+    assert (
+        "Creation Error: Please choose another name, 'Test Box 4'"
+        " is already in use (case insensitive)."
+    ) in ex_info.value.args[0]
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
