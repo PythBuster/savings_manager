@@ -94,6 +94,7 @@ async def update_moneybox(
 @moneybox_router.delete(
     "/{moneybox_id}",
     responses=DELETE_MONEYBOX_RESPONSES,
+    status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
 async def delete_moneybox(
     request: Request,
@@ -173,6 +174,7 @@ async def withdraw_moneybox(
 @moneybox_router.post(
     "/{moneybox_id}/balance/transfer",
     responses=TRANSFER_MONEYBOX_RESPONSES,
+    status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
 async def transfer_balance(
     request: Request,
