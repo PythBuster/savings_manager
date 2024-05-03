@@ -13,6 +13,7 @@ async def exists_instance(
     async_session: async_sessionmaker,
     orm_model: SqlBase,
     values: dict[str, Any],
+    case_insensitive: bool = False,
     exclude_ids: list[int] | None = None,
 ) -> bool:
     """Checks whether an instance exists in the database by given `values`.
@@ -23,6 +24,9 @@ async def exists_instance(
     :type orm_model: :class:`SqlBase`
     :param values: The key-values data used for the where-clause.
     :type values: :class:`dict[str, Any]`
+    :param case_insensitive: If `True`, `values` will be compared
+        by ignoring case-sensitivity, if `False`,
+    :type case_insensitive: :class:`bool`
     :param exclude_ids: The list of record ids to exclude from the exist query.
     :type exclude_ids: :class:`list[int] | None`
     :return: The created db instance.
@@ -45,10 +49,10 @@ async def exists_instance(
         if orm_field is None:
             raise ColumnDoesNotExistError(table=orm_model.__name__, column=column)
 
-        if orm_field == "name":
+        if case_insensitive and isinstance(value, str):
+            stmt = stmt.where(func.lower(orm_field) == func.lower(value))
+        else:
             stmt = stmt.where(orm_field == value)
-
-        stmt = stmt.where(func.lower(orm_field) == func.lower(value))
 
     exist_stmt = exists(stmt)
     async with async_session() as session:

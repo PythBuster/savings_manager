@@ -118,6 +118,7 @@ class DBManager:
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
             values={"name": moneybox_data["name"]},
+            case_insensitive=True,
         )
 
         if name_exist:
@@ -156,6 +157,7 @@ class DBManager:
                 orm_model=Moneybox,  # type: ignore
                 values={"name": moneybox_data["name"]},
                 exclude_ids=[moneybox_id],
+                case_insensitive=True,
             )
 
             if name_exist:

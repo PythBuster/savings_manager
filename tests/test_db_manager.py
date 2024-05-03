@@ -193,6 +193,7 @@ async def test_core_exists_instance__moneybox_name(db_manager: DBManager) -> Non
         async_session=db_manager.async_session,
         orm_model=Moneybox,  # type: ignore
         values={"name": moneybox_name},
+        case_insensitive=True,
     )
     assert existing
 
@@ -200,6 +201,7 @@ async def test_core_exists_instance__moneybox_name(db_manager: DBManager) -> Non
         async_session=db_manager.async_session,
         orm_model=Moneybox,  # type: ignore
         values={"name": "nope, no no no"},
+        case_insensitive=True,
     )
     assert not non_existing
 
@@ -208,6 +210,7 @@ async def test_core_exists_instance__moneybox_name(db_manager: DBManager) -> Non
             async_session=db_manager.async_session,
             orm_model=Moneybox,  # type: ignore
             values={"no_existing_field": "BLABLA"},
+            case_insensitive=True,
         )
 
     assert ex_info.value.args[0] == "Table 'Moneybox' has no column named 'no_existing_field'"
