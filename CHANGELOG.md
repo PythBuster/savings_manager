@@ -4,6 +4,13 @@
 
 ...
 
+## 1.1.0 (2024-05-03)
+### Changes:
+- add counterparty_moneybox_name to transactions table in database
+- add min len check-constraint for counterparty_moneybox_name if set
+- add balance check-constraint to moneyboxes table (balance >= 0=
+- performance optimization: resolving counterparty_moneybox_name ins transaction_logs will not be called dynamically anymore
+
 ## 1.0.0 (2024-05-03)
 ### Changes:
 - fix divers bugs
