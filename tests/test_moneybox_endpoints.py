@@ -11,6 +11,40 @@ from src.utils import equal_dict, equal_list_of_dict
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
+async def test_endpoint_get_moneyboxes_exist_5(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
+    )
+    expected_moneyboxes = {
+        "total": 5,
+        "moneyboxes": [
+            {"name": "Test Box 1", "id": 1, "balance": 0},
+            {"name": "Test Box 2", "id": 2, "balance": 0},
+            {"name": "Test Box 3", "id": 3, "balance": 0},
+            {"name": "Test Box 4", "id": 4, "balance": 0},
+            {"name": "Test Box 5", "id": 5, "balance": 0},
+        ],
+    }
+
+    moneyboxes = response.json()
+
+    assert response.status_code == 200
+    assert moneyboxes["total"] == expected_moneyboxes["total"]
+
+    for dict_1, dict_2 in zip(  # type: ignore
+        moneyboxes["moneyboxes"], expected_moneyboxes["moneyboxes"]
+    ):
+        assert equal_dict(
+            dict_1=dict_1,
+            dict_2=dict_2,
+            exclude_keys=["created_at", "modified_at"],
+        )
+
+
+@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
 async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClient) -> None:
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",

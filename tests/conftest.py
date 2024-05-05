@@ -1,18 +1,22 @@
 """Pytest configurations and fixtures are located here."""
 
 import os
+from functools import partial
 from pathlib import Path
 from typing import AsyncGenerator
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from dotenv import load_dotenv
 from httpx import AsyncClient
+from sqlalchemy import text
 
 from src.custom_types import DBSettings
 from src.db.db_manager import DBManager
 from src.db.models import Base
 from src.main import app, register_router
 from src.utils import get_db_settings
+from tests.db_test_data_initializer import DBTestDataInitializer
 
 pytest_plugins = ("pytest_asyncio",)
 """The pytest plugins which should be used to run tests."""
@@ -28,6 +32,23 @@ TEST_DB_DRIVER = os.getenv("DB_DRIVER")
 
 db_settings = get_db_settings()
 """The database settings."""
+
+
+@pytest.fixture(scope="function")
+async def load_test_data(request: FixtureRequest, db_manager: DBManager) -> None:
+    """The load data fixture.
+
+    :param request: The pytest fixture.
+    :type request: :class:`pytest.FixtureRequest`
+    :param db_manager: The database manager.
+    :type db_manager: :class:`DBManager`
+    """
+
+    callee_name = request.node.name
+    test_data_initializer_ = DBTestDataInitializer(
+        db_manager=db_manager,
+    )
+    await test_data_initializer_.run(test_case=callee_name)
 
 
 @pytest.fixture(scope="session", name="client")
@@ -75,6 +96,19 @@ async def mocked_db_manager() -> AsyncGenerator:
         db_settings=db_settings,
         engine_args={"echo": True},
     )
+
+    async def truncate_tables(self: DBManager) -> None:
+        """Truncate all tables."""
+
+        async with self.async_session.begin() as session:
+            await session.execute(text("PRAGMA foreign_keys = OFF;"))
+
+            for table in Base.metadata.sorted_tables:
+                await session.execute(table.delete())
+
+            await session.execute(text("PRAGMA foreign_keys = ON;"))
+
+    db_manager.truncate_tables = partial(truncate_tables, db_manager)  # type: ignore
 
     # create tables by using db_managers database async engine
     async with db_manager.async_engine.begin() as conn:

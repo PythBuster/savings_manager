@@ -642,7 +642,9 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_sub_balance_to_moneybox"])
-async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(db_manager: DBManager) -> None:
+async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(
+    db_manager: DBManager,
+) -> None:
     # moneybox 4
     moneybox_data_4 = {"name": "4-Test Box"}
     result_moneybox_data_4 = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)

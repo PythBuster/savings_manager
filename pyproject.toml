@@ -24,6 +24,7 @@ exclude = '''
   | alembic
   | docs
   | envs
+  | tests/db_test_data_initializer.py
 )/
 '''
 
@@ -62,6 +63,7 @@ load-plugins=[
 "/routes/responses/__init__.py"="duplicate-code"
 "src/db/__init__.py"="duplicate-code"
 "src/routes/responses/moneyboxes.py"="duplicate-code"
+"db_test_data_initializer.py"="invalid-name, line-too-long"
 
 [tool.poetry]
 name = "Savings Manager"
