@@ -172,6 +172,7 @@ async def test_endpoint_add_moneybox__two__status_200(
         exclude_keys=["created_at", "modified_at"],
     )
 
+
 @pytest.mark.dependency
 async def test_endpoint_add_moneybox__one__status_422__balance_postdata(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -187,59 +188,131 @@ async def test_endpoint_add_moneybox__one__status_422__balance_postdata(
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.dependency(depends=["test_endpoint_add_moneybox"])
-async def test_endpoint_update_moneybox(client: AsyncClient) -> None:
-    moneybox_data_1 = {"name": "Test Box Endpoint Add 1 - Updated"}
-
-    missing_id_response = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
-    )
-    assert missing_id_response.status_code == 405
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    moneybox_data_1 = {"name": "Updated Name Test Box 1"}
 
     response_1 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/7", json=moneybox_data_1
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_1
     )
-    monneybox = response_1.json()
+    moneybox_1 = response_1.json()
+    expected_moneybox_data_1 = moneybox_data_1 | {"id": 1, "balance": 0}
 
-    assert response_1.status_code == 200
+    assert response_1.status_code == status.HTTP_200_OK
     assert equal_dict(
-        dict_1=monneybox,
-        dict_2=moneybox_data_1 | {"id": 7, "balance": 0},
+        dict_1=moneybox_1,
+        dict_2=expected_moneybox_data_1,
+        exclude_keys=["created_at", "modified_at"],
+    )
+
+    # no change should be happened for moneyboxes 2 and 3
+    response_2 = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2",
+    )
+    moneybox_2 = response_2.json()
+    expected_moneybox_data_2 = {"name": "Test Box 2", "id": 2, "balance": 0}
+
+    assert response_2.status_code == status.HTTP_200_OK
+    assert equal_dict(
+        dict_1=moneybox_2,
+        dict_2=expected_moneybox_data_2,
+        exclude_keys=["created_at", "modified_at"],
+    )
+
+    response_3 = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3",
+    )
+    moneybox_3 = response_3.json()
+    expected_moneybox_data_3 = {"name": "Test Box 3", "id": 3, "balance": 0}
+
+    assert response_2.status_code == status.HTTP_200_OK
+    assert equal_dict(
+        dict_1=moneybox_3,
+        dict_2=expected_moneybox_data_3,
         exclude_keys=["created_at", "modified_at"],
     )
 
 
-@pytest.mark.dependency(depends=["test_endpoint_update_moneybox"])
-async def test_endpoint_delete_moneybox(client: AsyncClient) -> None:
-    missing_id_response = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}"
-    )
-    assert missing_id_response.status_code == 405
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    # balance not allowed in update data
+    moneybox_data_1 = {"name": "Updated Test Box 1", "balance": 200}
 
-    response_1 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/7"
+    response_1 = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_1
     )
-    assert response_1.status_code == 204
+
+    assert response_1.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    # unknown extra field not allowed in update data
+    moneybox_data_2 = {"name": "Updated Test Box 1", "unknwon_field": "xyz"}
+
+    response_2 = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2", json=moneybox_data_2
+    )
+
+    assert response_2.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.dependency
+async def test_endpoint_delete_moneybox_1__status_204(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response_1 = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
+    )
+    moneyboxes = response_1.json()
+
+    assert moneyboxes["total"] == 2
 
     response_2 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/42"
-    )
-    content_2 = response_2.json()
-    assert response_2.status_code == 404
-    assert content_2["message"] == "Moneybox with id 42 does not exist."
-    assert len(content_2["details"]) == 1
-    assert content_2["details"]["id"] == 42
-
-    response_3 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/-1"
-    )
-    assert response_3.status_code == 404
-
-    # can't delete moneybox 1, because balance > 0, expected 405 not allowed
-    response_4 = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1"
     )
-    assert response_4.status_code == 405
+    assert response_2.status_code == status.HTTP_204_NO_CONTENT
+
+    response_3 = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
+    )
+    moneyboxes = response_3.json()
+
+    assert moneyboxes["total"] == 1
+
+
+@pytest.mark.dependency
+async def test_endpoint_delete_moneybox_1__non_existing__status_404(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.dependency
+async def test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404(
+    load_test_data: None, client: AsyncClient  # pylint: disable=unused-argument
+) -> None:
+    response_1 = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1"
+    )
+    assert response_1.status_code == status.HTTP_204_NO_CONTENT
+
+    response_2 = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1"
+    )
+    assert response_2.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.dependency
+async def test_endpoint_delete_moneybox__status_405__path_incomplete(client: AsyncClient) -> None:
+    response = await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}")
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
 @pytest.mark.dependency(depends=["test_endpoint_delete_moneybox"])

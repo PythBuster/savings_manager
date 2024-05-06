@@ -32,6 +32,11 @@ class DBTestDataInitializer:
             "test_endpoint_add_moneybox__one__status_200": self.truncate_tables,  # no data needed,
             "test_endpoint_add_moneybox__two__status_200": self.truncate_tables,  # no data needed,
             "test_endpoint_add_moneybox__one__status_422__balance_postdata": self.truncate_tables,  # no data needed,
+            "test_endpoint_update_moneybox__moneybox_id_1__namechange": self.dataset_endpoint_update_moneybox__moneybox_id_1__namechange,
+            "test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field": self.dataset_test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field,
+            "test_endpoint_delete_moneybox_1__status_204": self.dataset_test_endpoint_delete_moneybox_1__status_204,
+            "test_endpoint_delete_moneybox_1__non_existing__status_404": self.truncate_tables,  # no data needed,
+            "test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404": self.dataset_test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404,
         }
         """Map test case name witch related test data generation function"""
 
@@ -88,7 +93,7 @@ class DBTestDataInitializer:
             flush=True,
         )
 
-        # create moneybox with id 2
+        # create moneybox with id 1
         moneyboxes_data = [
             {"name": "Test Box 1"},
         ]
@@ -133,3 +138,84 @@ class DBTestDataInitializer:
             transaction_type=TransactionType.DIRECT,
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
+
+    async def dataset_endpoint_update_moneybox__moneybox_id_1__namechange(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__moneybox_id_1__namechange`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 3 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+            {"name": "Test Box 2"},
+            {"name": "Test Box 3"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field`.
+        """
+
+        await self.truncate_tables()
+
+        # create 2 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+            {"name": "Test Box 2"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_delete_moneybox_1__status_204(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_delete_moneybox_1__status_204`.
+        """
+
+        await self.truncate_tables()
+
+        # create 2 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+            {"name": "Test Box 2"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_200_and_404`.
+        """
+
+        await self.truncate_tables()
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
