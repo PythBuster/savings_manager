@@ -47,8 +47,9 @@ async def load_test_data(request: FixtureRequest, db_manager: DBManager) -> None
     callee_name = request.node.name
     test_data_initializer_ = DBTestDataInitializer(
         db_manager=db_manager,
+        test_case=callee_name,
     )
-    await test_data_initializer_.run(test_case=callee_name)
+    await test_data_initializer_.run()
 
 
 @pytest.fixture(scope="session", name="client")

@@ -1,43 +1,67 @@
 """The database test data initializer."""
 
+from src.custom_types import TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 
 
 class DBTestDataInitializer:
     """The database test data initializer class."""
 
-    def __init__(self, db_manager: DBManager) -> None:
-        self.db_manager = db_manager
-        """Current database connection and session maker hold in db_manager."""
+    def __init__(self, db_manager: DBManager, test_case: str) -> None:
+        """Initialize the DBTestDataInitializer instance for ths specific
+        test case.
 
-        self.TEST_CASES_DATA = {
-            "test_endpoint_get_moneyboxes_exist_5": self.dataset_test_endpoint_get_moneyboxes_exist_5,
-        }
-        """Map test case ame witch related test data generation function"""
-
-    async def run(
-        self,
-        test_case: str,
-    ) -> None:
-        """Call data generator function depending on test case name map.
-
-        :param test_case: Name of the test case function.
+        :param db_manager: The current database manager.
+        :type db_manager: DBManager
+        :param test_case: The current function name of test case.
         :type test_case: str
         """
 
-        await self.TEST_CASES_DATA[test_case]()
+        self.db_manager = db_manager
+        """Current database connection and session maker hold in db_manager."""
 
-    async def dataset_test_endpoint_get_moneyboxes_exist_5(self) -> None:
-        """The data generation function for test_case:
-        `test_endpoint_get_moneyboxes_exist_5`.
-        """
+        self.test_case = test_case
+        """Current function name of test case."""
+
+        self.TEST_CASES_DATA = {
+            "test_endpoint_get_moneyboxes__status_200__total_5": self.dataset_test_endpoint_get_moneyboxes__status_200__total_5,
+            "test_endpoint_get_moneyboxes__status_204__no_content": self.truncate_tables,  # no data needed
+            "test_endpoint_get_moneybox__moneybox_id_1__status_200_existing": self.dataset_test_endpoint_get_moneybox__moneybox_id_1__status_200_existing,
+            "test_endpoint_get_moneybox_status_404_non_existing": self.truncate_tables,  # no data needed,
+            "test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_balance_100": self.dataset_test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_balance_100,
+            "test_endpoint_add_moneybox__one__status_200": self.truncate_tables,  # no data needed,
+            "test_endpoint_add_moneybox__two__status_200": self.truncate_tables,  # no data needed,
+            "test_endpoint_add_moneybox__one__status_422__balance_postdata": self.truncate_tables,  # no data needed,
+        }
+        """Map test case name witch related test data generation function"""
+
+    async def run(
+        self,
+    ) -> None:
+        """Call data generator function depending on test case name map."""
+
+        await self.TEST_CASES_DATA[self.test_case]()  # type: ignore
+
+    async def truncate_tables(self) -> None:
+        """Truncate tables."""
 
         print(
-            "Truncate tables and create data for 'test_endpoint_get_moneyboxes_exist_5'",
+            f"Truncate tables ({self.test_case})",
             flush=True,
         )
-
         await self.db_manager.truncate_tables()  # type: ignore
+
+    async def dataset_test_endpoint_get_moneyboxes__status_200__total_5(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_get_moneyboxes__status_200__total_5`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
 
         moneyboxes_data = [
             {"name": "Test Box 1"},
@@ -51,3 +75,61 @@ class DBTestDataInitializer:
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
+
+    async def dataset_test_endpoint_get_moneybox__moneybox_id_1__status_200_existing(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_get_moneybox__moneybox_id_1__status_200_existing`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create moneybox with id 2
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_balance_100(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_balance_100`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 2 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+            {"name": "Test Box 2"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+        # add some amount to moneybox with id 2
+        await self.db_manager.add_amount(
+            moneybox_id=2,
+            deposit_transaction_data={
+                "amount": 100,
+                "description": "Unit Test.",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )

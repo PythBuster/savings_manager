@@ -261,7 +261,7 @@ class DBManager:
         )
 
         if moneybox is None:
-            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
         moneybox.balance += amount  # type: ignore
 

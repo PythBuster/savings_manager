@@ -235,7 +235,7 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
-async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
+async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
     moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
     del moneybox_data["created_at"]
     del moneybox_data["modified_at"]
@@ -349,8 +349,8 @@ async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
     assert ex_info.value.record_id == 2
 
 
-@pytest.mark.dependency(depends=["test_add_balance_to_moneybox"])
-async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
+@pytest.mark.dependency(depends=["test_add_amount_to_moneybox"])
+async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
     moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
     del moneybox_data["created_at"]
     del moneybox_data["modified_at"]
@@ -478,7 +478,7 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     assert ex_info.value.record_id == 2
 
 
-@pytest.mark.dependency(depends=["test_sub_balance_to_moneybox"])
+@pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
 async def test_transfer_amount(db_manager: DBManager) -> None:
     from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
     to_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
@@ -641,7 +641,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     assert ex_info.value.details == {"amount": 123, "from_moneybox_id": 1, "to_moneybox_id": 1}
 
 
-@pytest.mark.dependency(depends=["test_sub_balance_to_moneybox"])
+@pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
 async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(
     db_manager: DBManager,
 ) -> None:

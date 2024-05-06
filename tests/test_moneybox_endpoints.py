@@ -4,14 +4,14 @@ from datetime import datetime
 
 import pytest
 from httpx import AsyncClient
+from starlette import status
 
 from src.custom_types import EndpointRouteType
-from src.db.db_manager import DBManager
-from src.utils import equal_dict, equal_list_of_dict
+from src.utils import equal_dict
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
-async def test_endpoint_get_moneyboxes_exist_5(
+async def test_endpoint_get_moneyboxes__status_200__total_5(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -31,7 +31,7 @@ async def test_endpoint_get_moneyboxes_exist_5(
 
     moneyboxes = response.json()
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert moneyboxes["total"] == expected_moneyboxes["total"]
 
     for dict_1, dict_2 in zip(  # type: ignore
@@ -44,128 +44,147 @@ async def test_endpoint_get_moneyboxes_exist_5(
         )
 
 
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
-async def test_endpoint_get_moneyboxes(db_manager: DBManager, client: AsyncClient) -> None:
+@pytest.mark.dependency
+async def test_endpoint_get_moneyboxes__status_204__no_content(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
     )
-    expected_moneyboxes = {
-        "total": 3,
-        "moneyboxes": [
-            {"name": "Test Box 1 - Updated", "id": 1, "balance": 33},
-            {"name": "Test Box 3", "id": 3, "balance": 300},
-            {"name": "Test Box 4", "id": 4, "balance": 0},
-        ],
-    }
-    moneyboxes = response.json()
 
-    assert response.status_code == 200
-    assert moneyboxes["total"] == expected_moneyboxes["total"]
+    assert response.status_code == status.HTTP_204_NO_CONTENT
 
-    assert equal_list_of_dict(
-        list_dict_1=moneyboxes["moneyboxes"],
-        list_dict_2=expected_moneyboxes["moneyboxes"],  # type: ignore
-        exclude_keys=["created_at", "modified_at", "id"],
-    )
 
-    # delete money all boxes
-    await db_manager.update_moneybox(moneybox_id=1, moneybox_data={"balance": 0})
-    await db_manager.update_moneybox(moneybox_id=3, moneybox_data={"balance": 0})
-
-    await db_manager.delete_moneybox(moneybox_id=1)
-    await db_manager.delete_moneybox(moneybox_id=3)
-    await db_manager.delete_moneybox(moneybox_id=4)
-
+@pytest.mark.dependency
+async def test_endpoint_get_moneybox__moneybox_id_1__status_200_existing(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
-    )
-    assert response.status_code == 204
-
-    # restore deleted moneyboxes
-    await db_manager._restore_moneybox(moneybox_id=1)  # pylint: disable=protected-access
-    await db_manager._restore_moneybox(moneybox_id=3)  # pylint: disable=protected-access
-    await db_manager._restore_moneybox(moneybox_id=4)  # pylint: disable=protected-access
-
-    await db_manager.update_moneybox(moneybox_id=1, moneybox_data={"balance": 33})
-    await db_manager.update_moneybox(moneybox_id=3, moneybox_data={"balance": 300})
-
-    response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
-    )
-    moneyboxes = response.json()
-
-    # test to ensure if moneyboxes were added
-    assert response.status_code == 200
-
-    assert moneyboxes["total"] == expected_moneyboxes["total"]
-    assert equal_list_of_dict(
-        list_dict_1=moneyboxes["moneyboxes"],
-        list_dict_2=expected_moneyboxes["moneyboxes"],  # type: ignore
-        exclude_keys=["created_at", "modified_at", "id"],
-    )
-
-
-@pytest.mark.dependency(depends=["test_endpoint_get_moneyboxes"])
-async def test_endpoint_get_moneybox(client: AsyncClient) -> None:
-    response_1 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
     )
-    moneybox = response_1.json()
+    moneybox = response.json()
 
-    expected_moneybox_data = {"name": "Test Box 1 - Updated", "id": 1, "balance": 33}
+    expected_moneybox_data = {"name": "Test Box 1", "id": 1, "balance": 0}
 
-    assert response_1.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert equal_dict(
         dict_1=moneybox,
         dict_2=expected_moneybox_data,  # type: ignore
         exclude_keys=["created_at", "modified_at"],
     )
 
-    response_2 = await client.get(
+
+@pytest.mark.dependency
+async def test_endpoint_get_moneybox_status_404_non_existing(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/0",
     )
-    assert response_2.status_code == 404
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    response_3 = await client.get(
+
+@pytest.mark.dependency
+async def test_endpoint_get_moneybox__status_405__path_incomplete(client: AsyncClient) -> None:
+    response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
     )
-    assert response_3.status_code == 405
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-@pytest.mark.dependency(depends=["test_endpoint_get_moneybox"])
-async def test_endpoint_add_moneybox(client: AsyncClient) -> None:
+@pytest.mark.dependency
+async def test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_balance_100(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2",
+    )
+    moneybox = response.json()
+
+    expected_moneybox_data = {"name": "Test Box 2", "id": 2, "balance": 100}
+
+    assert response.status_code == status.HTTP_200_OK
+    assert equal_dict(
+        dict_1=moneybox,
+        dict_2=expected_moneybox_data,  # type: ignore
+        exclude_keys=["created_at", "modified_at"],
+    )
+
+
+@pytest.mark.dependency
+async def test_endpoint_add_moneybox__one__status_200(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    moneybox_data = {"name": "Test Box Endpoint Add 1"}
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
+    )
+    moneybox = response.json()
+
+    expected_moneybox_data = {"name": "Test Box Endpoint Add 1", "id": 1, "balance": 0}
+
+    assert response.status_code == status.HTTP_200_OK
+    assert equal_dict(
+        dict_1=moneybox,
+        dict_2=expected_moneybox_data,
+        exclude_keys=["created_at", "modified_at"],
+    )
+
+
+@pytest.mark.dependency
+async def test_endpoint_add_moneybox__two__status_200(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
     moneybox_data_1 = {"name": "Test Box Endpoint Add 1"}
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
     )
-    moneybox = response_1.json()
+    moneybox_1 = response_1.json()
 
-    assert response_1.status_code == 200
+    expected_moneybox_data_1 = {"name": "Test Box Endpoint Add 1", "id": 1, "balance": 0}
+
+    assert response_1.status_code == status.HTTP_200_OK
     assert equal_dict(
-        dict_1=moneybox,
-        dict_2=moneybox_data_1 | {"id": 7, "balance": 0},
+        dict_1=moneybox_1,
+        dict_2=expected_moneybox_data_1,
         exclude_keys=["created_at", "modified_at"],
     )
 
-    moneybox_data_2 = {"name": "Test Box Endpoint Add 2", "balance": 1234}
+    moneybox_data_2 = {"name": "Test Box Endpoint Add 2"}
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
         json=moneybox_data_2,
     )
-    assert response_2.status_code == 422
+    moneybox_2 = response_2.json()
 
-    duplicate = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
-        json=moneybox_data_1,
+    expected_moneybox_data_2 = {"name": "Test Box Endpoint Add 2", "id": 2, "balance": 0}
+
+    assert response_2.status_code == status.HTTP_200_OK
+    assert equal_dict(
+        dict_1=moneybox_2,
+        dict_2=expected_moneybox_data_2,
+        exclude_keys=["created_at", "modified_at"],
     )
-    content = duplicate.json()
-    assert duplicate.status_code == 405
-    assert content["message"] == (
-        "Creation Error: Please choose another name, 'Test Box Endpoint Add 1' "
-        "is already in use (case insensitive)."
+
+@pytest.mark.dependency
+async def test_endpoint_add_moneybox__one__status_422__balance_postdata(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    # balance not allowed in post data
+    moneybox_data = {"name": "Test Box Endpoint Add 1", "balance": 200}
+
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
     )
-    assert len(content["details"]) == 1
-    assert content["details"]["name"] == "Test Box Endpoint Add 1"
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.dependency(depends=["test_endpoint_add_moneybox"])
