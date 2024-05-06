@@ -6,10 +6,7 @@ name: Python application
 on:
   push:
     branches:
-      - '*'
-  create:
-    branches:
-      - '*'
+      - '**'
 
 permissions:
   contents: read
