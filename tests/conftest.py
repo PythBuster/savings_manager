@@ -44,10 +44,10 @@ async def load_test_data(request: FixtureRequest, db_manager: DBManager) -> None
     :type db_manager: :class:`DBManager`
     """
 
-    callee_name = request.node.name
+    caller_name = request.node.name
     test_data_initializer_ = DBTestDataInitializer(
         db_manager=db_manager,
-        test_case=callee_name,
+        test_case=caller_name,
     )
     await test_data_initializer_.run()
 

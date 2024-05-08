@@ -37,6 +37,8 @@ class DBTestDataInitializer:
             "test_endpoint_delete_moneybox_1__status_204": self.dataset_test_endpoint_delete_moneybox_1__status_204,
             "test_endpoint_delete_moneybox_1__non_existing__status_404": self.truncate_tables,  # no data needed,
             "test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404": self.dataset_test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404,
+            "test_endpoint_deposit_moneybox_1__status_200": self.dataset_test_endpoint_deposit_moneybox_1__status_200,
+            "test_endpoint_deposit_moneybox_1__status_422__negative_amount": self.dataset_test_endpoint_deposit_moneybox_1__status_422__negative_amount,
         }
         """Map test case name witch related test data generation function"""
 
@@ -206,6 +208,44 @@ class DBTestDataInitializer:
     ) -> None:
         """The data generation function for test_case:
         `test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_200_and_404`.
+        """
+
+        await self.truncate_tables()
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_deposit_moneybox_1__status_200(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_deposit_moneybox_1__status_200`.
+        """
+
+        await self.truncate_tables()
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_deposit_moneybox_1__status_422__negative_amount(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_deposit_moneybox_1__status_405__negative_amount`.
         """
 
         await self.truncate_tables()
