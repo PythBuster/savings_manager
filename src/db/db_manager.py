@@ -8,7 +8,6 @@ from sqlalchemy.orm import joinedload
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
-    activate_instance,
     create_instance,
     deactivate_instance,
     exists_instance,
@@ -197,28 +196,6 @@ class DBManager:
         )
 
         if not deactivated:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
-
-    async def _restore_moneybox(self, moneybox_id: int) -> None:
-        """DB Function to restore a moneybox by given id.
-
-        Note: Function should not be used directly, but for test cases it helps to reactivate
-            specific states.
-
-        :param moneybox_id: The id of the moneybox.
-        :type moneybox_id: :class:`int`
-
-        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
-            was not found in database.
-        """
-
-        activated: bool = await activate_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=moneybox_id,
-        )
-
-        if not activated:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
