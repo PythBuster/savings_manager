@@ -237,7 +237,36 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
 
 
 @pytest.mark.dependency
-async def test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field(
+async def test_endpoint_moneybox_id_1__modified_at_checks(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response_1 = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+    )
+    content_1 = response_1.json()
+    assert content_1["modified_at"] is None
+
+    moneybox_data_2 = {"name": "Updated Name Test Box 1"}
+    response_2 = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_2
+    )
+    content_2 = response_2.json()
+
+    assert content_2["modified_at"] is not None
+
+    moneybox_data_3 = {"name": "RE-Updated Name Test Box 1"}
+    response_3 = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_3
+    )
+    content_3 = response_3.json()
+    assert datetime.fromisoformat(content_3["modified_at"]) > datetime.fromisoformat(
+        content_2["modified_at"]
+    )
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_fields(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -403,7 +432,6 @@ async def test_endpoint_deposit_moneybox_1__status_404__missing_moneybox_id_inva
 
 @pytest.mark.dependency
 async def test_endpoint_deposit_moneybox_1__status_422__negative_amount(
-    load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     deposit_data = {
@@ -415,8 +443,31 @@ async def test_endpoint_deposit_moneybox_1__status_422__negative_amount(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
         json=deposit_data,
     )
+    content = response.json()
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "greater_than_equal" == content["detail"][0]["type"]
+    assert "amount" in content["detail"][0]["loc"]
+
+
+@pytest.mark.dependency
+async def test_endpoint_deposit_moneybox_1__status_422__zero_amount(
+    client: AsyncClient,
+) -> None:
+    deposit_data = {
+        "amount": 0,
+        "description": "Bonus.",
+    }
+
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        json=deposit_data,
+    )
+    content = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "greater_than_equal" == content["detail"][0]["type"]
+    assert "amount" in content["detail"][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -505,7 +556,6 @@ async def test_endpoint_withdraw_moneybox_1__status_404__missing_moneybox_id_inv
 
 @pytest.mark.dependency
 async def test_endpoint_withdraw_moneybox_1__status_422__negative_amount(
-    load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     withdraw_data = {
@@ -517,8 +567,31 @@ async def test_endpoint_withdraw_moneybox_1__status_422__negative_amount(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
         json=withdraw_data,
     )
+    content = response.json()
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "greater_than_equal" == content["detail"][0]["type"]
+    assert "amount" in content["detail"][0]["loc"]
+
+
+@pytest.mark.dependency
+async def test_endpoint_withdraw_moneybox_1__status_422__zero_amount(
+    client: AsyncClient,
+) -> None:
+    withdraw_data = {
+        "amount": 0,
+        "description": "",
+    }
+
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        json=withdraw_data,
+    )
+    content = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "greater_than_equal" == content["detail"][0]["type"]
+    assert "amount" in content["detail"][0]["loc"]
 
 
 async def test_endpoint_withdraw_moneybox_1__status_405__balance_negative(
@@ -538,62 +611,168 @@ async def test_endpoint_withdraw_moneybox_1__status_405__balance_negative(
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
 
 
-@pytest.mark.dependency(depends=["test_endpoint_deposit_moneybox"])
-async def test_endpoint_transfer_amount_moneybox(client: AsyncClient) -> None:
-    response_moneybox_id_1_data = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
-    )
-    moneybox_id_1_data = response_moneybox_id_1_data.json()
-
-    response_moneybox_id_3_data = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3",
-    )
-    moneybox_id_3_data = response_moneybox_id_3_data.json()
-
-    transfer_data_1 = {
-        "amount": 50,
-        "to_moneybox_id": 1,
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": 500,
+        "to_moneybox_id": 2,
         "description": "Transfer money.",
     }
-
-    response_1 = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3/balance/transfer",
-        json=transfer_data_1,
-    )
-    assert response_1.status_code == 204
-
-    response_new_moneybox_id_1_data = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
-    )
-    new_moneybox_id_1_data = response_new_moneybox_id_1_data.json()
-
-    assert moneybox_id_1_data["modified_at"] < new_moneybox_id_1_data["modified_at"]
-    moneybox_id_1_data["balance"] += 50
-    assert equal_dict(
-        dict_1=moneybox_id_1_data,
-        dict_2=new_moneybox_id_1_data,
-        exclude_keys=["created_at", "modified_at"],
-    )
-
-    response_new_moneybox_id_3_data = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3",
-    )
-    new_moneybox_id_3_data = response_new_moneybox_id_3_data.json()
-
-    try:
-        datetime.fromisoformat(new_moneybox_id_3_data["modified_at"])
-    except:  # noqa: E722  # pylint: disable=bare-except
-        assert False, "Invalid datetime"
-
-    moneybox_id_3_data["balance"] -= 50
-    assert equal_dict(
-        dict_1=moneybox_id_3_data,
-        dict_2=new_moneybox_id_3_data,
-        exclude_keys=["created_at", "modified_at"],
-    )
-
-    response_2 = await client.post(
+    response = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
-        json=transfer_data_1,
+        json=transfer_data,
     )
-    assert response_2.status_code == 405
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204__missing_description_field(  # noqa: E501
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": 500,
+        "to_moneybox_id": 2,
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data,
+    )
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__missing_amount_field(
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "to_moneybox_id": 2,
+        "description": "Transfer money.",
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data,
+    )
+    content = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "missing" == content["detail"][0]["type"]
+    assert "amount" in content["detail"][0]["loc"]
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__missing_to_moneybox_id_field(  # noqa: E501
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": 500,
+        "description": "Transfer money.",
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data,
+    )
+    content = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "missing" == content["detail"][0]["type"]
+    assert "to_moneybox_id" in content["detail"][0]["loc"]
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__status_422__fail_extra_field(  # noqa: E501
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": 500,
+        "description": "Transfer money.",
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data,
+    )
+    content = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "missing" == content["detail"][0]["type"]
+    assert "to_moneybox_id" in content["detail"][0]["loc"]
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__negative_amount(
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": -500,
+        "to_moneybox_id": 2,
+        "description": "Transfer money.",
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data,
+    )
+    content = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "greater_than_equal" == content["detail"][0]["type"]
+    assert "amount" in content["detail"][0]["loc"]
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__zero_amount(
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": 0,
+        "to_moneybox_id": 2,
+        "description": "Transfer money.",
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data,
+    )
+    content = response.json()
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "greater_than_equal" == content["detail"][0]["type"]
+    assert "amount" in content["detail"][0]["loc"]
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__missing_moneybox_id_invalid_path(  # noqa: E501
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": 500,
+        "to_moneybox_id": 2,
+        "description": "Transfer money.",
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/balance/transfer",
+        json=transfer_data,
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.dependency
+async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__to_moneybox_id_2_not_found(  # noqa: E501
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    transfer_data = {
+        "amount": 500,
+        "to_moneybox_id": 2,
+        "description": "Transfer money.",
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        json=transfer_data,
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND

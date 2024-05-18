@@ -56,7 +56,7 @@ load-plugins=[
 [tool.pylint-per-file-ignores]
 "test_db_manager.py"="missing-function-docstring"
 "test_utils.py"="missing-function-docstring"
-"test_moneybox_endpoints.py"="missing-function-docstring"
+"test_moneybox_endpoints.py"="missing-function-docstring, line-too-long"
 "/routes/"="missing-function-docstring"
 "requests.py"="duplicate-code"
 "responses.py"="duplicate-code"

@@ -33,15 +33,17 @@ class DBTestDataInitializer:
             "test_endpoint_add_moneybox__two__status_200": self.truncate_tables,  # no data needed,
             "test_endpoint_add_moneybox__one__status_422__balance_postdata": self.truncate_tables,  # no data needed,
             "test_endpoint_update_moneybox__moneybox_id_1__namechange": self.dataset_endpoint_update_moneybox__moneybox_id_1__namechange,
-            "test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field": self.dataset_test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field,
+            "test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_fields": self.dataset_test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_fields,
+            "test_endpoint_moneybox_id_1__modified_at_checks": self.dataset_test_endpoint_moneybox_id_1__modified_at_checks,
             "test_endpoint_delete_moneybox_1__status_204": self.dataset_test_endpoint_delete_moneybox_1__status_204,
             "test_endpoint_delete_moneybox_1__non_existing__status_404": self.truncate_tables,  # no data needed,
             "test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404": self.dataset_test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404,
             "test_endpoint_deposit_moneybox_1__status_200": self.dataset_test_endpoint_deposit_moneybox_1__status_200,
-            "test_endpoint_deposit_moneybox_1__status_422__negative_amount": self.dataset_test_endpoint_deposit_moneybox_1__status_422__negative_amount,
             "test_endpoint_withdraw_moneybox_1__status_200": self.dataset_test_endpoint_withdraw_moneybox_1__status_200,
-            "test_endpoint_withdraw_moneybox_1__status_422__negative_amount": self.dataset_test_endpoint_withdraw_moneybox_1__status_422__negative_amount,
             "test_endpoint_withdraw_moneybox_1__status_405__balance_negative": self.dataset_test_endpoint_withdraw_moneybox_1__status_405__balance_negative,
+            "test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204": self.dataset_test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204,
+            "test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204__missing_description_field": self.dataset_test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204__missing_description_field,
+            "test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__to_moneybox_id_2_not_found": self.dataset_test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__to_moneybox_id_2_not_found,
         }
         """Map test case name witch related test data generation function"""
 
@@ -168,19 +170,46 @@ class DBTestDataInitializer:
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field(
+    async def dataset_test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_fields(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_field`.
+        `test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_fields`.
         """
 
         await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
 
         # create 2 moneyboxes
         moneyboxes_data = [
             {"name": "Test Box 1"},
             {"name": "Test Box 2"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_moneybox_id_1__modified_at_checks(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_moneybox_id_1__modified_at_checks`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -244,25 +273,6 @@ class DBTestDataInitializer:
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_endpoint_deposit_moneybox_1__status_422__negative_amount(
-        self,
-    ) -> None:
-        """The data generation function for test_case:
-        `test_endpoint_deposit_moneybox_1__status_405__negative_amount`.
-        """
-
-        await self.truncate_tables()
-
-        # create 1 moneybox
-        moneyboxes_data = [
-            {"name": "Test Box 1"},
-        ]
-
-        for moneybox_data in moneyboxes_data:
-            await self.db_manager.add_moneybox(
-                moneybox_data=moneybox_data,
-            )
-
     async def dataset_test_endpoint_withdraw_moneybox_1__status_200(
         self,
     ) -> None:
@@ -295,11 +305,11 @@ class DBTestDataInitializer:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    async def dataset_test_endpoint_withdraw_moneybox_1__status_422__negative_amount(
+    async def dataset_test_endpoint_withdraw_moneybox_1__status_405__balance_negative(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_withdraw_moneybox_1__status_422__negative_amount`.
+        `test_endpoint_withdraw_moneybox_1__status_405__balance_negative`.
         """
 
         await self.truncate_tables()
@@ -314,11 +324,83 @@ class DBTestDataInitializer:
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_endpoint_withdraw_moneybox_1__status_405__balance_negative(
+    async def dataset_test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_withdraw_moneybox_1__status_405__balance_negative`.
+        `test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 2 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+            {"name": "Test Box 2"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+        # add some amount to moneybox with id 2
+        await self.db_manager.add_amount(
+            moneybox_id=1,
+            deposit_transaction_data={
+                "amount": 1000,
+                "description": "Unit Test.",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+    async def dataset_test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204__missing_description_field(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204__missing_description_field`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 2 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1"},
+            {"name": "Test Box 2"},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+        # add some amount to moneybox with id 2
+        await self.db_manager.add_amount(
+            moneybox_id=1,
+            deposit_transaction_data={
+                "amount": 1000,
+                "description": "Unit Test.",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+    async def dataset_test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__to_moneybox_id_2_not_found(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__to_moneybox_id_2_not_found`.
         """
 
         await self.truncate_tables()
