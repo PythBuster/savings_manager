@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from httpx import AsyncClient
 from sqlalchemy import text
 
-from src.custom_types import DBSettings
+from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
 from src.main import app, register_router
@@ -32,6 +32,149 @@ TEST_DB_DRIVER = os.getenv("DB_DRIVER")
 
 db_settings = get_db_settings()
 """The database settings."""
+
+
+@pytest.fixture(scope="function")
+async def default_test_data(db_manager: DBManager) -> None:
+    """The default test data fixture.
+
+    Loads a fix dataset of testdata.
+
+    :param db_manager: The database manager.
+    :type db_manager: :class:`DBManager`
+    """
+
+    await db_manager.truncate_tables()  # type: ignore
+
+    # add 5 moneyboxes
+    moneyboxes_data = [
+        {"name": "Moneybox 1"},  # id: 1
+        {"name": "Moneybox 2"},  # id: 2
+        {"name": "Moneybox 3"},  # id: 3
+        {"name": "Moneybox 4"},  # id: 4
+        {"name": "Moneybox 5"},  # id: 5
+    ]
+
+    for moneybox_data in moneyboxes_data:
+        await db_manager.add_moneybox(
+            moneybox_data=moneybox_data,
+        )
+
+    # Moneybox 1
+    # 3x add / 1x transfer -> Moneybox 3
+    await db_manager.add_amount(
+        moneybox_id=1,
+        deposit_transaction_data={"amount": 1000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.add_amount(
+        moneybox_id=1,
+        deposit_transaction_data={"amount": 333, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.add_amount(
+        moneybox_id=1,
+        deposit_transaction_data={"amount": 2000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.transfer_amount(
+        from_moneybox_id=1,
+        transfer_transaction_data={"to_moneybox_id": 3, "amount": 3000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    # Moneybox 2
+    # 2x add / 3x sub
+    await db_manager.add_amount(
+        moneybox_id=2,
+        deposit_transaction_data={"amount": 6000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.sub_amount(
+        moneybox_id=2,
+        withdraw_transaction_data={"amount": 500, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.sub_amount(
+        moneybox_id=2,
+        withdraw_transaction_data={"amount": 600, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.add_amount(
+        moneybox_id=2,
+        deposit_transaction_data={"amount": 5000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.sub_amount(
+        moneybox_id=2,
+        withdraw_transaction_data={"amount": 900, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    # Moneybox 3
+    # 1x add / 2x sub / 1x transfer -> Moneybox 4
+    await db_manager.add_amount(
+        moneybox_id=3,
+        deposit_transaction_data={"amount": 10_000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.sub_amount(
+        moneybox_id=3,
+        withdraw_transaction_data={"amount": 900, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.transfer_amount(
+        from_moneybox_id=3,
+        transfer_transaction_data={"to_moneybox_id": 4, "amount": 5000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.sub_amount(
+        moneybox_id=3,
+        withdraw_transaction_data={"amount": 900, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    # Moneybox 4
+    # 1x add / 1x sub / 2x transfer -> Moneyboxes 1 + 3
+    await db_manager.add_amount(
+        moneybox_id=4,
+        deposit_transaction_data={"amount": 20_000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.transfer_amount(
+        from_moneybox_id=4,
+        transfer_transaction_data={"to_moneybox_id": 1, "amount": 15000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.sub_amount(
+        moneybox_id=4,
+        withdraw_transaction_data={"amount": 2000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+    await db_manager.transfer_amount(
+        from_moneybox_id=4,
+        transfer_transaction_data={"to_moneybox_id": 3, "amount": 8000, "description": ""},
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    await db_manager.delete_moneybox(moneybox_id=4)
 
 
 @pytest.fixture(scope="function")
