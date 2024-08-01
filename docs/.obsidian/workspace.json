@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Architecture/Database App v2.md",
+                "file": "Feauture Requests/Ideas.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Architecture/Database App v2.md",
+                "file": "Feauture Requests/Ideas.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Architecture/Database App v2.md",
+                "file": "Feauture Requests/Ideas.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Architecture/Database App v2.md"
+                "file": "Feauture Requests/Ideas.md"
               }
             }
           }
@@ -148,28 +148,29 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
+    "Guidelines/Workflow.md",
+    "Guidelines/Code/Code Style.md",
+    "Guidelines/Code/Quality Assurence.md",
+    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
+    "ui/draft/App Version 2.md",
+    "ui/draft/App Version 1.md",
+    "Architecture/Database App v2.md",
     "Feauture Requests/Ideas.md",
     "distribution_logs_app_v2.png",
     "Diagram 2.svg.xml",
     "Diagram 2.svg",
     "Diagram 1.svg.xml",
     "Diagram 1.svg",
-    "Architecture/Database App v2.md",
     "Architecture/Database App v1.md",
     "Architecture",
-    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "TransactionLog_Creation.png",
     "Requirements/Requirement Analysis.md",
     "ui/draft/App_v2_SavingsManagerUI.png",
     "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
     "ui/draft/date-filter-animation-.gif",
     "ui/draft/FullTransactionLogs_v1.png",
-    "ui/draft/App Version 1.md",
     "ui/draft/FullTransactionLogs.png",
     "sphinx/build/searchindex.js.tmp",
-    "Guidelines/Workflow.md",
-    "Guidelines/Code/Quality Assurence.md",
-    "Guidelines/Code/Code Style.md",
     "transaction_log/Final_Example_Transatcion_Log.ods",
     "transaction_log",
     "transaction_log/Final_Example_Transatcion_Log.html",
@@ -178,7 +179,6 @@
     "transaction_log/Untitled.md",
     "vulture_whitelist.def",
     "sphinx/source/utils.rst",
-    "ui/draft/App Version 2.md",
     "Guidelines/Code/Deployment.md",
     "Guidelines/Deployment/Unbenannt.md",
     "Guidelines/Code/Branching.md",

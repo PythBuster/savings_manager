@@ -16,7 +16,7 @@ from src.db.db_manager import DBManager
 from src.db.models import Base
 from src.main import app, register_router
 from src.utils import get_db_settings
-from tests.db_test_data_initializer import DBTestDataInitializer
+from tests.utils.db_test_data_initializer import DBTestDataInitializer
 
 pytest_plugins = ("pytest_asyncio",)
 """The pytest plugins which should be used to run tests."""
