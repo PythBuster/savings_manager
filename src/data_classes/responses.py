@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Annotated, Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, AwareDatetime
 
 from src.custom_types import TransactionTrigger, TransactionType
 
@@ -37,11 +37,11 @@ class MoneyboxResponse(BaseModel):
     balance: Annotated[int, Field(ge=0, description="The balance of the moneybox in CENTS.")]
     """The balance of the moneybox in CENTS."""
 
-    created_at: Annotated[datetime, Field(description="The creation date of the moneybox.")]
+    created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
     """The creation date of the moneybox."""
 
     modified_at: Annotated[
-        datetime | None, Field(description="The modification date of the moneybox.")
+        AwareDatetime | None, Field(description="The modification date of the moneybox.")
     ]
     """The modification date of the moneybox."""
 
@@ -60,6 +60,33 @@ class MoneyboxResponse(BaseModel):
         },
     )
     """The config of the model."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def strict_datetimes(cls, data: dict) -> Self:
+        """Check if 'modified_at' and 'created_at' is type datetime."""
+
+        if "modified_at" in data:
+            if isinstance(data["modified_at"], str):
+                try:
+                    datetime.fromisoformat(data["modified_at"])
+                except (TypeError, ValueError):
+                    raise ValueError("'modified_at' must be of type datetime.")
+
+            elif data["modified_at"] is not None and not isinstance(data["modified_at"], datetime):
+                raise ValueError("'modified_at' must be of type datetime.")
+
+        if "created_at" in data:
+            if isinstance(data["created_at"], str):
+                try:
+                    datetime.fromisoformat(data["created_at"])
+                except (TypeError, ValueError):
+                    raise ValueError("'created_at' must be of type datetime.")
+
+            elif not isinstance(data["created_at"], datetime):
+                raise ValueError("'created_at' must be of type datetime.")
+
+        return data
 
     @model_validator(mode="after")
     def validate_date_order(self) -> Self:
@@ -173,7 +200,7 @@ class TransactionLog(BaseModel):
     moneybox_id: Annotated[int, Field(description="The foreign key to moneybox.")]
     """The foreign key to moneybox."""
 
-    created_at: Annotated[datetime, Field(description="The creation date of the transaction log.")]
+    created_at: Annotated[AwareDatetime, Field(description="The creation date of the transaction log.")]
     """The creation date of the transaction log."""
 
     model_config = ConfigDict(
@@ -195,6 +222,23 @@ class TransactionLog(BaseModel):
         },
     )
     """The config of the model."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def strict_datetimes(cls, data: dict) -> Self:
+        """Check if 'modified_at' and 'created_at' is type datetime."""
+
+        if "created_at" in data:
+            if isinstance(data["created_at"], str):
+                try:
+                    datetime.fromisoformat(data["created_at"])
+                except (TypeError, ValueError):
+                    raise ValueError("'created_at' must be of type datetime.")
+
+            elif not isinstance(data["created_at"], datetime):
+                raise ValueError("'created_at' must be of type datetime.")
+
+        return data
 
 
 class TransactionLogs(BaseModel):
