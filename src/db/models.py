@@ -91,11 +91,12 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
         if exclude is None:
             exclude = []
 
-        if "is_active" not in exclude:
-            exclude.append("is_active")
+        # always exlude these columns
+        exclude.append("is_active")
+        exclude.append("note")
 
         return super().asdict(  # pylint: disable=no-member
-            exclude=exclude,
+            exclude=list(set(exclude)),  # remove duplicates by casting to set and back to list
             exclude_underscore=exclude_underscore,
             exclude_pk=exclude_pk,
             follow=follow,
