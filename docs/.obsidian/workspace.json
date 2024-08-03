@@ -11,26 +11,15 @@
             "id": "1bdf787dcc5f54b4",
             "type": "leaf",
             "state": {
-              "type": "image",
-              "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png"
-              }
-            }
-          },
-          {
-            "id": "b30b49659071a3ec",
-            "type": "leaf",
-            "state": {
               "type": "markdown",
               "state": {
-                "file": "Guidelines/Workflow.md",
+                "file": "Architecture/Database App v2.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -80,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 322.5
+    "width": 200
   },
   "right": {
     "id": "aa46344228e1c096",
@@ -96,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Guidelines/Workflow.md",
+                "file": "Architecture/Database App v2.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Guidelines/Workflow.md",
+                "file": "Architecture/Database App v2.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -136,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Guidelines/Workflow.md"
+                "file": "Architecture/Database App v2.md"
               }
             }
           }
@@ -157,31 +146,30 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "b30b49659071a3ec",
+  "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
-    "ui/draft/FullTransactionLogs_v2.png",
+    "Architecture/Database App v1.md",
+    "Architecture/Database App v2.md",
+    "ui/draft/App_v2_SavingsManagerUI.png",
+    "Requirements/Requirement Analysis.md",
     "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
+    "ui/draft/App Version 2.md",
+    "Diagram 2.svg",
+    "Guidelines/Workflow.md",
+    "ui/draft/FullTransactionLogs_v2.png",
     "distribution_logs_app_v2.png",
     "Diagram 2.svg.xml",
-    "Diagram 2.svg",
     "Diagram 1.svg.xml",
     "Diagram 1.svg",
-    "Architecture/Database App v2.md",
-    "Architecture/Database App v1.md",
     "Architecture",
-    "ui/draft/App Version 2.md",
     "Feauture Requests/Ideas.md",
-    "Guidelines/Workflow.md",
     "Guidelines/Code/Code Style.md",
     "Guidelines/Code/Quality Assurence.md",
     "ui/draft/App Version 1.md",
     "TransactionLog_Creation.png",
-    "Requirements/Requirement Analysis.md",
-    "ui/draft/App_v2_SavingsManagerUI.png",
     "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
     "ui/draft/date-filter-animation-.gif",
     "ui/draft/FullTransactionLogs_v1.png",
-    "ui/draft/FullTransactionLogs.png",
     "sphinx/build/searchindex.js.tmp",
     "transaction_log/Final_Example_Transatcion_Log.ods",
     "transaction_log",
