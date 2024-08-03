@@ -1,4 +1,7 @@
+"""All moneybox response model tests are located here."""
+
 from datetime import datetime
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -6,21 +9,44 @@ from pydantic import ValidationError
 from src.data_classes.responses import MoneyboxResponse
 
 
-def test_moneyboxresponse_valid_data():
+@pytest.mark.parametrize(
+    "data",
+    [
+        {
+            "id": 1,
+            "name": "Holiday",
+            "balance": 1000,
+            "created_at": "2020-05-01T00:00:00Z",
+            "modified_at": None,
+        },
+        {
+            "id": 2,
+            "name": "Holymoly",
+            "balance": 1234,
+            "created_at": "2020-05-01T00:00:00Z",
+            "modified_at": "2020-06-01T00:00:00Z",
+        },
+    ],
+)
+def test_moneyboxresponse_valid_data(data: dict[str, Any]):
     """Test valid MoneyboxResponse creation."""
-    data = {
-        "id": 1,
-        "name": "Holiday",
-        "balance": 1000,
-        "created_at": "2020-05-01T00:00:00Z",
-        "modified_at": None,
-    }
+
+    data_id = data["id"]
+    data_name = data["name"]
+    data_balance = data["balance"]
+    data_created_at = datetime.fromisoformat(data["created_at"])
+    data_modified_at = (
+        datetime.fromisoformat(data["modified_at"]) if data["modified_at"] is not None else None
+    )
+
     response = MoneyboxResponse(**data)
-    assert response.id == 1
-    assert response.name == "Holiday"
-    assert response.balance == 1000
-    assert response.created_at == datetime.fromisoformat("2020-05-01T00:00:00+00:00")
-    assert response.modified_at is None
+
+    assert response.id == data_id
+    assert response.name == data_name
+    assert response.balance == data_balance
+    assert response.created_at == data_created_at
+    assert response.modified_at == data_modified_at
+
 
 def test_moneyboxresponse_invalid_id__0():
     """Test MoneyboxResponse creation with invalid id."""
@@ -34,6 +60,7 @@ def test_moneyboxresponse_invalid_id__0():
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
 
+
 def test_moneyboxresponse_invalid_id__negative():
     """Test MoneyboxResponse creation with invalid id."""
     data = {
@@ -45,6 +72,7 @@ def test_moneyboxresponse_invalid_id__negative():
     }
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
+
 
 def test_moneyboxresponse_invalid_id__non_int():
     """Test MoneyboxResponse creation with invalid id."""
@@ -85,6 +113,7 @@ def test_moneyboxresponse_invalid_name__wrong_type():
     }
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
+
 
 def test_moneyboxresponse_invalid_balance__negative():
     """Test MoneyboxResponse creation with invalid balance."""
@@ -134,6 +163,7 @@ def test_moneyboxresponse_invalid_balance__wrong_type():
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
 
+
 def test_moneyboxresponse_invalid_date_order():
     """Test MoneyboxResponse creation with invalid date order."""
     data = {
@@ -146,8 +176,9 @@ def test_moneyboxresponse_invalid_date_order():
     with pytest.raises(ValueError, match="Error: 'created_at' comes after 'modified_at'."):
         MoneyboxResponse(**data)
 
-def test_moneyboxresponse_invalid_date__modified_at_wrong_type():
-    """Test MoneyboxResponse creation with invalid date order."""
+
+def test_moneyboxresponse_invalid_date__modified_at_wrong_type__int():
+    """Test MoneyboxResponse creation with invalid modified_at date value."""
     data = {
         "id": 1,
         "name": "Holiday",
@@ -155,11 +186,27 @@ def test_moneyboxresponse_invalid_date__modified_at_wrong_type():
         "created_at": "2020-05-02T00:00:00Z",
         "modified_at": 2,
     }
+
     with pytest.raises(ValueError):
         MoneyboxResponse(**data)
 
-def test_moneyboxresponse_invalid_date__created_at_wrong_type():
-    """Test MoneyboxResponse creation with invalid date order."""
+
+def test_moneyboxresponse_invalid_date__modified_at_wrong_type__not_isoformat_datetime():
+    """Test MoneyboxResponse creation with invalid modified_at date value."""
+    data = {
+        "id": 1,
+        "name": "Holiday",
+        "balance": 1000,
+        "created_at": "2020-05-02T00:00:00Z",
+        "modified_at": "2",
+    }
+
+    with pytest.raises(ValueError):
+        MoneyboxResponse(**data)
+
+
+def test_moneyboxresponse_invalid_date__created_at_wrong_type__int():
+    """Test MoneyboxResponse creation with invalid created_at date value."""
     data = {
         "id": 1,
         "name": "Holiday",
@@ -167,8 +214,24 @@ def test_moneyboxresponse_invalid_date__created_at_wrong_type():
         "created_at": 2,
         "modified_at": "2020-05-02T00:00:00Z",
     }
+
     with pytest.raises(ValueError):
         MoneyboxResponse(**data)
+
+
+def test_moneyboxresponse_invalid_date__created_at_wrong_type__not_isoformat_datetime():
+    """Test MoneyboxResponse creation with invalid created_at date value."""
+    data = {
+        "id": 1,
+        "name": "Holiday",
+        "balance": 1000,
+        "created_at": "2",
+        "modified_at": "2020-05-02T00:00:00Z",
+    }
+
+    with pytest.raises(ValueError):
+        MoneyboxResponse(**data)
+
 
 def test_moneyboxresponse_invalid_date__none_for_created_at():
     """Test MoneyboxResponse creation with invalid date order."""
@@ -177,10 +240,11 @@ def test_moneyboxresponse_invalid_date__none_for_created_at():
         "name": "Holiday",
         "balance": 1000,
         "created_at": None,  # Invalid, has to be a datetime or iso string datetime
-        "modified_at": "2020-05-01T00:00:00Z",
+        "modified_at": "2020-05-01T00:00:00",
     }
     with pytest.raises(ValueError):
         MoneyboxResponse(**data)
+
 
 def test_moneyboxresponse_valid_date_order():
     """Test MoneyboxResponse creation with valid date order."""

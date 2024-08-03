@@ -223,9 +223,9 @@ async def get_moneybox_transaction_logs(
 
     if transaction_logs_data:
         transaction_logs_data = {
-            "total": len(transaction_logs_data),
             "transaction_logs": transaction_logs_data,
         }
+
         transaction_logs = TransactionLogs(**transaction_logs_data)
         return transaction_logs
 

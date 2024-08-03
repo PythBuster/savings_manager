@@ -3,6 +3,15 @@
 from datetime import datetime, timezone
 from typing import Annotated, Any, Self
 
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    model_validator,
+    computed_field,
+    field_validator,
+)
 from pydantic import BaseModel, ConfigDict, Field, model_validator, AwareDatetime
 
 from src.custom_types import TransactionTrigger, TransactionType
@@ -66,25 +75,27 @@ class MoneyboxResponse(BaseModel):
     def strict_datetimes(cls, data: dict) -> Self:
         """Check if 'modified_at' and 'created_at' is type datetime."""
 
-        if "modified_at" in data:
+        if data["modified_at"] is not None:
             if isinstance(data["modified_at"], str):
                 try:
+                    # Code needed, because pydantic model in SERIALISATION mode will allow strings like "2"
+                    # here we need o check, if string is an isoformatted datetime string
                     datetime.fromisoformat(data["modified_at"])
                 except (TypeError, ValueError):
-                    raise ValueError("'modified_at' must be of type datetime.")
+                    raise ValueError("'created_at' must be of type datetime or datetime-string.")
+            elif not isinstance(data["modified_at"], datetime):
+                raise ValueError("'modified_at' must be of type datetime or datetime-string.")
 
-            elif data["modified_at"] is not None and not isinstance(data["modified_at"], datetime):
-                raise ValueError("'modified_at' must be of type datetime.")
+        if isinstance(data["created_at"], str):
+            try:
+                # Code needed, because pydantic model in SERIALISATION mode will allow strings like "2"
+                # here we need o check, if string is an isoformatted datetime string
+                datetime.fromisoformat(data["created_at"])
+            except (TypeError, ValueError):
+                raise ValueError("'created_at' must be of type datetime or datetime-string.")
 
-        if "created_at" in data:
-            if isinstance(data["created_at"], str):
-                try:
-                    datetime.fromisoformat(data["created_at"])
-                except (TypeError, ValueError):
-                    raise ValueError("'created_at' must be of type datetime.")
-
-            elif not isinstance(data["created_at"], datetime):
-                raise ValueError("'created_at' must be of type datetime.")
+        elif not isinstance(data["created_at"], datetime):
+            raise ValueError("'created_at' must be of type datetime or datetime-string.")
 
         return data
 
@@ -180,10 +191,11 @@ class TransactionLog(BaseModel):
     balance: Annotated[
         int,
         Field(
-            description="The balance of the moneybox at the time of the transaction.",
+            ge=0,
+            description="The new balance of the moneybox after the transaction.",
         ),
     ]
-    """The balance of the moneybox at the time of the transaction."""
+    """The new balance of the moneybox after the transaction."""
 
     counterparty_moneybox_id: Annotated[
         int | None,
@@ -197,10 +209,12 @@ class TransactionLog(BaseModel):
     """Transaction is a transfer between moneybox_id and
     counterparty_moneybox_id, if set."""
 
-    moneybox_id: Annotated[int, Field(description="The foreign key to moneybox.")]
+    moneybox_id: Annotated[int, Field(ge=1, description="The foreign key to moneybox.")]
     """The foreign key to moneybox."""
 
-    created_at: Annotated[AwareDatetime, Field(description="The creation date of the transaction log.")]
+    created_at: Annotated[
+        AwareDatetime, Field(description="The creation date of the transaction log.")
+    ]
     """The creation date of the transaction log."""
 
     model_config = ConfigDict(
@@ -223,29 +237,100 @@ class TransactionLog(BaseModel):
     )
     """The config of the model."""
 
+    @field_validator("amount")
+    @classmethod
+    def check_amount(cls, value: int) -> int:
+        """Check if amount is != 0. Transactions with amount of 0 doesn't make sense."""
+
+        if value == 0:
+            raise ValueError("Amount has to be positive or negative for the transaction.")
+
+        return value
+
     @model_validator(mode="before")
     @classmethod
-    def strict_datetimes(cls, data: dict) -> Self:
+    def strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Check if 'modified_at' and 'created_at' is type datetime."""
 
-        if "created_at" in data:
-            if isinstance(data["created_at"], str):
-                try:
-                    datetime.fromisoformat(data["created_at"])
-                except (TypeError, ValueError):
-                    raise ValueError("'created_at' must be of type datetime.")
-
-            elif not isinstance(data["created_at"], datetime):
-                raise ValueError("'created_at' must be of type datetime.")
+        if isinstance(data["created_at"], str):
+            try:
+                datetime.fromisoformat(data["created_at"])
+            except (TypeError, ValueError):
+                raise ValueError("'created_at' must be of type datetime or datetime-string.")
+        elif not isinstance(data["created_at"], datetime):
+            raise ValueError("'created_at' must be of type datetime or datetime-string.")
 
         return data
+
+    @model_validator(mode="after")
+    @classmethod
+    def check_transaction_trigger_and_type_combination(cls, self: Self) -> Self:
+        """Check for combinations:
+        - TransactionType.DIRECT + TransactionTrigger.AUTOMATICALLY
+        - TransactionType.DISTRIBUTION + TransactionTrigger.DIRECT
+
+        and raise exception if combination occurs."""
+
+        if (
+            self.transaction_type is not TransactionType.DIRECT
+            and self.transaction_trigger is not TransactionTrigger.AUTOMATICALLY
+        ):
+            raise ValueError(
+                "Invalid transaction type and transaction trigger combination!"
+                "An automated-direct action is not allowed for now."
+            )
+
+        if (
+            self.transaction_type is not TransactionType.DISTRIBUTION
+            and self.transaction_trigger is not TransactionTrigger.MANUALLY
+        ):
+            raise ValueError(
+                "Invalid transaction type and transaction trigger combination!"
+                "A manual-distributed action is not allowed for now."
+            )
+
+        return self
+
+    @model_validator(mode="after")
+    @classmethod
+    def check_counterparty_moneybox(cls, self: Self) -> Self:
+        """If counterparty_moneybox_name is set, counterparty_moneybox_id need to be set too."""
+
+        if (self.counterparty_moneybox_name is None) != (
+            self.counterparty_moneybox_id is None
+        ):
+            raise ValueError("Invalid combination: If one is None, the other must also be None.")
+
+        return self
+
+    @model_validator(mode="after")
+    @classmethod
+    def check_moneybox_id(cls, self: Self) -> Self:
+        """moneybox_id must not be the same as counterparty_moneybox_id"""
+
+        if self.moneybox_id == self.counterparty_moneybox_id:
+            raise ValueError("moneybox_id must not be the same as counterparty_moneybox_id.")
+
+        return self
+
+    @model_validator(mode="after")
+    @classmethod
+    def check_new_balance(cls, self: Self) -> Self:
+        """Check balance
+        - if amount is positive, balance must be at least greater than or equal to amount.
+
+        raise exception if not."""
+
+        if self.amount > 0 and self.balance < self.amount:
+            raise ValueError(
+                "New balance of the moneybox must be at least greater than or equal to amount."
+            )
+
+        return self
 
 
 class TransactionLogs(BaseModel):
     """The transaction logs response model."""
-
-    total: Annotated[int, Field(ge=0, description="The count of transaction logs.")]
-    """The count of transaction logs."""
 
     transaction_logs: Annotated[
         list[TransactionLog], Field(description="The list of transaction logs.")
@@ -266,3 +351,8 @@ class TransactionLogs(BaseModel):
         },
     )
     """The config of the model."""
+
+    @computed_field
+    @property
+    def total(self) -> int:
+        return len(self.transaction_logs)
