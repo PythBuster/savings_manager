@@ -28,7 +28,7 @@ from src.data_classes.responses import MoneyboxResponse
         },
     ],
 )
-def test_moneyboxresponse_valid_data(data: dict[str, Any]):
+def test_moneybox_response_valid_data(data: dict[str, Any]):
     """Test valid MoneyboxResponse creation."""
 
     data_id = data["id"]
@@ -48,8 +48,9 @@ def test_moneyboxresponse_valid_data(data: dict[str, Any]):
     assert response.modified_at == data_modified_at
 
 
-def test_moneyboxresponse_invalid_id__0():
+def test_moneybox_response_invalid_id__0():
     """Test MoneyboxResponse creation with invalid id."""
+
     data = {
         "id": 0,  # Invalid id, should be >= 1
         "name": "Holiday",
@@ -61,8 +62,9 @@ def test_moneyboxresponse_invalid_id__0():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_id__negative():
+def test_moneybox_response_invalid_id__negative():
     """Test MoneyboxResponse creation with invalid id."""
+
     data = {
         "id": -11,  # Invalid id, should be >= 1
         "name": "Holiday",
@@ -74,7 +76,7 @@ def test_moneyboxresponse_invalid_id__negative():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_id__non_int():
+def test_moneybox_response_invalid_id__non_int():
     """Test MoneyboxResponse creation with invalid id."""
 
     data = {
@@ -89,8 +91,9 @@ def test_moneyboxresponse_invalid_id__non_int():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_name__minlength():
+def test_moneybox_response_invalid_name__minlength():
     """Test MoneyboxResponse creation with invalid name."""
+
     data = {
         "id": 1,
         "name": "",  # Invalid name, should be at least 1 character
@@ -102,8 +105,9 @@ def test_moneyboxresponse_invalid_name__minlength():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_name__wrong_type():
+def test_moneybox_response_invalid_name__wrong_type():
     """Test MoneyboxResponse creation with invalid name."""
+
     data = {
         "id": 1,
         "name": 234423,  # Invalid name, should be a str and at least 1 character
@@ -115,7 +119,7 @@ def test_moneyboxresponse_invalid_name__wrong_type():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_balance__negative():
+def test_moneybox_response_invalid_balance__negative():
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -130,7 +134,7 @@ def test_moneyboxresponse_invalid_balance__negative():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_valid_balance__zero():
+def test_moneybox_response_valid_balance__zero():
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -149,7 +153,7 @@ def test_moneyboxresponse_valid_balance__zero():
     assert response.modified_at is None
 
 
-def test_moneyboxresponse_invalid_balance__wrong_type():
+def test_moneybox_response_invalid_balance__wrong_type():
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -164,8 +168,9 @@ def test_moneyboxresponse_invalid_balance__wrong_type():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_date_order():
+def test_moneybox_response_invalid_date_order():
     """Test MoneyboxResponse creation with invalid date order."""
+
     data = {
         "id": 1,
         "name": "Holiday",
@@ -177,8 +182,9 @@ def test_moneyboxresponse_invalid_date_order():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_date__modified_at_wrong_type__int():
+def test_moneybox_response_invalid_date__modified_at_wrong_type__int():
     """Test MoneyboxResponse creation with invalid modified_at date value."""
+
     data = {
         "id": 1,
         "name": "Holiday",
@@ -191,8 +197,9 @@ def test_moneyboxresponse_invalid_date__modified_at_wrong_type__int():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_date__modified_at_wrong_type__not_isoformat_datetime():
+def test_moneybox_response_invalid_date__modified_at_wrong_type__not_isoformat_datetime():
     """Test MoneyboxResponse creation with invalid modified_at date value."""
+
     data = {
         "id": 1,
         "name": "Holiday",
@@ -205,8 +212,9 @@ def test_moneyboxresponse_invalid_date__modified_at_wrong_type__not_isoformat_da
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_date__created_at_wrong_type__int():
+def test_moneybox_response_invalid_date__created_at_wrong_type__int():
     """Test MoneyboxResponse creation with invalid created_at date value."""
+
     data = {
         "id": 1,
         "name": "Holiday",
@@ -219,8 +227,9 @@ def test_moneyboxresponse_invalid_date__created_at_wrong_type__int():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_date__created_at_wrong_type__not_isoformat_datetime():
+def test_moneybox_response_invalid_date__created_at_wrong_type__not_isoformat_datetime():
     """Test MoneyboxResponse creation with invalid created_at date value."""
+
     data = {
         "id": 1,
         "name": "Holiday",
@@ -233,8 +242,9 @@ def test_moneyboxresponse_invalid_date__created_at_wrong_type__not_isoformat_dat
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_invalid_date__none_for_created_at():
+def test_moneybox_response_invalid_date__none_for_created_at():
     """Test MoneyboxResponse creation with invalid date order."""
+
     data = {
         "id": 1,
         "name": "Holiday",
@@ -246,8 +256,9 @@ def test_moneyboxresponse_invalid_date__none_for_created_at():
         MoneyboxResponse(**data)
 
 
-def test_moneyboxresponse_valid_date_order():
+def test_moneybox_response_valid_date_order():
     """Test MoneyboxResponse creation with valid date order."""
+
     data = {
         "id": 1,
         "name": "Holiday",
