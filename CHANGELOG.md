@@ -3,6 +3,11 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.2.0 (2024-08-03)
+### Changes:
+- redesign and implementation of a new test architecture
+- add further tests to reach a test coverage over 90%
+
 ## 1.1.0 (2024-05-03)
 ### Changes:
 - add counterparty_moneybox_name to transactions table in database
