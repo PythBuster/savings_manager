@@ -8,7 +8,7 @@ from sqlalchemy import ForeignKey, MetaData
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy_utc import UtcDateTime, utcnow
-
+from sqlalchemy.types import String
 from src.custom_types import TransactionTrigger, TransactionType
 
 meta = MetaData(
@@ -65,6 +65,15 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
         comment="Flag to mark instance as deleted.",
     )
     """Flag to mark instance as deleted."""
+
+    note: Mapped[str] = mapped_column(
+        String,
+        default="",
+        server_default="",
+        nullable=True,
+        comment="The note of this record",
+    )
+    """The note of this record."""
 
     def asdict(  # type: ignore  # pylint: disable=too-many-arguments
         self,
