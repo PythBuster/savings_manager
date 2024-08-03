@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 
 from src.custom_types import TransactionType, TransactionTrigger
-from src.data_classes.responses import TransactionLog
+from src.data_classes.responses import TransactionLogResponse
 
 
 @pytest.mark.parametrize(
@@ -76,7 +76,7 @@ def test_transaction_log_response_valid_data(data: dict[str, Any]):
     data_moneybox_id = data["moneybox_id"]
     data_created_at = datetime.fromisoformat(data["created_at"])
 
-    response = TransactionLog(**data)
+    response = TransactionLogResponse(**data)
 
     assert response.id == data_id
     assert response.counterparty_moneybox_name == data_counterparty_moneybox_name

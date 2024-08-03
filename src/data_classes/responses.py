@@ -33,7 +33,7 @@ class HTTPErrorResponse(BaseModel):
 
 
 class MoneyboxResponse(BaseModel):
-    """The pydantic moneybox response data model"""
+    """The pydantic moneybox response model"""
 
     id: Annotated[int, Field(ge=1, description="The id of the moneybox.")]
     """The id of the moneybox."""
@@ -144,7 +144,7 @@ class MoneyboxesResponse(BaseModel):
     """The config of the model."""
 
 
-class TransactionLog(BaseModel):
+class TransactionLogResponse(BaseModel):
     """The transaction log response model."""
 
     id: Annotated[int, Field(description="The ID of the transaction.")]
@@ -329,11 +329,11 @@ class TransactionLog(BaseModel):
         return self
 
 
-class TransactionLogs(BaseModel):
+class TransactionLogsResponse(BaseModel):
     """The transaction logs response model."""
 
     transaction_logs: Annotated[
-        list[TransactionLog], Field(description="The list of transaction logs.")
+        list[TransactionLogResponse], Field(description="The list of transaction logs.")
     ]
     """The list of transaction logs."""
 
@@ -344,7 +344,7 @@ class TransactionLogs(BaseModel):
                 {
                     "total": 1,
                     "transaction_logs": [
-                        TransactionLog.model_config["json_schema_extra"]["examples"][0],
+                        TransactionLogResponse.model_config["json_schema_extra"]["examples"][0],
                     ],
                 }
             ]
