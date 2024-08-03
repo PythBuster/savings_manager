@@ -9,13 +9,13 @@ from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType, TransactionTrigger, TransactionType
 from src.data_classes.requests import (
-    DepositTransactionModel,
-    MoneyboxCreateModel,
-    MoneyboxUpdateModel,
-    TransferTransactionModel,
-    WithdrawTransactionModel,
+    DepositTransactionRequest,
+    MoneyboxCreateRequest,
+    MoneyboxUpdateRequest,
+    TransferTransactionRequest,
+    WithdrawTransactionRequest,
 )
-from src.data_classes.responses import MoneyboxResponse, TransactionLogs
+from src.data_classes.responses import MoneyboxResponse, TransactionLogsResponse
 from src.routes.responses.moneybox import (
     CREATE_MONEYBOX_RESPONSES,
     DELETE_MONEYBOX_RESPONSES,
@@ -60,7 +60,7 @@ async def get_moneybox(
 async def add_moneybox(
     request: Request,
     moneybox_create_request: Annotated[
-        MoneyboxCreateModel, Body(title="Post Data", description="The new moneybox data.")
+        MoneyboxCreateRequest, Body(title="Post Data", description="The new moneybox data.")
     ],
 ) -> MoneyboxResponse:
     """Endpoint for adding moneybox."""
@@ -80,7 +80,7 @@ async def update_moneybox(
     request: Request,
     moneybox_id: Annotated[int, Depends(check_existence_of_moneybox_by_id)],
     moneybox_update_request: Annotated[
-        MoneyboxUpdateModel, Body(title="Update Data", description="The updating moneybox data.")
+        MoneyboxUpdateRequest, Body(title="Update Data", description="The updating moneybox data.")
     ],
 ) -> MoneyboxResponse:
     """Endpoint for updating moneybox by moneybox_id."""
@@ -121,7 +121,7 @@ async def deposit_moneybox(
         Depends(check_existence_of_moneybox_by_id),
     ],
     deposit_transaction: Annotated[
-        DepositTransactionModel,
+        DepositTransactionRequest,
         Body(
             title="Deposit amount",
             description="The deposit transaction with amount to add to moneybox, has to be >=0.",
@@ -151,7 +151,7 @@ async def withdraw_moneybox(
         Depends(check_existence_of_moneybox_by_id),
     ],
     withdraw_transaction: Annotated[
-        WithdrawTransactionModel,
+        WithdrawTransactionRequest,
         Body(
             title="Withdraw amount",
             description=(
@@ -183,7 +183,7 @@ async def transfer_balance(
         Depends(check_existence_of_moneybox_by_id),
     ],
     transfer_transaction: Annotated[
-        TransferTransactionModel,
+        TransferTransactionRequest,
         Body(
             title="Transfer amount",
             description=(
@@ -205,7 +205,7 @@ async def transfer_balance(
 
 @moneybox_router.get(
     "/{moneybox_id}/transactions",
-    response_model=TransactionLogs,
+    response_model=TransactionLogsResponse,
     responses=MONEYBOX_TRANSACTION_LOGS_RESPONSES,
 )
 async def get_moneybox_transaction_logs(
@@ -214,7 +214,7 @@ async def get_moneybox_transaction_logs(
         int,
         Depends(check_existence_of_moneybox_by_id),
     ],
-) -> TransactionLogs | Response:
+) -> TransactionLogsResponse | Response:
     """Endpoint for getting moneybox transaction logs."""
 
     transaction_logs_data = await request.app.state.db_manager.get_transaction_logs(
@@ -223,10 +223,10 @@ async def get_moneybox_transaction_logs(
 
     if transaction_logs_data:
         transaction_logs_data = {
-            "total": len(transaction_logs_data),
             "transaction_logs": transaction_logs_data,
         }
-        transaction_logs = TransactionLogs(**transaction_logs_data)
+
+        transaction_logs = TransactionLogsResponse(**transaction_logs_data)
         return transaction_logs
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

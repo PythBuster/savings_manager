@@ -5,8 +5,8 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class MoneyboxCreateModel(BaseModel):
-    """The pydantic moneybox create data model."""
+class MoneyboxCreateRequest(BaseModel):
+    """The pydantic moneybox create request model."""
 
     name: Annotated[
         str, Field(min_length=1, description="The name of the moneybox. Has to be unique.")
@@ -27,8 +27,8 @@ class MoneyboxCreateModel(BaseModel):
     """The config of the model."""
 
 
-class MoneyboxUpdateModel(BaseModel):
-    """The pydantic moneybox update data model."""
+class MoneyboxUpdateRequest(BaseModel):
+    """The pydantic moneybox update request model."""
 
     name: Annotated[
         str | None,
@@ -52,8 +52,8 @@ class MoneyboxUpdateModel(BaseModel):
     """The config of the model."""
 
 
-class DepositModel(BaseModel):
-    """The pydantic moneybox deposit data model."""
+class DepositRequest(BaseModel):
+    """The pydantic moneybox deposit request model."""
 
     amount: Annotated[
         int,
@@ -75,8 +75,8 @@ class DepositModel(BaseModel):
     """The config of the model."""
 
 
-class WithdrawModel(BaseModel):
-    """The pydantic moneybox withdraw data model."""
+class WithdrawRequest(BaseModel):
+    """The pydantic moneybox withdraw request model."""
 
     amount: Annotated[
         int,
@@ -98,8 +98,8 @@ class WithdrawModel(BaseModel):
     """The config of the model."""
 
 
-class TransferModel(BaseModel):
-    """The pydantic moneybox transfer balance data model."""
+class TransferRequest(BaseModel):
+    """The pydantic moneybox transfer balance request model."""
 
     to_moneybox_id: Annotated[
         int,
@@ -128,8 +128,8 @@ class TransferModel(BaseModel):
     """The config of the model."""
 
 
-class DepositTransactionModel(BaseModel):
-    """The deposit transaction pydantic model"""
+class DepositTransactionRequest(BaseModel):
+    """The deposit transaction request model"""
 
     amount: Annotated[
         int,
@@ -158,8 +158,8 @@ class DepositTransactionModel(BaseModel):
     """The config of the model."""
 
 
-class WithdrawTransactionModel(BaseModel):
-    """The withdrawal transaction pydantic model"""
+class WithdrawTransactionRequest(BaseModel):
+    """The withdrawal transaction request model"""
 
     amount: Annotated[
         int,
@@ -188,8 +188,8 @@ class WithdrawTransactionModel(BaseModel):
     """The config of the model."""
 
 
-class TransferTransactionModel(BaseModel):
-    """The transfer transaction pydantic model"""
+class TransferTransactionRequest(BaseModel):
+    """The transfer transaction request model"""
 
     to_moneybox_id: Annotated[
         int,

@@ -30,7 +30,6 @@ async def get_moneyboxes(
 
     if moneyboxes_data:
         moneyboxes_data = {
-            "total": len(moneyboxes_data),
             "moneyboxes": moneyboxes_data,
         }
         moneyboxes = MoneyboxesResponse(**moneyboxes_data)

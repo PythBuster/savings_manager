@@ -8,9 +8,9 @@ from pydantic import ValidationError
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.data_classes.requests import (
-    DepositTransactionModel,
-    TransferTransactionModel,
-    WithdrawTransactionModel,
+    DepositTransactionRequest,
+    TransferTransactionRequest,
+    WithdrawTransactionRequest,
 )
 from src.db import core
 from src.db.db_manager import DBManager
@@ -235,12 +235,12 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
-async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
+async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
     moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
     del moneybox_data["created_at"]
     del moneybox_data["modified_at"]
 
-    deposit_transaction_1 = DepositTransactionModel(
+    deposit_transaction_1 = DepositTransactionRequest(
         amount=1,
         description="Bonus.",
     )
@@ -259,7 +259,7 @@ async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
     moneybox_data["balance"] += 1
     assert moneybox_data == result_moneybox_data_1
 
-    deposit_transaction_2 = DepositTransactionModel(
+    deposit_transaction_2 = DepositTransactionRequest(
         amount=10,
         description="Bonus.",
     )
@@ -313,7 +313,7 @@ async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
     with pytest.raises(ValidationError):
         await db_manager.add_amount(
             moneybox_id=1,
-            deposit_transaction_data=DepositTransactionModel(
+            deposit_transaction_data=DepositTransactionRequest(
                 amount=0,
                 description="Bonus.",
             ).model_dump(),
@@ -349,13 +349,13 @@ async def test_add_balance_to_moneybox(db_manager: DBManager) -> None:
     assert ex_info.value.record_id == 2
 
 
-@pytest.mark.dependency(depends=["test_add_balance_to_moneybox"])
-async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
+@pytest.mark.dependency(depends=["test_add_amount_to_moneybox"])
+async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
     moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
     del moneybox_data["created_at"]
     del moneybox_data["modified_at"]
 
-    withdraw_transaction_1 = WithdrawTransactionModel(amount=1)
+    withdraw_transaction_1 = WithdrawTransactionRequest(amount=1)
     result_moneybox_data_1 = await db_manager.sub_amount(
         moneybox_id=1,
         withdraw_transaction_data=withdraw_transaction_1.model_dump(),
@@ -370,7 +370,7 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     moneybox_data["balance"] -= 1
     assert moneybox_data == result_moneybox_data_1
 
-    withdraw_transaction_2 = WithdrawTransactionModel(
+    withdraw_transaction_2 = WithdrawTransactionRequest(
         amount=10,
     )
     result_moneybox_data_2 = await db_manager.sub_amount(
@@ -424,12 +424,12 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     with pytest.raises(ValidationError):
         await db_manager.sub_amount(
             moneybox_id=1,
-            withdraw_transaction_data=WithdrawTransactionModel(amount=0).model_dump(),
+            withdraw_transaction_data=WithdrawTransactionRequest(amount=0).model_dump(),
             transaction_type=TransactionType.DIRECT,
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    withdraw_transaction_3 = WithdrawTransactionModel(
+    withdraw_transaction_3 = WithdrawTransactionRequest(
         amount=1000,
     )
 
@@ -478,12 +478,12 @@ async def test_sub_balance_to_moneybox(db_manager: DBManager) -> None:
     assert ex_info.value.record_id == 2
 
 
-@pytest.mark.dependency(depends=["test_sub_balance_to_moneybox"])
+@pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
 async def test_transfer_amount(db_manager: DBManager) -> None:
     from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
     to_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
 
-    transfer_transaction_1 = TransferTransactionModel(
+    transfer_transaction_1 = TransferTransactionRequest(
         to_moneybox_id=to_moneybox_data["id"],
         amount=33,
     )
@@ -543,7 +543,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     with pytest.raises(ValidationError):
         await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
-            transfer_transaction_data=TransferTransactionModel(
+            transfer_transaction_data=TransferTransactionRequest(
                 to_moneybox_id=to_moneybox_data["id"],
                 amount=0,
             ).model_dump(),
@@ -554,7 +554,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     with pytest.raises(MoneyboxNotFoundError):
         await db_manager.transfer_amount(
             from_moneybox_id=42,
-            transfer_transaction_data=TransferTransactionModel(
+            transfer_transaction_data=TransferTransactionRequest(
                 to_moneybox_id=to_moneybox_data["id"],
                 amount=10,
             ).model_dump(),
@@ -565,7 +565,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     with pytest.raises(MoneyboxNotFoundError):
         await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
-            transfer_transaction_data=TransferTransactionModel(
+            transfer_transaction_data=TransferTransactionRequest(
                 to_moneybox_id=41,
                 amount=10,
             ).model_dump(),
@@ -576,7 +576,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     with pytest.raises(BalanceResultIsNegativeError) as ex_info:
         await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
-            transfer_transaction_data=TransferTransactionModel(
+            transfer_transaction_data=TransferTransactionRequest(
                 to_moneybox_id=to_moneybox_data["id"],
                 amount=1000,
             ).model_dump(),
@@ -641,8 +641,10 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     assert ex_info.value.details == {"amount": 123, "from_moneybox_id": 1, "to_moneybox_id": 1}
 
 
-@pytest.mark.dependency(depends=["test_sub_balance_to_moneybox"])
-async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(db_manager: DBManager) -> None:
+@pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
+async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(
+    db_manager: DBManager,
+) -> None:
     # moneybox 4
     moneybox_data_4 = {"name": "4-Test Box"}
     result_moneybox_data_4 = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
@@ -651,7 +653,7 @@ async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(db_man
     moneybox_data_5 = {"name": "5-Test Box"}
     result_moneybox_data_5 = await db_manager.add_moneybox(moneybox_data=moneybox_data_5)
 
-    deposit_transaction = DepositTransactionModel(
+    deposit_transaction = DepositTransactionRequest(
         amount=100,
         description="Bonus.",
     )
@@ -662,7 +664,7 @@ async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(db_man
         transaction_trigger=TransactionTrigger.MANUALLY,
     )
 
-    transfer_transaction = TransferTransactionModel(
+    transfer_transaction = TransferTransactionRequest(
         to_moneybox_id=result_moneybox_data_5["id"],
         amount=20,
     )
@@ -674,7 +676,7 @@ async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(db_man
         transaction_trigger=TransactionTrigger.MANUALLY,
     )
 
-    withdraw_transaction = WithdrawTransactionModel(amount=20)
+    withdraw_transaction = WithdrawTransactionRequest(amount=20)
     await db_manager.sub_amount(
         moneybox_id=result_moneybox_data_5["id"],
         withdraw_transaction_data=withdraw_transaction.model_dump(),
@@ -687,7 +689,7 @@ async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(db_man
     # should able to get transaction logs without getting an exception
     assert await db_manager.get_transaction_logs(result_moneybox_data_4["id"])
 
-    withdraw_transaction = WithdrawTransactionModel(amount=80)
+    withdraw_transaction = WithdrawTransactionRequest(amount=80)
     await db_manager.sub_amount(
         moneybox_id=result_moneybox_data_4["id"],
         withdraw_transaction_data=withdraw_transaction.model_dump(),
