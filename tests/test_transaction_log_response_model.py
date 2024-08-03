@@ -4,8 +4,9 @@ from datetime import datetime
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
-from src.custom_types import TransactionType, TransactionTrigger
+from src.custom_types import TransactionTrigger, TransactionType
 from src.data_classes.responses import TransactionLogResponse
 
 
@@ -62,7 +63,7 @@ from src.data_classes.responses import TransactionLogResponse
         },
     ],
 )
-def test_transaction_log_response_valid_data(data: dict[str, Any]):
+def test_transaction_log_response_valid_data(data: dict[str, Any]) -> None:
     """Test valid TransactionLog creation."""
 
     data_id = data["id"]
@@ -88,3 +89,23 @@ def test_transaction_log_response_valid_data(data: dict[str, Any]):
     assert response.counterparty_moneybox_id == data_counterparty_moneybox_id
     assert response.moneybox_id == data_moneybox_id
     assert response.created_at == data_created_at
+
+
+def test_transaction_log_response_invalid_id__non_int() -> None:
+    """Test MoneyboxResponse creation with invalid id."""
+
+    data = {
+        "id": "1",
+        "counterparty_moneybox_name": "Holiday",
+        "description": "A Description",
+        "transaction_type": TransactionType.DIRECT,
+        "transaction_trigger": TransactionTrigger.MANUALLY,
+        "amount": 123,
+        "balance": 123,
+        "counterparty_moneybox_id": 2,
+        "moneybox_id": 1,
+        "created_at": "2020-05-01T00:00:00Z",
+    }
+
+    with pytest.raises(ValidationError):
+        TransactionLogResponse(**data)

@@ -1,7 +1,5 @@
 """The MoneyBox ORM model."""
 
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Any, List
 
@@ -182,8 +180,8 @@ class Transaction(SqlBase):  # pylint: disable=too-few-public-methods
     """Transaction is a transfer between moneybox_id and
     counterparty_moneybox_id, if set."""
 
-    counterparty_moneybox: Mapped[Moneybox] = (
-        relationship(  # pylint: disable=unsubscriptable-object
+    counterparty_moneybox: Mapped[Moneybox] = (  # pylint: disable=unsubscriptable-object
+        relationship(
             foreign_keys=[counterparty_moneybox_id],
         )
     )

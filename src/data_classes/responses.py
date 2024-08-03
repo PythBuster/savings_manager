@@ -8,11 +8,11 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    model_validator,
+    StrictInt,
     computed_field,
     field_validator,
+    model_validator,
 )
-from pydantic import BaseModel, ConfigDict, Field, model_validator, AwareDatetime
 
 from src.custom_types import TransactionTrigger, TransactionType
 
@@ -35,7 +35,7 @@ class HTTPErrorResponse(BaseModel):
 class MoneyboxResponse(BaseModel):
     """The pydantic moneybox response model"""
 
-    id: Annotated[int, Field(ge=1, description="The id of the moneybox.")]
+    id: Annotated[StrictInt, Field(description="The id of the moneybox.")]
     """The id of the moneybox."""
 
     name: Annotated[
@@ -43,7 +43,7 @@ class MoneyboxResponse(BaseModel):
     ]
     """The name of the moneybox. Has to be unique."""
 
-    balance: Annotated[int, Field(ge=0, description="The balance of the moneybox in CENTS.")]
+    balance: Annotated[StrictInt, Field(ge=0, description="The balance of the moneybox in CENTS.")]
     """The balance of the moneybox in CENTS."""
 
     created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
@@ -72,27 +72,33 @@ class MoneyboxResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def strict_datetimes(cls, data: dict) -> Self:
+    def strict_datetimes(cls, data: dict[Any, Any]) -> dict[Any, Any]:
         """Check if 'modified_at' and 'created_at' is type datetime."""
 
         if data["modified_at"] is not None:
             if isinstance(data["modified_at"], str):
                 try:
-                    # Code needed, because pydantic model in SERIALISATION mode will allow strings like "2"
+                    # Code needed, because pydantic model in SERIALISATION mode will allow
+                    # strings like "2"
                     # here we need o check, if string is an isoformatted datetime string
                     datetime.fromisoformat(data["modified_at"])
-                except (TypeError, ValueError):
-                    raise ValueError("'created_at' must be of type datetime or datetime-string.")
+                except (TypeError, ValueError) as ex:
+                    raise ValueError(
+                        "'created_at' must be of type datetime or datetime-string."
+                    ) from ex
             elif not isinstance(data["modified_at"], datetime):
                 raise ValueError("'modified_at' must be of type datetime or datetime-string.")
 
         if isinstance(data["created_at"], str):
             try:
-                # Code needed, because pydantic model in SERIALISATION mode will allow strings like "2"
+                # Code needed, because pydantic model in SERIALISATION mode will allow
+                # strings like "2"
                 # here we need o check, if string is an isoformatted datetime string
                 datetime.fromisoformat(data["created_at"])
-            except (TypeError, ValueError):
-                raise ValueError("'created_at' must be of type datetime or datetime-string.")
+            except (TypeError, ValueError) as ex:
+                raise ValueError(
+                    "'created_at' must be of type datetime or datetime-string."
+                ) from ex
 
         elif not isinstance(data["created_at"], datetime):
             raise ValueError("'created_at' must be of type datetime or datetime-string.")
@@ -112,9 +118,6 @@ class MoneyboxResponse(BaseModel):
 
 class MoneyboxesResponse(BaseModel):
     """The moneyboxes response model."""
-
-    total: Annotated[int, Field(ge=0, description="The count of moneyboxes.")]
-    """The count of moneyboxes."""
 
     moneyboxes: Annotated[list[MoneyboxResponse], Field(description="The list of moneyboxes.")]
     """The list of moneyboxes."""
@@ -143,11 +146,18 @@ class MoneyboxesResponse(BaseModel):
     )
     """The config of the model."""
 
+    @computed_field  # type: ignore
+    @property
+    def total(self) -> int:
+        """The count of moneyboxes."""
+
+        return len(self.moneyboxes)
+
 
 class TransactionLogResponse(BaseModel):
     """The transaction log response model."""
 
-    id: Annotated[int, Field(description="The ID of the transaction.")]
+    id: Annotated[StrictInt, Field(description="The ID of the transaction.")]
     """The ID of the transaction."""
 
     counterparty_moneybox_name: Annotated[
@@ -177,7 +187,7 @@ class TransactionLogResponse(BaseModel):
     Says, if balance was deposit or withdrawn manually or automatically."""
 
     amount: Annotated[
-        int,
+        StrictInt,
         Field(
             description=(
                 "The current amount of the transaction. "
@@ -189,7 +199,7 @@ class TransactionLogResponse(BaseModel):
     Can be negative, negative = withdraw, positive = deposit."""
 
     balance: Annotated[
-        int,
+        StrictInt,
         Field(
             ge=0,
             description="The new balance of the moneybox after the transaction.",
@@ -198,7 +208,7 @@ class TransactionLogResponse(BaseModel):
     """The new balance of the moneybox after the transaction."""
 
     counterparty_moneybox_id: Annotated[
-        int | None,
+        StrictInt | None,
         Field(
             description=(
                 "Transaction is a transfer between moneybox_id and "
@@ -209,7 +219,7 @@ class TransactionLogResponse(BaseModel):
     """Transaction is a transfer between moneybox_id and
     counterparty_moneybox_id, if set."""
 
-    moneybox_id: Annotated[int, Field(ge=1, description="The foreign key to moneybox.")]
+    moneybox_id: Annotated[StrictInt, Field(description="The foreign key to moneybox.")]
     """The foreign key to moneybox."""
 
     created_at: Annotated[
@@ -255,8 +265,10 @@ class TransactionLogResponse(BaseModel):
         if isinstance(data["created_at"], str):
             try:
                 datetime.fromisoformat(data["created_at"])
-            except (TypeError, ValueError):
-                raise ValueError("'created_at' must be of type datetime or datetime-string.")
+            except (TypeError, ValueError) as ex:
+                raise ValueError(
+                    "'created_at' must be of type datetime or datetime-string."
+                ) from ex
         elif not isinstance(data["created_at"], datetime):
             raise ValueError("'created_at' must be of type datetime or datetime-string.")
 
@@ -296,9 +308,7 @@ class TransactionLogResponse(BaseModel):
     def check_counterparty_moneybox(cls, self: Self) -> Self:
         """If counterparty_moneybox_name is set, counterparty_moneybox_id need to be set too."""
 
-        if (self.counterparty_moneybox_name is None) != (
-            self.counterparty_moneybox_id is None
-        ):
+        if (self.counterparty_moneybox_name is None) != (self.counterparty_moneybox_id is None):
             raise ValueError("Invalid combination: If one is None, the other must also be None.")
 
         return self
@@ -352,7 +362,9 @@ class TransactionLogsResponse(BaseModel):
     )
     """The config of the model."""
 
-    @computed_field
+    @computed_field  # type: ignore
     @property
     def total(self) -> int:
+        """The count of transaction logs."""
+
         return len(self.transaction_logs)

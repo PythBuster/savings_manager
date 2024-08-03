@@ -28,7 +28,7 @@ from src.data_classes.responses import MoneyboxResponse
         },
     ],
 )
-def test_moneybox_response_valid_data(data: dict[str, Any]):
+def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
     """Test valid MoneyboxResponse creation."""
 
     data_id = data["id"]
@@ -48,50 +48,40 @@ def test_moneybox_response_valid_data(data: dict[str, Any]):
     assert response.modified_at == data_modified_at
 
 
-def test_moneybox_response_invalid_id__0():
+@pytest.mark.parametrize(
+    "data",
+    [
+        {
+            "id": "one",  # Invalid id, should be type int
+            "name": "Holiday",
+            "balance": 1000,
+            "created_at": "2020-05-01T00:00:00Z",
+            "modified_at": None,
+        },
+        {
+            "id": "1",  # Invalid id, should be type int
+            "name": "Holiday",
+            "balance": 1000,
+            "created_at": "2020-05-01T00:00:00Z",
+            "modified_at": None,
+        },
+        {
+            "id": "jkhalkjghaökdsghdsg",  # Invalid id, should be type int
+            "name": "Holiday",
+            "balance": 1000,
+            "created_at": "2020-05-01T00:00:00Z",
+            "modified_at": None,
+        },
+    ],
+)
+def test_moneybox_response_invalid_id__non_int_type(data: dict[str, Any]) -> None:
     """Test MoneyboxResponse creation with invalid id."""
-
-    data = {
-        "id": 0,  # Invalid id, should be >= 1
-        "name": "Holiday",
-        "balance": 1000,
-        "created_at": "2020-05-01T00:00:00Z",
-        "modified_at": None,
-    }
-    with pytest.raises(ValidationError):
-        MoneyboxResponse(**data)
-
-
-def test_moneybox_response_invalid_id__negative():
-    """Test MoneyboxResponse creation with invalid id."""
-
-    data = {
-        "id": -11,  # Invalid id, should be >= 1
-        "name": "Holiday",
-        "balance": 1000,
-        "created_at": "2020-05-01T00:00:00Z",
-        "modified_at": None,
-    }
-    with pytest.raises(ValidationError):
-        MoneyboxResponse(**data)
-
-
-def test_moneybox_response_invalid_id__non_int():
-    """Test MoneyboxResponse creation with invalid id."""
-
-    data = {
-        "id": "one",  # Invalid id, should be integer and >= 1
-        "name": "Holiday",
-        "balance": 1000,
-        "created_at": "2020-05-01T00:00:00Z",
-        "modified_at": None,
-    }
 
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_name__minlength():
+def test_moneybox_response_invalid_name__minlength() -> None:
     """Test MoneyboxResponse creation with invalid name."""
 
     data = {
@@ -105,7 +95,7 @@ def test_moneybox_response_invalid_name__minlength():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_name__wrong_type():
+def test_moneybox_response_invalid_name__wrong_type() -> None:
     """Test MoneyboxResponse creation with invalid name."""
 
     data = {
@@ -119,7 +109,7 @@ def test_moneybox_response_invalid_name__wrong_type():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_balance__negative():
+def test_moneybox_response_invalid_balance__negative() -> None:
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -134,7 +124,7 @@ def test_moneybox_response_invalid_balance__negative():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_valid_balance__zero():
+def test_moneybox_response_valid_balance__zero() -> None:
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -146,6 +136,7 @@ def test_moneybox_response_valid_balance__zero():
     }
 
     response = MoneyboxResponse(**data)
+
     assert response.id == 1
     assert response.name == "Holiday"
     assert response.balance == 0
@@ -153,7 +144,7 @@ def test_moneybox_response_valid_balance__zero():
     assert response.modified_at is None
 
 
-def test_moneybox_response_invalid_balance__wrong_type():
+def test_moneybox_response_invalid_balance__wrong_type() -> None:
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -168,7 +159,7 @@ def test_moneybox_response_invalid_balance__wrong_type():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date_order():
+def test_moneybox_response_invalid_date_order() -> None:
     """Test MoneyboxResponse creation with invalid date order."""
 
     data = {
@@ -182,7 +173,7 @@ def test_moneybox_response_invalid_date_order():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__modified_at_wrong_type__int():
+def test_moneybox_response_invalid_date__modified_at_wrong_type__int() -> None:
     """Test MoneyboxResponse creation with invalid modified_at date value."""
 
     data = {
@@ -197,7 +188,7 @@ def test_moneybox_response_invalid_date__modified_at_wrong_type__int():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__modified_at_wrong_type__not_isoformat_datetime():
+def test_moneybox_response_invalid_date__modified_at_string_type__not_isoformat_datetime() -> None:
     """Test MoneyboxResponse creation with invalid modified_at date value."""
 
     data = {
@@ -212,7 +203,7 @@ def test_moneybox_response_invalid_date__modified_at_wrong_type__not_isoformat_d
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__created_at_wrong_type__int():
+def test_moneybox_response_invalid_date__created_at_wrong_type__int() -> None:
     """Test MoneyboxResponse creation with invalid created_at date value."""
 
     data = {
@@ -227,7 +218,7 @@ def test_moneybox_response_invalid_date__created_at_wrong_type__int():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__created_at_wrong_type__not_isoformat_datetime():
+def test_moneybox_response_invalid_date__created_at_string_type__not_isoformat_datetime() -> None:
     """Test MoneyboxResponse creation with invalid created_at date value."""
 
     data = {
@@ -242,7 +233,7 @@ def test_moneybox_response_invalid_date__created_at_wrong_type__not_isoformat_da
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__none_for_created_at():
+def test_moneybox_response_invalid_date__none_for_created_at() -> None:
     """Test MoneyboxResponse creation with invalid date order."""
 
     data = {
@@ -256,7 +247,7 @@ def test_moneybox_response_invalid_date__none_for_created_at():
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_valid_date_order():
+def test_moneybox_response_valid_date_order() -> None:
     """Test MoneyboxResponse creation with valid date order."""
 
     data = {
