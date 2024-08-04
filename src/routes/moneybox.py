@@ -86,7 +86,7 @@ async def update_moneybox(
     """Endpoint for updating moneybox by moneybox_id."""
 
     moneybox_data = await request.app.state.db_manager.update_moneybox(
-        moneybox_id=moneybox_id, moneybox_data=moneybox_update_request.model_dump(exclude_none=True)
+        moneybox_id=moneybox_id, moneybox_data=moneybox_update_request.model_dump(exclude_unset=True)
     )
     return MoneyboxResponse(**moneybox_data)
 

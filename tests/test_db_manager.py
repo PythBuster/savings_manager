@@ -21,7 +21,6 @@ from src.db.exceptions import (
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
-    NonPositiveTransferAmountError,
     TransferEqualMoneyboxError,
 )
 from src.db.models import Moneybox
@@ -308,33 +307,6 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    with pytest.raises(NonPositiveAmountError) as ex_info:
-        await db_manager.add_amount(
-            moneybox_id=1,
-            deposit_transaction_data={
-                "amount": 0,
-                "description": "Bonus.",
-            },
-            transaction_type=TransactionType.DIRECT,
-            transaction_trigger=TransactionTrigger.MANUALLY,
-        )
-
-    assert ex_info.value.message == "Can't add or sub amount less than 1 '0' to Moneybox '1'."
-    assert ex_info.value.details == {"amount": 0, "id": 1}
-    assert ex_info.value.record_id == 1
-
-    with pytest.raises(NonPositiveAmountError) as ex_info:
-        await db_manager.add_amount(
-            moneybox_id=2,
-            deposit_transaction_data={"amount": -1, "description": "Bonus."},
-            transaction_type=TransactionType.DIRECT,
-            transaction_trigger=TransactionTrigger.MANUALLY,
-        )
-
-    assert ex_info.value.message == "Can't add or sub amount less than 1 '-1' to Moneybox '2'."
-    assert ex_info.value.details == {"amount": -1, "id": 2}
-    assert ex_info.value.record_id == 2
-
 
 @pytest.mark.dependency(depends=["test_add_amount_to_moneybox"])
 async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
@@ -576,41 +548,6 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         "Not enough balance to sub."
     )
     assert ex_info.value.message == expected_exception_message
-
-    with pytest.raises(NonPositiveTransferAmountError) as ex_info:
-        await db_manager.transfer_amount(
-            from_moneybox_id=1,
-            transfer_transaction_data={
-                "to_moneybox_id": 2,
-                "amount": 0,
-            },
-            transaction_type=TransactionType.DIRECT,
-            transaction_trigger=TransactionTrigger.MANUALLY,
-        )
-
-    assert ex_info.value.message == (
-        "Can't transfer amount from moneybox '1'  to '2'. "
-        "Amount to transfer has to be greater than 0: amount=0."
-    )
-    assert ex_info.value.details == {"amount": 0, "from_moneybox_id": 1, "to_moneybox_id": 2}
-
-    with pytest.raises(NonPositiveTransferAmountError) as ex_info:
-        await db_manager.transfer_amount(
-            from_moneybox_id=1,
-            transfer_transaction_data={
-                "to_moneybox_id": 2,
-                "amount": 0,
-                "description": "Bonus.",
-            },
-            transaction_type=TransactionType.DIRECT,
-            transaction_trigger=TransactionTrigger.MANUALLY,
-        )
-
-    assert ex_info.value.message == (
-        "Can't transfer amount from moneybox '1'  to '2'. "
-        "Amount to transfer has to be greater than 0: amount=0."
-    )
-    assert ex_info.value.details == {"amount": 0, "from_moneybox_id": 1, "to_moneybox_id": 2}
 
     with pytest.raises(TransferEqualMoneyboxError) as ex_info:
         await db_manager.transfer_amount(

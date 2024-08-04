@@ -104,28 +104,6 @@ class NonPositiveAmountError(UpdateInstanceError):
         super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
 
 
-class NonPositiveTransferAmountError(UpdateInstanceError):
-    """Custom NonPositiveTransferAmountError Exception"""
-
-    def __init__(self, from_moneybox_id: int, to_moneybox_id: int, amount: int) -> None:
-        message = (
-            f"Can't transfer amount from moneybox '{from_moneybox_id}' "
-            f" to '{to_moneybox_id}'. Amount to transfer has to be greater than 0: {amount=}."
-        )
-        self.amount = amount
-        super().__init__(
-            record_id=None,
-            message=message,
-            details={
-                "amount": amount,
-                "from_moneybox_id": from_moneybox_id,
-                "to_moneybox_id": to_moneybox_id,
-            },
-        )
-
-        del self.details["id"]
-
-
 class TransferEqualMoneyboxError(UpdateInstanceError):
     """Custom TransferEqualMoneyboxError Exception"""
 
@@ -166,3 +144,4 @@ class HasBalanceError(DeleteInstanceError):
         )
         self.balance = balance
         super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
+

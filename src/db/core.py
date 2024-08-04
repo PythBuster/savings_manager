@@ -197,32 +197,6 @@ async def update_instance(
     return instance
 
 
-async def delete_instance(
-    async_session: async_sessionmaker,
-    orm_model: SqlBase,
-    record_id: int,
-) -> int:
-    """The core DELETE db function. Delete database record in orm_model by given id.
-
-    :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker`
-    :param orm_model: The orm model to handle with (table).
-    :type orm_model: :class:`SqlBase`
-    :param record_id: The instance id.
-    :type record_id: :class:`int`
-
-    :return: Amount of deleted rows.
-    :rtype: :class:`int`
-    """
-
-    stmt = delete(orm_model).where(orm_model.id == record_id)
-
-    async with async_session.begin() as session:
-        result = await session.execute(stmt)
-
-    return result.rowcount
-
-
 async def deactivate_instance(
     async_session: async_sessionmaker,
     orm_model: SqlBase,

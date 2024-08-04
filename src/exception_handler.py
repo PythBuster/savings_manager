@@ -2,6 +2,7 @@
 
 import logging
 
+import sqlalchemy
 from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
@@ -77,6 +78,25 @@ async def response_exception(exception: Exception) -> JSONResponse:
                 HTTPErrorResponse(
                     message=exception.message,  # type: ignore
                     details=exception.details,  # type: ignore
+                )
+            ),
+        )
+
+    if isinstance(exception, sqlalchemy.exc.IntegrityError):
+        error_message = exception.args[0]
+        error_parts = error_message.split(":")
+        exception_type, message, detail = error_parts
+
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=message.replace("\nDETAIL", "").strip(),  # type: ignore
+                    details={
+                        "exception": exception_type.strip(),
+                        "params": exception.params,
+                        "detail": detail.strip(),
+                    },  # type: ignore
                 )
             ),
         )

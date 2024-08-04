@@ -21,7 +21,6 @@ from src.db.exceptions import (
     MoneyboxNameExistError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
-    NonPositiveTransferAmountError,
     TransferEqualMoneyboxError,
 )
 from src.db.models import Moneybox, Transaction
@@ -162,9 +161,6 @@ class DBManager:
             if name_exist:
                 raise MoneyboxNameExistError(name=moneybox_data["name"])
 
-        if "priority" in moneybox_data and moneybox_data["priority"] is None:
-            del moneybox_data["priority"]
-
         moneybox = await update_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
@@ -229,10 +225,6 @@ class DBManager:
                  :class:`NegativeAmountError`: if balance to add is negative.
         """
 
-        amount = deposit_transaction_data["amount"]
-
-        if amount <= 0:
-            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         moneybox = await read_instance(
             async_session=self.async_session,
@@ -243,7 +235,7 @@ class DBManager:
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-        moneybox.balance += amount  # type: ignore
+        moneybox.balance += deposit_transaction_data["amount"]
 
         async with self.async_session.begin() as session:
             updated_moneybox = await update_instance(
@@ -253,16 +245,12 @@ class DBManager:
                 data=moneybox.asdict(),
             )
 
-            # should not be possible to reach this block
-            if updated_moneybox is None:
-                raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
-
             await self._add_transfer_log(
                 moneybox_id=moneybox_id,
                 description=deposit_transaction_data["description"],
                 transaction_type=transaction_type,
                 transaction_trigger=transaction_trigger,
-                amount=amount,
+                amount=deposit_transaction_data["amount"],
                 balance=updated_moneybox.balance,  # type: ignore
                 session=session,
             )
@@ -309,7 +297,7 @@ class DBManager:
         )
 
         if moneybox is None:
-            raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
         moneybox.balance -= amount  # type: ignore
 
@@ -323,10 +311,6 @@ class DBManager:
                 record_id=moneybox_id,
                 data=moneybox.asdict(),
             )
-
-            # should not be possible to reach this block
-            if updated_moneybox is None:
-                raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
             await self._add_transfer_log(
                 moneybox_id=moneybox_id,
@@ -374,13 +358,6 @@ class DBManager:
             raise TransferEqualMoneyboxError(
                 from_moneybox_id=from_moneybox_id,
                 to_moneybox_id=to_moneybox_id,
-                amount=amount,
-            )
-
-        if amount <= 0:
-            raise NonPositiveTransferAmountError(
-                from_moneybox_id=from_moneybox_id,
-                to_moneybox_id=transfer_transaction_data["to_moneybox_id"],
                 amount=amount,
             )
 
