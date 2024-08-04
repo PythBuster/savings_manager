@@ -21,11 +21,46 @@ async def test_endpoint_get_moneyboxes__status_200__total_5(
     expected_moneyboxes = {
         "total": 5,
         "moneyboxes": [
-            {"name": "Test Box 1", "id": 1, "balance": 0},
-            {"name": "Test Box 2", "id": 2, "balance": 0},
-            {"name": "Test Box 3", "id": 3, "balance": 0},
-            {"name": "Test Box 4", "id": 4, "balance": 0},
-            {"name": "Test Box 5", "id": 5, "balance": 0},
+            {
+                "name": "Test Box 1",
+                "id": 1,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "id": 2,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "id": 3,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "id": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "id": 5,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 5,
+            },
         ],
     }
 
@@ -66,7 +101,14 @@ async def test_endpoint_get_moneybox__moneybox_id_1__status_200_existing(
     )
     moneybox = response.json()
 
-    expected_moneybox_data = {"name": "Test Box 1", "id": 1, "balance": 0}
+    expected_moneybox_data = {
+        "name": "Test Box 1",
+        "id": 1,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
 
     assert response.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -97,7 +139,14 @@ async def test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_b
     )
     moneybox = response.json()
 
-    expected_moneybox_data = {"name": "Test Box 2", "id": 2, "balance": 100}
+    expected_moneybox_data = {
+        "name": "Test Box 2",
+        "id": 2,
+        "balance": 100,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 2,
+    }
 
     assert response.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -112,13 +161,25 @@ async def test_endpoint_add_moneybox__one__status_200(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
-    moneybox_data = {"name": "Test Box Endpoint Add 1"}
+    moneybox_data = {
+        "name": "Test Box Endpoint Add 1",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
     response = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
     )
     moneybox = response.json()
 
-    expected_moneybox_data = {"name": "Test Box Endpoint Add 1", "id": 1, "balance": 0}
+    expected_moneybox_data = {
+        "name": "Test Box Endpoint Add 1",
+        "id": 1,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
 
     assert response.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -133,13 +194,25 @@ async def test_endpoint_add_moneybox__two__status_200(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
-    moneybox_data_1 = {"name": "Test Box Endpoint Add 1"}
+    moneybox_data_1 = {
+        "name": "Test Box Endpoint Add 1",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
     )
     moneybox_1 = response_1.json()
 
-    expected_moneybox_data_1 = {"name": "Test Box Endpoint Add 1", "id": 1, "balance": 0}
+    expected_moneybox_data_1 = {
+        "name": "Test Box Endpoint Add 1",
+        "id": 1,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
 
     assert response_1.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -148,14 +221,26 @@ async def test_endpoint_add_moneybox__two__status_200(
         exclude_keys=["created_at", "modified_at"],
     )
 
-    moneybox_data_2 = {"name": "Test Box Endpoint Add 2"}
+    moneybox_data_2 = {
+        "name": "Test Box Endpoint Add 2",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 2,
+    }
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
         json=moneybox_data_2,
     )
     moneybox_2 = response_2.json()
 
-    expected_moneybox_data_2 = {"name": "Test Box Endpoint Add 2", "id": 2, "balance": 0}
+    expected_moneybox_data_2 = {
+        "name": "Test Box Endpoint Add 2",
+        "id": 2,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 2,
+    }
 
     assert response_2.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -185,13 +270,24 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
-    moneybox_data_1 = {"name": "Updated Name Test Box 1"}
+    moneybox_data_1 = {
+        "name": "Updated Name Test Box 1",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
 
     response_1 = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_1
     )
     moneybox_1 = response_1.json()
-    expected_moneybox_data_1 = moneybox_data_1 | {"id": 1, "balance": 0}
+    expected_moneybox_data_1 = moneybox_data_1 | {
+        "id": 1,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
 
     assert response_1.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -205,7 +301,14 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2",
     )
     moneybox_2 = response_2.json()
-    expected_moneybox_data_2 = {"name": "Test Box 2", "id": 2, "balance": 0}
+    expected_moneybox_data_2 = {
+        "name": "Test Box 2",
+        "id": 2,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 2,
+    }
 
     assert response_2.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -218,7 +321,14 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/3",
     )
     moneybox_3 = response_3.json()
-    expected_moneybox_data_3 = {"name": "Test Box 3", "id": 3, "balance": 0}
+    expected_moneybox_data_3 = {
+        "name": "Test Box 3",
+        "id": 3,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 3,
+    }
 
     assert response_2.status_code == status.HTTP_200_OK
     assert equal_dict(
@@ -239,7 +349,9 @@ async def test_endpoint_moneybox_id_1__modified_at_checks(
     content_1 = response_1.json()
     assert content_1["modified_at"] is None
 
-    moneybox_data_2 = {"name": "Updated Name Test Box 1"}
+    moneybox_data_2 = {
+        "name": "Updated Name Test Box 1",
+    }
     response_2 = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_2
     )
@@ -350,6 +462,9 @@ async def test_endpoint_deposit_moneybox_1__status_200(
         "name": "Test Box 1",
         "id": 1,
         "balance": 100,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -457,6 +572,9 @@ async def test_endpoint_withdraw_moneybox_1__status_200(
         "name": "Test Box 1",
         "id": 1,
         "balance": 1,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     assert response.status_code == status.HTTP_200_OK

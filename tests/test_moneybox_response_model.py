@@ -18,6 +18,9 @@ from src.data_classes.responses import MoneyboxResponse
             "balance": 1000,
             "created_at": "2020-05-01T00:00:00Z",
             "modified_at": None,
+            "savings_amount": 0,
+            "savings_target": None,
+            "priority": 1,
         },
         {
             "id": 2,
@@ -25,6 +28,9 @@ from src.data_classes.responses import MoneyboxResponse
             "balance": 1234,
             "created_at": "2020-05-01T00:00:00Z",
             "modified_at": "2020-06-01T00:00:00Z",
+            "savings_amount": 0,
+            "savings_target": None,
+            "priority": 2,
         },
     ],
 )
@@ -57,6 +63,9 @@ def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
             "balance": 1000,
             "created_at": "2020-05-01T00:00:00Z",
             "modified_at": None,
+            "savings_amount": 0,
+            "savings_target": None,
+            "priority": 1,
         },
         {
             "id": "1",  # Invalid id, should be type int
@@ -64,6 +73,9 @@ def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
             "balance": 1000,
             "created_at": "2020-05-01T00:00:00Z",
             "modified_at": None,
+            "savings_amount": 0,
+            "savings_target": None,
+            "priority": 1,
         },
         {
             "id": "jkhalkjghaökdsghdsg",  # Invalid id, should be type int
@@ -71,6 +83,9 @@ def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
             "balance": 1000,
             "created_at": "2020-05-01T00:00:00Z",
             "modified_at": None,
+            "savings_amount": 0,
+            "savings_target": None,
+            "priority": 1,
         },
     ],
 )
@@ -90,6 +105,9 @@ def test_moneybox_response_invalid_name__minlength() -> None:
         "balance": 1000,
         "created_at": "2020-05-01T00:00:00Z",
         "modified_at": None,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
@@ -104,6 +122,9 @@ def test_moneybox_response_invalid_name__wrong_type() -> None:
         "balance": 1000,
         "created_at": "2020-05-01T00:00:00Z",
         "modified_at": None,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
@@ -118,6 +139,9 @@ def test_moneybox_response_invalid_balance__negative() -> None:
         "balance": -1,  # Invalid balance, should be >= 0
         "created_at": "2020-05-01T00:00:00Z",
         "modified_at": None,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     with pytest.raises(ValidationError):
@@ -133,6 +157,9 @@ def test_moneybox_response_valid_balance__zero() -> None:
         "balance": 0,
         "created_at": "2020-05-01T00:00:00Z",
         "modified_at": None,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     response = MoneyboxResponse(**data)
@@ -153,6 +180,9 @@ def test_moneybox_response_invalid_balance__wrong_type() -> None:
         "balance": "zero",  # Invalid balance, should be an int and >= 0
         "created_at": "2020-05-01T00:00:00Z",
         "modified_at": None,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     with pytest.raises(ValidationError):
@@ -168,6 +198,9 @@ def test_moneybox_response_invalid_date_order() -> None:
         "balance": 1000,
         "created_at": "2020-05-02T00:00:00Z",
         "modified_at": "2020-05-01T00:00:00Z",  # Invalid order, modified_at is before created_at
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
     with pytest.raises(ValueError, match="Error: 'created_at' comes after 'modified_at'."):
         MoneyboxResponse(**data)
@@ -182,6 +215,9 @@ def test_moneybox_response_invalid_date__modified_at_wrong_type__int() -> None:
         "balance": 1000,
         "created_at": "2020-05-02T00:00:00Z",
         "modified_at": 2,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     with pytest.raises(ValueError):
@@ -197,6 +233,9 @@ def test_moneybox_response_invalid_date__modified_at_string_type__not_isoformat_
         "balance": 1000,
         "created_at": "2020-05-02T00:00:00Z",
         "modified_at": "2",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     with pytest.raises(ValueError):
@@ -212,6 +251,9 @@ def test_moneybox_response_invalid_date__created_at_wrong_type__int() -> None:
         "balance": 1000,
         "created_at": 2,
         "modified_at": "2020-05-02T00:00:00Z",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     with pytest.raises(ValueError):
@@ -227,6 +269,9 @@ def test_moneybox_response_invalid_date__created_at_string_type__not_isoformat_d
         "balance": 1000,
         "created_at": "2",
         "modified_at": "2020-05-02T00:00:00Z",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
 
     with pytest.raises(ValueError):
@@ -242,6 +287,9 @@ def test_moneybox_response_invalid_date__none_for_created_at() -> None:
         "balance": 1000,
         "created_at": None,  # Invalid, has to be a datetime or iso string datetime
         "modified_at": "2020-05-01T00:00:00",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
     with pytest.raises(ValueError):
         MoneyboxResponse(**data)
@@ -256,6 +304,9 @@ def test_moneybox_response_valid_date_order() -> None:
         "balance": 1000,
         "created_at": "2020-05-01T00:00:00Z",
         "modified_at": "2020-05-02T00:00:00Z",  # Valid order, modified_at is after created_at
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
     }
     response = MoneyboxResponse(**data)
     assert response.modified_at > response.created_at

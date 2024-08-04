@@ -76,11 +76,11 @@ class DBTestDataInitializer:
         )
 
         moneyboxes_data = [
-            {"name": "Test Box 1"},
-            {"name": "Test Box 2"},
-            {"name": "Test Box 3"},
-            {"name": "Test Box 4"},
-            {"name": "Test Box 5"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {"name": "Test Box 3", "savings_amount": 0, "savings_target": None, "priority": 3},
+            {"name": "Test Box 4", "savings_amount": 0, "savings_target": None, "priority": 4},
+            {"name": "Test Box 5", "savings_amount": 0, "savings_target": None, "priority": 5},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -102,7 +102,7 @@ class DBTestDataInitializer:
 
         # create moneybox with id 1
         moneyboxes_data = [
-            {"name": "Test Box 1"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -126,8 +126,8 @@ class DBTestDataInitializer:
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1"},
-            {"name": "Test Box 2"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -160,9 +160,9 @@ class DBTestDataInitializer:
 
         # create 3 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1"},
-            {"name": "Test Box 2"},
-            {"name": "Test Box 3"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {"name": "Test Box 3", "savings_amount": 0, "savings_target": None, "priority": 3},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -186,8 +186,8 @@ class DBTestDataInitializer:
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1"},
-            {"name": "Test Box 2"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -226,8 +226,8 @@ class DBTestDataInitializer:
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1"},
-            {"name": "Test Box 2"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -265,7 +265,7 @@ class DBTestDataInitializer:
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -284,7 +284,7 @@ class DBTestDataInitializer:
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -316,7 +316,7 @@ class DBTestDataInitializer:
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -340,8 +340,8 @@ class DBTestDataInitializer:
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1"},
-            {"name": "Test Box 2"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -376,8 +376,8 @@ class DBTestDataInitializer:
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1"},
-            {"name": "Test Box 2"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -407,7 +407,7 @@ class DBTestDataInitializer:
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1"},
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
         ]
 
         for moneybox_data in moneyboxes_data:

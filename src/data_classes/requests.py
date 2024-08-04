@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictInt
 
 
 class MoneyboxCreateRequest(BaseModel):
@@ -12,6 +12,29 @@ class MoneyboxCreateRequest(BaseModel):
         str, Field(min_length=1, description="The name of the moneybox. Has to be unique.")
     ]
     """The name of the moneybox. Has to be unique."""
+
+    savings_amount: Annotated[
+        StrictInt, Field(ge=0, description="The current savings amount of the moneybox.")
+    ]
+    """The current savings amount of the moneybox."""
+
+    savings_target: Annotated[
+        StrictInt | None,
+        Field(
+            ge=0,
+            description=(
+                "The current savings target. Is relevant for the automated "
+                "distributed saving progress."
+            ),
+        ),
+    ]
+    """"The current savings target. Is relevant for the automated 
+    distributed saving progress."""
+
+    priority: Annotated[
+        StrictInt, Field(ge=0, description=("The current priority of the moneybox."))
+    ]
+    """The current priority of the moneybox."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -37,6 +60,32 @@ class MoneyboxUpdateRequest(BaseModel):
         ),
     ]
     """The name of the moneybox. Has to be unique."""
+
+    savings_amount: Annotated[
+        StrictInt | None,
+        Field(default=None, ge=0, description="The current savings amount of the moneybox."),
+    ]
+    """The current savings amount of the moneybox."""
+
+    savings_target: Annotated[
+        StrictInt | None,
+        Field(
+            default=None,
+            ge=0,
+            description=(
+                "The current savings target. Is relevant for the automated "
+                "distributed saving progress."
+            ),
+        ),
+    ]
+    """"The current savings target. Is relevant for the automated 
+    distributed saving progress."""
+
+    priority: Annotated[
+        StrictInt | None,
+        Field(default=None, ge=0, description=("The current priority of the moneybox.")),
+    ]
+    """The current priority of the moneybox."""
 
     model_config = ConfigDict(
         extra="forbid",

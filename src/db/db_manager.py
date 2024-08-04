@@ -162,6 +162,9 @@ class DBManager:
             if name_exist:
                 raise MoneyboxNameExistError(name=moneybox_data["name"])
 
+        if "priority" in moneybox_data and moneybox_data["priority"] is None:
+            del moneybox_data["priority"]
+
         moneybox = await update_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore

@@ -7,8 +7,9 @@ from dictalchemy import make_class_dictable
 from sqlalchemy import ForeignKey, MetaData, text
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy_utc import UtcDateTime, utcnow
 from sqlalchemy.types import String
+from sqlalchemy_utc import UtcDateTime, utcnow
+
 from src.custom_types import TransactionTrigger, TransactionType
 
 meta = MetaData(

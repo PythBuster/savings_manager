@@ -46,6 +46,37 @@ class MoneyboxResponse(BaseModel):
     balance: Annotated[StrictInt, Field(ge=0, description="The balance of the moneybox in CENTS.")]
     """The balance of the moneybox in CENTS."""
 
+    savings_amount: Annotated[
+        StrictInt, Field(ge=0, description="The current savings amount of the moneybox.")
+    ]
+    """The current savings amount of the moneybox."""
+
+    savings_target: Annotated[
+        StrictInt | None,
+        Field(
+            ge=0,
+            description=(
+                "The current savings target. Is relevant for the automated "
+                "distributed saving progress."
+            ),
+        ),
+    ]
+    """"The current savings target. Is relevant for the automated 
+    distributed saving progress."""
+
+    priority: Annotated[
+        StrictInt | None,
+        Field(
+            ge=0,
+            description=(
+                "The current priority of the moneybox. There is only one moneybox with "
+                "a priority of Null (will be the marker for the overflow moneybox."
+            ),
+        ),
+    ]
+    """The current priority of the moneybox. There is only one moneybox with
+    a priority of Null (will be the marker for the overflow moneybox)."""
+
     created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
     """The creation date of the moneybox."""
 

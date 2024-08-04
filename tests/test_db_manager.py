@@ -1,6 +1,7 @@
 """All db_manager and db core tests are located here."""
 
 from datetime import datetime
+from typing import Any
 
 import pytest
 from fastapi.encoders import jsonable_encoder
@@ -41,11 +42,47 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
     assert db_manager is not None
 
 
-@pytest.mark.dependency
-async def test_add_moneybox(db_manager: DBManager) -> None:
+@pytest.mark.dependency(name="test_add_moneybox")
+@pytest.mark.parametrize(
+    "data",  # test different combinations of initial values
+    [
+        {
+            "id": 1,
+            "name": "Test Box 1",
+            "priority": 1,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+        {
+            "id": 2,
+            "name": "Test Box 2",
+            "priority": 2,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+        {
+            "id": 3,
+            "name": "Test Box 3",
+            "balance": 333,
+            "priority": 3,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+        {
+            "id": 4,
+            "name": "Test Box 4",
+            "priority": 4,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+    ],
+)
+async def test_add_moneybox(data: dict[str, Any], db_manager: DBManager) -> None:
     # moneybox 1
-    moneybox_data_1 = {"name": "Test Box 1"}
-    result_moneybox_data_1 = await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
+    moneybox_id = data["id"]
+    del data["id"]
+
+    result_moneybox_data_1 = await db_manager.add_moneybox(moneybox_data=data)
 
     assert isinstance(result_moneybox_data_1["created_at"], datetime)
     assert result_moneybox_data_1["modified_at"] is None
@@ -53,78 +90,15 @@ async def test_add_moneybox(db_manager: DBManager) -> None:
     del result_moneybox_data_1["created_at"]
     del result_moneybox_data_1["modified_at"]
 
-    expected_moneybox_data = moneybox_data_1 | {"id": 1, "balance": 0}
+    expected_moneybox_data = {"id": moneybox_id, "balance": 0} | data
     assert result_moneybox_data_1 == expected_moneybox_data
 
     with pytest.raises(MoneyboxNameExistError) as ex_info:
-        await db_manager.add_moneybox(moneybox_data=moneybox_data_1)
+        await db_manager.add_moneybox(moneybox_data=data)
 
     assert (
-        "Creation Error: Please choose another name, 'Test Box 1' "
+        f"Creation Error: Please choose another name, '{data['name']}' "
         "is already in use (case insensitive)."
-    ) in ex_info.value.args[0]
-
-    # moneybox 2
-    moneybox_data_2 = {"name": "Test Box 2"}
-    result_moneybox_data_2 = await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
-
-    assert isinstance(result_moneybox_data_2["created_at"], datetime)
-    assert result_moneybox_data_2["modified_at"] is None
-
-    del result_moneybox_data_2["created_at"]
-    del result_moneybox_data_2["modified_at"]
-
-    expected_moneybox_data = moneybox_data_2 | {"id": 2, "balance": 0}
-    assert result_moneybox_data_2 == expected_moneybox_data
-
-    with pytest.raises(MoneyboxNameExistError) as ex_info:
-        await db_manager.add_moneybox(moneybox_data=moneybox_data_2)
-
-    assert (
-        "Creation Error: Please choose another name, 'Test Box 2' "
-        "is already in use (case insensitive)."
-    ) in ex_info.value.args[0]
-
-    # moneybox 3
-    moneybox_data_3: dict[str, str | int] = {"name": "Test Box 3", "balance": 333}
-    result_moneybox_data_3 = await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
-
-    assert isinstance(result_moneybox_data_3["created_at"], datetime)
-    assert result_moneybox_data_3["modified_at"] is None
-
-    del result_moneybox_data_3["created_at"]
-    del result_moneybox_data_3["modified_at"]
-
-    expected_moneybox_data = moneybox_data_3 | {"id": 3, "balance": 333}
-    assert result_moneybox_data_3 == expected_moneybox_data
-
-    with pytest.raises(MoneyboxNameExistError) as ex_info:
-        await db_manager.add_moneybox(moneybox_data=moneybox_data_3)
-
-    assert (
-        "Creation Error: Please choose another name, 'Test Box 3' "
-        "is already in use (case insensitive)."
-    ) in ex_info.value.args[0]
-
-    # moneybox 4
-    moneybox_data_4 = {"name": "Test Box 4"}
-    result_moneybox_data_4 = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
-
-    assert isinstance(result_moneybox_data_4["created_at"], datetime)
-    assert result_moneybox_data_4["modified_at"] is None
-
-    del result_moneybox_data_4["created_at"]
-    del result_moneybox_data_4["modified_at"]
-
-    expected_moneybox_data = moneybox_data_4 | {"id": 4, "balance": 0}
-    assert result_moneybox_data_4 == expected_moneybox_data
-
-    with pytest.raises(MoneyboxNameExistError) as ex_info:
-        await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
-
-    assert (
-        "Creation Error: Please choose another name, 'Test Box 4'"
-        " is already in use (case insensitive)."
     ) in ex_info.value.args[0]
 
 
@@ -142,7 +116,13 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
     del result_moneybox_data["created_at"]
     del result_moneybox_data["modified_at"]
 
-    expected_moneybox_data = moneybox_data | {"id": 1, "balance": 0}
+    expected_moneybox_data = moneybox_data | {
+        "id": 1,
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
     assert result_moneybox_data == expected_moneybox_data
 
     moneybox_data["name"] = "new"
@@ -169,7 +149,14 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
     del result_moneybox_data["created_at"]
     del result_moneybox_data["modified_at"]
 
-    expected_moneybox_data = {"id": 1, "balance": 0, "name": "Test Box 1 - Updated"}
+    expected_moneybox_data = {
+        "id": 1,
+        "balance": 0,
+        "name": "Test Box 1 - Updated",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
     assert result_moneybox_data == expected_moneybox_data
 
     non_existing_moneybox_ids = [-42, -1, 0, 5, 1654856415456]
