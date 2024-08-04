@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, List
 
 from dictalchemy import make_class_dictable
-from sqlalchemy import ForeignKey, MetaData
+from sqlalchemy import ForeignKey, MetaData, text
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy_utc import UtcDateTime, utcnow
@@ -125,6 +125,37 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
         nullable=False,
     )
     """The current balance of the moneybox."""
+
+    savings_amount: Mapped[int] = mapped_column(
+        default=0,
+        server_default=text("0"),
+        nullable=False,
+        comment="The current savings amount of the moneybox.",
+    )
+    """The current savings amount of the moneybox."""
+
+    savings_target: Mapped[int] = mapped_column(
+        default=None,
+        server_default=None,
+        nullable=True,
+        comment=(
+            "The current savings target. Is relevant for the automated distributed "
+            "saving progress."
+        ),
+    )
+    """"The current savings target. Is relevant for the automated 
+    distributed saving progress."""
+
+    priority: Mapped[int] = mapped_column(
+        nullable=True,
+        unique=True,
+        comment=(
+            "The current priority of the moneybox. There is only one moneybox with "
+            "a priority of Null (will be the marker for the overflow moneybox."
+        ),
+    )
+    """The current priority of the moneybox. There is only one moneybox with
+    a priority of Null (will be the marker for the overflow moneybox)."""
 
     transactions_log: Mapped[List["Transaction"]] = (  # pylint: disable=unsubscriptable-object
         relationship(
