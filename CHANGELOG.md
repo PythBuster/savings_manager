@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.3.0 (2024-08-03)
+### Features:
+- add note column to all tables to be able to add admin notes to each record
+
 ## 1.2.0 (2024-08-03)
 ### Changes:
 - redesign and implementation of a new test architecture
