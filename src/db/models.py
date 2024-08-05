@@ -3,14 +3,13 @@
 from datetime import datetime, timezone
 from typing import Any, List
 
-from dictalchemy import make_class_dictable
 from sqlalchemy import ForeignKey, MetaData, text, DateTime, func
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 
 from src.custom_types import TransactionTrigger, TransactionType
-from src.utils import get_vanilla_datetime
+from src.utils import get_vanilla_datetime, as_dict
 
 meta = MetaData(
     naming_convention={
@@ -30,9 +29,6 @@ class Base(DeclarativeBase):  # pylint: disable=too-few-public-methods
 
     metadata = meta
     """The database meta config."""
-
-
-make_class_dictable(Base)
 
 
 class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-methods
@@ -86,7 +82,6 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
         follow=None,
         include=None,
         only=None,
-        method="asdict",
         **kwargs,
     ) -> dict[str, Any]:
         """Overloaded method from make_class_dictable()."""
@@ -98,14 +93,14 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
         exclude.append("is_active")
         exclude.append("note")
 
-        return super().asdict(  # pylint: disable=no-member
+        return as_dict(  # pylint: disable=no-member
+            model=self,
             exclude=list(set(exclude)),  # remove duplicates by casting to set and back to list
             exclude_underscore=exclude_underscore,
             exclude_pk=exclude_pk,
             follow=follow,
             include=include,
             only=only,
-            method=method,
             **kwargs,
         )
 

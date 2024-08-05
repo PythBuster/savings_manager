@@ -7,6 +7,7 @@ import tomllib
 from pathlib import Path
 from typing import Annotated, Any, Hashable
 
+from dictalchemy import asdict
 from dotenv import load_dotenv
 from starlette.requests import Request
 
@@ -32,13 +33,13 @@ async def check_existence_of_moneybox_by_id(
     _ = await request.app.state.db_manager.get_moneybox(moneybox_id=moneybox_id)
     return moneybox_id
 
+
 def get_vanilla_datetime() -> datetime:
     """Get a datetime without TZinfo and without microseconds
     as isoformat"""
 
-    return datetime.datetime.now(
-        tz=datetime.timezone.utc
-    ).replace(tzinfo=None, microsecond=0)
+    return datetime.datetime.now(tz=datetime.timezone.utc).replace(tzinfo=None, microsecond=0)
+
 
 def get_db_settings() -> DBSettings:
     """A :class:`DBSettings` spawner.
@@ -179,3 +180,25 @@ def equal_list_of_dict(
                 del item[key]
 
     return list_dict_1 == list_dict_2
+
+
+def as_dict(
+    model: "SqlBase",
+    exclude=None,
+    exclude_underscore=None,
+    exclude_pk=None,
+    follow=None,
+    include=None,
+    only=None,
+    **kwargs,
+) -> dict[str, Any]:
+    return asdict(
+        model=model,
+        exclude=exclude,
+        exclude_underscore=exclude_underscore,
+        exclude_pk=exclude_pk,
+        follow=follow,
+        include=include,
+        only=only,
+        **kwargs,
+    )

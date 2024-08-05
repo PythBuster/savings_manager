@@ -226,9 +226,7 @@ async def example_1_db_settings() -> AsyncGenerator:
     """
 
     yield DBSettings(
-        db_environment="test",
-        db_driver="sqlite+aiosqlite",
-        db_file="test_database.sqlite3"
+        db_environment="test", db_driver="sqlite+aiosqlite", db_file="test_database.sqlite3"
     )
 
 
@@ -257,36 +255,31 @@ async def mocked_db_manager() -> AsyncGenerator:
 
     db_manager.truncate_tables = partial(truncate_tables, db_manager)  # type: ignore
 
-    #alembic_ini_path = (Path(__file__).parent.parent / "alembic.ini").resolve().absolute()
-    #alembic_cfg = Config(str(alembic_ini_path))  # Adjust the path to your alembic.ini file
+    # alembic_ini_path = (Path(__file__).parent.parent / "alembic.ini").resolve().absolute()
+    # alembic_cfg = Config(str(alembic_ini_path))  # Adjust the path to your alembic.ini file
 
     # Dynamically update the sqlalchemy.url
-    #alembic_cfg.set_main_option("sqlalchemy.url", str(db_manager.db_connection_string))
+    # alembic_cfg.set_main_option("sqlalchemy.url", str(db_manager.db_connection_string))
 
     # Upgrade the database using Alembic
-    #async with db_manager.async_engine.begin() as conn:
+    # async with db_manager.async_engine.begin() as conn:
     #    await conn.run_sync(Base.metadata.create_all)
     #    await conn.run_sync(run_migrations, alembic_cfg, "upgrade", "head")
     #    print("Database tables created with Alembic migrations.", flush=True)
 
     # create db tables and apply all db migrations
-    subprocess.Popen(
-        ("alembic", "-x", "testing", "upgrade", "head")
-    )
+    subprocess.Popen(("alembic", "-x", "testing", "upgrade", "head"))
     time.sleep(2)
 
     yield db_manager
 
     time.sleep(2)
     # downgrade the test database to base
-    subprocess.Popen(
-        ("alembic", "-x", "testing", "downgrade", "base")
-    )
+    subprocess.Popen(("alembic", "-x", "testing", "downgrade", "base"))
 
     # Downgrade the database using Alembic
-    #async with db_manager.async_engine.begin() as conn:
+    # async with db_manager.async_engine.begin() as conn:
     #    await conn.run_sync(Base.metadata.drop_all)
     #    print("Database tables dropped with Alembic migrations.", flush=True)
 
     print("DB Manager removed.", flush=True)
-

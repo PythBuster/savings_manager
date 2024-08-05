@@ -97,16 +97,14 @@ async def test_add_moneybox(data: dict[str, Any], db_manager: DBManager) -> None
         data["priority"] = 2
         await db_manager.add_moneybox(moneybox_data=data)
 
-    assert (
-        'UNIQUE constraint failed: moneyboxes.name'
-    ) in ex_info.value.args[0]
+    assert ("UNIQUE constraint failed: moneyboxes.name") in ex_info.value.args[0]
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
 async def test_update_moneybox(db_manager: DBManager) -> None:
     moneybox_data = {"name": "Test Box 1 - Updated"}
     result_moneybox_data = await db_manager.update_moneybox(
-        moneybox_id=1,
+        moneybox_id=2,
         moneybox_data=moneybox_data,
     )
 
@@ -117,7 +115,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
     del result_moneybox_data["modified_at"]
 
     expected_moneybox_data = moneybox_data | {
-        "id": 1,
+        "id": 2,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
