@@ -1,4 +1,5 @@
 """The database test data initializer."""
+import time
 
 from src.custom_types import TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
@@ -53,6 +54,9 @@ class DBTestDataInitializer:
         """Call data generator function depending on test case name map."""
 
         await self.TEST_CASES_DATA[self.test_case]()  # type: ignore
+
+        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
+        time.sleep(1)
 
     async def truncate_tables(self) -> None:
         """Truncate tables."""
@@ -135,6 +139,9 @@ class DBTestDataInitializer:
                 moneybox_data=moneybox_data,
             )
 
+        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
+        time.sleep(1)
+
         # add some amount to moneybox with id 2
         await self.db_manager.add_amount(
             moneybox_id=2,
@@ -209,7 +216,7 @@ class DBTestDataInitializer:
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1"},
+            {"name": "Test Box 1", "priority": 1},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -246,7 +253,7 @@ class DBTestDataInitializer:
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1"},
+            {"name": "Test Box 1", "priority": 1},
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -291,6 +298,9 @@ class DBTestDataInitializer:
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
+
+        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
+        time.sleep(1)
 
         # add some amount to moneybox 1
         deposit_transaction_data = {
@@ -349,6 +359,9 @@ class DBTestDataInitializer:
                 moneybox_data=moneybox_data,
             )
 
+        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
+        time.sleep(1)
+
         # add some amount to moneybox with id 2
         await self.db_manager.add_amount(
             moneybox_id=1,
@@ -384,6 +397,9 @@ class DBTestDataInitializer:
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
+
+        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
+        time.sleep(1)
 
         # add some amount to moneybox with id 2
         await self.db_manager.add_amount(

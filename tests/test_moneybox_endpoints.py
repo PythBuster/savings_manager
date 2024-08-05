@@ -1,5 +1,5 @@
 """All moneybox endpoint tests are located here."""
-
+import asyncio
 from datetime import datetime
 
 import pytest
@@ -124,7 +124,7 @@ async def test_endpoint_get_moneybox_status_404_non_existing(
     client: AsyncClient,
 ) -> None:
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/0",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/10",
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -154,7 +154,6 @@ async def test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_b
         dict_2=expected_moneybox_data,  # type: ignore
         exclude_keys=["created_at", "modified_at"],
     )
-
 
 @pytest.mark.dependency
 async def test_endpoint_add_moneybox__one__status_200(
@@ -277,6 +276,7 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
         "priority": 1,
     }
 
+
     response_1 = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_1
     )
@@ -358,6 +358,9 @@ async def test_endpoint_moneybox_id_1__modified_at_checks(
     content_2 = response_2.json()
 
     assert content_2["modified_at"] is not None
+
+    # sleep to get higher modified_at datetime (simulate time passing before modifying data)
+    await asyncio.sleep(1)
 
     moneybox_data_3 = {"name": "RE-Updated Name Test Box 1"}
     response_3 = await client.patch(

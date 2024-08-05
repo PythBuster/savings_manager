@@ -32,8 +32,6 @@ class EnvironmentType(StrEnum):
 class DBSettings(BaseModel):
     """The database credentials."""
 
-    db_environment: EnvironmentType
-
     db_driver: str
     """Database driver."""
 

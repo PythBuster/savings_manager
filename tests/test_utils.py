@@ -11,7 +11,7 @@ async def test_db_settings(db_settings_1: DBSettings) -> None:
     # sqlite as file
     db_settings = DBSettings(
         db_driver="sqlite",
-        db_name="test.db",
+        db_file="test.db",
     )
 
     expected_database_url = "sqlite:///test.db"
@@ -21,24 +21,17 @@ async def test_db_settings(db_settings_1: DBSettings) -> None:
     # sqlite in memory
     db_settings = DBSettings(
         db_driver="sqlite",
-        db_name=":memory:",
+        db_file=":memory:",
     )
 
     expected_database_url = "sqlite:///:memory:"
     result_database_url = get_database_url(db_settings)
     assert expected_database_url == result_database_url
 
-    # postgres
-    db_settings = db_settings_1
-    db_settings.db_driver = "postgres"
-
-    expected_database_url = "postgres://test_user:test_password@1.2.3.4:1234/test_db"
-    result_database_url = get_database_url(db_settings)
-    assert expected_database_url == result_database_url
-
     # not supported driver
     db_settings = DBSettings(
         db_driver="unknown",
+        db_file="123",
     )
 
     with pytest.raises(ValueError) as ex_info:

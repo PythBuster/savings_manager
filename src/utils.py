@@ -50,7 +50,6 @@ def get_db_settings() -> DBSettings:
     """
 
     return DBSettings(
-        db_environment=os.getenv("DB_ENVIRONMENT", ""),
         db_driver=os.getenv("DB_DRIVER", ""),
         db_file=os.getenv("DB_FILE", ""),
     )

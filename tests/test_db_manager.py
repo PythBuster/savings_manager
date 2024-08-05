@@ -124,7 +124,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
     assert result_moneybox_data == expected_moneybox_data
 
     moneybox_data["name"] = "new"
-    non_existing_moneybox_ids = [-42, -1, 0, 5, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 6, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.update_moneybox(
@@ -141,14 +141,14 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_update_moneybox"])
 async def test_get_moneybox(db_manager: DBManager) -> None:
-    result_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+    result_moneybox_data = await db_manager.get_moneybox(moneybox_id=2)
     assert isinstance(result_moneybox_data["created_at"], datetime)
     assert isinstance(result_moneybox_data["modified_at"], datetime)
     del result_moneybox_data["created_at"]
     del result_moneybox_data["modified_at"]
 
     expected_moneybox_data = {
-        "id": 1,
+        "id": 2,
         "balance": 0,
         "name": "Test Box 1 - Updated",
         "savings_amount": 0,
@@ -157,7 +157,7 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
     }
     assert result_moneybox_data == expected_moneybox_data
 
-    non_existing_moneybox_ids = [-42, -1, 0, 5, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 6, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.get_moneybox(moneybox_id=moneybox_id)
@@ -205,7 +205,7 @@ async def test_core_exists_instance__moneybox_name(db_manager: DBManager) -> Non
 
 @pytest.mark.dependency(depends=["test_add_moneybox"], session="scope")
 async def test_delete_moneybox(db_manager: DBManager) -> None:
-    assert await db_manager.delete_moneybox(moneybox_id=2) is None  # type: ignore
+    assert await db_manager.delete_moneybox(moneybox_id=3) is None  # type: ignore
 
     non_existing_moneybox_ids = [-42, -1, 0, 1654856415456]
     for moneybox_id in non_existing_moneybox_ids:
@@ -221,7 +221,7 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
 async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
-    moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+    moneybox_data = await db_manager.get_moneybox(moneybox_id=2)
     del moneybox_data["created_at"]
     del moneybox_data["modified_at"]
 
@@ -230,7 +230,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
         description="Bonus.",
     )
     result_moneybox_data_1 = await db_manager.add_amount(
-        moneybox_id=1,
+        moneybox_id=2,
         deposit_transaction_data=deposit_transaction_1.model_dump(),
         transaction_type=TransactionType.DIRECT,
         transaction_trigger=TransactionTrigger.MANUALLY,
@@ -249,7 +249,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
         description="Bonus.",
     )
     result_moneybox_data_2 = await db_manager.add_amount(
-        moneybox_id=1,
+        moneybox_id=2,
         deposit_transaction_data=deposit_transaction_2.model_dump(),
         transaction_type=TransactionType.DIRECT,
         transaction_trigger=TransactionTrigger.MANUALLY,
@@ -263,7 +263,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
     assert moneybox_data == result_moneybox_data_2
 
     # check for add logs
-    transaction_logs = await db_manager.get_transaction_logs(moneybox_id=1)
+    transaction_logs = await db_manager.get_transaction_logs(moneybox_id=2)
 
     for transaction_log in transaction_logs:
         del transaction_log["created_at"]
@@ -277,7 +277,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
         "balance": 1,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
-        "moneybox_id": 1,
+        "moneybox_id": 2,
     }
     expected_dict_2 = {
         "description": "Bonus.",
@@ -287,7 +287,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
         "balance": 11,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
-        "moneybox_id": 1,
+        "moneybox_id": 2,
     }
 
     assert len(transaction_logs) == 2
@@ -297,7 +297,7 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
     # expected exception tests
     with pytest.raises(ValidationError):
         await db_manager.add_amount(
-            moneybox_id=1,
+            moneybox_id=2,
             deposit_transaction_data=DepositTransactionRequest(
                 amount=0,
                 description="Bonus.",
@@ -309,13 +309,13 @@ async def test_add_amount_to_moneybox(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_add_amount_to_moneybox"])
 async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
-    moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+    moneybox_data = await db_manager.get_moneybox(moneybox_id=2)
     del moneybox_data["created_at"]
     del moneybox_data["modified_at"]
 
     withdraw_transaction_1 = WithdrawTransactionRequest(amount=1)
     result_moneybox_data_1 = await db_manager.sub_amount(
-        moneybox_id=1,
+        moneybox_id=2,
         withdraw_transaction_data=withdraw_transaction_1.model_dump(),
         transaction_type=TransactionType.DIRECT,
         transaction_trigger=TransactionTrigger.MANUALLY,
@@ -332,7 +332,7 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
         amount=10,
     )
     result_moneybox_data_2 = await db_manager.sub_amount(
-        moneybox_id=1,
+        moneybox_id=2,
         withdraw_transaction_data=withdraw_transaction_2.model_dump(),
         transaction_type=TransactionType.DIRECT,
         transaction_trigger=TransactionTrigger.MANUALLY,
@@ -346,7 +346,7 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
     assert moneybox_data == result_moneybox_data_2
 
     # test sub transaction logs
-    transaction_logs = await db_manager.get_transaction_logs(moneybox_id=1)
+    transaction_logs = await db_manager.get_transaction_logs(moneybox_id=2)
 
     for transaction_log in transaction_logs:
         del transaction_log["created_at"]
@@ -360,7 +360,7 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
         "balance": 10,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
-        "moneybox_id": 1,
+        "moneybox_id": 2,
     }
 
     expected_withdraw_dict_2 = {
@@ -371,7 +371,7 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
         "balance": 0,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
-        "moneybox_id": 1,
+        "moneybox_id": 2,
     }
 
     assert len(transaction_logs) == 4
@@ -393,37 +393,37 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
 
     with pytest.raises(BalanceResultIsNegativeError) as ex_info:
         await db_manager.sub_amount(
-            moneybox_id=1,
+            moneybox_id=2,
             withdraw_transaction_data=withdraw_transaction_3.model_dump(),
             transaction_type=TransactionType.DIRECT,
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
     assert (
-        "Can't sub amount '1000' from Moneybox '1'. Not enough balance to sub."
+        "Can't sub amount '1000' from Moneybox '2'. Not enough balance to sub."
         == ex_info.value.message
     )
     assert isinstance(ex_info.value.details, dict)
     assert len(ex_info.value.details) == 2
-    assert ex_info.value.details["id"] == 1
+    assert ex_info.value.details["id"] == 2
     assert ex_info.value.details["amount"] == 1000
-    assert ex_info.value.record_id == 1
+    assert ex_info.value.record_id == 2
 
     with pytest.raises(NonPositiveAmountError) as ex_info:
         await db_manager.sub_amount(
-            moneybox_id=1,
+            moneybox_id=2,
             withdraw_transaction_data={"amount": 0},
             transaction_type=TransactionType.DIRECT,
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert ex_info.value.message == "Can't add or sub amount less than 1 '0' to Moneybox '1'."
-    assert ex_info.value.details == {"amount": 0, "id": 1}
-    assert ex_info.value.record_id == 1
+    assert ex_info.value.message == "Can't add or sub amount less than 1 '0' to Moneybox '2'."
+    assert ex_info.value.details == {"amount": 0, "id": 2}
+    assert ex_info.value.record_id == 2
 
     with pytest.raises(NonPositiveAmountError) as ex_info:
         await db_manager.sub_amount(
-            moneybox_id=2,
+            moneybox_id=4,
             withdraw_transaction_data={
                 "amount": -1,
             },
@@ -431,15 +431,15 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert ex_info.value.message == "Can't add or sub amount less than 1 '-1' to Moneybox '2'."
-    assert ex_info.value.details == {"amount": -1, "id": 2}
-    assert ex_info.value.record_id == 2
+    assert ex_info.value.message == "Can't add or sub amount less than 1 '-1' to Moneybox '4'."
+    assert ex_info.value.details == {"amount": -1, "id": 4}
+    assert ex_info.value.record_id == 4
 
 
 @pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
 async def test_transfer_amount(db_manager: DBManager) -> None:
-    from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
-    to_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+    from_moneybox_data = await db_manager.get_moneybox(moneybox_id=4)
+    to_moneybox_data = await db_manager.get_moneybox(moneybox_id=2)
 
     transfer_transaction_1 = TransferTransactionRequest(
         to_moneybox_id=to_moneybox_data["id"],
@@ -453,15 +453,15 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         transaction_trigger=TransactionTrigger.MANUALLY,
     )
 
-    new_from_moneybox_data = await db_manager.get_moneybox(moneybox_id=3)
-    new_to_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
+    new_from_moneybox_data = await db_manager.get_moneybox(moneybox_id=4)
+    new_to_moneybox_data = await db_manager.get_moneybox(moneybox_id=2)
 
     assert from_moneybox_data["balance"] - 33 == new_from_moneybox_data["balance"]
     assert to_moneybox_data["balance"] + 33 == new_to_moneybox_data["balance"]
 
     # test sub transaction logs
-    transaction_logs_moneybox_1 = await db_manager.get_transaction_logs(moneybox_id=1)
-    transaction_logs_moneybox_3 = await db_manager.get_transaction_logs(moneybox_id=3)
+    transaction_logs_moneybox_1 = await db_manager.get_transaction_logs(moneybox_id=2)
+    transaction_logs_moneybox_3 = await db_manager.get_transaction_logs(moneybox_id=4)
 
     for transaction_log in transaction_logs_moneybox_1:
         del transaction_log["created_at"]
@@ -477,8 +477,8 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         "transaction_trigger": TransactionTrigger.MANUALLY,
         "amount": 33,
         "balance": 33,
-        "counterparty_moneybox_id": 3,
-        "moneybox_id": 1,
+        "counterparty_moneybox_id": 4,
+        "moneybox_id": 2,
         "counterparty_moneybox_name": "Test Box 3",
     }
     expected_transfer_dict_moneybox_3 = {
@@ -487,8 +487,8 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         "transaction_trigger": TransactionTrigger.MANUALLY,
         "amount": -33,
         "balance": 300,
-        "counterparty_moneybox_id": 1,
-        "moneybox_id": 3,
+        "counterparty_moneybox_id": 2,
+        "moneybox_id": 4,
         "counterparty_moneybox_name": "Test Box 1 - Updated",
     }
 
@@ -550,9 +550,9 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
 
     with pytest.raises(TransferEqualMoneyboxError) as ex_info:
         await db_manager.transfer_amount(
-            from_moneybox_id=1,
+            from_moneybox_id=2,
             transfer_transaction_data={
-                "to_moneybox_id": 1,
+                "to_moneybox_id": 2,
                 "amount": 123,
                 "description": "Bonus.",
             },
@@ -561,19 +561,19 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         )
 
     assert ex_info.value.message == "Can't transfer within the same moneybox"
-    assert ex_info.value.details == {"amount": 123, "from_moneybox_id": 1, "to_moneybox_id": 1}
+    assert ex_info.value.details == {"amount": 123, "from_moneybox_id": 2, "to_moneybox_id": 2}
 
 
 @pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
-async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(
+async def test_get_transactions_logs_with_counterparty_to_deleted_moneybox(
     db_manager: DBManager,
 ) -> None:
     # moneybox 4
-    moneybox_data_4 = {"name": "4-Test Box"}
+    moneybox_data_4 = {"name": "4-Test Box", "priority": 6}
     result_moneybox_data_4 = await db_manager.add_moneybox(moneybox_data=moneybox_data_4)
 
     # moneybox 5
-    moneybox_data_5 = {"name": "5-Test Box"}
+    moneybox_data_5 = {"name": "5-Test Box", "priority": 7}
     result_moneybox_data_5 = await db_manager.add_moneybox(moneybox_data=moneybox_data_5)
 
     deposit_transaction = DepositTransactionRequest(
@@ -609,7 +609,7 @@ async def test_get_transactionslogs_with_counterparty_to_deleted_moneybox(
 
     await db_manager.delete_moneybox(result_moneybox_data_5["id"])
 
-    # should able to get transaction logs without getting an exception
+    # should be able to get transaction logs without getting an exception
     assert await db_manager.get_transaction_logs(result_moneybox_data_4["id"])
 
     withdraw_transaction = WithdrawTransactionRequest(amount=80)

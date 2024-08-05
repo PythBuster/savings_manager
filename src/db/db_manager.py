@@ -145,6 +145,9 @@ class DBManager:
             data=moneybox_data,
         )
 
+        if moneybox is None:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
         return moneybox.asdict()
 
     async def delete_moneybox(self, moneybox_id: int) -> None:

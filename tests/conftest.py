@@ -55,17 +55,19 @@ async def default_test_data(db_manager: DBManager) -> None:
 
     # add 5 moneyboxes
     moneyboxes_data = [
-        {"name": "Moneybox 1"},  # id: 1
-        {"name": "Moneybox 2"},  # id: 2
-        {"name": "Moneybox 3"},  # id: 3
-        {"name": "Moneybox 4"},  # id: 4
-        {"name": "Moneybox 5"},  # id: 5
+        {"name": "Moneybox 1", "priority": 1},  # id: 1
+        {"name": "Moneybox 2", "priority": 2},  # id: 2
+        {"name": "Moneybox 3", "priority": 3},  # id: 3
+        {"name": "Moneybox 4", "priority": 4},  # id: 4
+        {"name": "Moneybox 5", "priority": 5},  # id: 5
     ]
 
     for moneybox_data in moneyboxes_data:
         await db_manager.add_moneybox(
             moneybox_data=moneybox_data,
         )
+
+    time.sleep(1)
 
     # Moneybox 1
     # 3x add / 1x transfer -> Moneybox 3
@@ -183,6 +185,8 @@ async def default_test_data(db_manager: DBManager) -> None:
 
     await db_manager.delete_moneybox(moneybox_id=4)
 
+    time.sleep(1)
+
 
 @pytest.fixture(scope="function")
 async def load_test_data(request: FixtureRequest, db_manager: DBManager) -> None:
@@ -226,7 +230,7 @@ async def example_1_db_settings() -> AsyncGenerator:
     """
 
     yield DBSettings(
-        db_environment="test", db_driver="sqlite+aiosqlite", db_file="test_database.sqlite3"
+        db_driver="sqlite+aiosqlite", db_file="test_database.sqlite3"
     )
 
 
