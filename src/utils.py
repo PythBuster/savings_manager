@@ -1,7 +1,6 @@
 """All helper functions are located here."""
 
 import argparse
-import datetime
 import os
 import tomllib
 from pathlib import Path
@@ -32,13 +31,6 @@ async def check_existence_of_moneybox_by_id(
 
     _ = await request.app.state.db_manager.get_moneybox(moneybox_id=moneybox_id)
     return moneybox_id
-
-
-def get_vanilla_datetime() -> datetime:
-    """Get a datetime without TZinfo and without microseconds
-    as isoformat"""
-
-    return datetime.datetime.now(tz=datetime.timezone.utc).replace(tzinfo=None, microsecond=0)
 
 
 def get_db_settings() -> DBSettings:
@@ -181,7 +173,7 @@ def equal_list_of_dict(
     return list_dict_1 == list_dict_2
 
 
-def as_dict(
+def as_dict(  # pylint: disable=missing-function-docstring, too-many-arguments
     model: "SqlBase",
     exclude=None,
     exclude_underscore=None,

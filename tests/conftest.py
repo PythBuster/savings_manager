@@ -1,23 +1,18 @@
 """Pytest configurations and fixtures are located here."""
 
 import os
+import subprocess
 import time
 from functools import partial
 from pathlib import Path
-import subprocess
 from typing import AsyncGenerator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from alembic import command, context
-from alembic.config import Config
-from alembic.runtime.environment import EnvironmentContext
-from alembic.script import ScriptDirectory
 from dotenv import load_dotenv
 from httpx import AsyncClient
 from sqlalchemy import text
 
-from src.constants import WORKING_DIR
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
@@ -229,9 +224,7 @@ async def example_1_db_settings() -> AsyncGenerator:
     :rtype: AsyncGenerator
     """
 
-    yield DBSettings(
-        db_driver="sqlite+aiosqlite", db_file="test_database.sqlite3"
-    )
+    yield DBSettings(db_driver="sqlite+aiosqlite", db_file="test_database.sqlite3")
 
 
 @pytest.fixture(scope="session", name="db_manager")

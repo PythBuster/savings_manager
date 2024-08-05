@@ -32,7 +32,7 @@ class MoneyboxCreateRequest(BaseModel):
     distributed saving progress."""
 
     priority: Annotated[
-        StrictInt, Field(ge=0, description=("The current priority of the moneybox."))
+        StrictInt, Field(ge=0, description="The current priority of the moneybox.")
     ]
     """The current priority of the moneybox."""
 
@@ -86,7 +86,7 @@ class MoneyboxUpdateRequest(BaseModel):
 
     priority: Annotated[
         StrictInt | None,
-        Field(default=None, ge=1, description=("The current priority of the moneybox.")),
+        Field(default=None, ge=1, description="The current priority of the moneybox."),
     ]
     """The current priority of the moneybox."""
 

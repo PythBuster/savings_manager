@@ -1,4 +1,5 @@
 """All moneybox endpoint tests are located here."""
+
 import asyncio
 from datetime import datetime
 
@@ -155,6 +156,7 @@ async def test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_b
         exclude_keys=["created_at", "modified_at"],
     )
 
+
 @pytest.mark.dependency
 async def test_endpoint_add_moneybox__one__status_200(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -275,7 +277,6 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
         "savings_target": None,
         "priority": 1,
     }
-
 
     response_1 = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_1

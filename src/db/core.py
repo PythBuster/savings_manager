@@ -1,9 +1,8 @@
 """DB core functionalities are located here."""
 
-from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import Sequence, and_, delete, exists, func, insert, select, update
+from sqlalchemy import Sequence, and_, exists, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.db.exceptions import ColumnDoesNotExistError

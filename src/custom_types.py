@@ -1,9 +1,8 @@
 """All custom types are located here."""
 
 from enum import StrEnum
-from typing import Any
 
-from pydantic import BaseModel, ConfigDict, SecretStr, model_validator
+from pydantic import BaseModel, ConfigDict
 
 
 class EndpointRouteType(StrEnum):

@@ -3,7 +3,6 @@
 from typing import Any
 
 from sqlalchemy import and_, insert, select, update
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 

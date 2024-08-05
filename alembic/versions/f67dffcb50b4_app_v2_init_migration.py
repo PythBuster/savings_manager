@@ -5,13 +5,13 @@ Revises:
 Create Date: 2024-08-05 09:52:00.849141
 
 """
+import datetime
 import uuid
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
-from src.utils import get_vanilla_datetime
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = 'f67dffcb50b4'
@@ -65,7 +65,7 @@ def upgrade() -> None:
     # Insert initial moneybox data with priority = NULL
     new_moneybox = {
         "name": str(uuid.uuid4()),
-        "created_at": get_vanilla_datetime().isoformat(sep=" "),
+        "created_at": datetime.datetime.now(tz=datetime.timezone.utc).isoformat(sep=" "),
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,

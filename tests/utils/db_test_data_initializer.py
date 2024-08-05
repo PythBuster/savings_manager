@@ -1,4 +1,5 @@
 """The database test data initializer."""
+
 import time
 
 from src.custom_types import TransactionTrigger, TransactionType

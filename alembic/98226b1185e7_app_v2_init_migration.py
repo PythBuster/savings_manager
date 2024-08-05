@@ -9,10 +9,9 @@ import datetime
 import uuid
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
-import sqlalchemy_utc
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '98226b1185e7'

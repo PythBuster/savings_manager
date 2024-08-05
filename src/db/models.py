@@ -1,15 +1,15 @@
 """The MoneyBox ORM model."""
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, List
 
-from sqlalchemy import ForeignKey, MetaData, text, DateTime, func
+from sqlalchemy import DateTime, ForeignKey, MetaData, func, text
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 
 from src.custom_types import TransactionTrigger, TransactionType
-from src.utils import get_vanilla_datetime, as_dict
+from src.utils import as_dict
 
 meta = MetaData(
     naming_convention={
@@ -124,7 +124,7 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
     )
     """The current balance of the moneybox."""
 
-    savings_amount: Mapped[int] = mapped_column(
+    savings_amount: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
         default=0,
         server_default=text("0"),
         nullable=False,
@@ -132,7 +132,7 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
     )
     """The current savings amount of the moneybox."""
 
-    savings_target: Mapped[int] = mapped_column(
+    savings_target: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
         default=None,
         server_default=None,
         nullable=True,
@@ -144,7 +144,7 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
     """"The current savings target. Is relevant for the automated 
     distributed saving progress."""
 
-    priority: Mapped[int] = mapped_column(
+    priority: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
         nullable=True,
         unique=False,
         comment=(

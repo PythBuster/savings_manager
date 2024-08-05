@@ -12,11 +12,11 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src import exception_handler
+from src.constants import SPHINX_DIRECTORY
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
-from src.constants import SPHINX_DIRECTORY
 from src.utils import get_app_data, get_db_settings, load_environment
 
 tags_metadata = [

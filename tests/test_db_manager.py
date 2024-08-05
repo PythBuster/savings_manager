@@ -97,7 +97,7 @@ async def test_add_moneybox(data: dict[str, Any], db_manager: DBManager) -> None
         data["priority"] = 2
         await db_manager.add_moneybox(moneybox_data=data)
 
-    assert ("UNIQUE constraint failed: moneyboxes.name") in ex_info.value.args[0]
+    assert "UNIQUE constraint failed: moneyboxes.name" in ex_info.value.args[0]
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
