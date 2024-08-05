@@ -1,5 +1,6 @@
 """DB core functionalities are located here."""
 
+from datetime import datetime, timezone
 from typing import Any
 
 from sqlalchemy import Sequence, and_, delete, exists, func, insert, select, update

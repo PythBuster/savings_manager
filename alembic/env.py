@@ -33,7 +33,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+is_testing = context.get_x_argument(as_dictionary=True).get('testing')
+
+if is_testing is None:
+    dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+else:
+    dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
+
 print(dotenv_path)
 load_dotenv(dotenv_path=dotenv_path)
 print(f"Loaded {dotenv_path}")
@@ -61,6 +67,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -68,7 +75,10 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+    )
 
     with context.begin_transaction():
         context.run_migrations()

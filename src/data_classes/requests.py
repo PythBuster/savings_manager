@@ -43,6 +43,9 @@ class MoneyboxCreateRequest(BaseModel):
             "examples": [
                 {
                     "name": "Holiday",
+                    "savings_amount": 0,
+                    "savings_target": 50000,
+                    "priority": 1,
                 }
             ]
         },
@@ -94,11 +97,15 @@ class MoneyboxUpdateRequest(BaseModel):
             "examples": [
                 {
                     "name": "Holiday",
+                    "savings_amount": 0,
+                    "savings_target": 50000,
+                    "priority": 1,
                 }
             ]
         },
     )
     """The config of the model."""
+
 
 class DepositTransactionRequest(BaseModel):
     """The deposit transaction request model"""

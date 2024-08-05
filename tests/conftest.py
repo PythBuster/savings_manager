@@ -1,16 +1,23 @@
 """Pytest configurations and fixtures are located here."""
 
 import os
+import time
 from functools import partial
 from pathlib import Path
+import subprocess
 from typing import AsyncGenerator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from alembic import command, context
+from alembic.config import Config
+from alembic.runtime.environment import EnvironmentContext
+from alembic.script import ScriptDirectory
 from dotenv import load_dotenv
 from httpx import AsyncClient
 from sqlalchemy import text
 
+from src.constants import WORKING_DIR
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
@@ -219,12 +226,9 @@ async def example_1_db_settings() -> AsyncGenerator:
     """
 
     yield DBSettings(
-        db_user="test_user",
-        db_password="test_password",
-        db_host="1.2.3.4",
-        db_port=1234,
-        db_name="test_db",
+        db_environment="test",
         db_driver="sqlite+aiosqlite",
+        db_file="test_database.sqlite3"
     )
 
 
@@ -243,7 +247,6 @@ async def mocked_db_manager() -> AsyncGenerator:
 
     async def truncate_tables(self: DBManager) -> None:
         """Truncate all tables."""
-
         async with self.async_session.begin() as session:
             await session.execute(text("PRAGMA foreign_keys = OFF;"))
 
@@ -254,16 +257,36 @@ async def mocked_db_manager() -> AsyncGenerator:
 
     db_manager.truncate_tables = partial(truncate_tables, db_manager)  # type: ignore
 
-    # create tables by using db_managers database async engine
-    async with db_manager.async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        print("Database tables created.", flush=True)
+    #alembic_ini_path = (Path(__file__).parent.parent / "alembic.ini").resolve().absolute()
+    #alembic_cfg = Config(str(alembic_ini_path))  # Adjust the path to your alembic.ini file
+
+    # Dynamically update the sqlalchemy.url
+    #alembic_cfg.set_main_option("sqlalchemy.url", str(db_manager.db_connection_string))
+
+    # Upgrade the database using Alembic
+    #async with db_manager.async_engine.begin() as conn:
+    #    await conn.run_sync(Base.metadata.create_all)
+    #    await conn.run_sync(run_migrations, alembic_cfg, "upgrade", "head")
+    #    print("Database tables created with Alembic migrations.", flush=True)
+
+    # create db tables and apply all db migrations
+    subprocess.Popen(
+        ("alembic", "-x", "testing", "upgrade", "head")
+    )
+    time.sleep(2)
 
     yield db_manager
 
-    # drop tables by using db_managers database async engine
-    async with db_manager.async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        print("Database tables dropped.", flush=True)
+    time.sleep(2)
+    # downgrade the test database to base
+    subprocess.Popen(
+        ("alembic", "-x", "testing", "downgrade", "base")
+    )
+
+    # Downgrade the database using Alembic
+    #async with db_manager.async_engine.begin() as conn:
+    #    await conn.run_sync(Base.metadata.drop_all)
+    #    print("Database tables dropped with Alembic migrations.", flush=True)
 
     print("DB Manager removed.", flush=True)
+

@@ -85,7 +85,8 @@ async def response_exception(exception: Exception) -> JSONResponse:
     if isinstance(exception, sqlalchemy.exc.IntegrityError):
         error_message = exception.args[0]
         error_parts = error_message.split(":")
-        exception_type, message, detail = error_parts
+        exception_type, message, *detail = error_parts
+        detail = "".join(detail)
 
         return JSONResponse(
             status_code=status.HTTP_409_CONFLICT,

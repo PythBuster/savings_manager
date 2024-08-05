@@ -3,6 +3,7 @@
 from typing import Any
 
 from sqlalchemy import and_, insert, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
@@ -10,7 +11,6 @@ from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
     create_instance,
     deactivate_instance,
-    exists_instance,
     read_instance,
     read_instances,
     update_instance,
@@ -18,7 +18,6 @@ from src.db.core import (
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
     HasBalanceError,
-    MoneyboxNameExistError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
@@ -112,16 +111,6 @@ class DBManager:
         :rtype: :class:`dict[str, Any]`
         """
 
-        name_exist = await exists_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            values={"name": moneybox_data["name"]},
-            case_insensitive=True,
-        )
-
-        if name_exist:
-            raise MoneyboxNameExistError(name=moneybox_data["name"])
-
         moneybox = await create_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
@@ -149,27 +138,12 @@ class DBManager:
             was not found in database.
         """
 
-        if "name" in moneybox_data:
-            name_exist = await exists_instance(
-                async_session=self.async_session,
-                orm_model=Moneybox,  # type: ignore
-                values={"name": moneybox_data["name"]},
-                exclude_ids=[moneybox_id],
-                case_insensitive=True,
-            )
-
-            if name_exist:
-                raise MoneyboxNameExistError(name=moneybox_data["name"])
-
         moneybox = await update_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
             record_id=moneybox_id,
             data=moneybox_data,
         )
-
-        if moneybox is None:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
         return moneybox.asdict()
 
@@ -224,7 +198,6 @@ class DBManager:
                     was not found in database.
                  :class:`NegativeAmountError`: if balance to add is negative.
         """
-
 
         moneybox = await read_instance(
             async_session=self.async_session,

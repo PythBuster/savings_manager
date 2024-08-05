@@ -1,16 +1,16 @@
 """The MoneyBox ORM model."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, List
 
 from dictalchemy import make_class_dictable
-from sqlalchemy import ForeignKey, MetaData, text
+from sqlalchemy import ForeignKey, MetaData, text, DateTime, func
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
-from sqlalchemy_utc import UtcDateTime, utcnow
 
 from src.custom_types import TransactionTrigger, TransactionType
+from src.utils import get_vanilla_datetime
 
 meta = MetaData(
     naming_convention={
@@ -44,17 +44,18 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     """The primary ID of the row."""
 
     created_at: Mapped[datetime] = mapped_column(
-        UtcDateTime,  # type: ignore
-        default=utcnow(),
+        DateTime(timezone=True),
+        default=func.now(),
+        server_default=func.now(),
         nullable=False,
         comment="The created utc datetime.",
     )
     """The created utc datetime."""
 
     modified_at: Mapped[datetime | None] = mapped_column(
-        UtcDateTime,  # type: ignore
+        DateTime(timezone=True),
         default=None,
-        onupdate=utcnow(),
+        onupdate=func.now(),
         nullable=True,
         comment="The modified utc datetime.",
     )
@@ -62,6 +63,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
 
     is_active: Mapped[bool] = mapped_column(
         default=True,
+        server_default=text("1"),
         nullable=False,
         comment="Flag to mark instance as deleted.",
     )
@@ -149,7 +151,7 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
 
     priority: Mapped[int] = mapped_column(
         nullable=True,
-        unique=True,
+        unique=False,
         comment=(
             "The current priority of the moneybox. There is only one moneybox with "
             "a priority of Null (will be the marker for the overflow moneybox."

@@ -15,7 +15,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
@@ -82,6 +82,7 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -93,8 +94,6 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="db.html#db.core.activate_instance">activate_instance() (in module db.core)</a>
-</li>
       <li><a href="db.html#db.db_manager.DBManager.add_amount">add_amount() (db.db_manager.DBManager method)</a>
 </li>
       <li><a href="db.html#db.db_manager.DBManager.add_moneybox">add_moneybox() (db.db_manager.DBManager method)</a>
@@ -103,20 +102,14 @@
         <li><a href="routes.html#routes.moneybox.add_moneybox">(in module routes.moneybox)</a>
 </li>
       </ul></li>
-      <li><a href="data_classes.html#data_classes.requests.DepositModel.amount">amount (data_classes.requests.DepositModel attribute)</a>
+      <li><a href="data_classes.html#data_classes.requests.DepositTransactionRequest.amount">amount (data_classes.requests.DepositTransactionRequest attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.DepositTransactionModel.amount">(data_classes.requests.DepositTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.TransferTransactionRequest.amount">(data_classes.requests.TransferTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.TransferModel.amount">(data_classes.requests.TransferModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionRequest.amount">(data_classes.requests.WithdrawTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.TransferTransactionModel.amount">(data_classes.requests.TransferTransactionModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.amount">(data_classes.requests.WithdrawModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionModel.amount">(data_classes.requests.WithdrawTransactionModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.amount">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.amount">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
         <li><a href="db.html#db.models.Transaction.amount">(db.models.Transaction attribute)</a>
 </li>
@@ -142,7 +135,7 @@
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.balance">balance (data_classes.responses.MoneyboxResponse attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.balance">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.balance">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
         <li><a href="db.html#db.models.Moneybox.balance">(db.models.Moneybox attribute)</a>
 </li>
@@ -161,7 +154,17 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.check_amount">check_amount() (data_classes.responses.TransactionLogResponse class method)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.check_counterparty_moneybox">check_counterparty_moneybox() (data_classes.responses.TransactionLogResponse class method)</a>
+</li>
       <li><a href="utils.html#utils.check_existence_of_moneybox_by_id">check_existence_of_moneybox_by_id() (in module utils)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.check_moneybox_id">check_moneybox_id() (data_classes.responses.TransactionLogResponse class method)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.check_new_balance">check_new_balance() (data_classes.responses.TransactionLogResponse class method)</a>
+</li>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.check_transaction_trigger_and_type_combination">check_transaction_trigger_and_type_combination() (data_classes.responses.TransactionLogResponse class method)</a>
 </li>
       <li><a href="db.html#db.exceptions.ColumnDoesNotExistError">ColumnDoesNotExistError</a>
 </li>
@@ -169,26 +172,26 @@
 </li>
       <li><a href="db.html#db.models.Transaction.counterparty_moneybox">counterparty_moneybox (db.models.Transaction attribute)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLog.counterparty_moneybox_id">counterparty_moneybox_id (data_classes.responses.TransactionLog attribute)</a>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.counterparty_moneybox_id">counterparty_moneybox_id (data_classes.responses.TransactionLogResponse attribute)</a>
 
       <ul>
         <li><a href="db.html#db.models.Transaction.counterparty_moneybox_id">(db.models.Transaction attribute)</a>
 </li>
       </ul></li>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLog.counterparty_moneybox_name">counterparty_moneybox_name (data_classes.responses.TransactionLog attribute)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.counterparty_moneybox_name">counterparty_moneybox_name (data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
       <li><a href="utils.html#utils.create_envfile_from_envvars">create_envfile_from_envvars() (in module utils)</a>
 </li>
       <li><a href="db.html#db.core.create_instance">create_instance() (in module db.core)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="routes.responses.html#routes.responses.moneybox.CREATE_MONEYBOX_RESPONSES">CREATE_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
 </li>
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.created_at">created_at (data_classes.responses.MoneyboxResponse attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.created_at">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.created_at">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
         <li><a href="db.html#db.models.Moneybox.created_at">(db.models.Moneybox attribute)</a>
 </li>
@@ -284,13 +287,11 @@
 </li>
       <li><a href="db.html#db.db_manager.DBManager">DBManager (class in db.db_manager)</a>
 </li>
-      <li><a href="custom_types.html#custom_types.DBSettings">DBSettings (class in custom_types)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="db.html#db.core.deactivate_instance">deactivate_instance() (in module db.core)</a>
+      <li><a href="custom_types.html#custom_types.DBSettings">DBSettings (class in custom_types)</a>
 </li>
-      <li><a href="db.html#db.core.delete_instance">delete_instance() (in module db.core)</a>
+      <li><a href="db.html#db.core.deactivate_instance">deactivate_instance() (in module db.core)</a>
 </li>
       <li><a href="db.html#db.db_manager.DBManager.delete_moneybox">delete_moneybox() (db.db_manager.DBManager method)</a>
 
@@ -306,18 +307,16 @@
 </li>
       <li><a href="routes.responses.html#routes.responses.moneybox.DEPOSIT_MONEYBOX_RESPONSES">DEPOSIT_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.DepositModel">DepositModel (class in data_classes.requests)</a>
+      <li><a href="data_classes.html#data_classes.requests.DepositTransactionRequest">DepositTransactionRequest (class in data_classes.requests)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.DepositTransactionModel">DepositTransactionModel (class in data_classes.requests)</a>
-</li>
-      <li><a href="data_classes.html#data_classes.requests.DepositTransactionModel.description">description (data_classes.requests.DepositTransactionModel attribute)</a>
+      <li><a href="data_classes.html#data_classes.requests.DepositTransactionRequest.description">description (data_classes.requests.DepositTransactionRequest attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.TransferTransactionModel.description">(data_classes.requests.TransferTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.TransferTransactionRequest.description">(data_classes.requests.TransferTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionModel.description">(data_classes.requests.WithdrawTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionRequest.description">(data_classes.requests.WithdrawTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.description">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.description">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
         <li><a href="db.html#db.models.Transaction.description">(db.models.Transaction attribute)</a>
 </li>
@@ -430,7 +429,7 @@
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.id">id (data_classes.responses.MoneyboxResponse attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.id">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.id">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
         <li><a href="db.html#db.models.Moneybox.id">(db.models.Moneybox attribute)</a>
 </li>
@@ -474,21 +473,15 @@
       <li><a href="custom_types.html#custom_types.DBSettings.model_computed_fields">model_computed_fields (custom_types.DBSettings attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.DepositModel.model_computed_fields">(data_classes.requests.DepositModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.DepositTransactionRequest.model_computed_fields">(data_classes.requests.DepositTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.DepositTransactionModel.model_computed_fields">(data_classes.requests.DepositTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest.model_computed_fields">(data_classes.requests.MoneyboxCreateRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_computed_fields">(data_classes.requests.MoneyboxCreateModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest.model_computed_fields">(data_classes.requests.MoneyboxUpdateRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_computed_fields">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.TransferTransactionRequest.model_computed_fields">(data_classes.requests.TransferTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.TransferModel.model_computed_fields">(data_classes.requests.TransferModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.TransferTransactionModel.model_computed_fields">(data_classes.requests.TransferTransactionModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.model_computed_fields">(data_classes.requests.WithdrawModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionModel.model_computed_fields">(data_classes.requests.WithdrawTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionRequest.model_computed_fields">(data_classes.requests.WithdrawTransactionRequest attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.HTTPErrorResponse.model_computed_fields">(data_classes.responses.HTTPErrorResponse attribute)</a>
 </li>
@@ -496,29 +489,23 @@
 </li>
         <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.model_computed_fields">(data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.model_computed_fields">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.model_computed_fields">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLogs.model_computed_fields">(data_classes.responses.TransactionLogs attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogsResponse.model_computed_fields">(data_classes.responses.TransactionLogsResponse attribute)</a>
 </li>
       </ul></li>
       <li><a href="custom_types.html#custom_types.DBSettings.model_config">model_config (custom_types.DBSettings attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.DepositModel.model_config">(data_classes.requests.DepositModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.DepositTransactionRequest.model_config">(data_classes.requests.DepositTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.DepositTransactionModel.model_config">(data_classes.requests.DepositTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest.model_config">(data_classes.requests.MoneyboxCreateRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_config">(data_classes.requests.MoneyboxCreateModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest.model_config">(data_classes.requests.MoneyboxUpdateRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_config">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.TransferTransactionRequest.model_config">(data_classes.requests.TransferTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.TransferModel.model_config">(data_classes.requests.TransferModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.TransferTransactionModel.model_config">(data_classes.requests.TransferTransactionModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.model_config">(data_classes.requests.WithdrawModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionModel.model_config">(data_classes.requests.WithdrawTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionRequest.model_config">(data_classes.requests.WithdrawTransactionRequest attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.HTTPErrorResponse.model_config">(data_classes.responses.HTTPErrorResponse attribute)</a>
 </li>
@@ -526,29 +513,23 @@
 </li>
         <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.model_config">(data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.model_config">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.model_config">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLogs.model_config">(data_classes.responses.TransactionLogs attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogsResponse.model_config">(data_classes.responses.TransactionLogsResponse attribute)</a>
 </li>
       </ul></li>
       <li><a href="custom_types.html#custom_types.DBSettings.model_fields">model_fields (custom_types.DBSettings attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.DepositModel.model_fields">(data_classes.requests.DepositModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.DepositTransactionRequest.model_fields">(data_classes.requests.DepositTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.DepositTransactionModel.model_fields">(data_classes.requests.DepositTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest.model_fields">(data_classes.requests.MoneyboxCreateRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.model_fields">(data_classes.requests.MoneyboxCreateModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest.model_fields">(data_classes.requests.MoneyboxUpdateRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.model_fields">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.TransferTransactionRequest.model_fields">(data_classes.requests.TransferTransactionRequest attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.requests.TransferModel.model_fields">(data_classes.requests.TransferModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.TransferTransactionModel.model_fields">(data_classes.requests.TransferTransactionModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawModel.model_fields">(data_classes.requests.WithdrawModel attribute)</a>
-</li>
-        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionModel.model_fields">(data_classes.requests.WithdrawTransactionModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionRequest.model_fields">(data_classes.requests.WithdrawTransactionRequest attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.HTTPErrorResponse.model_fields">(data_classes.responses.HTTPErrorResponse attribute)</a>
 </li>
@@ -556,13 +537,11 @@
 </li>
         <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.model_fields">(data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLog.model_fields">(data_classes.responses.TransactionLog attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.model_fields">(data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLogs.model_fields">(data_classes.responses.TransactionLogs attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogsResponse.model_fields">(data_classes.responses.TransactionLogsResponse attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.modified_at">modified_at (data_classes.responses.MoneyboxResponse attribute)</a>
 
       <ul>
@@ -573,6 +552,8 @@
         <li><a href="db.html#db.models.Transaction.modified_at">(db.models.Transaction attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -620,7 +601,7 @@
 </li>
       <li><a href="db.html#db.models.Transaction.moneybox">moneybox (db.models.Transaction attribute)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLog.moneybox_id">moneybox_id (data_classes.responses.TransactionLog attribute)</a>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.moneybox_id">moneybox_id (data_classes.responses.TransactionLogResponse attribute)</a>
 
       <ul>
         <li><a href="db.html#db.models.Transaction.moneybox_id">(db.models.Transaction attribute)</a>
@@ -630,7 +611,7 @@
 </li>
       <li><a href="routes.responses.html#routes.responses.moneybox.MONEYBOX_TRANSACTION_LOGS_RESPONSES">MONEYBOX_TRANSACTION_LOGS_RESPONSES (in module routes.responses.moneybox)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel">MoneyboxCreateModel (class in data_classes.requests)</a>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest">MoneyboxCreateRequest (class in data_classes.requests)</a>
 </li>
       <li><a href="custom_types.html#custom_types.EndpointRouteType.MONEYBOXES">MONEYBOXES (custom_types.EndpointRouteType attribute)</a>
 </li>
@@ -646,7 +627,7 @@
 </li>
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse">MoneyboxResponse (class in data_classes.responses)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel">MoneyboxUpdateModel (class in data_classes.requests)</a>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest">MoneyboxUpdateRequest (class in data_classes.requests)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -654,10 +635,10 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateModel.name">name (data_classes.requests.MoneyboxCreateModel attribute)</a>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest.name">name (data_classes.requests.MoneyboxCreateRequest attribute)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateModel.name">(data_classes.requests.MoneyboxUpdateModel attribute)</a>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest.name">(data_classes.requests.MoneyboxUpdateRequest attribute)</a>
 </li>
         <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.name">(data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
@@ -668,8 +649,30 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="db.html#db.exceptions.NonPositiveAmountError">NonPositiveAmountError</a>
 </li>
-      <li><a href="db.html#db.exceptions.NonPositiveTransferAmountError">NonPositiveTransferAmountError</a>
+      <li><a href="db.html#db.models.Moneybox.note">note (db.models.Moneybox attribute)</a>
+
+      <ul>
+        <li><a href="db.html#db.models.SqlBase.note">(db.models.SqlBase attribute)</a>
 </li>
+        <li><a href="db.html#db.models.Transaction.note">(db.models.Transaction attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest.priority">priority (data_classes.requests.MoneyboxCreateRequest attribute)</a>
+
+      <ul>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest.priority">(data_classes.requests.MoneyboxUpdateRequest attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.priority">(data_classes.responses.MoneyboxResponse attribute)</a>
+</li>
+        <li><a href="db.html#db.models.Moneybox.priority">(db.models.Moneybox attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -736,6 +739,28 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest.savings_amount">savings_amount (data_classes.requests.MoneyboxCreateRequest attribute)</a>
+
+      <ul>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest.savings_amount">(data_classes.requests.MoneyboxUpdateRequest attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.savings_amount">(data_classes.responses.MoneyboxResponse attribute)</a>
+</li>
+        <li><a href="db.html#db.models.Moneybox.savings_amount">(db.models.Moneybox attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="data_classes.html#data_classes.requests.MoneyboxCreateRequest.savings_target">savings_target (data_classes.requests.MoneyboxCreateRequest attribute)</a>
+
+      <ul>
+        <li><a href="data_classes.html#data_classes.requests.MoneyboxUpdateRequest.savings_target">(data_classes.requests.MoneyboxUpdateRequest attribute)</a>
+</li>
+        <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.savings_target">(data_classes.responses.MoneyboxResponse attribute)</a>
+</li>
+        <li><a href="db.html#db.models.Moneybox.savings_target">(db.models.Moneybox attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     settings
 
@@ -745,12 +770,16 @@
       </ul></li>
       <li><a href="settings.html#settings.SPHINX_DIRECTORY">SPHINX_DIRECTORY (in module settings)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="db.html#db.models.SqlBase">SqlBase (class in db.models)</a>
 </li>
       <li><a href="db.html#db.models.SqlBase.strict_attrs">strict_attrs (db.models.SqlBase attribute)</a>
 </li>
+      <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.strict_datetimes">strict_datetimes() (data_classes.responses.MoneyboxResponse class method)</a>
+
+      <ul>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.strict_datetimes">(data_classes.responses.TransactionLogResponse class method)</a>
+</li>
+      </ul></li>
       <li><a href="db.html#db.db_manager.DBManager.sub_amount">sub_amount() (db.db_manager.DBManager method)</a>
 </li>
   </ul></td>
@@ -761,29 +790,25 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="custom_types.html#custom_types.EnvironmentType.TEST">TEST (custom_types.EnvironmentType attribute)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.TransferModel.to_moneybox_id">to_moneybox_id (data_classes.requests.TransferModel attribute)</a>
-
-      <ul>
-        <li><a href="data_classes.html#data_classes.requests.TransferTransactionModel.to_moneybox_id">(data_classes.requests.TransferTransactionModel attribute)</a>
+      <li><a href="data_classes.html#data_classes.requests.TransferTransactionRequest.to_moneybox_id">to_moneybox_id (data_classes.requests.TransferTransactionRequest attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="data_classes.html#data_classes.responses.MoneyboxesResponse.total">total (data_classes.responses.MoneyboxesResponse attribute)</a>
+      <li><a href="data_classes.html#data_classes.responses.MoneyboxesResponse.total">total (data_classes.responses.MoneyboxesResponse property)</a>
 
       <ul>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLogs.total">(data_classes.responses.TransactionLogs attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogsResponse.total">(data_classes.responses.TransactionLogsResponse property)</a>
 </li>
       </ul></li>
       <li><a href="db.html#db.models.Transaction">Transaction (class in db.models)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLogs.transaction_logs">transaction_logs (data_classes.responses.TransactionLogs attribute)</a>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogsResponse.transaction_logs">transaction_logs (data_classes.responses.TransactionLogsResponse attribute)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLog.transaction_trigger">transaction_trigger (data_classes.responses.TransactionLog attribute)</a>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.transaction_trigger">transaction_trigger (data_classes.responses.TransactionLogResponse attribute)</a>
 
       <ul>
         <li><a href="db.html#db.models.Transaction.transaction_trigger">(db.models.Transaction attribute)</a>
 </li>
       </ul></li>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLog.transaction_type">transaction_type (data_classes.responses.TransactionLog attribute)</a>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.transaction_type">transaction_type (data_classes.responses.TransactionLogResponse attribute)</a>
 
       <ul>
         <li><a href="db.html#db.models.Transaction.transaction_type">(db.models.Transaction attribute)</a>
@@ -791,9 +816,9 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLog">TransactionLog (class in data_classes.responses)</a>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse">TransactionLogResponse (class in data_classes.responses)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.responses.TransactionLogs">TransactionLogs (class in data_classes.responses)</a>
+      <li><a href="data_classes.html#data_classes.responses.TransactionLogsResponse">TransactionLogsResponse (class in data_classes.responses)</a>
 </li>
       <li><a href="db.html#db.models.Moneybox.transactions_log">transactions_log (db.models.Moneybox attribute)</a>
 </li>
@@ -809,9 +834,7 @@
 </li>
       <li><a href="db.html#db.exceptions.TransferEqualMoneyboxError">TransferEqualMoneyboxError</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.TransferModel">TransferModel (class in data_classes.requests)</a>
-</li>
-      <li><a href="data_classes.html#data_classes.requests.TransferTransactionModel">TransferTransactionModel (class in data_classes.requests)</a>
+      <li><a href="data_classes.html#data_classes.requests.TransferTransactionRequest">TransferTransactionRequest (class in data_classes.requests)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -856,13 +879,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="routes.html#routes.moneybox.withdraw_moneybox">withdraw_moneybox() (in module routes.moneybox)</a>
 </li>
-      <li><a href="routes.responses.html#routes.responses.moneybox.WITHDRAW_MONEYBOX_RESPONSES">WITHDRAW_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_classes.html#data_classes.requests.WithdrawModel">WithdrawModel (class in data_classes.requests)</a>
+      <li><a href="routes.responses.html#routes.responses.moneybox.WITHDRAW_MONEYBOX_RESPONSES">WITHDRAW_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
 </li>
-      <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionModel">WithdrawTransactionModel (class in data_classes.requests)</a>
+      <li><a href="data_classes.html#data_classes.requests.WithdrawTransactionRequest">WithdrawTransactionRequest (class in data_classes.requests)</a>
 </li>
   </ul></td>
 </tr></table>

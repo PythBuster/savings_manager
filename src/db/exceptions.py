@@ -144,4 +144,3 @@ class HasBalanceError(DeleteInstanceError):
         )
         self.balance = balance
         super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
-

@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from typing import Annotated, Any, Self
 
 from pydantic import (
-    AwareDatetime,
     BaseModel,
     ConfigDict,
     Field,
@@ -77,11 +76,11 @@ class MoneyboxResponse(BaseModel):
     """The current priority of the moneybox. There is only one moneybox with
     a priority of Null (will be the marker for the overflow moneybox)."""
 
-    created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
+    created_at: Annotated[datetime, Field(description="The creation date of the moneybox.")]
     """The creation date of the moneybox."""
 
     modified_at: Annotated[
-        AwareDatetime | None, Field(description="The modification date of the moneybox.")
+        datetime | None, Field(description="The modification date of the moneybox.")
     ]
     """The modification date of the moneybox."""
 
@@ -253,9 +252,7 @@ class TransactionLogResponse(BaseModel):
     moneybox_id: Annotated[StrictInt, Field(description="The foreign key to moneybox.")]
     """The foreign key to moneybox."""
 
-    created_at: Annotated[
-        AwareDatetime, Field(description="The creation date of the transaction log.")
-    ]
+    created_at: Annotated[datetime, Field(description="The creation date of the transaction log.")]
     """The creation date of the transaction log."""
 
     model_config = ConfigDict(

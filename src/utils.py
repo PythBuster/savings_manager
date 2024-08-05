@@ -1,6 +1,7 @@
 """All helper functions are located here."""
 
 import argparse
+import datetime
 import os
 import tomllib
 from pathlib import Path
@@ -31,6 +32,13 @@ async def check_existence_of_moneybox_by_id(
     _ = await request.app.state.db_manager.get_moneybox(moneybox_id=moneybox_id)
     return moneybox_id
 
+def get_vanilla_datetime() -> datetime:
+    """Get a datetime without TZinfo and without microseconds
+    as isoformat"""
+
+    return datetime.datetime.now(
+        tz=datetime.timezone.utc
+    ).replace(tzinfo=None, microsecond=0)
 
 def get_db_settings() -> DBSettings:
     """A :class:`DBSettings` spawner.
@@ -41,12 +49,9 @@ def get_db_settings() -> DBSettings:
     """
 
     return DBSettings(
-        db_user=os.getenv("DB_USER", ""),
-        db_password=os.getenv("DB_PASSWORD", ""),
-        db_host=os.getenv("DB_HOST", ""),
-        db_port=os.getenv("DB_PORT"),
-        db_name=os.getenv("DB_NAME", ""),
-        db_driver=os.getenv("DB_DRIVER"),
+        db_environment=os.getenv("DB_ENVIRONMENT", ""),
+        db_driver=os.getenv("DB_DRIVER", ""),
+        db_file=os.getenv("DB_FILE", ""),
     )
 
 
@@ -60,14 +65,7 @@ def get_database_url(db_settings: DBSettings) -> str:
     """
 
     if "sqlite" in db_settings.db_driver:
-        return f"{db_settings.db_driver}:///{db_settings.db_name}"
-
-    if "postgres" in db_settings.db_driver:
-        return (
-            f"{db_settings.db_driver}://"
-            f"{db_settings.db_user}:{db_settings.db_password.get_secret_value()}"
-            f"@{db_settings.db_host}:{db_settings.db_port}/{db_settings.db_name}"
-        )
+        return f"{db_settings.db_driver}:///{db_settings.db_file}"
 
     raise ValueError("Not supported database driver.")
 

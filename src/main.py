@@ -16,7 +16,7 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
-from src.settings import SPHINX_DIRECTORY
+from src.constants import SPHINX_DIRECTORY
 from src.utils import get_app_data, get_db_settings, load_environment
 
 tags_metadata = [

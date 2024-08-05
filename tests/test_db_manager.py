@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.data_classes.requests import (
@@ -18,7 +19,6 @@ from src.db.db_manager import DBManager
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
     ColumnDoesNotExistError,
-    MoneyboxNameExistError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
@@ -28,8 +28,8 @@ from tests.conftest import TEST_DB_DRIVER
 
 
 @pytest.mark.first
-async def test_if_test_db_in_memory_is_used(db_manager: DBManager) -> None:
-    assert db_manager.db_connection_string == f"{TEST_DB_DRIVER}:///:memory:"
+async def test_if_test_db_is_used(db_manager: DBManager) -> None:
+    assert db_manager.db_connection_string == f"{TEST_DB_DRIVER}:///test_database.sqlite3"
 
 
 @pytest.mark.dependency
@@ -46,21 +46,21 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
     "data",  # test different combinations of initial values
     [
         {
-            "id": 1,
+            "id": 2,
             "name": "Test Box 1",
             "priority": 1,
             "savings_amount": 0,
             "savings_target": None,
         },
         {
-            "id": 2,
+            "id": 3,
             "name": "Test Box 2",
             "priority": 2,
             "savings_amount": 0,
             "savings_target": None,
         },
         {
-            "id": 3,
+            "id": 4,
             "name": "Test Box 3",
             "balance": 333,
             "priority": 3,
@@ -68,7 +68,7 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
             "savings_target": None,
         },
         {
-            "id": 4,
+            "id": 5,
             "name": "Test Box 4",
             "priority": 4,
             "savings_amount": 0,
@@ -76,6 +76,7 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
         },
     ],
 )
+@pytest.mark.asyncio
 async def test_add_moneybox(data: dict[str, Any], db_manager: DBManager) -> None:
     # moneybox 1
     moneybox_id = data["id"]
@@ -92,12 +93,12 @@ async def test_add_moneybox(data: dict[str, Any], db_manager: DBManager) -> None
     expected_moneybox_data = {"id": moneybox_id, "balance": 0} | data
     assert result_moneybox_data_1 == expected_moneybox_data
 
-    with pytest.raises(MoneyboxNameExistError) as ex_info:
+    with pytest.raises(IntegrityError) as ex_info:
+        data["priority"] = 2
         await db_manager.add_moneybox(moneybox_data=data)
 
     assert (
-        f"Creation Error: Please choose another name, '{data['name']}' "
-        "is already in use (case insensitive)."
+        'UNIQUE constraint failed: moneyboxes.name'
     ) in ex_info.value.args[0]
 
 
