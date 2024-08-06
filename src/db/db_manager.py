@@ -19,6 +19,7 @@ from src.db.exceptions import (
     HasBalanceError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
+    OverflowMoneyboxCantBeDeletedError,
     TransferEqualMoneyboxError,
 )
 from src.db.models import Moneybox, Transaction
@@ -160,6 +161,10 @@ class DBManager:
         """
 
         moneybox = await self.get_moneybox(moneybox_id=moneybox_id)
+
+        # Moneybox with priority=0 is the overflow moneybox and can't be deleted!
+        if moneybox["priority"] == 0:
+            raise OverflowMoneyboxCantBeDeletedError(moneybox_id=moneybox_id)
 
         if moneybox["balance"] > 0:
             raise HasBalanceError(moneybox_id=moneybox_id, balance=moneybox["balance"])

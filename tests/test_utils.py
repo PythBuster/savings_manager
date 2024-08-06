@@ -124,5 +124,6 @@ def test_equal_list_of_dict(
     expected_result: bool,
 ) -> None:
     assert (
-        equal_list_of_dict(list_dict_1, list_dict_2, exclude_keys) == expected_result  # type: ignore
+        equal_list_of_dict(list_dict_1, list_dict_2, exclude_keys)  # type: ignore
+        == expected_result
     )

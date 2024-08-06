@@ -91,7 +91,7 @@ class MoneyboxResponse(BaseModel):
                     "id": 1,
                     "name": "Holiday",
                     "balance": 0,
-                    "created_at": "2020-05-01T00:00:00Z",
+                    "created_at": "2020-05-01 20:15:02",
                     "modified_at": None,
                 }
             ]
@@ -267,7 +267,7 @@ class TransactionLogResponse(BaseModel):
                     "amount": 50,
                     "balance": 50,
                     "counterparty_moneybox_id": 3,
-                    "created_at": datetime.now(tz=timezone.utc),
+                    "created_at": "2020-05-01 20:15:02",
                 }
             ]
         },

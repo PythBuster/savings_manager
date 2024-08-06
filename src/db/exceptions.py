@@ -120,3 +120,11 @@ class HasBalanceError(DeleteInstanceError):
         )
         self.balance = balance
         super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
+
+
+class OverflowMoneyboxCantBeDeletedError(DeleteInstanceError):
+    """Custom OverflowMoneyboxCantBeDeletedError Exception"""
+
+    def __init__(self, moneybox_id: int) -> None:
+        message = "Deleting overflow moneybox is not allowed/possible!"
+        super().__init__(record_id=moneybox_id, message=message)
