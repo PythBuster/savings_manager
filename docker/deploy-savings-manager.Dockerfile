@@ -2,7 +2,7 @@ FROM python:3.11
 
 LABEL maintainer="PythBuster <pythbuster@gmail.com>"
 
-RUN apt-get update && apt-get install -y --no-install-recommends python3-poetry python3-dev python3-debugpy
+RUN apt-get update && apt-get install -y --no-install-recommends python3-poetry python3-dev
 
 COPY src /savings_manager/src
 COPY scripts /savings_manager/scripts
