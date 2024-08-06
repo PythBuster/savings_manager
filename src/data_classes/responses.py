@@ -60,8 +60,7 @@ class MoneyboxResponse(BaseModel):
             ),
         ),
     ]
-    """"The current savings target. Is relevant for the automated 
-    distributed saving progress."""
+    """"The current savings target. Is relevant for the automated distributed saving progress."""
 
     priority: Annotated[
         StrictInt | None,

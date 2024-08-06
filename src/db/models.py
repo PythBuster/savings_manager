@@ -41,8 +41,8 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=func.now(),
-        server_default=func.now(),
+        default=func.now(),  # pylint: disable=not-callable
+        server_default=func.now(),  # pylint: disable=not-callable
         nullable=False,
         comment="The created utc datetime.",
     )
@@ -51,7 +51,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     modified_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         default=None,
-        onupdate=func.now(),
+        onupdate=func.now(),  # pylint: disable=not-callable
         nullable=True,
         comment="The modified utc datetime.",
     )
@@ -141,8 +141,7 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
             "saving progress."
         ),
     )
-    """"The current savings target. Is relevant for the automated 
-    distributed saving progress."""
+    """"The current savings target. Is relevant for the automated distributed saving progress."""
 
     priority: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
         nullable=True,

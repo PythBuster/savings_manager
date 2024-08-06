@@ -19,9 +19,10 @@ from src.db.db_manager import DBManager
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
     ColumnDoesNotExistError,
+    HasBalanceError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
-    TransferEqualMoneyboxError, HasBalanceError,
+    TransferEqualMoneyboxError,
 )
 from src.db.models import Moneybox
 from tests.conftest import TEST_DB_DRIVER

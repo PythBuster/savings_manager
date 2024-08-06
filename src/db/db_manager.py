@@ -230,7 +230,7 @@ class DBManager:
                 session=session,
             )
 
-        return updated_moneybox.asdict()
+        return updated_moneybox.asdict()  # type: ignore
 
     async def sub_amount(  # pylint: disable=too-many-arguments
         self,
@@ -297,7 +297,7 @@ class DBManager:
                 session=session,
             )
 
-        return updated_moneybox.asdict()
+        return updated_moneybox.asdict()  # type: ignore
 
     async def transfer_amount(  # pylint: disable=too-many-locals
         self,

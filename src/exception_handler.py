@@ -8,11 +8,7 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from src.data_classes.responses import HTTPErrorResponse
-from src.db.exceptions import (
-    HasBalanceError,
-    RecordNotFoundError,
-    UpdateInstanceError,
-)
+from src.db.exceptions import HasBalanceError, RecordNotFoundError, UpdateInstanceError
 
 
 async def response_exception(exception: Exception) -> JSONResponse:

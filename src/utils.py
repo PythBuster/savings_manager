@@ -173,8 +173,8 @@ def equal_list_of_dict(
     return list_dict_1 == list_dict_2
 
 
-def as_dict(  # pylint: disable=missing-function-docstring, too-many-arguments
-    model: "SqlBase",
+def as_dict(  # type: ignore  # pylint: disable=missing-function-docstring, too-many-arguments
+    model: "SqlBase",  # type: ignore  # noqa: F821
     exclude=None,
     exclude_underscore=None,
     exclude_pk=None,

@@ -265,14 +265,14 @@ async def mocked_db_manager() -> AsyncGenerator:
     #    print("Database tables created with Alembic migrations.", flush=True)
 
     # create db tables and apply all db migrations
-    subprocess.Popen(("alembic", "-x", "testing", "upgrade", "head"))
+    subprocess.call(("alembic", "-x", "testing", "upgrade", "head"))
     time.sleep(2)
 
     yield db_manager
 
     time.sleep(2)
     # downgrade the test database to base
-    subprocess.Popen(("alembic", "-x", "testing", "downgrade", "base"))
+    subprocess.call(("alembic", "-x", "testing", "downgrade", "base"))
 
     # Downgrade the database using Alembic
     # async with db_manager.async_engine.begin() as conn:

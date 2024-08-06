@@ -28,8 +28,7 @@ class MoneyboxCreateRequest(BaseModel):
             ),
         ),
     ]
-    """"The current savings target. Is relevant for the automated 
-    distributed saving progress."""
+    """"The current savings target. Is relevant for the automated distributed saving progress."""
 
     priority: Annotated[StrictInt, Field(ge=0, description="The current priority of the moneybox.")]
     """The current priority of the moneybox."""
@@ -79,8 +78,7 @@ class MoneyboxUpdateRequest(BaseModel):
             ),
         ),
     ]
-    """"The current savings target. Is relevant for the automated 
-    distributed saving progress."""
+    """"The current savings target. Is relevant for the automated distributed saving progress."""
 
     priority: Annotated[
         StrictInt | None,

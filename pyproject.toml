@@ -68,7 +68,7 @@ exclude = '''
   | alembic
   | docs
   | envs
-  | tests/db_test_data_initializer.py
+  | tests/utils/db_test_data_initializer.py
 )/
 '''
 

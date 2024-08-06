@@ -313,7 +313,7 @@ async def test_moneybox_response_invalid_date__modified_at_wrong_type__int() -> 
         MoneyboxResponse(**data)
 
 
-async def test_moneybox_response_invalid_date__modified_at_string_type__not_isoformat_datetime() -> (
+async def test_moneybox_response_invalid_date__modified_at_string_type__not_isoformat_datetime() -> (  # pylint: disable=line-too-long  # noqa
     None
 ):
     """Test MoneyboxResponse creation with invalid modified_at date value."""
@@ -388,7 +388,32 @@ async def test_moneybox_response_invalid_date__none_for_created_at() -> None:
         MoneyboxResponse(**data)
 
 
-async def test_moneybox_response_valid_date_order() -> None:
+@pytest.mark.parametrize(
+    "data",
+    [
+        {
+            "id": 1,
+            "name": "Holiday",
+            "balance": 1000,
+            "created_at": "2020-05-01T00:00:00Z",
+            "modified_at": "2020-05-02T00:00:00Z",  # Valid order, modified_at is after created_at
+            "savings_amount": 0,
+            "savings_target": None,
+            "priority": 1,
+        },
+        {
+            "id": 1,
+            "name": "Holiday",
+            "balance": 1000,
+            "created_at": "2020-05-01T00:00:00Z",
+            "modified_at": None,
+            "savings_amount": 0,
+            "savings_target": None,
+            "priority": 1,
+        },
+    ],
+)
+async def test_moneybox_response_valid_date_order(data: dict[str, Any]) -> None:
     """Test MoneyboxResponse creation with valid date order."""
 
     data = {
@@ -402,4 +427,4 @@ async def test_moneybox_response_valid_date_order() -> None:
         "priority": 1,
     }
     response = MoneyboxResponse(**data)
-    assert response.modified_at > response.created_at
+    assert response.modified_at is None or response.modified_at > response.created_at

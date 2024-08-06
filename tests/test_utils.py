@@ -1,5 +1,7 @@
 """All util functions are tested here."""
 
+from typing import Any
+
 import pytest
 
 from src.custom_types import DBSettings
@@ -7,7 +9,7 @@ from src.utils import equal_dict, equal_list_of_dict, get_app_data, get_database
 
 
 @pytest.mark.dependency
-async def test_db_settings(db_settings_1: DBSettings) -> None:
+async def test_db_settings() -> None:  # pylint: disable= unused-argument
     # sqlite as file
     db_settings = DBSettings(
         db_driver="sqlite",
@@ -85,7 +87,9 @@ def test_get_app_data() -> None:
         ({"a": 1}, {"b": 2}, ["c"], False),
     ],
 )
-def test_equal_dict(dict_1, dict_2, exclude_keys, expected_result):
+def test_equal_dict(
+    dict_1: dict[str, Any], dict_2: dict[str, Any], exclude_keys: list[str], expected_result: bool
+) -> None:
     assert equal_dict(dict_1, dict_2, exclude_keys) == expected_result
 
 
@@ -113,5 +117,12 @@ def test_equal_dict(dict_1, dict_2, exclude_keys, expected_result):
         ([{"a": 1}], [{"b": 2}], ["c"], False),
     ],
 )
-def test_equal_list_of_dict(list_dict_1, list_dict_2, exclude_keys, expected_result):
-    assert equal_list_of_dict(list_dict_1, list_dict_2, exclude_keys) == expected_result
+def test_equal_list_of_dict(
+    list_dict_1: list[dict[str, Any]],
+    list_dict_2: list[dict[str, Any]],
+    exclude_keys: list[str],
+    expected_result: bool,
+) -> None:
+    assert (
+        equal_list_of_dict(list_dict_1, list_dict_2, exclude_keys) == expected_result  # type: ignore
+    )
