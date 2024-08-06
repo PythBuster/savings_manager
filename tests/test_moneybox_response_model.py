@@ -34,7 +34,7 @@ from src.data_classes.responses import MoneyboxResponse
         },
     ],
 )
-def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
+async def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
     """Test valid MoneyboxResponse creation."""
 
     data_id = data["id"]
@@ -44,6 +44,9 @@ def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
     data_modified_at = (
         datetime.fromisoformat(data["modified_at"]) if data["modified_at"] is not None else None
     )
+    data_savings_amount = data["savings_amount"]
+    data_savings_target = data["savings_target"]
+    data_priority = data["priority"]
 
     response = MoneyboxResponse(**data)
 
@@ -52,6 +55,9 @@ def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
     assert response.balance == data_balance
     assert response.created_at == data_created_at
     assert response.modified_at == data_modified_at
+    assert response.savings_amount == data_savings_amount
+    assert response.savings_target == data_savings_target
+    assert response.priority == data_priority
 
 
 @pytest.mark.parametrize(
@@ -89,14 +95,14 @@ def test_moneybox_response_valid_data(data: dict[str, Any]) -> None:
         },
     ],
 )
-def test_moneybox_response_invalid_id__non_int_type(data: dict[str, Any]) -> None:
+async def test_moneybox_response_invalid_id__non_int_type(data: dict[str, Any]) -> None:
     """Test MoneyboxResponse creation with invalid id."""
 
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_name__minlength() -> None:
+async def test_moneybox_response_invalid_name__minlength() -> None:
     """Test MoneyboxResponse creation with invalid name."""
 
     data = {
@@ -113,7 +119,7 @@ def test_moneybox_response_invalid_name__minlength() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_name__wrong_type() -> None:
+async def test_moneybox_response_invalid_name__wrong_type() -> None:
     """Test MoneyboxResponse creation with invalid name."""
 
     data = {
@@ -130,7 +136,7 @@ def test_moneybox_response_invalid_name__wrong_type() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_balance__negative() -> None:
+async def test_moneybox_response_invalid_balance__negative() -> None:
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -148,7 +154,7 @@ def test_moneybox_response_invalid_balance__negative() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_valid_balance__zero() -> None:
+async def test_moneybox_response_valid_balance__zero() -> None:
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -169,9 +175,12 @@ def test_moneybox_response_valid_balance__zero() -> None:
     assert response.balance == 0
     assert response.created_at == datetime.fromisoformat("2020-05-01T00:00:00Z")
     assert response.modified_at is None
+    assert response.savings_amount == 0
+    assert response.savings_target is None
+    assert response.priority == 1
 
 
-def test_moneybox_response_invalid_balance__wrong_type() -> None:
+async def test_moneybox_response_invalid_balance__wrong_type() -> None:
     """Test MoneyboxResponse creation with invalid balance."""
 
     data = {
@@ -189,7 +198,87 @@ def test_moneybox_response_invalid_balance__wrong_type() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date_order() -> None:
+async def test_moneybox_response_invalid_savings_amount__negative() -> None:
+    """Test MoneyboxResponse creation with invalid savings_amount."""
+
+    data = {
+        "id": 1,
+        "name": "Holiday",
+        "balance": 10,  # Invalid balance, should be >= 0
+        "created_at": "2020-05-01T00:00:00Z",
+        "modified_at": None,
+        "savings_amount": -10,
+        "savings_target": None,
+        "priority": 1,
+    }
+
+    with pytest.raises(ValidationError):
+        MoneyboxResponse(**data)
+
+
+async def test_moneybox_response_valid_savings_amount__zero() -> None:
+    """Test MoneyboxResponse creation with invalid saving_amount."""
+
+    data = {
+        "id": 1,
+        "name": "Holiday",
+        "balance": 10,
+        "created_at": "2020-05-01T00:00:00Z",
+        "modified_at": None,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+    }
+
+    response = MoneyboxResponse(**data)
+
+    assert response.id == 1
+    assert response.name == "Holiday"
+    assert response.balance == 10
+    assert response.created_at == datetime.fromisoformat("2020-05-01T00:00:00Z")
+    assert response.modified_at is None
+    assert response.savings_amount == 0
+    assert response.savings_target is None
+    assert response.priority == 1
+
+
+async def test_moneybox_response_invalid_balance__wrong_type__string_number() -> None:
+    """Test MoneyboxResponse creation with invalid balance."""
+
+    data = {
+        "id": 1,
+        "name": "Holiday",
+        "balance": 0,
+        "created_at": "2020-05-01T00:00:00Z",
+        "modified_at": None,
+        "savings_amount": "zero",
+        "savings_target": None,
+        "priority": 1,
+    }
+
+    with pytest.raises(ValidationError):
+        MoneyboxResponse(**data)
+
+
+async def test_moneybox_response_invalid_balance__wrong_type__str_int() -> None:
+    """Test MoneyboxResponse creation with invalid balance."""
+
+    data = {
+        "id": 1,
+        "name": "Holiday",
+        "balance": 0,
+        "created_at": "2020-05-01T00:00:00Z",
+        "modified_at": None,
+        "savings_amount": "0",
+        "savings_target": None,
+        "priority": 1,
+    }
+
+    with pytest.raises(ValidationError):
+        MoneyboxResponse(**data)
+
+
+async def test_moneybox_response_invalid_date_order() -> None:
     """Test MoneyboxResponse creation with invalid date order."""
 
     data = {
@@ -206,7 +295,7 @@ def test_moneybox_response_invalid_date_order() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__modified_at_wrong_type__int() -> None:
+async def test_moneybox_response_invalid_date__modified_at_wrong_type__int() -> None:
     """Test MoneyboxResponse creation with invalid modified_at date value."""
 
     data = {
@@ -224,7 +313,9 @@ def test_moneybox_response_invalid_date__modified_at_wrong_type__int() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__modified_at_string_type__not_isoformat_datetime() -> None:
+async def test_moneybox_response_invalid_date__modified_at_string_type__not_isoformat_datetime() -> (
+    None
+):
     """Test MoneyboxResponse creation with invalid modified_at date value."""
 
     data = {
@@ -242,7 +333,7 @@ def test_moneybox_response_invalid_date__modified_at_string_type__not_isoformat_
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__created_at_wrong_type__int() -> None:
+async def test_moneybox_response_invalid_date__created_at_wrong_type__int() -> None:
     """Test MoneyboxResponse creation with invalid created_at date value."""
 
     data = {
@@ -260,7 +351,9 @@ def test_moneybox_response_invalid_date__created_at_wrong_type__int() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__created_at_string_type__not_isoformat_datetime() -> None:
+async def test_moneybox_response_invalid_date__created_at_string_type__not_isoformat_datetime() -> (
+    None
+):
     """Test MoneyboxResponse creation with invalid created_at date value."""
 
     data = {
@@ -278,7 +371,7 @@ def test_moneybox_response_invalid_date__created_at_string_type__not_isoformat_d
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_invalid_date__none_for_created_at() -> None:
+async def test_moneybox_response_invalid_date__none_for_created_at() -> None:
     """Test MoneyboxResponse creation with invalid date order."""
 
     data = {
@@ -295,7 +388,7 @@ def test_moneybox_response_invalid_date__none_for_created_at() -> None:
         MoneyboxResponse(**data)
 
 
-def test_moneybox_response_valid_date_order() -> None:
+async def test_moneybox_response_valid_date_order() -> None:
     """Test MoneyboxResponse creation with valid date order."""
 
     data = {

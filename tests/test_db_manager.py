@@ -21,7 +21,7 @@ from src.db.exceptions import (
     ColumnDoesNotExistError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
-    TransferEqualMoneyboxError,
+    TransferEqualMoneyboxError, HasBalanceError,
 )
 from src.db.models import Moneybox
 from tests.conftest import TEST_DB_DRIVER
@@ -205,6 +205,30 @@ async def test_core_exists_instance__moneybox_name(db_manager: DBManager) -> Non
 
 @pytest.mark.dependency(depends=["test_add_moneybox"], session="scope")
 async def test_delete_moneybox(db_manager: DBManager) -> None:
+    # add amount to moneybox 3
+    deposit_transaction = DepositTransactionRequest(
+        amount=1,
+        description="Bonus.",
+    )
+    await db_manager.add_amount(
+        moneybox_id=3,
+        deposit_transaction_data=deposit_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
+    with pytest.raises(HasBalanceError) as ex_info:
+        await db_manager.delete_moneybox(moneybox_id=3)
+
+    # sub amount from moneybox 3 for deletion
+    withdraw_transaction = WithdrawTransactionRequest(amount=1)
+    await db_manager.sub_amount(
+        moneybox_id=3,
+        withdraw_transaction_data=withdraw_transaction.model_dump(),
+        transaction_type=TransactionType.DIRECT,
+        transaction_trigger=TransactionTrigger.MANUALLY,
+    )
+
     assert await db_manager.delete_moneybox(moneybox_id=3) is None  # type: ignore
 
     non_existing_moneybox_ids = [-42, -1, 0, 1654856415456]

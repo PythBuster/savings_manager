@@ -9,7 +9,6 @@ from starlette.responses import JSONResponse
 
 from src.data_classes.responses import HTTPErrorResponse
 from src.db.exceptions import (
-    CreateInstanceError,
     HasBalanceError,
     RecordNotFoundError,
     UpdateInstanceError,
@@ -41,17 +40,6 @@ async def response_exception(exception: Exception) -> JSONResponse:
     if issubclass(exception.__class__, RecordNotFoundError):
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=jsonable_encoder(
-                HTTPErrorResponse(
-                    message=exception.message,  # type: ignore
-                    details=exception.details,  # type: ignore
-                )
-            ),
-        )
-
-    if issubclass(exception.__class__, CreateInstanceError):
-        return JSONResponse(
-            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,  # type: ignore
