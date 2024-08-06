@@ -1,5 +1,14 @@
 # Savings Manager
 
+The "Savings Manager" helps you to manage your savings. With the help of virtual accounts, budgets can be saved for various goals, and this is completely automated.
+
+By setting a fixed monthly savings amount, you can determine the maximum monthly amount that can be saved in the overall system. By assigning desired savings amounts for each moneybox and upper savings limits, the monthly savings amount is automatically distributed across the moneyboxes at the beginning of each month. By setting a fixed priority, you can achieve a savings constellation that helps you achieve certain savings goals faster than others.
+
+The strength here: if you withdraw a certain amount from a cash box, the priority list of cash boxes will automatically create a balance that ensures that this just emptied cash box is quickly refilled.
+
+This makes it easy to save and you can watch as each moneybox is gradually refilled. Of course, amounts can be moved between the moneyboxes and manual deposits into the moneyboxes are always possible!
+
+Translated with DeepL.com (free version)
 
 ## Deployment / Contribution
 
