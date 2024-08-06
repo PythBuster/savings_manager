@@ -74,10 +74,8 @@
 <li><a class="reference internal" href="#module-db.exceptions">db.exceptions module</a><ul>
 <li><a class="reference internal" href="#db.exceptions.BalanceResultIsNegativeError"><code class="docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.ColumnDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">ColumnDoesNotExistError</span></code></a></li>
-<li><a class="reference internal" href="#db.exceptions.CreateInstanceError"><code class="docutils literal notranslate"><span class="pre">CreateInstanceError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.DeleteInstanceError"><code class="docutils literal notranslate"><span class="pre">DeleteInstanceError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.HasBalanceError"><code class="docutils literal notranslate"><span class="pre">HasBalanceError</span></code></a></li>
-<li><a class="reference internal" href="#db.exceptions.MoneyboxNameExistError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNameExistError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.MoneyboxNotFoundError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.NonPositiveAmountError"><code class="docutils literal notranslate"><span class="pre">NonPositiveAmountError</span></code></a></li>
 <li><a class="reference internal" href="#db.exceptions.RecordNotFoundError"><code class="docutils literal notranslate"><span class="pre">RecordNotFoundError</span></code></a></li>
@@ -87,14 +85,6 @@
 </li>
 <li><a class="reference internal" href="#module-db.models">db.models module</a><ul>
 <li><a class="reference internal" href="#db.models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a><ul>
-<li><a class="reference internal" href="#db.models.Base.asdict"><code class="docutils literal notranslate"><span class="pre">Base.asdict()</span></code></a></li>
-<li><a class="reference internal" href="#db.models.Base.dictalchemy_asdict_include"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_asdict_include</span></code></a></li>
-<li><a class="reference internal" href="#db.models.Base.dictalchemy_exclude"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_exclude</span></code></a></li>
-<li><a class="reference internal" href="#db.models.Base.dictalchemy_exclude_underscore"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_exclude_underscore</span></code></a></li>
-<li><a class="reference internal" href="#db.models.Base.dictalchemy_fromdict_allow_pk"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_fromdict_allow_pk</span></code></a></li>
-<li><a class="reference internal" href="#db.models.Base.dictalchemy_fromdict_include"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_fromdict_include</span></code></a></li>
-<li><a class="reference internal" href="#db.models.Base.dictalchemy_include"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_include</span></code></a></li>
-<li><a class="reference internal" href="#db.models.Base.fromdict"><code class="docutils literal notranslate"><span class="pre">Base.fromdict()</span></code></a></li>
 <li><a class="reference internal" href="#db.models.Base.metadata"><code class="docutils literal notranslate"><span class="pre">Base.metadata</span></code></a></li>
 <li><a class="reference internal" href="#db.models.Base.registry"><code class="docutils literal notranslate"><span class="pre">Base.registry</span></code></a></li>
 </ul>
@@ -572,13 +562,6 @@ was not found in database.</p>
 </dd></dl>
 
 <dl class="py exception">
-<dt class="sig sig-object py" id="db.exceptions.CreateInstanceError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">CreateInstanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.CreateInstanceError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Base CreateInstanceError Exception Class</p>
-</dd></dl>
-
-<dl class="py exception">
 <dt class="sig sig-object py" id="db.exceptions.DeleteInstanceError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">DeleteInstanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.DeleteInstanceError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
@@ -590,13 +573,6 @@ was not found in database.</p>
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">HasBalanceError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moneybox_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">balance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.HasBalanceError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#db.exceptions.DeleteInstanceError" title="db.exceptions.DeleteInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeleteInstanceError</span></code></a></p>
 <p>Custom HasBalanceError Exception</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="db.exceptions.MoneyboxNameExistError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.exceptions.</span></span><span class="sig-name descname"><span class="pre">MoneyboxNameExistError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.exceptions.MoneyboxNameExistError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#db.exceptions.CreateInstanceError" title="db.exceptions.CreateInstanceError"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreateInstanceError</span></code></a></p>
-<p>Custom Exception for already existing moneybox names in database.</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -643,102 +619,6 @@ was not found in database.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">db.models.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.models.Base" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DeclarativeBase</span></code></p>
 <p>The declarative Base model</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="db.models.Base.asdict">
-<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_underscore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_pk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'asdict'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.models.Base.asdict" title="Link to this definition"></a></dt>
-<dd><p>Get a dict from a model</p>
-<p>Using the <cite>method</cite> parameter makes it possible to have multiple methods
-that formats the result.</p>
-<p>Additional keyword arguments will be passed to all relationships that are
-followed. This can be used to pass on things like request or context.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>follow</strong> – List or dict of relationships that should be followed.
-If the parameter is a dict the value should be a dict of             keyword arguments. Currently it follows InstrumentedList,             MappedCollection and regular 1:1, 1:m, m:m relationships. Follow             takes an extra argument, ‘method’, which is the method that             should be used on the relation. It also takes the extra argument             ‘parent’ which determines where the relationships data should be             added in the response dict. If ‘parent’ is set the relationship             will be added with it’s own key as a child to <cite>parent</cite>.</p></li>
-<li><p><strong>exclude</strong> – List of properties that should be excluded, will be             merged with <cite>model.dictalchemy_exclude</cite></p></li>
-<li><p><strong>exclude_pk</strong> – If True any column that refers to the primary key will             be excluded.</p></li>
-<li><p><strong>exclude_underscore</strong> – Overides <cite>model.dictalchemy_exclude_underscore</cite>            if set</p></li>
-<li><p><strong>include</strong> – List of properties that should be included. Use this to             allow python properties to be called. This list will be merged             with <cite>model.dictalchemy_asdict_include</cite> or             <cite>model.dictalchemy_include</cite>.</p></li>
-<li><p><strong>only</strong> – List of properties that should be included. This will             override everything else except <cite>follow</cite>.</p></li>
-<li><p><strong>method</strong> – Name of the method that is currently called. This will be             the default method used in ‘follow’ unless another method is            set.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dictalchemy.errors.MissingRelationError</span></code>             if <cite>follow</cite> contains a non-existent relationship.</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dictalchemy.errors.UnsupportedRelationError</span></code> If <cite>follow</cite>             contains an existing relationship that currently isn’t supported.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="db.models.Base.dictalchemy_asdict_include">
-<span class="sig-name descname"><span class="pre">dictalchemy_asdict_include</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#db.models.Base.dictalchemy_asdict_include" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="db.models.Base.dictalchemy_exclude">
-<span class="sig-name descname"><span class="pre">dictalchemy_exclude</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#db.models.Base.dictalchemy_exclude" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="db.models.Base.dictalchemy_exclude_underscore">
-<span class="sig-name descname"><span class="pre">dictalchemy_exclude_underscore</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#db.models.Base.dictalchemy_exclude_underscore" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="db.models.Base.dictalchemy_fromdict_allow_pk">
-<span class="sig-name descname"><span class="pre">dictalchemy_fromdict_allow_pk</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#db.models.Base.dictalchemy_fromdict_allow_pk" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="db.models.Base.dictalchemy_fromdict_include">
-<span class="sig-name descname"><span class="pre">dictalchemy_fromdict_include</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#db.models.Base.dictalchemy_fromdict_include" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="db.models.Base.dictalchemy_include">
-<span class="sig-name descname"><span class="pre">dictalchemy_include</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#db.models.Base.dictalchemy_include" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="db.models.Base.fromdict">
-<span class="sig-name descname"><span class="pre">fromdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_underscore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_pk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#db.models.Base.fromdict" title="Link to this definition"></a></dt>
-<dd><p>Update a model from a dict</p>
-<p>Works almost identically as <code class="xref py py-meth docutils literal notranslate"><span class="pre">dictalchemy.utils.asdict()</span></code>. However, it
-will not create missing instances or update collections.</p>
-<p>This method updates the following properties on a model:</p>
-<ul class="simple">
-<li><p>Simple columns</p></li>
-<li><p>Synonyms</p></li>
-<li><p>Simple 1-m relationships</p></li>
-</ul>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> – dict of data</p></li>
-<li><p><strong>exclude</strong> – list of properties that should be excluded</p></li>
-<li><p><strong>exclude_underscore</strong> – If True underscore properties will be excluded,            if set to None model.dictalchemy_exclude_underscore will be used.</p></li>
-<li><p><strong>allow_pk</strong> – If True any column that refers to the primary key will             be excluded. Defaults model.dictalchemy_fromdict_allow_pk or             dictable.constants.fromdict_allow_pk. If set to True a primary             key can still be excluded with the <cite>exclude</cite> parameter.</p></li>
-<li><p><strong>follow</strong> – Dict of relations that should be followed, the key is the             arguments passed to the relation. Relations only works on simple             relations, not on lists.</p></li>
-<li><p><strong>include</strong> – List of properties that should be included. This list             will override anything in the exclude list. It will not override             allow_pk.</p></li>
-<li><p><strong>only</strong> – List of the only properties that should be set. This             will not override <cite>allow_pk</cite> or <cite>follow</cite>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dictalchemy.errors.DictalchemyError</span></code> If a primary key is             in data and allow_pk is False</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The model</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="db.models.Base.metadata">
 <span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">MetaData</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">MetaData()</span></em><a class="headerlink" href="#db.models.Base.metadata" title="Link to this definition"></a></dt>
@@ -817,8 +697,7 @@ a priority of Null (will be the marker for the overflow moneybox).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="db.models.Moneybox.savings_target">
 <span class="sig-name descname"><span class="pre">savings_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Mapped</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#db.models.Moneybox.savings_target" title="Link to this definition"></a></dt>
-<dd><p>“The current savings target. Is relevant for the automated 
-distributed saving progress.</p>
+<dd><p>“The current savings target. Is relevant for the automated distributed saving progress.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -835,7 +714,7 @@ distributed saving progress.</p>
 <p>An ORM declarative Base model with an ID as primary key</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="db.models.SqlBase.asdict">
-<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_underscore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_pk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'asdict'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.models.SqlBase.asdict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">asdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_underscore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_pk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#db.models.SqlBase.asdict" title="Link to this definition"></a></dt>
 <dd><p>Overloaded method from make_class_dictable().</p>
 </dd></dl>
 

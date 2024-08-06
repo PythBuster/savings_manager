@@ -75,15 +75,15 @@
 <h1>src<a class="headerlink" href="#src" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="constants.html">constants module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="constants.html#constants.SPHINX_DIRECTORY"><code class="docutils literal notranslate"><span class="pre">SPHINX_DIRECTORY</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="constants.html#constants.WORKING_DIR"><code class="docutils literal notranslate"><span class="pre">WORKING_DIR</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="custom_types.html">custom_types module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="custom_types.html#custom_types.DBSettings"><code class="docutils literal notranslate"><span class="pre">DBSettings</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.convert_port"><code class="docutils literal notranslate"><span class="pre">DBSettings.convert_port()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_driver"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_driver</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_host"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_host</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_name"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_password"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_port"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_port</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_user"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_user</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.db_file"><code class="docutils literal notranslate"><span class="pre">DBSettings.db_file</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DBSettings.model_computed_fields</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.model_config"><code class="docutils literal notranslate"><span class="pre">DBSettings.model_config</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="custom_types.html#custom_types.DBSettings.model_fields"><code class="docutils literal notranslate"><span class="pre">DBSettings.model_fields</span></code></a></li>
@@ -260,10 +260,8 @@
 <li class="toctree-l2"><a class="reference internal" href="db.html#module-db.exceptions">db.exceptions module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.BalanceResultIsNegativeError"><code class="docutils literal notranslate"><span class="pre">BalanceResultIsNegativeError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.ColumnDoesNotExistError"><code class="docutils literal notranslate"><span class="pre">ColumnDoesNotExistError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.CreateInstanceError"><code class="docutils literal notranslate"><span class="pre">CreateInstanceError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.DeleteInstanceError"><code class="docutils literal notranslate"><span class="pre">DeleteInstanceError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.HasBalanceError"><code class="docutils literal notranslate"><span class="pre">HasBalanceError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.MoneyboxNameExistError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNameExistError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.MoneyboxNotFoundError"><code class="docutils literal notranslate"><span class="pre">MoneyboxNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.NonPositiveAmountError"><code class="docutils literal notranslate"><span class="pre">NonPositiveAmountError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.exceptions.RecordNotFoundError"><code class="docutils literal notranslate"><span class="pre">RecordNotFoundError</span></code></a></li>
@@ -273,14 +271,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="db.html#module-db.models">db.models module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="db.html#db.models.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.asdict"><code class="docutils literal notranslate"><span class="pre">Base.asdict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.dictalchemy_asdict_include"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_asdict_include</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.dictalchemy_exclude"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_exclude</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.dictalchemy_exclude_underscore"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_exclude_underscore</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.dictalchemy_fromdict_allow_pk"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_fromdict_allow_pk</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.dictalchemy_fromdict_include"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_fromdict_include</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.dictalchemy_include"><code class="docutils literal notranslate"><span class="pre">Base.dictalchemy_include</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.fromdict"><code class="docutils literal notranslate"><span class="pre">Base.fromdict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.metadata"><code class="docutils literal notranslate"><span class="pre">Base.metadata</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="db.html#db.models.Base.registry"><code class="docutils literal notranslate"><span class="pre">Base.registry</span></code></a></li>
 </ul>
@@ -368,11 +358,8 @@
 <li class="toctree-l2"><a class="reference internal" href="routes.html#module-routes">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="settings.html">settings module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="settings.html#settings.SPHINX_DIRECTORY"><code class="docutils literal notranslate"><span class="pre">SPHINX_DIRECTORY</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">utils module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#utils.as_dict"><code class="docutils literal notranslate"><span class="pre">as_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#utils.check_existence_of_moneybox_by_id"><code class="docutils literal notranslate"><span class="pre">check_existence_of_moneybox_by_id()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#utils.create_envfile_from_envvars"><code class="docutils literal notranslate"><span class="pre">create_envfile_from_envvars()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#utils.equal_dict"><code class="docutils literal notranslate"><span class="pre">equal_dict()</span></code></a></li>
