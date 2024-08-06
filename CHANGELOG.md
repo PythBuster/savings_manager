@@ -3,6 +3,12 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.4.0 (2024-08-06)
+### Features:
+- add v2 related columns to moneybox table
+- switch database from postgres to sqlite
+- adapt and implement further unit tests
+
 ## 1.3.0 (2024-08-03)
 ### Features:
 - add note column to all tables to be able to add admin notes to each record
