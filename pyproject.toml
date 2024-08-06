@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Savings Manager"
-version = "1.4.0"
+version = "1.5.0"
 description = "Manage your savings on your physical account via the app."
 authors = ["'PythBuster' <'pythbuster@gmail.com'>"]
 readme = "README.md"

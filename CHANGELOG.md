@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.5.0 (2024-08-06)
+### Features:
+- protect deleting overflow moneybox (which is flagged by priority=0)
+
 ## 1.4.0 (2024-08-06)
 ### Features:
 - add v2 related columns to moneybox table
