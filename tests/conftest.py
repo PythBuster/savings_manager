@@ -250,19 +250,16 @@ async def mocked_db_manager() -> AsyncGenerator:
 
             await session.execute(text("PRAGMA foreign_keys = ON;"))
 
+    # add truncate tables help function for tests to database manager
     db_manager.truncate_tables = partial(truncate_tables, db_manager)  # type: ignore
 
-    # alembic_ini_path = (Path(__file__).parent.parent / "alembic.ini").resolve().absolute()
-    # alembic_cfg = Config(str(alembic_ini_path))  # Adjust the path to your alembic.ini file
-
-    # Dynamically update the sqlalchemy.url
-    # alembic_cfg.set_main_option("sqlalchemy.url", str(db_manager.db_connection_string))
-
-    # Upgrade the database using Alembic
-    # async with db_manager.async_engine.begin() as conn:
-    #    await conn.run_sync(Base.metadata.create_all)
-    #    await conn.run_sync(run_migrations, alembic_cfg, "upgrade", "head")
-    #    print("Database tables created with Alembic migrations.", flush=True)
+    # clear db if not cleared in last test session
+    subprocess.call(("alembic", "-x", "testing", "downgrade", "base"))
+    time.sleep(1)
+    # drop tables
+    async with db_manager.async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+    time.sleep(2)
 
     # create db tables and apply all db migrations
     subprocess.call(("alembic", "-x", "testing", "upgrade", "head"))
@@ -270,13 +267,11 @@ async def mocked_db_manager() -> AsyncGenerator:
 
     yield db_manager
 
-    time.sleep(2)
     # downgrade the test database to base
     subprocess.call(("alembic", "-x", "testing", "downgrade", "base"))
-
-    # Downgrade the database using Alembic
-    # async with db_manager.async_engine.begin() as conn:
-    #    await conn.run_sync(Base.metadata.drop_all)
-    #    print("Database tables dropped with Alembic migrations.", flush=True)
+    time.sleep(1)
+    # drop tables
+    async with db_manager.async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
     print("DB Manager removed.", flush=True)
