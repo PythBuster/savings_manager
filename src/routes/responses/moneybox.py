@@ -34,24 +34,6 @@ GET_MONEYBOX_RESPONSES = {
             }
         },
     },
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {
-        "description": "Unprocessable Content",
-        "content": {
-            "application/json": {
-                "example": {
-                    "detail": [
-                        {
-                            "type": "string_type",
-                            "loc": ["body", "name"],
-                            "msg": "Input should be a valid string",
-                            "input": 123,
-                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
-                        }
-                    ]
-                }
-            }
-        },
-    },
     status.HTTP_500_INTERNAL_SERVER_ERROR: {
         "description": "Internal Server Error",
     },
@@ -88,22 +70,19 @@ CREATE_MONEYBOX_RESPONSES = {
             }
         },
     },
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {
-        "description": "Unprocessable Content",
+    status.HTTP_409_CONFLICT: {
+        "description": "Conflict",
         "content": {
             "application/json": {
-                "example": {
-                    "detail": [
-                        {
-                            "type": "string_type",
-                            "loc": ["body", "name"],
-                            "msg": "Input should be a valid string",
-                            "input": 123,
-                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
-                        }
-                    ]
-                }
-            },
+                "example": HTTPErrorResponse(
+                    message="moneyboxes.name",
+                    details={
+                        "exception": "(sqlite3.IntegrityError) UNIQUE constraint failed",
+                        "params": ["Holiday", 0, 0, 50000, 0, 1, ""],
+                        "detail": "",
+                    },
+                )
+            }
         },
     },
     status.HTTP_500_INTERNAL_SERVER_ERROR: {
@@ -155,22 +134,19 @@ UPDATE_MONEYBOX_RESPONSES = {
             }
         },
     },
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {
-        "description": "Unprocessable Content",
+    status.HTTP_409_CONFLICT: {
+        "description": "Conflict",
         "content": {
             "application/json": {
-                "example": {
-                    "detail": [
-                        {
-                            "type": "string_type",
-                            "loc": ["body", "name"],
-                            "msg": "Input should be a valid string",
-                            "input": 123,
-                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
-                        }
-                    ]
-                }
-            },
+                "example": HTTPErrorResponse(
+                    message="moneyboxes.name",
+                    details={
+                        "exception": "(sqlite3.IntegrityError) UNIQUE constraint failed",
+                        "params": ["Holiday", 0, 0, 50000, 0, 1, ""],
+                        "detail": "",
+                    },
+                )
+            }
         },
     },
     status.HTTP_500_INTERNAL_SERVER_ERROR: {
@@ -224,24 +200,6 @@ DELETE_MONEYBOX_RESPONSES = {
             }
         },
     },
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {
-        "description": "Unprocessable Content",
-        "content": {
-            "application/json": {
-                "example": {
-                    "detail": [
-                        {
-                            "type": "string_type",
-                            "loc": ["body", "name"],
-                            "msg": "Input should be a valid string",
-                            "input": 123,
-                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
-                        }
-                    ]
-                }
-            },
-        },
-    },
     status.HTTP_500_INTERNAL_SERVER_ERROR: {
         "description": "Internal Server Error",
     },
@@ -289,24 +247,6 @@ DEPOSIT_MONEYBOX_RESPONSES = {
                     },
                 ),
             }
-        },
-    },
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {
-        "description": "Unprocessable Content",
-        "content": {
-            "application/json": {
-                "example": {
-                    "detail": [
-                        {
-                            "type": "string_type",
-                            "loc": ["body", "name"],
-                            "msg": "Input should be a valid string",
-                            "input": 123,
-                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
-                        }
-                    ]
-                }
-            },
         },
     },
     status.HTTP_500_INTERNAL_SERVER_ERROR: {
@@ -361,24 +301,6 @@ TRANSFER_MONEYBOX_RESPONSES = {
             }
         },
     },
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {
-        "description": "Unprocessable Content",
-        "content": {
-            "application/json": {
-                "example": {
-                    "detail": [
-                        {
-                            "type": "string_type",
-                            "loc": ["body", "name"],
-                            "msg": "Input should be a valid string",
-                            "input": 123,
-                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
-                        }
-                    ]
-                }
-            },
-        },
-    },
     status.HTTP_500_INTERNAL_SERVER_ERROR: {
         "description": "Internal Server Error",
     },
@@ -416,24 +338,6 @@ MONEYBOX_TRANSACTION_LOGS_RESPONSES = {
                         "moneybox_id": 1,
                     },
                 ),
-            }
-        },
-    },
-    status.HTTP_422_UNPROCESSABLE_ENTITY: {
-        "description": "Unprocessable Content",
-        "content": {
-            "application/json": {
-                "example": {
-                    "detail": [
-                        {
-                            "type": "string_type",
-                            "loc": ["body", "name"],
-                            "msg": "Input should be a valid string",
-                            "input": 123,
-                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
-                        }
-                    ]
-                }
             }
         },
     },

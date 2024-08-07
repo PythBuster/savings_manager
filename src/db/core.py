@@ -117,7 +117,7 @@ async def read_instance(
     else:
         stmt = select(orm_model).where(orm_model.id == record_id)
 
-    async with async_session.begin() as session:
+    async with async_session() as session:
         result = await session.execute(stmt)
 
     instance = result.scalars().one_or_none()

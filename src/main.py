@@ -1,5 +1,6 @@
 """The start module of the savings manager app."""
 
+import functools
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Callable
 
@@ -17,6 +18,7 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
+from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
 from src.utils import get_app_data, get_db_settings, load_environment
 
 tags_metadata = [
@@ -112,6 +114,11 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     fastapi_app.state.db_manager = DBManager(
         db_settings=get_db_settings(),
     )
+
+    # Define the custom OpenAPI schema
+    # save original fastapi_app.openapi to call it later in mocked one
+    fastapi_app.openapi_original = fastapi_app.openapi
+    fastapi_app.openapi = functools.partial(custom_422_openapi_schema, fastapi_app)
 
 
 def register_router(fastapi_app: FastAPI) -> None:

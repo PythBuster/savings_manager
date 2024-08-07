@@ -21,6 +21,8 @@ from src.db.exceptions import (
     NonPositiveAmountError,
     OverflowMoneyboxCantBeDeletedError,
     TransferEqualMoneyboxError,
+    OverflowMoneyboxCantBeUpdatedError,
+    OverflowMoneyboxNotFoundError,
 )
 from src.db.models import Moneybox, Transaction
 from src.utils import get_database_url
@@ -101,6 +103,31 @@ class DBManager:
 
         return moneybox.asdict()
 
+    async def _get_overflow_moneybox(self) -> Moneybox:
+        """DB Function to get the overflow moneybox.
+
+        There is only one overflow moneybox (special moneybox) which has the priority colum value of 0.
+        Note: Only 'is_active' moneyboxes will be requested.
+
+        :return: The overflow moneybox orm instance.
+        :rtype: :class:`Moneybox`
+
+        :raises: :class:`OverflowMoneyboxNotFoundError`: if there are no overflow moneybox in the
+            database, missing moneybox with priority = 0.
+        """
+
+        stmt = select(Moneybox).where(and_(Moneybox.priority == 0, Moneybox.is_active.is_(True)))
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        moneybox = result.scalars().one_or_none()
+
+        if moneybox is None:
+            raise OverflowMoneyboxNotFoundError()
+
+        return moneybox
+
     async def add_moneybox(self, moneybox_data: dict[str, Any]) -> dict[str, Any]:
         """DB Function to add a new moneybox into database.
 
@@ -138,6 +165,12 @@ class DBManager:
             was not found in database.
         """
 
+        # get overflow moneybox and protect updating it
+        _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
+
+        if moneybox_id == _overflow_moneybox.id:
+            raise OverflowMoneyboxCantBeUpdatedError(moneybox_id=_overflow_moneybox.id)
+
         moneybox = await update_instance(
             async_session=self.async_session,
             orm_model=Moneybox,  # type: ignore
@@ -161,9 +194,9 @@ class DBManager:
         """
 
         moneybox = await self.get_moneybox(moneybox_id=moneybox_id)
+        _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
 
-        # Moneybox with priority=0 is the overflow moneybox and can't be deleted!
-        if moneybox["priority"] == 0:
+        if moneybox["id"] == _overflow_moneybox.id:
             raise OverflowMoneyboxCantBeDeletedError(moneybox_id=moneybox_id)
 
         if moneybox["balance"] > 0:

@@ -91,8 +91,11 @@ class MoneyboxResponse(BaseModel):
                     "id": 1,
                     "name": "Holiday",
                     "balance": 0,
-                    "created_at": "2020-05-01 20:15:02",
-                    "modified_at": None,
+                    "savings_amount": 0,
+                    "savings_target": 50000,
+                    "priority": 1,
+                    "created_at": "2024-08-07T03:28:08",
+                    "modified_at": "2024-08-08T12:34:56",
                 }
             ]
         },

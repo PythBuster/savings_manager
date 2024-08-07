@@ -4,6 +4,16 @@ from abc import ABC
 from typing import Any
 
 
+class InconsistentDatabaseError(ABC, Exception):
+    """Base InconsistentDatabaseError Exception Class"""
+
+    def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
+        self.message = f"Inconsistent Database! {message}"
+        self.details = details
+
+        super().__init__(message)
+
+
 class RecordNotFoundError(ABC, Exception):
     """Base RecordNotFound Exception Class"""
 
@@ -128,3 +138,24 @@ class OverflowMoneyboxCantBeDeletedError(DeleteInstanceError):
     def __init__(self, moneybox_id: int) -> None:
         message = "Deleting overflow moneybox is not allowed/possible!"
         super().__init__(record_id=moneybox_id, message=message)
+
+
+class OverflowMoneyboxCantBeUpdatedError(UpdateInstanceError):
+    """Custom OverflowMoneyboxCantBeUpdatedError Exception"""
+
+    def __init__(self, moneybox_id: int) -> None:
+        message = "Updating overflow moneybox is not allowed/possible!"
+        super().__init__(record_id=moneybox_id, message=message)
+
+
+class OverflowMoneyboxNotFoundError(InconsistentDatabaseError):
+    """Custom OverflowMoneyboxNotFoundError Exception"""
+
+    def __init__(self) -> None:
+        message = (
+            "No overflow moneybox found in database! There has to be one moneybox with "
+            "priority = 0 as column value!"
+        )
+        super().__init__(
+            message=message,
+        )

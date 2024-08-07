@@ -12,6 +12,7 @@ from src.db.exceptions import (
     DeleteInstanceError,
     RecordNotFoundError,
     UpdateInstanceError,
+    InconsistentDatabaseError,
 )
 
 
@@ -23,6 +24,17 @@ async def response_exception(exception: Exception) -> JSONResponse:
     :return: The exception as a json response.
     :rtype: :class:`JSONResponse`
     """
+
+    if isinstance(exception, InconsistentDatabaseError):
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=exception.message,
+                    details=exception.details,
+                )
+            ),
+        )
 
     if isinstance(exception, ConnectionRefusedError):
         _, arg_2 = exception.args
