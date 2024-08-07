@@ -3,6 +3,13 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.6.0 (2024-08-07)
+### Features:
+- adapt create moneybox endpoint: handle constraints errors for priority
+- adapt update moneybox endpoint: protect updating overflow moneybox and handle constraints errors
+- adapt delete moneybox endpoint: protect deleting overflow moneybox
+- get moneyboxes will detect double or missing overflow moneybox and will raise an InconsistentDatabase Exception
+
 ## 1.5.0 (2024-08-06)
 ### Features:
 - protect deleting overflow moneybox (which is flagged by priority=0)
