@@ -1,6 +1,5 @@
 """The start module of the savings manager app."""
 
-import functools
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Callable
 
@@ -115,10 +114,14 @@ def initialize_app(fastapi_app: FastAPI) -> None:
         db_settings=get_db_settings(),
     )
 
+    set_custom_openapi_schema(fastapi_app=fastapi_app)
+
+
+def set_custom_openapi_schema(fastapi_app: FastAPI) -> FastAPI:
     # Define the custom OpenAPI schema
     # save original fastapi_app.openapi to call it later in mocked one
     fastapi_app.openapi_original = fastapi_app.openapi
-    fastapi_app.openapi = functools.partial(custom_422_openapi_schema, fastapi_app)
+    fastapi_app.openapi = lambda: custom_422_openapi_schema(fastapi_app)
 
 
 def register_router(fastapi_app: FastAPI) -> None:

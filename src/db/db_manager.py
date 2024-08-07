@@ -20,9 +20,9 @@ from src.db.exceptions import (
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     OverflowMoneyboxCantBeDeletedError,
-    TransferEqualMoneyboxError,
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
+    TransferEqualMoneyboxError,
 )
 from src.db.models import Moneybox, Transaction
 from src.utils import get_database_url

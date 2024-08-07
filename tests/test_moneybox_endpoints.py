@@ -12,7 +12,7 @@ from src.utils import equal_dict
 
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
-async def test_endpoint_get_moneyboxes__status_200__total_5(
+async def test_endpoint_get_moneyboxes__status_200__total_6(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -20,11 +20,19 @@ async def test_endpoint_get_moneyboxes__status_200__total_5(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
     )
     expected_moneyboxes = {
-        "total": 5,
+        "total": 6,
         "moneyboxes": [
             {
-                "name": "Test Box 1",
+                "name": "1bd2a9ee-26a1-4630-a068-19865cf2ca62",
                 "id": 1,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 0,
+            },
+            {
+                "name": "Test Box 1",
+                "id": 2,
                 "balance": 0,
                 "savings_amount": 0,
                 "savings_target": None,
@@ -32,7 +40,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_5(
             },
             {
                 "name": "Test Box 2",
-                "id": 2,
+                "id": 3,
                 "balance": 0,
                 "savings_amount": 0,
                 "savings_target": None,
@@ -40,7 +48,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_5(
             },
             {
                 "name": "Test Box 3",
-                "id": 3,
+                "id": 4,
                 "balance": 0,
                 "savings_amount": 0,
                 "savings_target": None,
@@ -48,7 +56,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_5(
             },
             {
                 "name": "Test Box 4",
-                "id": 4,
+                "id": 5,
                 "balance": 0,
                 "savings_amount": 0,
                 "savings_target": None,
@@ -56,7 +64,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_5(
             },
             {
                 "name": "Test Box 5",
-                "id": 5,
+                "id": 6,
                 "balance": 0,
                 "savings_amount": 0,
                 "savings_target": None,
@@ -89,22 +97,23 @@ async def test_endpoint_get_moneyboxes__status_204__no_content(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
     )
 
-    assert response.status_code == status.HTTP_204_NO_CONTENT
+    # there should be always at least one moneybox: the overflow moneybox
+    assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.dependency
-async def test_endpoint_get_moneybox__moneybox_id_1__status_200_existing(
+async def test_endpoint_get_moneybox__moneybox_id_2__status_200_existing(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2",
     )
     moneybox = response.json()
 
     expected_moneybox_data = {
         "name": "Test Box 1",
-        "id": 1,
+        "id": 2,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
@@ -141,12 +150,12 @@ async def test_endpoint_get_moneybox__moneybox_id_2__status_200_existing__with_b
     moneybox = response.json()
 
     expected_moneybox_data = {
-        "name": "Test Box 2",
+        "name": "Test Box 1",
         "id": 2,
         "balance": 100,
         "savings_amount": 0,
         "savings_target": None,
-        "priority": 2,
+        "priority": 1,
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -175,7 +184,7 @@ async def test_endpoint_add_moneybox__one__status_200(
 
     expected_moneybox_data = {
         "name": "Test Box Endpoint Add 1",
-        "id": 1,
+        "id": 2,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
@@ -208,7 +217,7 @@ async def test_endpoint_add_moneybox__two__status_200(
 
     expected_moneybox_data_1 = {
         "name": "Test Box Endpoint Add 1",
-        "id": 1,
+        "id": 2,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
@@ -236,7 +245,7 @@ async def test_endpoint_add_moneybox__two__status_200(
 
     expected_moneybox_data_2 = {
         "name": "Test Box Endpoint Add 2",
-        "id": 2,
+        "id": 3,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
@@ -267,7 +276,7 @@ async def test_endpoint_add_moneybox__one__status_422__balance_postdata(
 
 
 @pytest.mark.dependency
-async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
+async def test_endpoint_update_overflow_moneybox(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -281,34 +290,69 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
     response_1 = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_1
     )
-    moneybox_1 = response_1.json()
-    expected_moneybox_data_1 = moneybox_data_1 | {
-        "id": 1,
+    content = response_1.json()
+    assert response_1.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert content["message"] == "Updating overflow moneybox is not allowed/possible!"
+
+
+@pytest.mark.dependency
+async def test_endpoint_delete_overflow_moneybox__status_405(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1")
+    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert response.json() == {
+        "details": {
+            "id": 1,
+        },
+        "message": "Deleting overflow moneybox is not allowed/possible!",
+    }
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__moneybox_id_4__namechange(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    moneybox_data_4 = {
+        "name": "Updated Name Test Box 4",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 3,
+    }
+    expected_moneybox_data_4 = {
+        "name": "Updated Name Test Box 4",
+        "id": 4,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
-        "priority": 1,
+        "priority": 3,
     }
 
-    assert response_1.status_code == status.HTTP_200_OK
+    response_4 = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/4", json=moneybox_data_4
+    )
+    moneybox_4 = response_4.json()
+    assert response_4.status_code == status.HTTP_200_OK
     assert equal_dict(
-        dict_1=moneybox_1,
-        dict_2=expected_moneybox_data_1,
+        dict_1=moneybox_4,
+        dict_2=expected_moneybox_data_4,
         exclude_keys=["created_at", "modified_at"],
     )
 
-    # no change should be happened for moneyboxes 2 and 3
+    # no change should be happened for moneyboxes id=2 and id=3
     response_2 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2",
     )
     moneybox_2 = response_2.json()
     expected_moneybox_data_2 = {
-        "name": "Test Box 2",
+        "name": "Test Box 1",
         "id": 2,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
-        "priority": 2,
+        "priority": 1,
     }
 
     assert response_2.status_code == status.HTTP_200_OK
@@ -323,15 +367,15 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
     )
     moneybox_3 = response_3.json()
     expected_moneybox_data_3 = {
-        "name": "Test Box 3",
+        "name": "Test Box 2",
         "id": 3,
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
-        "priority": 3,
+        "priority": 2,
     }
 
-    assert response_2.status_code == status.HTTP_200_OK
+    assert response_3.status_code == status.HTTP_200_OK
     assert equal_dict(
         dict_1=moneybox_3,
         dict_2=expected_moneybox_data_3,
@@ -340,12 +384,12 @@ async def test_endpoint_update_moneybox__moneybox_id_1__namechange(
 
 
 @pytest.mark.dependency
-async def test_endpoint_moneybox_id_1__modified_at_checks(
+async def test_endpoint_moneybox_id_2__modified_at_checks(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     response_1 = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2",
     )
     content_1 = response_1.json()
     assert content_1["modified_at"] is None
@@ -354,7 +398,7 @@ async def test_endpoint_moneybox_id_1__modified_at_checks(
         "name": "Updated Name Test Box 1",
     }
     response_2 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_2
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2", json=moneybox_data_2
     )
     content_2 = response_2.json()
 
@@ -365,7 +409,7 @@ async def test_endpoint_moneybox_id_1__modified_at_checks(
 
     moneybox_data_3 = {"name": "RE-Updated Name Test Box 1"}
     response_3 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1", json=moneybox_data_3
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2", json=moneybox_data_3
     )
     content_3 = response_3.json()
     assert datetime.fromisoformat(content_3["modified_at"]) > datetime.fromisoformat(
@@ -398,7 +442,7 @@ async def test_endpoint_update_moneybox__moneybox_id_1__status_422__fail_extra_f
 
 
 @pytest.mark.dependency
-async def test_endpoint_delete_moneybox_1__status_204(
+async def test_endpoint_delete_moneybox_2__status_204(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -407,10 +451,10 @@ async def test_endpoint_delete_moneybox_1__status_204(
     )
     moneyboxes = response_1.json()
 
-    assert moneyboxes["total"] == 2
+    assert moneyboxes["total"] == 3
 
     response_2 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1"
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2"
     )
     assert response_2.status_code == status.HTTP_204_NO_CONTENT
 
@@ -419,35 +463,35 @@ async def test_endpoint_delete_moneybox_1__status_204(
     )
     moneyboxes = response_3.json()
 
-    assert moneyboxes["total"] == 1
+    assert moneyboxes["total"] == 2
 
 
 @pytest.mark.dependency
-async def test_endpoint_delete_moneybox_1__non_existing__status_404(
+async def test_endpoint_delete_moneybox_2__non_existing__status_404(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
-    response = await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1")
+    response = await client.delete(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2")
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
-async def test_endpoint_delete_moneybox_1__non_existing_after_success_deletion__status_204_and_404(
+async def test_endpoint_delete_moneybox_2__non_existing_after_success_deletion__status_204_and_404(
     load_test_data: None, client: AsyncClient  # pylint: disable=unused-argument
 ) -> None:
     response_1 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1"
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2"
     )
     assert response_1.status_code == status.HTTP_204_NO_CONTENT
 
     response_2 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1"
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2"
     )
     assert response_2.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
-async def test_endpoint_deposit_moneybox_1__status_200(
+async def test_endpoint_deposit_moneybox_2__status_200(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -457,14 +501,14 @@ async def test_endpoint_deposit_moneybox_1__status_200(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/add",
         json=deposit_data,
     )
     moneybox = response.json()
 
     expected_data = {
         "name": "Test Box 1",
-        "id": 1,
+        "id": 2,
         "balance": 100,
         "savings_amount": 0,
         "savings_target": None,
@@ -480,7 +524,7 @@ async def test_endpoint_deposit_moneybox_1__status_200(
 
 
 @pytest.mark.dependency
-async def test_endpoint_deposit_moneybox_1__status_422__fail_extra_field(
+async def test_endpoint_deposit_moneybox_2__status_422__fail_extra_field(
     client: AsyncClient,
 ) -> None:
     deposit_data = {
@@ -498,7 +542,7 @@ async def test_endpoint_deposit_moneybox_1__status_422__fail_extra_field(
 
 
 @pytest.mark.dependency
-async def test_endpoint_deposit_moneybox_1__status_422__missing_required_amount_field(
+async def test_endpoint_deposit_moneybox_2__status_422__missing_required_amount_field(
     client: AsyncClient,
 ) -> None:
     deposit_data = {
@@ -517,7 +561,7 @@ async def test_endpoint_deposit_moneybox_1__status_422__missing_required_amount_
 
 
 @pytest.mark.dependency
-async def test_endpoint_deposit_moneybox_1__status_422__negative_amount(
+async def test_endpoint_deposit_moneybox_2__status_422__negative_amount(
     client: AsyncClient,
 ) -> None:
     deposit_data = {
@@ -526,7 +570,7 @@ async def test_endpoint_deposit_moneybox_1__status_422__negative_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/add",
         json=deposit_data,
     )
     content = response.json()
@@ -537,7 +581,7 @@ async def test_endpoint_deposit_moneybox_1__status_422__negative_amount(
 
 
 @pytest.mark.dependency
-async def test_endpoint_deposit_moneybox_1__status_422__zero_amount(
+async def test_endpoint_deposit_moneybox_2__status_422__zero_amount(
     client: AsyncClient,
 ) -> None:
     deposit_data = {
@@ -546,7 +590,7 @@ async def test_endpoint_deposit_moneybox_1__status_422__zero_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/add",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/add",
         json=deposit_data,
     )
     content = response.json()
@@ -557,7 +601,7 @@ async def test_endpoint_deposit_moneybox_1__status_422__zero_amount(
 
 
 @pytest.mark.dependency
-async def test_endpoint_withdraw_moneybox_1__status_200(
+async def test_endpoint_withdraw_moneybox_2__status_200(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -567,14 +611,14 @@ async def test_endpoint_withdraw_moneybox_1__status_200(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/sub",
         json=withdraw_data,
     )
     moneybox = response.json()
 
     expected_data = {
         "name": "Test Box 1",
-        "id": 1,
+        "id": 2,
         "balance": 1,
         "savings_amount": 0,
         "savings_target": None,
@@ -590,7 +634,7 @@ async def test_endpoint_withdraw_moneybox_1__status_200(
 
 
 @pytest.mark.dependency
-async def test_endpoint_withdraw_moneybox_1__status_422__fail_extra_field(
+async def test_endpoint_withdraw_moneybox_2__status_422__fail_extra_field(
     client: AsyncClient,
 ) -> None:
     withdraw_data = {
@@ -600,7 +644,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__fail_extra_field(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/sub",
         json=withdraw_data,
     )
 
@@ -608,7 +652,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__fail_extra_field(
 
 
 @pytest.mark.dependency
-async def test_endpoint_withdraw_moneybox_1__status_422__missing_required_amount_field(
+async def test_endpoint_withdraw_moneybox_2__status_422__missing_required_amount_field(
     client: AsyncClient,
 ) -> None:
     withdraw_data = {
@@ -616,7 +660,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__missing_required_amount
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/sub",
         json=withdraw_data,
     )
     content = response.json()
@@ -627,7 +671,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__missing_required_amount
 
 
 @pytest.mark.dependency
-async def test_endpoint_withdraw_moneybox_1__status_422__negative_amount(
+async def test_endpoint_withdraw_moneybox_2__status_422__negative_amount(
     client: AsyncClient,
 ) -> None:
     withdraw_data = {
@@ -636,7 +680,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__negative_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/sub",
         json=withdraw_data,
     )
     content = response.json()
@@ -647,7 +691,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__negative_amount(
 
 
 @pytest.mark.dependency
-async def test_endpoint_withdraw_moneybox_1__status_422__zero_amount(
+async def test_endpoint_withdraw_moneybox_2__status_422__zero_amount(
     client: AsyncClient,
 ) -> None:
     withdraw_data = {
@@ -656,7 +700,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__zero_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/sub",
         json=withdraw_data,
     )
     content = response.json()
@@ -666,7 +710,7 @@ async def test_endpoint_withdraw_moneybox_1__status_422__zero_amount(
     assert "amount" in content["detail"][0]["loc"]
 
 
-async def test_endpoint_withdraw_moneybox_1__status_405__balance_negative(
+async def test_endpoint_withdraw_moneybox_2__status_405__balance_negative(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -676,7 +720,7 @@ async def test_endpoint_withdraw_moneybox_1__status_405__balance_negative(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/sub",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/sub",
         json=withdraw_data,
     )
 
@@ -684,17 +728,17 @@ async def test_endpoint_withdraw_moneybox_1__status_405__balance_negative(
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204(
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_204(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     transfer_data = {
         "amount": 500,
-        "to_moneybox_id": 2,
+        "to_moneybox_id": 3,
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
 
@@ -702,16 +746,16 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204(
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204__missing_description_field(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_204__missing_description_field(  # noqa: E501
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     transfer_data = {
         "amount": 500,
-        "to_moneybox_id": 2,
+        "to_moneybox_id": 3,
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
 
@@ -719,15 +763,15 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_204__mi
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__missing_amount_field(
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_422__missing_amount_field(
     client: AsyncClient,
 ) -> None:
     transfer_data = {
-        "to_moneybox_id": 2,
+        "to_moneybox_id": 3,
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
     content = response.json()
@@ -738,7 +782,7 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__mi
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__missing_to_moneybox_id_field(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_422__missing_to_moneybox_id_field(  # noqa: E501
     client: AsyncClient,
 ) -> None:
     transfer_data = {
@@ -746,7 +790,7 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__mi
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
     content = response.json()
@@ -757,7 +801,7 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__mi
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__status_422__fail_extra_field(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_422__status_422__fail_extra_field(  # noqa: E501
     client: AsyncClient,
 ) -> None:
     transfer_data = {
@@ -765,7 +809,7 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__st
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
     content = response.json()
@@ -776,16 +820,16 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__st
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__negative_amount(
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_422__negative_amount(
     client: AsyncClient,
 ) -> None:
     transfer_data = {
         "amount": -500,
-        "to_moneybox_id": 2,
+        "to_moneybox_id": 3,
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
     content = response.json()
@@ -796,16 +840,16 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__ne
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__zero_amount(
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_422__zero_amount(
     client: AsyncClient,
 ) -> None:
     transfer_data = {
         "amount": 0,
-        "to_moneybox_id": 2,
+        "to_moneybox_id": 3,
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
     content = response.json()
@@ -816,17 +860,17 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_422__ze
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__to_moneybox_id_2_not_found(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_2_to_moneybox_3__status_404__to_moneybox_id_3_not_found(  # noqa: E501
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     transfer_data = {
         "amount": 500,
-        "to_moneybox_id": 2,
+        "to_moneybox_id": 3,
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/balance/transfer",
         json=transfer_data,
     )
 
@@ -834,18 +878,18 @@ async def test_endpoint_transfer_amount_moneybox_1_to_moneybox_2__status_404__to
 
 
 @pytest.mark.dependency
-async def test_endpoint_get_transactions_log_moneybox_1__status_200(  # noqa: E501
+async def test_endpoint_get_transactions_log_moneybox_2__status_200(  # noqa: E501
     default_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/1/transactions",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/transactions",
     )
     content = response.json()
 
     expected_logs = [
         {
-            "id": 1,
+            "id": 2,
             "counterparty_moneybox_name": None,
             "description": "",
             "transaction_type": "direct",
@@ -853,18 +897,7 @@ async def test_endpoint_get_transactions_log_moneybox_1__status_200(  # noqa: E5
             "amount": 1000,
             "balance": 1000,
             "counterparty_moneybox_id": None,
-            "moneybox_id": 1,
-        },
-        {
-            "id": 2,
-            "counterparty_moneybox_name": None,
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": 333,
-            "balance": 1333,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": 1,
+            "moneybox_id": 2,
         },
         {
             "id": 3,
@@ -872,21 +905,32 @@ async def test_endpoint_get_transactions_log_moneybox_1__status_200(  # noqa: E5
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
-            "amount": 2000,
-            "balance": 3333,
+            "amount": 333,
+            "balance": 1333,
             "counterparty_moneybox_id": None,
-            "moneybox_id": 1,
+            "moneybox_id": 2,
         },
         {
             "id": 4,
+            "counterparty_moneybox_name": None,
+            "description": "",
+            "transaction_type": "direct",
+            "transaction_trigger": "manually",
+            "amount": 2000,
+            "balance": 3333,
+            "counterparty_moneybox_id": None,
+            "moneybox_id": 2,
+        },
+        {
+            "id": 5,
             "counterparty_moneybox_name": "Moneybox 3",
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
             "amount": -3000,
             "balance": 333,
-            "counterparty_moneybox_id": 3,
-            "moneybox_id": 1,
+            "counterparty_moneybox_id": 4,
+            "moneybox_id": 2,
         },
         {
             "id": 18,
@@ -896,8 +940,8 @@ async def test_endpoint_get_transactions_log_moneybox_1__status_200(  # noqa: E5
             "transaction_trigger": "manually",
             "amount": 15000,
             "balance": 15333,
-            "counterparty_moneybox_id": 4,
-            "moneybox_id": 1,
+            "counterparty_moneybox_id": 5,
+            "moneybox_id": 2,
         },
     ]
 
@@ -924,58 +968,53 @@ async def test_endpoint_get_transactions_log_moneybox_2__status_200(  # noqa: E5
 
     expected_logs = [
         {
-            "id": 6,
             "counterparty_moneybox_name": None,
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
-            "amount": 6000,
-            "balance": 6000,
+            "amount": 1000,
+            "balance": 1000,
             "counterparty_moneybox_id": None,
             "moneybox_id": 2,
         },
         {
-            "id": 7,
             "counterparty_moneybox_name": None,
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
-            "amount": -500,
-            "balance": 5500,
+            "amount": 333,
+            "balance": 1333,
             "counterparty_moneybox_id": None,
             "moneybox_id": 2,
         },
         {
-            "id": 8,
             "counterparty_moneybox_name": None,
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
-            "amount": -600,
-            "balance": 4900,
+            "amount": 2000,
+            "balance": 3333,
             "counterparty_moneybox_id": None,
             "moneybox_id": 2,
         },
         {
-            "id": 9,
-            "counterparty_moneybox_name": None,
+            "counterparty_moneybox_name": "Moneybox 2",
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
-            "amount": 5000,
-            "balance": 9900,
-            "counterparty_moneybox_id": None,
+            "amount": -3000,
+            "balance": 333,
+            "counterparty_moneybox_id": 3,
             "moneybox_id": 2,
         },
         {
-            "id": 10,
-            "counterparty_moneybox_name": None,
+            "counterparty_moneybox_name": "Moneybox 4",
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
-            "amount": -900,
-            "balance": 9000,
-            "counterparty_moneybox_id": None,
+            "amount": 15000,
+            "balance": 15333,
+            "counterparty_moneybox_id": 5,
             "moneybox_id": 2,
         },
     ]
@@ -987,7 +1026,7 @@ async def test_endpoint_get_transactions_log_moneybox_2__status_200(  # noqa: E5
         assert equal_dict(
             dict_1=expected_log,  # type: ignore
             dict_2=content["transaction_logs"][i],
-            exclude_keys=["modified_at", "created_at"],
+            exclude_keys=["modified_at", "created_at", "id"],
         )
 
 
@@ -1003,69 +1042,63 @@ async def test_endpoint_get_transactions_log_moneybox_3__status_200(  # noqa: E5
 
     expected_logs = [
         {
-            "id": 5,
             "counterparty_moneybox_name": "Moneybox 1",
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
             "amount": 3000,
             "balance": 3000,
-            "counterparty_moneybox_id": 1,
+            "counterparty_moneybox_id": 2,
             "moneybox_id": 3,
         },
         {
-            "id": 11,
             "counterparty_moneybox_name": None,
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
-            "amount": 10000,
-            "balance": 13000,
+            "amount": 6000,
+            "balance": 9000,
             "counterparty_moneybox_id": None,
             "moneybox_id": 3,
         },
         {
-            "id": 12,
+            "counterparty_moneybox_name": None,
+            "description": "",
+            "transaction_type": "direct",
+            "transaction_trigger": "manually",
+            "amount": -500,
+            "balance": 8500,
+            "counterparty_moneybox_id": None,
+            "moneybox_id": 3,
+        },
+        {
+            "counterparty_moneybox_name": None,
+            "description": "",
+            "transaction_type": "direct",
+            "transaction_trigger": "manually",
+            "amount": -600,
+            "balance": 7900,
+            "counterparty_moneybox_id": None,
+            "moneybox_id": 3,
+        },
+        {
+            "counterparty_moneybox_name": None,
+            "description": "",
+            "transaction_type": "direct",
+            "transaction_trigger": "manually",
+            "amount": 5000,
+            "balance": 12900,
+            "counterparty_moneybox_id": None,
+            "moneybox_id": 3,
+        },
+        {
             "counterparty_moneybox_name": None,
             "description": "",
             "transaction_type": "direct",
             "transaction_trigger": "manually",
             "amount": -900,
-            "balance": 12100,
+            "balance": 12000,
             "counterparty_moneybox_id": None,
-            "moneybox_id": 3,
-        },
-        {
-            "id": 13,
-            "counterparty_moneybox_name": "Moneybox 4",
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": -5000,
-            "balance": 7100,
-            "counterparty_moneybox_id": 4,
-            "moneybox_id": 3,
-        },
-        {
-            "id": 15,
-            "counterparty_moneybox_name": None,
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": -900,
-            "balance": 6200,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": 3,
-        },
-        {
-            "id": 21,
-            "counterparty_moneybox_name": "Moneybox 4",
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": 8000,
-            "balance": 14200,
-            "counterparty_moneybox_id": 4,
             "moneybox_id": 3,
         },
     ]
@@ -1077,12 +1110,24 @@ async def test_endpoint_get_transactions_log_moneybox_3__status_200(  # noqa: E5
         assert equal_dict(
             dict_1=expected_log,  # type: ignore
             dict_2=content["transaction_logs"][i],
-            exclude_keys=["modified_at", "created_at"],
+            exclude_keys=["modified_at", "created_at", "id"],
         )
 
 
 @pytest.mark.dependency
-async def test_endpoint_get_transactions_log_moneybox_5__status_204(  # noqa: E501
+async def test_endpoint_get_transactions_log_moneybox_6__status_204(  # noqa: E501
+    default_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/6/transactions",
+    )
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.dependency
+async def test_endpoint_get_transactions_log_moneybox_5__status_404__deleted_and_not_found(  # noqa: E501
     default_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
@@ -1090,28 +1135,16 @@ async def test_endpoint_get_transactions_log_moneybox_5__status_204(  # noqa: E5
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/5/transactions",
     )
 
-    assert response.status_code == status.HTTP_204_NO_CONTENT
-
-
-@pytest.mark.dependency
-async def test_endpoint_get_transactions_log_moneybox_4__status_404__deleted_and_not_found(  # noqa: E501
-    default_test_data: None,  # pylint: disable=unused-argument
-    client: AsyncClient,
-) -> None:
-    response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/4/transactions",
-    )
-
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
-async def test_endpoint_get_transactions_log_moneybox_6__status_404__not_existing_and_not_found(  # noqa: E501
+async def test_endpoint_get_transactions_log_moneybox_7__status_404__not_existing_and_not_found(  # noqa: E501
     default_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/6/transactions",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/7/transactions",
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

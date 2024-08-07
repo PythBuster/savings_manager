@@ -10,9 +10,9 @@ from starlette.responses import JSONResponse
 from src.data_classes.responses import HTTPErrorResponse
 from src.db.exceptions import (
     DeleteInstanceError,
+    InconsistentDatabaseError,
     RecordNotFoundError,
     UpdateInstanceError,
-    InconsistentDatabaseError,
 )
 
 
