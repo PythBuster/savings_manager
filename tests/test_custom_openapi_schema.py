@@ -1,9 +1,11 @@
+"""All tests for custom_openapi_schema are located here."""
+
 import pytest
 from httpx import AsyncClient
 
 
 @pytest.mark.dependency
-async def test_custom_openapi_schema(client: AsyncClient):
+async def test_custom_openapi_schema(client: AsyncClient) -> None:
     response = await client.get("/openapi.json")
     assert response.status_code == 200
     openapi_schema = response.json()

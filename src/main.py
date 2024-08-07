@@ -117,9 +117,14 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     set_custom_openapi_schema(fastapi_app=fastapi_app)
 
 
-def set_custom_openapi_schema(fastapi_app: FastAPI) -> FastAPI:
-    # Define the custom OpenAPI schema
-    # save original fastapi_app.openapi to call it later in mocked one
+def set_custom_openapi_schema(fastapi_app: FastAPI) -> None:
+    """Define the custom OpenAPI schema
+        save original fastapi_app.openapi to call it later in mocked one.
+
+    :param fastapi_app: The fast api app.
+    :type fastapi_app: FastAPI
+    """
+
     fastapi_app.openapi_original = fastapi_app.openapi
     fastapi_app.openapi = lambda: custom_422_openapi_schema(fastapi_app)
 

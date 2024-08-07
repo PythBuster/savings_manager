@@ -923,81 +923,6 @@ async def test_endpoint_get_transactions_log_moneybox_2__status_200(  # noqa: E5
         },
         {
             "id": 5,
-            "counterparty_moneybox_name": "Moneybox 3",
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": -3000,
-            "balance": 333,
-            "counterparty_moneybox_id": 4,
-            "moneybox_id": 2,
-        },
-        {
-            "id": 18,
-            "counterparty_moneybox_name": "Moneybox 4",
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": 15000,
-            "balance": 15333,
-            "counterparty_moneybox_id": 5,
-            "moneybox_id": 2,
-        },
-    ]
-
-    assert response.status_code == status.HTTP_200_OK
-    assert content["total"] == 5
-
-    for i, expected_log in enumerate(expected_logs):
-        assert equal_dict(
-            dict_1=expected_log,  # type: ignore
-            dict_2=content["transaction_logs"][i],
-            exclude_keys=["modified_at", "created_at"],
-        )
-
-
-@pytest.mark.dependency
-async def test_endpoint_get_transactions_log_moneybox_2__status_200(  # noqa: E501
-    default_test_data: None,  # pylint: disable=unused-argument
-    client: AsyncClient,
-) -> None:
-    response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/2/transactions",
-    )
-    content = response.json()
-
-    expected_logs = [
-        {
-            "counterparty_moneybox_name": None,
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": 1000,
-            "balance": 1000,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": 2,
-        },
-        {
-            "counterparty_moneybox_name": None,
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": 333,
-            "balance": 1333,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": 2,
-        },
-        {
-            "counterparty_moneybox_name": None,
-            "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
-            "amount": 2000,
-            "balance": 3333,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": 2,
-        },
-        {
             "counterparty_moneybox_name": "Moneybox 2",
             "description": "",
             "transaction_type": "direct",
@@ -1008,6 +933,7 @@ async def test_endpoint_get_transactions_log_moneybox_2__status_200(  # noqa: E5
             "moneybox_id": 2,
         },
         {
+            "id": 18,
             "counterparty_moneybox_name": "Moneybox 4",
             "description": "",
             "transaction_type": "direct",

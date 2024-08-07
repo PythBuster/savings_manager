@@ -106,7 +106,8 @@ class DBManager:
     async def _get_overflow_moneybox(self) -> Moneybox:
         """DB Function to get the overflow moneybox.
 
-        There is only one overflow moneybox (special moneybox) which has the priority colum value of 0.
+        There is only one overflow moneybox (special moneybox) which has the
+        priority colum value of 0.
         Note: Only 'is_active' moneyboxes will be requested.
 
         :return: The overflow moneybox orm instance.

@@ -1,6 +1,6 @@
 """All response models are located here."""
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Annotated, Any, Self
 
 from pydantic import (

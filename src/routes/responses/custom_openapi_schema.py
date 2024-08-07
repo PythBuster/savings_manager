@@ -1,3 +1,5 @@
+"""Custom openapi schema definitions are located here."""
+
 from typing import Any
 
 from fastapi import FastAPI
@@ -27,7 +29,7 @@ def custom_422_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
                                                 "loc": ["body", "name"],
                                                 "msg": "Input should be a valid string",
                                                 "input": 123,
-                                                "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                                                "url": "https://errors.pydantic.dev/2.6/v/string_type",  # noqa: E501  # pylint: disable=line-too-long
                                             }
                                         ]
                                     },
