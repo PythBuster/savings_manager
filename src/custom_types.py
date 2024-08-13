@@ -22,8 +22,8 @@ class EndpointRouteType(StrEnum):
 class EnvironmentType(StrEnum):
     """The Environment Types to handle env loading logic."""
 
-    DEV = "dev"
-    """Development Environment."""
+    LIVE = "live"
+    """Live Environment (including DEV, STAGE, PROD)."""
 
     TEST = "test"
     """Testing Environment."""

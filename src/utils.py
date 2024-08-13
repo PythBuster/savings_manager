@@ -98,7 +98,7 @@ def load_environment() -> EnvironmentType:
     )
     args = parser.parse_args()
 
-    if args.environment == EnvironmentType.DEV:
+    if args.environment == EnvironmentType.LIVE:
         dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
         load_dotenv(dotenv_path=dotenv_path)
         print(f"Loaded {dotenv_path}")

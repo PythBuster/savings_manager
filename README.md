@@ -39,7 +39,7 @@ To get the newest repo, just pull it and rebuilt docker:
 
 
 ##### Database
-A postgres database is needed. To connect to the database, add a `.env` filge
+A postgres database is needed. To connect to the database, add a `.env` file
 in: `/src/envs` with following information:
 
 ```
@@ -107,7 +107,7 @@ It will automatically update the sphinx documentation.
 
 #### Init:
 In our case, alembic already exists and don't need to be initialized.
-Just for documentation: `alembic init -t async alembic` in project root dir will initialized an alembic environment.
+Just for documentation: `alembic init -t async alembic` in project root dir will initialize an alembic environment.
 
 #### Migration:
 **Upgrade to a revision:**
@@ -126,3 +126,23 @@ Just for documentation: `alembic init -t async alembic` in project root dir will
 
 `alembic revision --autogenerate -m "Added account table"`
 
+# RUN
+
+If poetry environment is initialized and all dependencies are initially installed
+via:
+- for production (usage only): `poetry install --without dev`
+- for development: `poetry install`
+
+you should be able to start the app from root directory of the project by using the following command:
+`poetry run python -m src.main --environment live`
+
+Argument `--environment live` is required to load the .env file in `/envs` dir (see section: **Deployment/Contribution**).
+If argument is missing, app will load the .env.test credentials which will only work for pytest.
+
+This will start a service on:
+`http://localhost:8001`
+
+To see the API documentation or use the API via SwaggerUI, visit:
+`http://localhost:8001/docs`
+
+``
