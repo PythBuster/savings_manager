@@ -18,6 +18,7 @@ from src.db.core import (
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
     CreateInstanceError,
+    DeleteInstanceError,
     HasBalanceError,
     MoneyboxNotFoundByNameError,
     MoneyboxNotFoundError,
@@ -27,7 +28,6 @@ from src.db.exceptions import (
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
     UpdateInstanceError,
-    DeleteInstanceError,
 )
 from src.db.models import Moneybox, MoneyboxNameHistory, Transaction
 from src.utils import get_database_url
@@ -164,7 +164,7 @@ class DBManager:
             }
             moneybox_name_history = await create_instance(
                 async_session=session,
-                orm_model=MoneyboxNameHistory,
+                orm_model=MoneyboxNameHistory,  # type: ignore
                 data=moneybox_name_history_data,
             )
 
@@ -249,7 +249,7 @@ class DBManager:
                 }
                 moneybox_name_history = await create_instance(
                     async_session=session,
-                    orm_model=MoneyboxNameHistory,
+                    orm_model=MoneyboxNameHistory,  # type: ignore
                     data=moneybox_name_history_data,
                 )
 
@@ -284,7 +284,7 @@ class DBManager:
         async with self.async_session.begin() as session:
             updated_moneybox = await update_instance(
                 async_session=session,
-                orm_model=Moneybox,
+                orm_model=Moneybox,  # type: ignore
                 record_id=moneybox_id,
                 data={"priority": None},
             )
