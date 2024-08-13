@@ -6,7 +6,6 @@ from typing import Any
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
-from sqlalchemy.util import await_only
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
@@ -742,7 +741,7 @@ class DBManager:
             raise UpdateInstanceError(
                 record_id=None,
                 message="Updating priority=0 is not allowed (reserved for Overflow Moneybox)",
-                details=priorities,
+                details=priorities,  # type: ignore
             )
 
         async with self.async_session.begin() as session:

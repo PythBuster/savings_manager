@@ -124,7 +124,7 @@ def create_envfile_from_envvars() -> None:
 def equal_dict(
     dict_1: dict,
     dict_2: dict,
-    exclude_keys: list[str] = None,
+    exclude_keys: list[str] | None = None,
 ) -> bool:
     """Compare two dictionaries by excluding keys specified in exclude_keys.
 
@@ -133,7 +133,7 @@ def equal_dict(
     :param dict_2: The second dictionary.
     :type dict_2: :class:`dict`
     :param exclude_keys: List of keys to exclude from given dictionaries.
-    :type exclude_keys: :class:`list[str]`
+    :type exclude_keys: :class:`list[str]` | :class:`None`
     :return: True if the two dictionaries are equal, False otherwise.
     :rtype: :class:`bool`
     """
