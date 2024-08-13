@@ -40,9 +40,9 @@ class DBTestDataInitializer:
             "test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields": self.dataset_test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields,
             "test_endpoint_first_moneybox__modified_at_checks": self.dataset_test_endpoint_first_moneybox__modified_at_checks,
             "test_endpoint_delete_second_moneybox__status_204": self.dataset_test_endpoint_delete_second_moneybox__status_204,
-            "test_endpoint_deposit_second_moneybox__status_200": self.dataset_test_endpoint_deposit_second_moneybox__status_200,
-            "test_endpoint_withdraw_second_moneybox__status_200": self.dataset_test_endpoint_withdraw_second_moneybox__status_200,
-            "test_endpoint_withdraw_second_moneybox__status_405__balance_negative": self.dataset_test_endpoint_withdraw_second_moneybox__status_405__balance_negative,
+            "test_endpoint_deposit_first_moneybox__status_200": self.dataset_test_endpoint_deposit_first_moneybox__status_200,
+            "test_endpoint_withdraw_first_moneybox__status_200": self.dataset_test_endpoint_withdraw_first_moneybox__status_200,
+            "test_endpoint_withdraw_first_moneybox__status_405__balance_negative": self.dataset_test_endpoint_withdraw_first_moneybox__status_405__balance_negative,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found,
@@ -309,11 +309,11 @@ class DBTestDataInitializer:
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_endpoint_deposit_second_moneybox__status_200(
+    async def dataset_test_endpoint_deposit_first_moneybox__status_200(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_deposit_second_moneybox__status_200`.
+        `test_endpoint_deposit_first_moneybox__status_200`.
         """
 
         await self.truncate_tables()
@@ -328,11 +328,11 @@ class DBTestDataInitializer:
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_endpoint_withdraw_second_moneybox__status_200(
+    async def dataset_test_endpoint_withdraw_first_moneybox__status_200(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_withdraw_second_moneybox__status_200`.
+        `test_endpoint_withdraw_first_moneybox__status_200`.
         """
 
         await self.truncate_tables()
@@ -365,11 +365,11 @@ class DBTestDataInitializer:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    async def dataset_test_endpoint_withdraw_second_moneybox__status_405__balance_negative(
+    async def dataset_test_endpoint_withdraw_first_moneybox__status_405__balance_negative(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_withdraw_second_moneybox__status_405__balance_negative`.
+        `test_endpoint_withdraw_first_moneybox__status_405__balance_negative`.
         """
 
         await self.truncate_tables()

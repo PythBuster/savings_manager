@@ -110,7 +110,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
             include=include,
             only=only,
             **kwargs,
-        )
+        )  # pylint: disable=duplicate-code
 
 
 class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
@@ -171,12 +171,12 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
         )
     )
 
-    moneybox_name_history: Mapped[List["MoneyboxNameHistory"]] = (  # noqa: typing  # pylint: disable=unsubscriptable-object
-        relationship(
-            back_populates="moneybox",
-            foreign_keys="[MoneyboxNameHistory.moneybox_id]",
-            cascade="all, delete-orphan",
-        )
+    moneybox_name_history: Mapped[  # noqa: typing  # pylint: disable=(unsubscriptable-object
+        List["MoneyboxNameHistory"]
+    ] = relationship(
+        back_populates="moneybox",
+        foreign_keys="[MoneyboxNameHistory.moneybox_id]",
+        cascade="all, delete-orphan",
     )
 
     __table_args__ = (
