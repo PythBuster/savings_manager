@@ -3,6 +3,11 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.11.0 (2024-08-13)
+### Features:
+- add priority list db get/update function
+
+
 ## 1.10.0 (2024-08-13)
 ### Changes:
 - change pytest ordering dependency (use pytest-order instead of pytest-ordering)
