@@ -6,6 +6,7 @@ from typing import Any
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
+from sqlalchemy.util import await_only
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
@@ -644,28 +645,32 @@ class DBManager:
             for transaction in moneybox.transactions_log
         ]
 
-    async def _get_historical_moneybox_name(self, moneybox_id: int, from_datetime: datetime) -> str:
+    async def _get_historical_moneybox_name(
+        self, moneybox_id: int, from_datetime: datetime | None = None
+    ) -> str:
         """Get historical moneybox name for the given moneybox id within given datetime.
 
         :param moneybox_id: The moneybox id.
         :type moneybox_id: :class:`int`
-        :param from_datetime: The datetime of the moneybox name.
-        :type from_datetime: :class:`datetime.datetime`
+        :param from_datetime: The datetime of the moneybox name, defaults to None.
+        :type from_datetime: :class:`datetime.datetime` | :class:`None`
         :return: The historical moneybox name for the given moneybox id within given datetime.
         :rtype: :class:`str`
         """
 
-        stmt = (
-            select(MoneyboxNameHistory)
-            .where(
+        stmt = select(MoneyboxNameHistory).order_by(desc(MoneyboxNameHistory.created_at)).limit(1)
+
+        if from_datetime is None:
+            stmt = stmt.where(
+                MoneyboxNameHistory.moneybox_id == moneybox_id,
+            )
+        else:
+            stmt = stmt.where(
                 and_(
                     MoneyboxNameHistory.moneybox_id == moneybox_id,
                     MoneyboxNameHistory.created_at <= from_datetime,
                 )
             )
-            .order_by(desc(MoneyboxNameHistory.created_at))
-            .limit(1)
-        )
 
         async with self.async_session() as session:
             result = await session.execute(stmt)
@@ -697,3 +702,70 @@ class DBManager:
             raise MoneyboxNotFoundByNameError(name=name)
 
         return moneybox.id
+
+    async def get_priority_list(self) -> dict[int, dict[str, str | int]]:
+        """Get the priority list (moneybox_id to priority and name map).
+
+        :return: The priority list (moneybox_id to priority and name map).
+        :type: :class:`dict[int, dict[str, str|int]]`
+        """
+
+        stmt = select(Moneybox.id, Moneybox.priority, Moneybox.name).where(
+            Moneybox.is_active.is_(True),
+        )
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        priorities = result.all()
+
+        priority_map = {
+            moneybox_id: {
+                "name": name,
+                "priority": priority,
+            }
+            for moneybox_id, priority, name in priorities
+        }
+
+        return priority_map
+
+    async def update_priority_list(
+        self, priorities: dict[int, int]
+    ) -> dict[int, dict[str, str | int]]:
+        """Set new priorities by given priority list.
+
+        :return: The updated priority list (moneybox_id to priority and name map).
+        :type: :class:`dict[int, dict[str, str|int]]`
+        """
+
+        if 0 in set(priorities.values()):
+            raise UpdateInstanceError(
+                record_id=None,
+                message="Updating priority=0 is not allowed (reserved for Overflow Moneybox)",
+                details=priorities,
+            )
+
+        async with self.async_session.begin() as session:
+            reset_data = [
+                {"id": moneybox_id, "priority": None}
+                for moneybox_id, priority in priorities.items()
+            ]
+
+            # ORM Bulk UPDATE by Primary Key -> set priority to None
+            await session.execute(
+                update(Moneybox),
+                params=reset_data,
+            )
+
+            data = [
+                {"id": moneybox_id, "priority": priority}
+                for moneybox_id, priority in priorities.items()
+            ]
+
+            # ORM Bulk UPDATE by Primary Key -> set real priorities
+            await session.execute(
+                update(Moneybox),
+                params=data,
+            )
+
+        return await self.get_priority_list()

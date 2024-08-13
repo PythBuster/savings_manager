@@ -1,6 +1,7 @@
 """All database exceptions are located."""
 
 from abc import ABC
+from collections.abc import Hashable
 from typing import Any
 
 
@@ -30,7 +31,7 @@ class CrudDatabaseError(ABC, Exception):
     """Base CrudDatabaseError Exception Class"""
 
     def __init__(
-        self, record_id: int | None, message: str, details: dict[str, Any] | None = None
+        self, record_id: int | None, message: str, details: dict[Hashable, Any] | None = None
     ) -> None:
         self.record_id = record_id
         self.message = message
@@ -51,7 +52,7 @@ class UpdateInstanceError(CrudDatabaseError):
         self,
         record_id: int | None,
         message: str,
-        details: dict[str, Any] | None = None,
+        details: dict[Hashable, Any] | None = None,
     ) -> None:
         super().__init__(record_id=record_id, message=message, details=details)
 
@@ -60,7 +61,7 @@ class CreateInstanceError(CrudDatabaseError):
     """Base CreateInstanceError Exception Class"""
 
     def __init__(
-        self, record_id: int | None, message: str, details: dict[str, Any] | None = None
+        self, record_id: int | None, message: str, details: dict[Hashable, Any] | None = None
     ) -> None:
         super().__init__(record_id=record_id, message=message, details=details)
 
@@ -69,7 +70,7 @@ class DeleteInstanceError(CrudDatabaseError):
     """Base DeleteInstanceError Exception Class"""
 
     def __init__(
-        self, record_id: int | None, message: str, details: dict[str, Any] | None = None
+        self, record_id: int | None, message: str, details: dict[Hashable, Any] | None = None
     ) -> None:
         super().__init__(record_id=record_id, message=message, details=details)
 

@@ -20,7 +20,9 @@ from src.db.exceptions import (
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
+    UpdateInstanceError,
 )
+from src.utils import equal_dict
 
 
 @pytest.mark.order(1)
@@ -93,6 +95,67 @@ async def test_add_moneybox(data: dict[str, Any], db_manager: DBManager) -> None
 
     expected_moneybox_data = {"id": moneybox_id, "balance": 0} | data
     assert result_moneybox_data == expected_moneybox_data
+
+
+async def test_get_priority_list(db_manager: DBManager) -> None:
+    priorities = await db_manager.get_priority_list()
+
+    expected_priorities = {
+        # moneybox_id -> priority
+        1: {"priority": 0, "name": "?"},
+        2: {"priority": 1, "name": "Test Box 1"},
+        3: {"priority": 2, "name": "Test Box 2"},
+        4: {"priority": 3, "name": "Test Box 3"},
+        5: {"priority": 4, "name": "Test Box 4"},
+    }
+
+    assert expected_priorities[1]["priority"] == priorities[1]["priority"]
+
+    assert equal_dict(dict_1=expected_priorities[2], dict_2=priorities[2])
+    assert equal_dict(dict_1=expected_priorities[3], dict_2=priorities[3])
+    assert equal_dict(dict_1=expected_priorities[4], dict_2=priorities[4])
+    assert equal_dict(dict_1=expected_priorities[5], dict_2=priorities[5])
+
+
+async def test_update_priorities(db_manager: DBManager) -> None:
+    new_priorities_1 = {
+        2: 4,
+        3: 3,
+        4: 2,
+        5: 1,
+    }
+
+    result = await db_manager.update_priority_list(priorities=new_priorities_1)
+    del result[1]  # delete overflow moneybox
+
+    expected_priorities = {
+        # moneybox_id -> priority
+        2: {"priority": 4, "name": "Test Box 1"},
+        3: {"priority": 3, "name": "Test Box 2"},
+        4: {"priority": 2, "name": "Test Box 3"},
+        5: {"priority": 1, "name": "Test Box 4"},
+    }
+
+    assert equal_dict(dict_1=result, dict_2=expected_priorities)
+
+    new_priorities_2 = {
+        1: 0,  # with 0
+        2: 1,
+        3: 2,
+        4: 3,
+        5: 4,
+    }
+
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        await db_manager.update_priority_list(priorities=new_priorities_2)
+
+    assert (
+        ex_info.value.message
+        == "Updating priority=0 is not allowed (reserved for Overflow Moneybox)"
+    )
+
+    del new_priorities_2[1]
+    await db_manager.update_priority_list(priorities=new_priorities_2)
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
