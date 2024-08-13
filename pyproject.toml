@@ -21,7 +21,6 @@ requests = "^2.32.3"
 dictalchemy3 = "^1.0.0"
 postgres = "^4.0"
 asyncpg = "^0.29.0"
-pytest-order = "^1.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -40,6 +39,7 @@ vulture = "^2.11"
 sphinx-rtd-theme = "^2.0.0"
 httpx = "^0.26.0"
 sqlalchemy-stubs = "^0.4"
+pytest-order = "^1.2.1"
 
 
 [tool.black]
