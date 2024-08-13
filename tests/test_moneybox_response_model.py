@@ -115,6 +115,7 @@ async def test_moneybox_response_invalid_name__minlength() -> None:
         "savings_target": None,
         "priority": 1,
     }
+
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
 
@@ -132,6 +133,7 @@ async def test_moneybox_response_invalid_name__wrong_type() -> None:
         "savings_target": None,
         "priority": 1,
     }
+
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
 

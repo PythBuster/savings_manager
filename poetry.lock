@@ -1524,19 +1524,18 @@ pytest = ">=3.7.0"
 setuptools = "*"
 
 [[package]]
-name = "pytest-ordering"
-version = "0.6"
+name = "pytest-order"
+version = "1.2.1"
 description = "pytest plugin to run your tests in a specific order"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 files = [
-    {file = "pytest-ordering-0.6.tar.gz", hash = "sha256:561ad653626bb171da78e682f6d39ac33bb13b3e272d406cd555adb6b006bda6"},
-    {file = "pytest_ordering-0.6-py2-none-any.whl", hash = "sha256:27fba3fc265f5d0f8597e7557885662c1bdc1969497cd58aff6ed21c3b617de2"},
-    {file = "pytest_ordering-0.6-py3-none-any.whl", hash = "sha256:3f314a178dbeb6777509548727dc69edf22d6d9a2867bf2d310ab85c403380b6"},
+    {file = "pytest-order-1.2.1.tar.gz", hash = "sha256:4451bd8821ba4fa2109455a2fcc882af60ef8e53e09d244d67674be08f56eac3"},
+    {file = "pytest_order-1.2.1-py3-none-any.whl", hash = "sha256:c3082fc73f9ddcf13e4a22dda9bbcc2f39865bf537438a1d50fa241e028dd743"},
 ]
 
 [package.dependencies]
-pytest = "*"
+pytest = {version = ">=6.2.4", markers = "python_version >= \"3.10\""}
 
 [[package]]
 name = "python-dotenv"
@@ -2029,4 +2028,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "59be148ee5b14bc27142af12e7ccd6882a868a8175cfece78245e372fe4c3840"
+content-hash = "d8ccc585e203856c7495d5a873ef1e08feb97bb67731cc977e03a06b2461cc1f"

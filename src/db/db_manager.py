@@ -26,7 +26,8 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError, DeleteInstanceError,
+    UpdateInstanceError,
+    DeleteInstanceError,
 )
 from src.db.models import Moneybox, MoneyboxNameHistory, Transaction
 from src.utils import get_database_url
@@ -307,8 +308,6 @@ class DBManager:
                     message="Failed to delete (deactivate) moneybox.",
                     details={"deactivated": deactivated},
                 )
-
-
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
     #  sub_amount are almost identical, combine in one function?

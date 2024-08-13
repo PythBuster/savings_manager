@@ -23,7 +23,7 @@ from src.db.exceptions import (
 )
 
 
-@pytest.mark.first
+@pytest.mark.order(1)
 async def test_if_test_db_is_used(db_manager: DBManager) -> None:
     assert (
         db_manager.db_connection_string
