@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.8.1 (2024-08-13)
+### Changes:
+- adapt docker build pipelines
+
 ## 1.8.0 (2024-08-13)
 ### Changes:
 - adapt some unit tests to avoid unexpected behavior like different order of records into database as expected
