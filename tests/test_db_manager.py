@@ -25,8 +25,6 @@ from src.db.exceptions import (
 )
 from src.db.models import Moneybox
 
-pytestmark = pytest.mark.asyncio(loop_scope="scope")
-
 
 @pytest.mark.first
 async def test_if_test_db_is_used(db_manager: DBManager) -> None:

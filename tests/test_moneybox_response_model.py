@@ -8,8 +8,6 @@ from pydantic import ValidationError
 
 from src.data_classes.responses import MoneyboxResponse
 
-pytestmark = pytest.mark.asyncio(loop_scope="scope")
-
 
 @pytest.mark.parametrize(
     "data",

@@ -11,8 +11,6 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.utils import equal_dict
 
-pytestmark = pytest.mark.asyncio(loop_scope="scope")
-
 
 @pytest.mark.dependency(depends=["tests/test_db_manager.py::test_transfer_amount"], scope="session")
 async def test_endpoint_get_moneyboxes__status_200__total_6(

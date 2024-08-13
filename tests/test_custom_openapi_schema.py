@@ -3,8 +3,6 @@
 import pytest
 from httpx import AsyncClient
 
-pytestmark = pytest.mark.asyncio(loop_scope="scope")
-
 
 @pytest.mark.dependency
 async def test_custom_openapi_schema(client: AsyncClient) -> None:

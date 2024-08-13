@@ -9,8 +9,6 @@ from pydantic import ValidationError
 from src.custom_types import TransactionTrigger, TransactionType
 from src.data_classes.responses import TransactionLogResponse
 
-pytestmark = pytest.mark.asyncio(loop_scope="scope")
-
 
 @pytest.mark.parametrize(
     "data",
