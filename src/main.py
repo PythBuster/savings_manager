@@ -164,7 +164,6 @@ def main() -> None:
         port=8001,
         loop="asyncio",
         workers=1,
-        # reload=environment_type is EnvironmentType.DEV,
     )
     print("Stop uvicorn server.", flush=True)
 

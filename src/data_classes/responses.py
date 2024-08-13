@@ -166,7 +166,7 @@ class MoneyboxesResponse(BaseModel):
                             "savings_target": None,
                             "priority": 0,
                             "created_at": "2024-08-13 02:50:41.837275 +00:00",
-                            "modified_at": None
+                            "modified_at": None,
                         },
                         {
                             "id": 2,
@@ -176,9 +176,9 @@ class MoneyboxesResponse(BaseModel):
                             "savings_target": 50000,
                             "priority": 1,
                             "created_at": "2024-08-16 02:50:41.837275 +00:00",
-                            "modified_at": "2024-08-17 04:41:45.126672 +00:00"
-                        }
-                    ]
+                            "modified_at": "2024-08-17 04:41:45.126672 +00:00",
+                        },
+                    ],
                 }
             ]
         },
