@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Architecture/Database App v2.md",
+                "file": "Feauture Requests/Ideas.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Architecture/Database App v2.md",
+                "file": "Feauture Requests/Ideas.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Architecture/Database App v2.md",
+                "file": "Feauture Requests/Ideas.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Architecture/Database App v2.md"
+                "file": "Feauture Requests/Ideas.md"
               }
             }
           }
@@ -148,26 +148,27 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
-    "Architecture/Database App v1.md",
-    "Architecture/Database App v2.md",
+    "TransactionLog_Creation.png",
+    "distribution_logs_app_v2.png",
     "Diagram 2.svg",
     "Diagram 1.svg",
     "Diagram.svg",
-    "_changelog_template.md",
+    "ui/draft/FullTransactionLogs_v2.png",
     "ui/draft/SavingsManagerUI_v2.png",
     "ui/draft/SavingsManagerUI_v1.png",
-    "ui/draft/FullTransactionLogs_v2.png",
+    "ui/draft/FullTransactionLogs_v1.png",
     "ui/draft/date-filter-animation-.gif",
-    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "ui/draft/App_v2_SavingsManagerUI.png",
-    "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
+    "Requirements/Requirement Analysis.md",
+    "Guidelines/Workflow.md",
+    "Guidelines/Code/Quality Assurence.md",
+    "Guidelines/Code/Code Style.md",
+    "Architecture/Database App v2.md",
+    "Architecture/Database App v1.md",
+    "_changelog_template.md",
     "ui/draft/App Version 1.md",
     "ui/draft/App Version 2.md",
     "Feauture Requests/Ideas.md",
-    "Guidelines/Code/Quality Assurence.md",
-    "Guidelines/Code/Code Style.md",
-    "Requirements/Requirement Analysis.md",
-    "Guidelines/Workflow.md",
     "Diagram 2.svg.xml",
     "Diagram 1.svg.xml",
     "Architecture",

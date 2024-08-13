@@ -26,8 +26,8 @@ class RecordNotFoundError(ABC, Exception):
         super().__init__(message)
 
 
-class UpdateInstanceError(ABC, Exception):
-    """Base UpdateInstanceError Exception Class"""
+class CrudDatabaseError(ABC, Exception):
+    """Base CrudDatabaseError Exception Class"""
 
     def __init__(
         self, record_id: int | None, message: str, details: dict[str, Any] | None = None
@@ -44,22 +44,34 @@ class UpdateInstanceError(ABC, Exception):
         super().__init__(message)
 
 
-class DeleteInstanceError(ABC, Exception):
+class UpdateInstanceError(CrudDatabaseError):
+    """Base UpdateInstanceError Exception Class"""
+
+    def __init__(
+        self,
+        record_id: int | None,
+        message: str,
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(record_id=record_id, message=message, details=details)
+
+
+class CreateInstanceError(CrudDatabaseError):
+    """Base CreateInstanceError Exception Class"""
+
+    def __init__(
+        self, record_id: int | None, message: str, details: dict[str, Any] | None = None
+    ) -> None:
+        super().__init__(record_id=record_id, message=message, details=details)
+
+
+class DeleteInstanceError(CrudDatabaseError):
     """Base DeleteInstanceError Exception Class"""
 
     def __init__(
         self, record_id: int | None, message: str, details: dict[str, Any] | None = None
     ) -> None:
-        self.record_id = record_id
-        self.message = message
-
-        if details is None:
-            details = {}
-
-        self.details = details | {
-            "id": record_id,
-        }
-        super().__init__(message)
+        super().__init__(record_id=record_id, message=message, details=details)
 
 
 class ColumnDoesNotExistError(Exception):

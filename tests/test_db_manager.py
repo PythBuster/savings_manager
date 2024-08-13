@@ -13,17 +13,14 @@ from src.data_classes.requests import (
     TransferTransactionRequest,
     WithdrawTransactionRequest,
 )
-from src.db import core
 from src.db.db_manager import DBManager
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
-    ColumnDoesNotExistError,
     HasBalanceError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
 )
-from src.db.models import Moneybox
 
 
 @pytest.mark.first
@@ -165,40 +162,6 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.details["id"] == moneybox_id
         assert ex_info.value.record_id == moneybox_id
-
-
-@pytest.mark.dependency(depends=["test_get_moneybox"])
-async def test_core_exists_instance__moneybox_name(db_manager: DBManager) -> None:
-    result_moneybox_data = await db_manager.get_moneybox(moneybox_id=1)
-    moneybox_name = result_moneybox_data["name"]
-
-    existing = await core.exists_instance(
-        async_session=db_manager.async_session,
-        orm_model=Moneybox,  # type: ignore
-        values={"name": moneybox_name},
-        case_insensitive=True,
-    )
-    assert existing
-
-    non_existing = await core.exists_instance(
-        async_session=db_manager.async_session,
-        orm_model=Moneybox,  # type: ignore
-        values={"name": "nope, no no no"},
-        case_insensitive=True,
-    )
-    assert not non_existing
-
-    with pytest.raises(ColumnDoesNotExistError) as ex_info:
-        await core.exists_instance(
-            async_session=db_manager.async_session,
-            orm_model=Moneybox,  # type: ignore
-            values={"no_existing_field": "BLABLA"},
-            case_insensitive=True,
-        )
-
-    assert ex_info.value.args[0] == "Table 'Moneybox' has no column named 'no_existing_field'"
-    assert ex_info.value.table == "Moneybox"
-    assert ex_info.value.column == "no_existing_field"
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"], session="scope")

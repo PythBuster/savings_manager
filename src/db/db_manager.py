@@ -17,6 +17,7 @@ from src.db.core import (
 )
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
+    CreateInstanceError,
     HasBalanceError,
     MoneyboxNotFoundByNameError,
     MoneyboxNotFoundError,
@@ -25,6 +26,7 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
+    UpdateInstanceError, DeleteInstanceError,
 )
 from src.db.models import Moneybox, MoneyboxNameHistory, Transaction
 from src.utils import get_database_url
@@ -141,23 +143,44 @@ class DBManager:
         :rtype: :class:`dict[str, Any]`
         """
 
-        moneybox = await create_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            data=moneybox_data,
-        )
+        async with self.async_session.begin() as session:
+            moneybox = await create_instance(
+                async_session=session,
+                orm_model=Moneybox,  # type: ignore
+                data=moneybox_data,
+            )
 
-        await self.create_moneybox_name_history(
-            moneybox_id=moneybox.id,
-            name=moneybox.name,
-        )
+            if moneybox is None:
+                raise CreateInstanceError(
+                    record_id=None,
+                    message="Failed to create moneybox.",
+                    details=moneybox_data,
+                )
+
+            moneybox_name_history_data = {
+                "name": moneybox.name,
+                "moneybox_id": moneybox.id,
+            }
+            moneybox_name_history = await create_instance(
+                async_session=session,
+                orm_model=MoneyboxNameHistory,
+                data=moneybox_name_history_data,
+            )
+
+            if moneybox_name_history is None:
+                raise CreateInstanceError(
+                    record_id=None,
+                    message="Failed to create moneybox name history.",
+                    details=moneybox_name_history_data,
+                )
 
         return moneybox.asdict()
 
-    async def create_moneybox_name_history(
+    async def _create_moneybox_name_history(
         self,
         moneybox_id: int,
         name: str,
+        session: AsyncSession,
     ) -> dict[str, Any]:
         """DB Function to create a moneybox history for a moneybox id.
 
@@ -165,12 +188,14 @@ class DBManager:
         :type moneybox_id: :class:`int`
         :param name: The name of the moneybox.
         :type name: :class:`str`
+        :param session: The current session of the db creation.
+        :type session:: class:`AsyncSession`
 
         :return: The created moneybox history data.
         """
 
         moneybox_name_history = await create_instance(
-            async_session=self.async_session,
+            async_session=session,
             orm_model=MoneyboxNameHistory,  # type: ignore
             data={
                 "moneybox_id": moneybox_id,
@@ -205,21 +230,34 @@ class DBManager:
         if moneybox_id == _overflow_moneybox.id:
             raise OverflowMoneyboxCantBeUpdatedError(moneybox_id=_overflow_moneybox.id)
 
-        moneybox = await update_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=moneybox_id,
-            data=moneybox_data,
-        )
-
-        if moneybox is None:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
-
-        if "name" in moneybox_data:
-            await self.create_moneybox_name_history(
-                moneybox_id=moneybox.id,
-                name=moneybox.name,
+        async with self.async_session.begin() as session:
+            moneybox = await update_instance(
+                async_session=session,
+                orm_model=Moneybox,  # type: ignore
+                record_id=moneybox_id,
+                data=moneybox_data,
             )
+
+            if moneybox is None:
+                raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+            if "name" in moneybox_data:
+                moneybox_name_history_data = {
+                    "name": moneybox.name,
+                    "moneybox_id": moneybox.id,
+                }
+                moneybox_name_history = await create_instance(
+                    async_session=session,
+                    orm_model=MoneyboxNameHistory,
+                    data=moneybox_name_history_data,
+                )
+
+                if moneybox_name_history is None:
+                    raise UpdateInstanceError(
+                        record_id=None,
+                        message="Failed to update moneybox name history.",
+                        details=moneybox_name_history_data,
+                    )
 
         return moneybox.asdict()
 
@@ -242,14 +280,35 @@ class DBManager:
         if moneybox["balance"] > 0:
             raise HasBalanceError(moneybox_id=moneybox_id, balance=moneybox["balance"])
 
-        deactivated: bool = await deactivate_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=moneybox_id,
-        )
+        async with self.async_session.begin() as session:
+            updated_moneybox = await update_instance(
+                async_session=session,
+                orm_model=Moneybox,
+                record_id=moneybox_id,
+                data={"priority": None},
+            )
 
-        if not deactivated:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+            if not updated_moneybox:
+                raise UpdateInstanceError(
+                    record_id=moneybox_id,
+                    message="Failed to update moneybox priority.",
+                    details={"priority": None},
+                )
+
+            deactivated: bool = await deactivate_instance(
+                async_session=session,
+                orm_model=Moneybox,  # type: ignore
+                record_id=moneybox_id,
+            )
+
+            if not deactivated:
+                raise DeleteInstanceError(
+                    record_id=moneybox_id,
+                    message="Failed to delete (deactivate) moneybox.",
+                    details={"deactivated": deactivated},
+                )
+
+
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
     #  sub_amount are almost identical, combine in one function?

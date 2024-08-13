@@ -2,75 +2,22 @@
 
 from typing import Any
 
-from sqlalchemy import Sequence, and_, exists, func, insert, select, update
+from sqlalchemy import Sequence, and_, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.db.exceptions import ColumnDoesNotExistError
 from src.db.models import SqlBase
 
 
-async def exists_instance(
-    async_session: async_sessionmaker,
-    orm_model: SqlBase,
-    values: dict[str, Any],
-    case_insensitive: bool = False,
-    exclude_ids: list[int] | None = None,
-) -> bool:
-    """Checks whether an instance exists in the database by given `values`.
-
-    :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker`
-    :param orm_model: The orm model to handle with (table).
-    :type orm_model: :class:`SqlBase`
-    :param values: The key-values data used for the where-clause.
-    :type values: :class:`dict[str, Any]`
-    :param case_insensitive: If `True`, `values` will be compared
-        by ignoring case-sensitivity, if `False`,
-    :type case_insensitive: :class:`bool`
-    :param exclude_ids: The list of record ids to exclude from the exist query.
-    :type exclude_ids: :class:`list[int] | None`
-    :return: The created db instance.
-    :rtype: :class:`bool`
-    """
-
-    if exclude_ids is None:
-        exclude_ids = []
-
-    stmt = select(orm_model).where(
-        and_(
-            orm_model.is_active.is_(True),
-            orm_model.id.notin_(exclude_ids),
-        )
-    )
-
-    for column, value in values.items():
-        orm_field = getattr(orm_model, column, None)
-
-        if orm_field is None:
-            raise ColumnDoesNotExistError(table=orm_model.__name__, column=column)
-
-        if case_insensitive and isinstance(value, str):
-            stmt = stmt.where(func.lower(orm_field) == func.lower(value))
-        else:
-            stmt = stmt.where(orm_field == value)
-
-    exist_stmt = exists(stmt)
-    async with async_session() as session:
-        result = await session.execute(exist_stmt.select())
-
-    exist = result.scalar_one()
-    return exist
-
-
 async def create_instance(
-    async_session: async_sessionmaker,
+    async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     data: dict[str, Any],
 ) -> SqlBase:
     """The core CREATE db function.
 
-    :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker`
+    :param async_session: The current async_session of the database or a session_maker,
+        which shall used to create the async_session.
+    :type async_session: :class:`async_sessionmaker | AsyncSession`
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
     :param data: The ORM model data.
@@ -81,23 +28,27 @@ async def create_instance(
 
     stmt = insert(orm_model).values(data).returning(orm_model)
 
-    async with async_session.begin() as session:
-        result = await session.execute(stmt)
+    if isinstance(async_session, AsyncSession):
+        result = await async_session.execute(stmt)
+    else:
+        async with async_session.begin() as session:
+            result = await session.execute(stmt)
 
     instance = result.scalars().one()
     return instance
 
 
 async def read_instance(
-    async_session: async_sessionmaker,
+    async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     record_id: int,
     only_active_instances: bool = True,
 ) -> SqlBase | None:
     """The core SELECT db function.
 
-    :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker`
+    :param async_session: The current async_session of the database or a session_maker,
+        which shall used to create the async_session.
+    :type async_session: :class:`async_sessionmaker | AsyncSession`
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
     :param record_id: The instance id.
@@ -117,22 +68,26 @@ async def read_instance(
     else:
         stmt = select(orm_model).where(orm_model.id == record_id)
 
-    async with async_session() as session:
-        result = await session.execute(stmt)
+    if isinstance(async_session, AsyncSession):
+        result = await async_session.execute(stmt)
+    else:
+        async with async_session.begin() as session:
+            result = await session.execute(stmt)
 
     instance = result.scalars().one_or_none()
     return instance
 
 
 async def read_instances(
-    async_session: async_sessionmaker,
+    async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     only_active_instances: bool = True,
 ) -> Sequence[SqlBase]:
     """The core multi SELECT db function.
 
-    :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker`
+    :param async_session: The current async_session of the database or a session_maker,
+        which shall used to create the async_session.
+    :type async_session: :class:`async_sessionmaker | AsyncSession`
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
     :param only_active_instances: If true, only active instances will be returned (is_active=True).
@@ -148,8 +103,11 @@ async def read_instances(
     else:
         stmt = select(orm_model)
 
-    async with async_session() as session:
-        result = await session.execute(stmt)
+    if isinstance(async_session, AsyncSession):
+        result = await async_session.execute(stmt)
+    else:
+        async with async_session.begin() as session:
+            result = await session.execute(stmt)
 
     instances = result.scalars().all()
     return instances
@@ -163,8 +121,9 @@ async def update_instance(
 ) -> SqlBase | None:
     """The core UPDATE db function.
 
-    :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker` | :class:`AsyncSession`
+    :param async_session: The current async_session of the database or a session_maker,
+        which shall used to create the async_session.
+    :type async_session: :class:`async_sessionmaker | AsyncSession`
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
     :param record_id: The instance id.
@@ -198,15 +157,16 @@ async def update_instance(
 
 
 async def deactivate_instance(
-    async_session: async_sessionmaker,
+    async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     record_id: int,
 ) -> bool:
     """The core deactivate db function. Specific update function to set `ìs_active`
     column to false.
 
-    :param async_session: The current async_session of the database.
-    :type async_session: :class:`async_sessionmaker`
+    :param async_session: The current async_session of the database or a session_maker,
+        which shall used to create the async_session.
+    :type async_session: :class:`async_sessionmaker | AsyncSession`
     :param orm_model: The orm model to handle with (table).
     :type orm_model: :class:`SqlBase`
     :param record_id: The instance id.
@@ -227,7 +187,6 @@ async def deactivate_instance(
             update(orm_model)
             .where(orm_model.id == record_id)
             .values(is_active=False)
-            .values(priority=None)  # reset priority to Null for deleted moneyboxes
             .returning(orm_model)
         )
 
