@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.7.0 (2024-08-13)
+### Features:
+- switch database to postgres
+
 ## 1.6.0 (2024-08-07)
 ### Features:
 - adapt create moneybox endpoint: handle constraints errors for priority
