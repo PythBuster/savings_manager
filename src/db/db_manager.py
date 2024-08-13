@@ -1,10 +1,12 @@
 """All database definitions are located here."""
 
+from datetime import datetime
 from typing import Any
 
-from sqlalchemy import and_, insert, select, update
+from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.interfaces import LoaderOption
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
@@ -17,6 +19,7 @@ from src.db.core import (
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
     HasBalanceError,
+    MoneyboxNotFoundByNameError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     OverflowMoneyboxCantBeDeletedError,
@@ -24,7 +27,7 @@ from src.db.exceptions import (
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
 )
-from src.db.models import Moneybox, Transaction
+from src.db.models import Moneybox, MoneyboxNameHistory, Transaction
 from src.utils import get_database_url
 
 
@@ -145,7 +148,38 @@ class DBManager:
             data=moneybox_data,
         )
 
+        await self.create_moneybox_name_history(
+            moneybox_id=moneybox.id,
+            name=moneybox.name,
+        )
+
         return moneybox.asdict()
+
+    async def create_moneybox_name_history(
+        self,
+        moneybox_id: int,
+        name: str,
+    ) -> dict[str, Any]:
+        """DB Function to create a moneybox history for a moneybox id.
+
+        :param moneybox_id: The id of the moneybox.
+        :type moneybox_id: :class:`int`
+        :param name: The name of the moneybox.
+        :type name: :class:`str`
+
+        :return: The created moneybox history data.
+        """
+
+        moneybox_name_history = await create_instance(
+            async_session=self.async_session,
+            orm_model=MoneyboxNameHistory,  # type: ignore
+            data={
+                "moneybox_id": moneybox_id,
+                "name": name,
+            },
+        )
+
+        return moneybox_name_history.asdict()
 
     async def update_moneybox(
         self,
@@ -181,6 +215,12 @@ class DBManager:
 
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+        if "name" in moneybox_data:
+            await self.create_moneybox_name_history(
+                moneybox_id=moneybox.id,
+                name=moneybox.name,
+            )
 
         return moneybox.asdict()
 
@@ -520,29 +560,83 @@ class DBManager:
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-        resolved_moneybox_names_cache = {}
-
-        async def resolve_moneybox_name(counterparty_moneybox_id_: int | None) -> str | None:
+        # TODO: save resolved names on a cache?
+        #   map like:  id  -> datetimerange -> name
+        async def resolve_moneybox_name(
+            counterparty_moneybox_id_: int | None,
+            from_datetime: datetime,
+        ) -> str | None:
             if counterparty_moneybox_id_ is None:
                 return None
 
-            if counterparty_moneybox_id_ not in resolved_moneybox_names_cache:
-                counterparty_moneybox_ = await self.get_moneybox(
-                    moneybox_id=counterparty_moneybox_id_,
-                    only_active_instances=False,
-                )
-                resolved_moneybox_names_cache[counterparty_moneybox_id_] = counterparty_moneybox_[
-                    "name"
-                ]
+            counterparty_moneybox_name = await self._get_historical_moneybox_name(
+                moneybox_id=counterparty_moneybox_id_,
+                from_datetime=from_datetime,
+            )
 
-            return resolved_moneybox_names_cache[counterparty_moneybox_id_]
+            return counterparty_moneybox_name
 
         return [
             transaction.asdict(exclude=["modified_at"])
             | {
                 "counterparty_moneybox_name": await resolve_moneybox_name(
-                    counterparty_moneybox_id_=transaction.counterparty_moneybox_id
+                    counterparty_moneybox_id_=transaction.counterparty_moneybox_id,
+                    from_datetime=transaction.created_at,
                 )
             }
             for transaction in moneybox.transactions_log
         ]
+
+    async def _get_historical_moneybox_name(self, moneybox_id: int, from_datetime: datetime) -> str:
+        """Get historical moneybox name for the given moneybox id within given datetime.
+
+        :param moneybox_id: The moneybox id.
+        :type moneybox_id: :class:`int`
+        :param from_datetime: The datetime of the moneybox name.
+        :type from_datetime: :class:`datetime.datetime`
+        :return: The historical moneybox name for the given moneybox id within given datetime.
+        :rtype: :class:`str`
+        """
+
+        stmt = (
+            select(MoneyboxNameHistory)
+            .where(
+                and_(
+                    MoneyboxNameHistory.moneybox_id == moneybox_id,
+                    MoneyboxNameHistory.created_at <= from_datetime,
+                )
+            )
+            .order_by(desc(MoneyboxNameHistory.created_at))
+            .limit(1)
+        )
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        moneybox_name_history = result.scalars().one_or_none()
+
+        if moneybox_name_history is None:
+            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+        return moneybox_name_history.name
+
+    async def _get_moneybox_id_by_name(self, name: str) -> int:
+        """Get moneybox id for the given name.
+
+        :param name: The name of the moneybox.
+        :type name: :class:`str`
+        :return: The moneybox id for the given name.
+        :rtype: :class:`int`
+        """
+
+        stmt = select(Moneybox).where(Moneybox.name == name)
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        moneybox = result.scalars().one_or_none()
+
+        if moneybox is None:
+            raise MoneyboxNotFoundByNameError(name=name)
+
+        return moneybox.id

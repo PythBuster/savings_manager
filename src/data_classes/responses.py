@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Annotated, Any, Self
 
 from pydantic import (
+    AwareDatetime,
     BaseModel,
     ConfigDict,
     Field,
@@ -75,11 +76,11 @@ class MoneyboxResponse(BaseModel):
     """The current priority of the moneybox. There is only one moneybox with
     a priority of Null (will be the marker for the overflow moneybox)."""
 
-    created_at: Annotated[datetime, Field(description="The creation date of the moneybox.")]
+    created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
     """The creation date of the moneybox."""
 
     modified_at: Annotated[
-        datetime | None, Field(description="The modification date of the moneybox.")
+        AwareDatetime | None, Field(description="The modification date of the moneybox.")
     ]
     """The modification date of the moneybox."""
 
@@ -94,8 +95,8 @@ class MoneyboxResponse(BaseModel):
                     "savings_amount": 0,
                     "savings_target": 50000,
                     "priority": 1,
-                    "created_at": "2024-08-07T03:28:08",
-                    "modified_at": "2024-08-08T12:34:56",
+                    "created_at": "2024-08-11 13:57:17.941840 +00:00",
+                    "modified_at": "2024-08-11 15:03:17.312860 +00:00",
                 }
             ]
         },
@@ -104,16 +105,13 @@ class MoneyboxResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def strict_datetimes(cls, data: dict[Any, Any]) -> dict[Any, Any]:
+    def convert_to_strict_datetimes(cls, data: dict[Any, Any]) -> dict[Any, Any]:
         """Check if 'modified_at' and 'created_at' is type datetime."""
 
         if data["modified_at"] is not None:
             if isinstance(data["modified_at"], str):
                 try:
-                    # Code needed, because pydantic model in SERIALISATION mode will allow
-                    # strings like "2"
-                    # here we need o check, if string is an isoformatted datetime string
-                    datetime.fromisoformat(data["modified_at"])
+                    data["modified_at"] = datetime.fromisoformat(data["modified_at"])
                 except (TypeError, ValueError) as ex:
                     raise ValueError(
                         "'created_at' must be of type datetime or datetime-string."
@@ -123,10 +121,7 @@ class MoneyboxResponse(BaseModel):
 
         if isinstance(data["created_at"], str):
             try:
-                # Code needed, because pydantic model in SERIALISATION mode will allow
-                # strings like "2"
-                # here we need o check, if string is an isoformatted datetime string
-                datetime.fromisoformat(data["created_at"])
+                data["created_at"] = datetime.fromisoformat(data["created_at"])
             except (TypeError, ValueError) as ex:
                 raise ValueError(
                     "'created_at' must be of type datetime or datetime-string."
@@ -141,6 +136,8 @@ class MoneyboxResponse(BaseModel):
     def validate_date_order(self) -> Self:
         """Check if 'modified_at' date is after 'created_at'."""
 
+        # create_at datetime has to be smaller than modified_at datetime!
+        #   created_at == modified_at is not allowed
         if self.modified_at is not None and self.created_at >= self.modified_at:
             msg = "Error: 'created_at' comes after 'modified_at'."
             raise ValueError(msg)
@@ -270,7 +267,8 @@ class TransactionLogResponse(BaseModel):
                     "amount": 50,
                     "balance": 50,
                     "counterparty_moneybox_id": 3,
-                    "created_at": "2020-05-01 20:15:02",
+                    "counterparty_moneybox_name": "Moneybox 3",
+                    "created_at": "2024-08-11 13:57:17.941840 +00:00",
                 }
             ]
         },
@@ -289,12 +287,12 @@ class TransactionLogResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
+    def convert_to_strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Check if 'modified_at' and 'created_at' is type datetime."""
 
         if isinstance(data["created_at"], str):
             try:
-                datetime.fromisoformat(data["created_at"])
+                data["created_at"] = datetime.fromisoformat(data["created_at"])
             except (TypeError, ValueError) as ex:
                 raise ValueError(
                     "'created_at' must be of type datetime or datetime-string."

@@ -14,14 +14,13 @@ alembic = "^1.13.2"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
 pydantic = {extras = ["email"], version = "^2.8.2"}
 pydantic-settings = "^2.4.0"
-aiosqlite = "^0.19.0"
 python-dotenv = "^1.0.1"
 fastapi = "^0.109.2"
-pytest-cov = "^4.1.0"
 uvicorn = "^0.27.1"
 requests = "^2.32.3"
-pytest-asyncio = "^0.23.8"
 dictalchemy3 = "^1.0.0"
+postgres = "^4.0"
+asyncpg = "^0.29.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -34,7 +33,8 @@ pytest = "^8.3.2"
 pytest-dependency = "^0.6.0"
 pytest-ordering = "^0.6"
 sphinx = "^7.4.7"
-pytest-asyncio = "^0.23.5"
+pytest-asyncio = "0.21.2"
+pytest-cov = "^4.1.0"
 pylint-per-file-ignores = "^1.3.2"
 vulture = "^2.11"
 sphinx-rtd-theme = "^2.0.0"
@@ -101,7 +101,6 @@ load-plugins=[
 "test_db_manager.py"="missing-function-docstring, duplicate-code"
 "test_utils.py"="missing-function-docstring"
 "test_custom_openapi_schema.py"="missing-function-docstring"
-"test_moneybox_endpoints.py"="missing-function-docstring, line-too-long, too-many-lines, duplicate-code"
 "/routes/"="missing-function-docstring"
 "requests.py"="duplicate-code"
 "responses.py"="duplicate-code"
@@ -113,10 +112,12 @@ load-plugins=[
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
 addopts = "--maxfail=1 --cov=src --cov-report html"
 testpaths = [
     "tests",
 ]
+
 
 [tool.coverage.run]
 omit = [

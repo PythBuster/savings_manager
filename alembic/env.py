@@ -42,12 +42,12 @@ else:
 
 print(dotenv_path)
 load_dotenv(dotenv_path=dotenv_path)
-print(f"Loaded {dotenv_path}")
+print(f"Loaded {dotenv_path}", flush=True)
 
 db_settings = get_db_settings()
 database_url = get_database_url(db_settings=db_settings)
 config.set_main_option("sqlalchemy.url", database_url)
-
+print(f"{db_settings.db_driver=}, {db_settings.db_host=}, {db_settings.db_port=}", flush=True)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -67,7 +67,6 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        render_as_batch=True,
     )
 
     with context.begin_transaction():

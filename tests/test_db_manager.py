@@ -25,12 +25,16 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
 )
 from src.db.models import Moneybox
-from tests.conftest import TEST_DB_DRIVER
+
+pytestmark = pytest.mark.asyncio(loop_scope="scope")
 
 
 @pytest.mark.first
 async def test_if_test_db_is_used(db_manager: DBManager) -> None:
-    assert db_manager.db_connection_string == f"{TEST_DB_DRIVER}:///test_database.sqlite3"
+    assert (
+        db_manager.db_connection_string
+        == "postgresql+asyncpg://test_postgres:test_postgres@localhost:8765/savings_manager"
+    )
 
 
 @pytest.mark.dependency
@@ -49,6 +53,7 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
         {
             "id": 2,
             "name": "Test Box 1",
+            "balance": 0,
             "priority": 1,
             "savings_amount": 0,
             "savings_target": None,
@@ -56,6 +61,7 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
         {
             "id": 3,
             "name": "Test Box 2",
+            "balance": 0,
             "priority": 2,
             "savings_amount": 0,
             "savings_target": None,
@@ -71,34 +77,28 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
         {
             "id": 5,
             "name": "Test Box 4",
+            "balance": 0,
             "priority": 4,
             "savings_amount": 0,
             "savings_target": None,
         },
     ],
 )
-@pytest.mark.asyncio
 async def test_add_moneybox(data: dict[str, Any], db_manager: DBManager) -> None:
     # moneybox 1
     moneybox_id = data["id"]
     del data["id"]
 
-    result_moneybox_data_1 = await db_manager.add_moneybox(moneybox_data=data)
+    result_moneybox_data = await db_manager.add_moneybox(moneybox_data=data)
 
-    assert isinstance(result_moneybox_data_1["created_at"], datetime)
-    assert result_moneybox_data_1["modified_at"] is None
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert result_moneybox_data["modified_at"] is None
 
-    del result_moneybox_data_1["created_at"]
-    del result_moneybox_data_1["modified_at"]
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
 
     expected_moneybox_data = {"id": moneybox_id, "balance": 0} | data
-    assert result_moneybox_data_1 == expected_moneybox_data
-
-    with pytest.raises(IntegrityError) as ex_info:
-        data["priority"] = 2
-        await db_manager.add_moneybox(moneybox_data=data)
-
-    assert "UNIQUE constraint failed: moneyboxes.name" in ex_info.value.args[0]
+    assert result_moneybox_data == expected_moneybox_data
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
@@ -125,7 +125,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
     assert result_moneybox_data == expected_moneybox_data
 
     moneybox_data["name"] = "new"
-    non_existing_moneybox_ids = [-42, -1, 0, 6, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 6, 165485641]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.update_moneybox(
@@ -133,7 +133,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
                 moneybox_data=moneybox_data,
             )
 
-        assert f"Moneybox with id {moneybox_id} does not exist." == ex_info.value.message
+        assert f"Moneybox with id '{moneybox_id}' does not exist." == ex_info.value.message
         assert isinstance(ex_info.value.details, dict)
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.details["id"] == moneybox_id
@@ -158,12 +158,12 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
     }
     assert result_moneybox_data == expected_moneybox_data
 
-    non_existing_moneybox_ids = [-42, -1, 0, 6, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 6, 165485641]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.get_moneybox(moneybox_id=moneybox_id)
 
-        assert f"Moneybox with id {moneybox_id} does not exist." == ex_info.value.message
+        assert f"Moneybox with id '{moneybox_id}' does not exist." == ex_info.value.message
         assert isinstance(ex_info.value.details, dict)
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.details["id"] == moneybox_id
@@ -232,12 +232,12 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
 
     assert await db_manager.delete_moneybox(moneybox_id=3) is None  # type: ignore
 
-    non_existing_moneybox_ids = [-42, -1, 0, 1654856415456]
+    non_existing_moneybox_ids = [-42, -1, 0, 7, 165485641]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.delete_moneybox(moneybox_id=moneybox_id)
 
-        assert f"Moneybox with id {moneybox_id} does not exist." == ex_info.value.message
+        assert f"Moneybox with id '{moneybox_id}' does not exist." == ex_info.value.message
         assert isinstance(ex_info.value.details, dict)
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.details["id"] == moneybox_id

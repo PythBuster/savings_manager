@@ -14,13 +14,14 @@ class MoneyboxCreateRequest(BaseModel):
     """The name of the moneybox. Has to be unique."""
 
     savings_amount: Annotated[
-        StrictInt, Field(ge=0, description="The current savings amount of the moneybox.")
+        StrictInt, Field(default=0, ge=0, description="The current savings amount of the moneybox.")
     ]
     """The current savings amount of the moneybox."""
 
     savings_target: Annotated[
         StrictInt | None,
         Field(
+            default=0,
             ge=0,
             description=(
                 "The current savings target. Is relevant for the automated "

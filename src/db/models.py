@@ -3,7 +3,16 @@
 from datetime import datetime
 from typing import Any, List
 
-from sqlalchemy import DateTime, ForeignKey, MetaData, func, text
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    MetaData,
+    event,
+    func,
+    text,
+)
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
@@ -59,7 +68,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
 
     is_active: Mapped[bool] = mapped_column(
         default=True,
-        server_default=text("1"),
+        server_default=text("true"),
         nullable=False,
         comment="Flag to mark instance as deleted.",
     )
@@ -69,7 +78,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
         String,
         default="",
         server_default="",
-        nullable=True,
+        nullable=False,
         comment="The note of this record",
     )
     """The note of this record."""
@@ -112,13 +121,14 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
     """Moneybox table name."""
 
     name: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
-        comment="The name of a moneybox.",
+        comment="The name of the moneybox.",
         nullable=False,
     )
-    """The name of a moneybox."""
+    """The name of the moneybox."""
 
     balance: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
         default=0,
+        server_default="0",
         comment="The current balance of the moneybox.",
         nullable=False,
     )
@@ -126,7 +136,7 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
 
     savings_amount: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
         default=0,
-        server_default=text("0"),
+        server_default="0",
         nullable=False,
         comment="The current savings amount of the moneybox.",
     )
@@ -145,10 +155,10 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
 
     priority: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
         nullable=True,
-        unique=False,
         comment=(
             "The current priority of the moneybox. There is only one moneybox with "
-            "a priority of Null (will be the marker for the overflow moneybox."
+            "a priority of Null (will be the marker for the overflow moneybox. And only "
+            "disables moneyboxes cant have e NULL value as priority."
         ),
     )
     """The current priority of the moneybox. There is only one moneybox with
@@ -158,7 +168,45 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
         relationship(
             back_populates="moneybox",
             foreign_keys="[Transaction.moneybox_id]",
+            cascade="all, delete-orphan",
         )
+    )
+
+    moneybox_name_history: Mapped[List["MoneyboxNameHistory"]] = (
+        relationship(  # pylint: disable=unsubscriptable-object
+            back_populates="moneybox",
+            foreign_keys="[MoneyboxNameHistory.moneybox_id]",
+            cascade="all, delete-orphan",
+        )
+    )
+
+    __table_args__ = (
+        Index(
+            "idx_unique_moneyboxes_name_active",
+            "name",
+            unique=True,
+            postgresql_where=text("is_active = true"),
+        ),
+        Index(
+            "idx_unique_moneyboxes_priority_active",
+            "priority",
+            unique=True,
+            postgresql_where=text("is_active = true"),
+        ),
+        CheckConstraint("priority >= 0", name="ck_moneyboxes_priority_nonnegative"),
+        CheckConstraint("balance >= 0", name="ck_moneyboxes_balance_nonnegative"),
+        CheckConstraint(
+            "savings_target IS NULL OR savings_target >= 0",
+            name="ck_moneyboxes_savings_target_nonnegative",
+        ),
+        CheckConstraint("savings_amount >= 0", name="ck_moneyboxes_savings_amount_nonnegative"),
+        CheckConstraint("char_length(trim(name)) > 0", name="ck_moneyboxes_name_nonempty"),
+        CheckConstraint(
+            "NOT (is_active = false AND balance != 0)", name="ck_moneyboxes_is_active_balance"
+        ),
+        CheckConstraint(
+            "is_active = true OR priority IS NULL", name="ck_moneyboxes_priority_if_inactive"
+        ),
     )
 
 
@@ -169,6 +217,7 @@ class Transaction(SqlBase):  # pylint: disable=too-few-public-methods
 
     description: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
         default="",
+        server_default="",
         nullable=False,
         comment="The description of the transaction action.",
     )
@@ -209,7 +258,6 @@ class Transaction(SqlBase):  # pylint: disable=too-few-public-methods
     """The balance of the moneybox at the time of the transaction."""
 
     counterparty_moneybox_id: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
-        ForeignKey("moneyboxes.id"),
         nullable=True,
         comment=(
             "Transaction is a transfer between moneybox_id and " "counterparty_moneybox_id, if set."
@@ -218,19 +266,38 @@ class Transaction(SqlBase):  # pylint: disable=too-few-public-methods
     """Transaction is a transfer between moneybox_id and
     counterparty_moneybox_id, if set."""
 
-    counterparty_moneybox: Mapped[Moneybox] = (  # pylint: disable=unsubscriptable-object
-        relationship(
-            foreign_keys=[counterparty_moneybox_id],
-        )
-    )
-    """The foreign key to moneybox as counterparty relation, which can be None."""
-
     moneybox_id: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
-        ForeignKey("moneyboxes.id"),
+        ForeignKey("moneyboxes.id", ondelete="CASCADE"),
     )
     """The foreign key to moneybox."""
 
     moneybox: Mapped["Moneybox"] = relationship(  # pylint: disable=unsubscriptable-object
         back_populates="transactions_log",
         foreign_keys=[moneybox_id],
+        passive_deletes=True,
     )
+
+    __table_args__ = (CheckConstraint("balance >= 0", name="ck_transactions_balance_nonnegative"),)
+
+
+class MoneyboxNameHistory(SqlBase):  # pylint: disable=too-few-public-methods
+    """The MoneyboxNameHistory ORM."""
+
+    __tablename__ = "moneybox_name_histories"
+
+    moneybox_id: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
+        ForeignKey("moneyboxes.id", ondelete="CASCADE"),
+    )
+    """The foreign key to moneybox."""
+
+    moneybox: Mapped["Moneybox"] = relationship(  # pylint: disable=unsubscriptable-object
+        back_populates="moneybox_name_history",
+        foreign_keys=[moneybox_id],
+        passive_deletes=True,
+    )
+
+    name: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
+        comment="The new name of the moneybox.",
+        nullable=False,
+    )
+    """The new name of the moneybox."""

@@ -43,7 +43,11 @@ def get_db_settings() -> DBSettings:
 
     return DBSettings(
         db_driver=os.getenv("DB_DRIVER", ""),
-        db_file=os.getenv("DB_FILE", ""),
+        db_name=os.getenv("DB_NAME", ""),
+        db_host=os.getenv("DB_HOST", ""),
+        db_port=os.getenv("DB_PORT", ""),
+        db_user=os.getenv("DB_USER", ""),
+        db_password=os.getenv("DB_PASSWORD", ""),
     )
 
 
@@ -56,10 +60,10 @@ def get_database_url(db_settings: DBSettings) -> str:
     :rtype: :class:`str`
     """
 
-    if "sqlite" in db_settings.db_driver:
-        return f"{db_settings.db_driver}:///{db_settings.db_file}"
+    if "postgres" in db_settings.db_driver:
+        return f"{db_settings.db_driver}://{db_settings.db_user}:{db_settings.db_password.get_secret_value()}@{db_settings.db_host}:{db_settings.db_port}/{db_settings.db_name}"  # noqa: ignore  # pylint: disable=line-too-long
 
-    raise ValueError("Not supported database driver.")
+    raise ValueError(f"Not supported database driver: {db_settings.db_driver}")
 
 
 def get_app_data() -> dict[str, Any]:
@@ -134,43 +138,11 @@ def equal_dict(
     :rtype: :class:`bool`
     """
 
-    for key in exclude_keys:
-        if key in dict_1:
-            del dict_1[key]
+    # Create copies of the dictionaries to avoid modifying the originals
+    dict_1_filtered = {k: v for k, v in dict_1.items() if k not in exclude_keys}
+    dict_2_filtered = {k: v for k, v in dict_2.items() if k not in exclude_keys}
 
-        if key in dict_2:
-            del dict_2[key]
-
-    return dict_1 == dict_2
-
-
-def equal_list_of_dict(
-    list_dict_1: list[dict[Hashable, Any]],
-    list_dict_2: list[dict[Hashable, Any]],
-    exclude_keys: list[str],
-) -> bool:
-    """Compare two dictionaries by excluding keys specified in exclude_keys.
-
-    :param list_dict_1: The first list of dictionaries.
-    :type list_dict_1: :class:`list[dict[Hashable, Any]]`
-    :param list_dict_2: The second list of dictionaries.
-    :type list_dict_2: :class:`list[dict[Hashable, Any]]`
-    :param exclude_keys: List of keys to exclude from given dictionaries.
-    :type exclude_keys: :class:`list[str]`
-    :return: True if the two list of dictionaries are equal, False otherwise.
-    :rtype: :class:`bool`
-    """
-
-    for key in exclude_keys:
-        for item in list_dict_1:
-            if key in item:
-                del item[key]
-
-        for item in list_dict_2:
-            if key in item:
-                del item[key]
-
-    return list_dict_1 == list_dict_2
+    return dict_1_filtered == dict_2_filtered
 
 
 def as_dict(  # type: ignore  # pylint: disable=missing-function-docstring, too-many-arguments

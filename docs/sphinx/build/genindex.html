@@ -81,6 +81,7 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -252,10 +253,14 @@
         <li><a href="constants.html#module-constants">module</a>
 </li>
       </ul></li>
-      <li><a href="db.html#db.models.Transaction.counterparty_moneybox">counterparty_moneybox (db.models.Transaction attribute)</a>
+      <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.convert_to_strict_datetimes">convert_to_strict_datetimes() (data_classes.responses.MoneyboxResponse class method)</a>
 
       <ul>
-        <li><a href="src.db.html#src.db.models.Transaction.counterparty_moneybox">(src.db.models.Transaction attribute)</a>
+        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.convert_to_strict_datetimes">(data_classes.responses.TransactionLogResponse class method)</a>
+</li>
+        <li><a href="src.data_classes.html#src.data_classes.responses.MoneyboxResponse.convert_to_strict_datetimes">(src.data_classes.responses.MoneyboxResponse class method)</a>
+</li>
+        <li><a href="src.data_classes.html#src.data_classes.responses.TransactionLogResponse.convert_to_strict_datetimes">(src.data_classes.responses.TransactionLogResponse class method)</a>
 </li>
       </ul></li>
       <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.counterparty_moneybox_id">counterparty_moneybox_id (data_classes.responses.TransactionLogResponse attribute)</a>
@@ -288,6 +293,12 @@
         <li><a href="src.db.html#src.db.core.create_instance">(in module src.db.core)</a>
 </li>
       </ul></li>
+      <li><a href="db.html#db.db_manager.DBManager.create_moneybox_name_history">create_moneybox_name_history() (db.db_manager.DBManager method)</a>
+
+      <ul>
+        <li><a href="src.db.html#src.db.db_manager.DBManager.create_moneybox_name_history">(src.db.db_manager.DBManager method)</a>
+</li>
+      </ul></li>
       <li><a href="routes.responses.html#routes.responses.moneybox.CREATE_MONEYBOX_RESPONSES">CREATE_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
 
       <ul>
@@ -301,6 +312,8 @@
 </li>
         <li><a href="db.html#db.models.Moneybox.created_at">(db.models.Moneybox attribute)</a>
 </li>
+        <li><a href="db.html#db.models.MoneyboxNameHistory.created_at">(db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="db.html#db.models.SqlBase.created_at">(db.models.SqlBase attribute)</a>
 </li>
         <li><a href="db.html#db.models.Transaction.created_at">(db.models.Transaction attribute)</a>
@@ -311,11 +324,15 @@
 </li>
         <li><a href="src.db.html#src.db.models.Moneybox.created_at">(src.db.models.Moneybox attribute)</a>
 </li>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.created_at">(src.db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="src.db.html#src.db.models.SqlBase.created_at">(src.db.models.SqlBase attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.Transaction.created_at">(src.db.models.Transaction attribute)</a>
 </li>
       </ul></li>
+      <li><a href="routes.responses.html#routes.responses.custom_openapi_schema.custom_422_openapi_schema">custom_422_openapi_schema() (in module routes.responses.custom_openapi_schema)</a>
+</li>
       <li>
     custom_types
 
@@ -397,10 +414,34 @@
         <li><a href="src.html#src.custom_types.DBSettings.db_driver">(src.custom_types.DBSettings attribute)</a>
 </li>
       </ul></li>
-      <li><a href="custom_types.html#custom_types.DBSettings.db_file">db_file (custom_types.DBSettings attribute)</a>
+      <li><a href="custom_types.html#custom_types.DBSettings.db_host">db_host (custom_types.DBSettings attribute)</a>
 
       <ul>
-        <li><a href="src.html#src.custom_types.DBSettings.db_file">(src.custom_types.DBSettings attribute)</a>
+        <li><a href="src.html#src.custom_types.DBSettings.db_host">(src.custom_types.DBSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="custom_types.html#custom_types.DBSettings.db_name">db_name (custom_types.DBSettings attribute)</a>
+
+      <ul>
+        <li><a href="src.html#src.custom_types.DBSettings.db_name">(src.custom_types.DBSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="custom_types.html#custom_types.DBSettings.db_password">db_password (custom_types.DBSettings attribute)</a>
+
+      <ul>
+        <li><a href="src.html#src.custom_types.DBSettings.db_password">(src.custom_types.DBSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="custom_types.html#custom_types.DBSettings.db_port">db_port (custom_types.DBSettings attribute)</a>
+
+      <ul>
+        <li><a href="src.html#src.custom_types.DBSettings.db_port">(src.custom_types.DBSettings attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="custom_types.html#custom_types.DBSettings.db_user">db_user (custom_types.DBSettings attribute)</a>
+
+      <ul>
+        <li><a href="src.html#src.custom_types.DBSettings.db_user">(src.custom_types.DBSettings attribute)</a>
 </li>
       </ul></li>
       <li><a href="db.html#db.db_manager.DBManager">DBManager (class in db.db_manager)</a>
@@ -415,6 +456,8 @@
         <li><a href="src.html#src.custom_types.DBSettings">(class in src.custom_types)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="db.html#db.core.deactivate_instance">deactivate_instance() (in module db.core)</a>
 
       <ul>
@@ -431,8 +474,6 @@
         <li><a href="src.db.html#src.db.db_manager.DBManager.delete_moneybox">(src.db.db_manager.DBManager method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="routes.responses.html#routes.responses.moneybox.DELETE_MONEYBOX_RESPONSES">DELETE_MONEYBOX_RESPONSES (in module routes.responses.moneybox)</a>
 
       <ul>
@@ -531,12 +572,6 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="src.html#src.utils.equal_list_of_dict">equal_list_of_dict() (in module src.utils)</a>
-
-      <ul>
-        <li><a href="utils.html#utils.equal_list_of_dict">(in module utils)</a>
-</li>
-      </ul></li>
       <li>
     exception_handler
 
@@ -649,6 +684,8 @@
 </li>
         <li><a href="db.html#db.models.Moneybox.id">(db.models.Moneybox attribute)</a>
 </li>
+        <li><a href="db.html#db.models.MoneyboxNameHistory.id">(db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="db.html#db.models.SqlBase.id">(db.models.SqlBase attribute)</a>
 </li>
         <li><a href="db.html#db.models.Transaction.id">(db.models.Transaction attribute)</a>
@@ -659,6 +696,8 @@
 </li>
         <li><a href="src.db.html#src.db.models.Moneybox.id">(src.db.models.Moneybox attribute)</a>
 </li>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.id">(src.db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="src.db.html#src.db.models.SqlBase.id">(src.db.models.SqlBase attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.Transaction.id">(src.db.models.Transaction attribute)</a>
@@ -666,16 +705,22 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="db.html#db.exceptions.InconsistentDatabaseError">InconsistentDatabaseError</a>, <a href="src.db.html#src.db.exceptions.InconsistentDatabaseError">[1]</a>
+</li>
       <li><a href="src.html#src.main.initialize_app">initialize_app() (in module src.main)</a>
 </li>
       <li><a href="db.html#db.models.Moneybox.is_active">is_active (db.models.Moneybox attribute)</a>
 
       <ul>
+        <li><a href="db.html#db.models.MoneyboxNameHistory.is_active">(db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="db.html#db.models.SqlBase.is_active">(db.models.SqlBase attribute)</a>
 </li>
         <li><a href="db.html#db.models.Transaction.is_active">(db.models.Transaction attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.Moneybox.is_active">(src.db.models.Moneybox attribute)</a>
+</li>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.is_active">(src.db.models.MoneyboxNameHistory attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.SqlBase.is_active">(src.db.models.SqlBase attribute)</a>
 </li>
@@ -868,12 +913,12 @@
         <li><a href="src.data_classes.html#src.data_classes.responses.TransactionLogsResponse.model_fields">(src.data_classes.responses.TransactionLogsResponse attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.modified_at">modified_at (data_classes.responses.MoneyboxResponse attribute)</a>
 
       <ul>
         <li><a href="db.html#db.models.Moneybox.modified_at">(db.models.Moneybox attribute)</a>
+</li>
+        <li><a href="db.html#db.models.MoneyboxNameHistory.modified_at">(db.models.MoneyboxNameHistory attribute)</a>
 </li>
         <li><a href="db.html#db.models.SqlBase.modified_at">(db.models.SqlBase attribute)</a>
 </li>
@@ -883,11 +928,15 @@
 </li>
         <li><a href="src.db.html#src.db.models.Moneybox.modified_at">(src.db.models.Moneybox attribute)</a>
 </li>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.modified_at">(src.db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="src.db.html#src.db.models.SqlBase.modified_at">(src.db.models.SqlBase attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.Transaction.modified_at">(src.db.models.Transaction attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -921,6 +970,8 @@
         <li><a href="routes.html#module-routes.moneyboxes">routes.moneyboxes</a>
 </li>
         <li><a href="routes.responses.html#module-routes.responses">routes.responses</a>
+</li>
+        <li><a href="routes.responses.html#module-routes.responses.custom_openapi_schema">routes.responses.custom_openapi_schema</a>
 </li>
         <li><a href="routes.responses.html#module-routes.responses.moneybox">routes.responses.moneybox</a>
 </li>
@@ -977,20 +1028,38 @@
       </ul></li>
       <li><a href="custom_types.html#custom_types.EndpointRouteType.MONEYBOX">MONEYBOX (custom_types.EndpointRouteType attribute)</a>
 </li>
-      <li><a href="db.html#db.models.Transaction.moneybox">moneybox (db.models.Transaction attribute)</a>
+      <li><a href="db.html#db.models.MoneyboxNameHistory.moneybox">moneybox (db.models.MoneyboxNameHistory attribute)</a>
+
+      <ul>
+        <li><a href="db.html#db.models.Transaction.moneybox">(db.models.Transaction attribute)</a>
 </li>
+      </ul></li>
       <li><a href="src.html#src.custom_types.EndpointRouteType.MONEYBOX">MONEYBOX (src.custom_types.EndpointRouteType attribute)</a>
 </li>
-      <li><a href="src.db.html#src.db.models.Transaction.moneybox">moneybox (src.db.models.Transaction attribute)</a>
+      <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.moneybox">moneybox (src.db.models.MoneyboxNameHistory attribute)</a>
+
+      <ul>
+        <li><a href="src.db.html#src.db.models.Transaction.moneybox">(src.db.models.Transaction attribute)</a>
 </li>
+      </ul></li>
       <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.moneybox_id">moneybox_id (data_classes.responses.TransactionLogResponse attribute)</a>
 
       <ul>
+        <li><a href="db.html#db.models.MoneyboxNameHistory.moneybox_id">(db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="db.html#db.models.Transaction.moneybox_id">(db.models.Transaction attribute)</a>
 </li>
         <li><a href="src.data_classes.html#src.data_classes.responses.TransactionLogResponse.moneybox_id">(src.data_classes.responses.TransactionLogResponse attribute)</a>
 </li>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.moneybox_id">(src.db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="src.db.html#src.db.models.Transaction.moneybox_id">(src.db.models.Transaction attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="db.html#db.models.Moneybox.moneybox_name_history">moneybox_name_history (db.models.Moneybox attribute)</a>
+
+      <ul>
+        <li><a href="src.db.html#src.db.models.Moneybox.moneybox_name_history">(src.db.models.Moneybox attribute)</a>
 </li>
       </ul></li>
       <li><a href="routes.html#routes.moneybox.moneybox_router">moneybox_router (in module routes.moneybox)</a>
@@ -1031,6 +1100,14 @@
         <li><a href="src.data_classes.html#src.data_classes.responses.MoneyboxesResponse">(class in src.data_classes.responses)</a>
 </li>
       </ul></li>
+      <li><a href="db.html#db.models.MoneyboxNameHistory">MoneyboxNameHistory (class in db.models)</a>
+
+      <ul>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory">(class in src.db.models)</a>
+</li>
+      </ul></li>
+      <li><a href="db.html#db.exceptions.MoneyboxNotFoundByNameError">MoneyboxNotFoundByNameError</a>, <a href="src.db.html#src.db.exceptions.MoneyboxNotFoundByNameError">[1]</a>
+</li>
       <li><a href="db.html#db.exceptions.MoneyboxNotFoundError">MoneyboxNotFoundError</a>, <a href="src.db.html#src.db.exceptions.MoneyboxNotFoundError">[1]</a>
 </li>
       <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse">MoneyboxResponse (class in data_classes.responses)</a>
@@ -1060,6 +1137,8 @@
 </li>
         <li><a href="db.html#db.models.Moneybox.name">(db.models.Moneybox attribute)</a>
 </li>
+        <li><a href="db.html#db.models.MoneyboxNameHistory.name">(db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="src.data_classes.html#src.data_classes.requests.MoneyboxCreateRequest.name">(src.data_classes.requests.MoneyboxCreateRequest attribute)</a>
 </li>
         <li><a href="src.data_classes.html#src.data_classes.requests.MoneyboxUpdateRequest.name">(src.data_classes.requests.MoneyboxUpdateRequest attribute)</a>
@@ -1067,6 +1146,8 @@
         <li><a href="src.data_classes.html#src.data_classes.responses.MoneyboxResponse.name">(src.data_classes.responses.MoneyboxResponse attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.Moneybox.name">(src.db.models.Moneybox attribute)</a>
+</li>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.name">(src.db.models.MoneyboxNameHistory attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1076,17 +1157,35 @@
       <li><a href="db.html#db.models.Moneybox.note">note (db.models.Moneybox attribute)</a>
 
       <ul>
+        <li><a href="db.html#db.models.MoneyboxNameHistory.note">(db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="db.html#db.models.SqlBase.note">(db.models.SqlBase attribute)</a>
 </li>
         <li><a href="db.html#db.models.Transaction.note">(db.models.Transaction attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.Moneybox.note">(src.db.models.Moneybox attribute)</a>
 </li>
+        <li><a href="src.db.html#src.db.models.MoneyboxNameHistory.note">(src.db.models.MoneyboxNameHistory attribute)</a>
+</li>
         <li><a href="src.db.html#src.db.models.SqlBase.note">(src.db.models.SqlBase attribute)</a>
 </li>
         <li><a href="src.db.html#src.db.models.Transaction.note">(src.db.models.Transaction attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="db.html#db.exceptions.OverflowMoneyboxCantBeDeletedError">OverflowMoneyboxCantBeDeletedError</a>, <a href="src.db.html#src.db.exceptions.OverflowMoneyboxCantBeDeletedError">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="db.html#db.exceptions.OverflowMoneyboxCantBeUpdatedError">OverflowMoneyboxCantBeUpdatedError</a>, <a href="src.db.html#src.db.exceptions.OverflowMoneyboxCantBeUpdatedError">[1]</a>
+</li>
+      <li><a href="db.html#db.exceptions.OverflowMoneyboxNotFoundError">OverflowMoneyboxNotFoundError</a>, <a href="src.db.html#src.db.exceptions.OverflowMoneyboxNotFoundError">[1]</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1176,6 +1275,13 @@
 </li>
       </ul></li>
       <li>
+    routes.responses.custom_openapi_schema
+
+      <ul>
+        <li><a href="routes.responses.html#module-routes.responses.custom_openapi_schema">module</a>
+</li>
+      </ul></li>
+      <li>
     routes.responses.moneybox
 
       <ul>
@@ -1231,6 +1337,8 @@
         <li><a href="src.db.html#src.db.models.Moneybox.savings_target">(src.db.models.Moneybox attribute)</a>
 </li>
       </ul></li>
+      <li><a href="src.html#src.main.set_custom_openapi_schema">set_custom_openapi_schema() (in module src.main)</a>
+</li>
       <li><a href="constants.html#constants.SPHINX_DIRECTORY">SPHINX_DIRECTORY (in module constants)</a>
 
       <ul>
@@ -1285,6 +1393,8 @@
         <li><a href="src.data_classes.html#module-src.data_classes.responses">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     src.db
 
@@ -1292,8 +1402,6 @@
         <li><a href="src.db.html#module-src.db">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     src.db.core
 
@@ -1389,16 +1497,6 @@
 
       <ul>
         <li><a href="src.db.html#src.db.models.SqlBase.strict_attrs">(src.db.models.SqlBase attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="data_classes.html#data_classes.responses.MoneyboxResponse.strict_datetimes">strict_datetimes() (data_classes.responses.MoneyboxResponse class method)</a>
-
-      <ul>
-        <li><a href="data_classes.html#data_classes.responses.TransactionLogResponse.strict_datetimes">(data_classes.responses.TransactionLogResponse class method)</a>
-</li>
-        <li><a href="src.data_classes.html#src.data_classes.responses.MoneyboxResponse.strict_datetimes">(src.data_classes.responses.MoneyboxResponse class method)</a>
-</li>
-        <li><a href="src.data_classes.html#src.data_classes.responses.TransactionLogResponse.strict_datetimes">(src.data_classes.responses.TransactionLogResponse class method)</a>
 </li>
       </ul></li>
       <li><a href="db.html#db.db_manager.DBManager.sub_amount">sub_amount() (db.db_manager.DBManager method)</a>

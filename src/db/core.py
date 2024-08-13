@@ -4,6 +4,7 @@ from typing import Any
 
 from sqlalchemy import Sequence, and_, exists, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.orm.interfaces import LoaderOption
 
 from src.db.exceptions import ColumnDoesNotExistError
 from src.db.models import SqlBase
@@ -227,6 +228,7 @@ async def deactivate_instance(
             update(orm_model)
             .where(orm_model.id == record_id)
             .values(is_active=False)
+            .values(priority=None)  # reset priority to Null for deleted moneyboxes
             .returning(orm_model)
         )
 

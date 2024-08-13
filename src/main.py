@@ -161,7 +161,7 @@ def main() -> None:
     uvicorn.run(
         "src.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8001,
         loop="asyncio",
         workers=1,
         # reload=environment_type is EnvironmentType.DEV,

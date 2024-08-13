@@ -2,7 +2,8 @@
 
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import ConfigDict, SecretStr
+from pydantic_settings import BaseSettings
 
 
 class EndpointRouteType(StrEnum):
@@ -28,14 +29,26 @@ class EnvironmentType(StrEnum):
     """Testing Environment."""
 
 
-class DBSettings(BaseModel):
+class DBSettings(BaseSettings):
     """The database credentials."""
 
     db_driver: str
     """Database driver."""
 
-    db_file: str
-    """Database file path."""
+    db_name: str
+    """Database name."""
+
+    db_host: str
+    """Database host."""
+
+    db_port: int
+    """Database port."""
+
+    db_user: str
+    """Database user."""
+
+    db_password: SecretStr
+    """Database password."""
 
     model_config = ConfigDict(extra="forbid")
     """Model config."""

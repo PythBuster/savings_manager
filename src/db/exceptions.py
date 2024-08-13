@@ -17,7 +17,7 @@ class InconsistentDatabaseError(ABC, Exception):
 class RecordNotFoundError(ABC, Exception):
     """Base RecordNotFound Exception Class"""
 
-    def __init__(self, record_id: int, message: str) -> None:
+    def __init__(self, record_id: int | None, message: str) -> None:
         self.record_id = record_id
         self.message = message
         self.details = {
@@ -77,8 +77,16 @@ class MoneyboxNotFoundError(RecordNotFoundError):
     """Custom MoneyboxNotFound Exception"""
 
     def __init__(self, moneybox_id: int) -> None:
-        message = f"Moneybox with id {moneybox_id} does not exist."
+        message = f"Moneybox with id '{moneybox_id}' does not exist."
         super().__init__(record_id=moneybox_id, message=message)
+
+
+class MoneyboxNotFoundByNameError(RecordNotFoundError):
+    """Custom MoneyboxNotFoundByNameError Exception"""
+
+    def __init__(self, name: str) -> None:
+        message = f"Moneybox with name '{name}' does not exist."
+        super().__init__(record_id=None, message=message)
 
 
 class NonPositiveAmountError(UpdateInstanceError):

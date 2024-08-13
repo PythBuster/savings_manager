@@ -9,6 +9,8 @@ from pydantic import ValidationError
 from src.custom_types import TransactionTrigger, TransactionType
 from src.data_classes.responses import TransactionLogResponse
 
+pytestmark = pytest.mark.asyncio(loop_scope="scope")
+
 
 @pytest.mark.parametrize(
     "data",
@@ -23,7 +25,7 @@ from src.data_classes.responses import TransactionLogResponse
             "balance": 123,
             "counterparty_moneybox_id": 2,
             "moneybox_id": 1,
-            "created_at": "2020-05-01T00:00:00Z",
+            "created_at": "2024-08-11 13:57:17.941840 +00:00",
         },
         {
             "id": 2,
@@ -35,7 +37,7 @@ from src.data_classes.responses import TransactionLogResponse
             "balance": 0,
             "counterparty_moneybox_id": None,
             "moneybox_id": 2,
-            "created_at": "2020-05-01T00:00:00Z",
+            "created_at": "2024-08-11 13:57:17.941840 +00:00",
         },
         {
             "id": 3,
@@ -47,7 +49,7 @@ from src.data_classes.responses import TransactionLogResponse
             "balance": 100,
             "counterparty_moneybox_id": 1,
             "moneybox_id": 3,
-            "created_at": "2020-05-01T00:00:00Z",
+            "created_at": "2024-08-11 13:57:17.941840 +00:00",
         },
         {
             "id": 4,
@@ -59,7 +61,7 @@ from src.data_classes.responses import TransactionLogResponse
             "balance": 0,
             "counterparty_moneybox_id": 2,
             "moneybox_id": 4,
-            "created_at": "2020-05-01T00:00:00Z",
+            "created_at": "2024-08-11 13:57:17.941840 +00:00",
         },
     ],
 )
@@ -104,7 +106,7 @@ def test_transaction_log_response_invalid_id__non_int() -> None:
         "balance": 123,
         "counterparty_moneybox_id": 2,
         "moneybox_id": 1,
-        "created_at": "2020-05-01T00:00:00Z",
+        "created_at": "2024-08-11 13:57:17.941840 +00:00",
     }
 
     with pytest.raises(ValidationError):

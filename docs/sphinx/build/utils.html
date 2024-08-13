@@ -49,7 +49,6 @@
 <li><a class="reference internal" href="#utils.check_existence_of_moneybox_by_id"><code class="docutils literal notranslate"><span class="pre">check_existence_of_moneybox_by_id()</span></code></a></li>
 <li><a class="reference internal" href="#utils.create_envfile_from_envvars"><code class="docutils literal notranslate"><span class="pre">create_envfile_from_envvars()</span></code></a></li>
 <li><a class="reference internal" href="#utils.equal_dict"><code class="docutils literal notranslate"><span class="pre">equal_dict()</span></code></a></li>
-<li><a class="reference internal" href="#utils.equal_list_of_dict"><code class="docutils literal notranslate"><span class="pre">equal_list_of_dict()</span></code></a></li>
 <li><a class="reference internal" href="#utils.get_app_data"><code class="docutils literal notranslate"><span class="pre">get_app_data()</span></code></a></li>
 <li><a class="reference internal" href="#utils.get_database_url"><code class="docutils literal notranslate"><span class="pre">get_database_url()</span></code></a></li>
 <li><a class="reference internal" href="#utils.get_db_settings"><code class="docutils literal notranslate"><span class="pre">get_db_settings()</span></code></a></li>
@@ -139,27 +138,6 @@ in /envs dir by reading environment variables.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="utils.equal_list_of_dict">
-<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">equal_list_of_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_dict_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_dict_2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#utils.equal_list_of_dict" title="Link to this definition"></a></dt>
-<dd><p>Compare two dictionaries by excluding keys specified in exclude_keys.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>list_dict_1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[dict[Hashable,</span> <span class="pre">Any]]</span></code>) – The first list of dictionaries.</p></li>
-<li><p><strong>list_dict_2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[dict[Hashable,</span> <span class="pre">Any]]</span></code>) – The second list of dictionaries.</p></li>
-<li><p><strong>exclude_keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list[str]</span></code>) – List of keys to exclude from given dictionaries.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the two list of dictionaries are equal, False otherwise.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="utils.get_app_data">
 <span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_app_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#utils.get_app_data" title="Link to this definition"></a></dt>
 <dd><p>Extract app information from pyproject.toml.</p>
@@ -175,7 +153,7 @@ in /envs dir by reading environment variables.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.get_database_url">
-<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_database_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DBSettings</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#utils.get_database_url" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_database_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="src.html#src.custom_types.DBSettings" title="src.custom_types.DBSettings"><span class="pre">DBSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#utils.get_database_url" title="Link to this definition"></a></dt>
 <dd><p>Create a database connection string based on db_settings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -192,7 +170,7 @@ in /envs dir by reading environment variables.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.get_db_settings">
-<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_db_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DBSettings</span></span></span><a class="headerlink" href="#utils.get_db_settings" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">get_db_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="src.html#src.custom_types.DBSettings" title="src.custom_types.DBSettings"><span class="pre">DBSettings</span></a></span></span><a class="headerlink" href="#utils.get_db_settings" title="Link to this definition"></a></dt>
 <dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">DBSettings</span></code> spawner.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -207,7 +185,7 @@ and return a <code class="xref py py-class docutils literal notranslate"><span c
 
 <dl class="py function">
 <dt class="sig sig-object py" id="utils.load_environment">
-<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">load_environment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EnvironmentType</span></span></span><a class="headerlink" href="#utils.load_environment" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">utils.</span></span><span class="sig-name descname"><span class="pre">load_environment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="src.html#src.custom_types.EnvironmentType" title="src.custom_types.EnvironmentType"><span class="pre">EnvironmentType</span></a></span></span><a class="headerlink" href="#utils.load_environment" title="Link to this definition"></a></dt>
 <dd><p>Helper function to load the current env file, depending on deploy environment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
