@@ -3,6 +3,11 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.9.0 (2024-08-13)
+### Changes:
+- refactor db core functions
+- fix: moved setting priority of moneybox to None in correct db function
+
 ## 1.8.1 (2024-08-13)
 ### Changes:
 - adapt docker build pipelines
