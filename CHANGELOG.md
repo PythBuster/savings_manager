@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.8.0 (2024-08-13)
+### Changes:
+- adapt some unit tests to avoid unexpected behavior like different order of records into database as expected
+
 ## 1.7.0 (2024-08-13)
 ### Features:
 - switch database to postgres
