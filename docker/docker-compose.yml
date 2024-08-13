@@ -30,7 +30,7 @@ services:
     links:
       - postgres_database
     ports:
-      - 8000:8000
+      - 8001:8001
     environment:
       - DB_DRIVER=postgresql+asyncpg
       - DB_NAME=savings_manager

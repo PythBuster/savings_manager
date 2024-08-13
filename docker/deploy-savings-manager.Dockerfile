@@ -23,4 +23,4 @@ RUN poetry install --without dev
 RUN poetry run python3.11 -c "from src import utils; utils.create_envfile_from_envvars();"
 
 ENTRYPOINT ["sh", "scripts/entrypoint.sh"]
-CMD ["poetry", "run", "python3.11", "-m", "src.main", "--environment", "dev"]
+CMD ["poetry", "run", "python3.11", "-m", "src.main", "--environment", "live"]
