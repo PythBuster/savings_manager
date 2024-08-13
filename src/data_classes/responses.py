@@ -160,15 +160,25 @@ class MoneyboxesResponse(BaseModel):
                     "moneyboxes": [
                         {
                             "id": 1,
-                            "name": "Holiday",
-                            "balance": 1255,
+                            "name": "672c0145-c910-4ce8-8202-d6ce9ba405a4",
+                            "balance": 0,
+                            "savings_amount": 0,
+                            "savings_target": None,
+                            "priority": 0,
+                            "created_at": "2024-08-13 02:50:41.837275 +00:00",
+                            "modified_at": None
                         },
                         {
                             "id": 2,
-                            "name": "Extra Bills",
-                            "balance": 250,
-                        },
-                    ],
+                            "name": "Holiday",
+                            "balance": 1050,
+                            "savings_amount": 50,
+                            "savings_target": 50000,
+                            "priority": 1,
+                            "created_at": "2024-08-16 02:50:41.837275 +00:00",
+                            "modified_at": "2024-08-17 04:41:45.126672 +00:00"
+                        }
+                    ]
                 }
             ]
         },
