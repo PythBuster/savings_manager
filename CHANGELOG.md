@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.10.0 (2024-08-13)
+### Changes:
+- change pytest ordering dependency (use pytest-order instead of pytest-ordering)
+
 ## 1.9.0 (2024-08-13)
 ### Changes:
 - refactor db core functions
