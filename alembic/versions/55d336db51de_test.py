@@ -1,4 +1,4 @@
-"""test
+"""initial_database_migration_app_v2
 
 Revision ID: 55d336db51de
 Revises: 
