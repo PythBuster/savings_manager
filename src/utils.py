@@ -4,7 +4,7 @@ import argparse
 import os
 import tomllib
 from pathlib import Path
-from typing import Annotated, Any, Hashable
+from typing import Annotated, Any
 
 from dictalchemy import asdict
 from dotenv import load_dotenv

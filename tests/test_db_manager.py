@@ -6,7 +6,6 @@ from typing import Any
 import pytest
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
-from sqlalchemy.exc import IntegrityError
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.data_classes.requests import (

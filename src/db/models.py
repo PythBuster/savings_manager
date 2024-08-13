@@ -9,7 +9,6 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     MetaData,
-    event,
     func,
     text,
 )
@@ -172,8 +171,8 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
         )
     )
 
-    moneybox_name_history: Mapped[List["MoneyboxNameHistory"]] = (
-        relationship(  # pylint: disable=unsubscriptable-object
+    moneybox_name_history: Mapped[List["MoneyboxNameHistory"]] = (  # noqa: typing  # pylint: disable=unsubscriptable-object
+        relationship(
             back_populates="moneybox",
             foreign_keys="[MoneyboxNameHistory.moneybox_id]",
             cascade="all, delete-orphan",

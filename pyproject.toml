@@ -98,7 +98,8 @@ load-plugins=[
 
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
 [tool.pylint-per-file-ignores]
-"test_db_manager.py"="missing-function-docstring, duplicate-code"
+"test_db_manager.py"="missing-function-docstring"
+"test_moneybox_endpoints.py"="missing-function-docstring, too-many-locals, too-many-lines"
 "test_utils.py"="missing-function-docstring"
 "test_custom_openapi_schema.py"="missing-function-docstring"
 "/routes/"="missing-function-docstring"
@@ -106,9 +107,7 @@ load-plugins=[
 "responses.py"="duplicate-code"
 "/routes/responses/__init__.py"="duplicate-code"
 "src/db/__init__.py"="duplicate-code"
-"src/routes/responses/moneyboxes.py"="duplicate-code"
 "db_test_data_initializer.py"="invalid-name, line-too-long"
-"custom_openapi_schema.py"="duplicate-code"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

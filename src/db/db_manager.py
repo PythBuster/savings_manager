@@ -6,7 +6,6 @@ from typing import Any
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.interfaces import LoaderOption
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (

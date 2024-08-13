@@ -11,7 +11,6 @@ import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 from dotenv import load_dotenv
 from httpx import AsyncClient
-from sqlalchemy import text
 
 from src.constants import WORKING_DIR
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
@@ -34,7 +33,7 @@ db_settings = get_db_settings()
 
 
 @pytest_asyncio.fixture(scope="session")
-def event_loop():
+def event_loop() -> asyncio.AbstractEventLoop:  # type: ignore
     """Needed for https://github.com/igortg/pytest-async-sqlalchemy"""
     loop = asyncio.get_event_loop()
     yield loop
@@ -269,7 +268,7 @@ async def example_1_db_settings() -> AsyncGenerator:
 
 
 @pytest_asyncio.fixture(scope="session", name="db_manager")
-async def mocked_db_manager() -> DBManager:
+async def mocked_db_manager() -> DBManager:  # type: ignore
     """A fixture to create the db_manager.
 
     :return: The DBManager connected to the test database.

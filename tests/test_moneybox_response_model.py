@@ -288,7 +288,7 @@ async def test_moneybox_response_invalid_date_order() -> None:
         "name": "Holiday",
         "balance": 1000,
         "created_at": "2024-08-11 13:57:17.941840 +00:00",
-        "modified_at": "2024-08-11 11:03:17.312860 +00:00",  # Invalid order, modified_at is before created_at
+        "modified_at": "2024-08-11 11:03:17.312860 +00:00",  # Invalid order, modified_at is before created_at  # noqa: typing  # pylint: disable=line-too-long
         "savings_amount": 0,
         "savings_target": None,
         "priority": 1,

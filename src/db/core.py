@@ -4,7 +4,6 @@ from typing import Any
 
 from sqlalchemy import Sequence, and_, exists, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from sqlalchemy.orm.interfaces import LoaderOption
 
 from src.db.exceptions import ColumnDoesNotExistError
 from src.db.models import SqlBase

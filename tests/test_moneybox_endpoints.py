@@ -39,7 +39,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "balance": 0,
                 "savings_amount": 0,
                 "savings_target": None,
-                "priority": 1,
+                "priority": 1,  # pylint: disable=duplicate-code
             },
             {
                 "name": "Test Box 2",
@@ -494,7 +494,7 @@ async def test_endpoint_delete_second_moneybox__status_204(
     )
     moneyboxes = response_1.json()
 
-    assert moneyboxes["total"] == 3
+    assert moneyboxes["total"] == 3  # type: ignore
 
     response_2 = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}"
@@ -506,7 +506,7 @@ async def test_endpoint_delete_second_moneybox__status_204(
     )
     moneyboxes = response_3.json()
 
-    assert moneyboxes["total"] == 2
+    assert moneyboxes["total"] == 2  # type: ignore
 
     response = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}"
@@ -801,10 +801,10 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 2",
     )
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 3",
     )
 
@@ -814,7 +814,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204(
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
 
@@ -822,15 +822,15 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204(
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field(  # noqa: E501  # pylint: disable=line-too-long
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 2",
     )
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 3",
     )
 
@@ -839,7 +839,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204__mi
         "to_moneybox_id": third_moneybox_id,
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
 
@@ -851,10 +851,10 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third__status_422__m
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 2",
     )
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 3",
     )
 
@@ -863,7 +863,7 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third__status_422__m
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
@@ -874,11 +874,11 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third__status_422__m
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__missing_to_moneybox_id_field(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__missing_to_moneybox_id_field(  # noqa: E501  # pylint: disable=line-too-long
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 2",
     )
 
@@ -887,7 +887,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__mi
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
@@ -898,11 +898,11 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__mi
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__status_422__fail_extra_field(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__status_422__fail_extra_field(  # noqa: E501  # pylint: disable=line-too-long
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
         name="Test Box 2",
     )
 
@@ -911,7 +911,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__st
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
@@ -926,8 +926,8 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third_status_422__ne
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 3")
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")  # noqa: typing  # pylint: disable=protected-access, line-too-long
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 3")  # noqa: typing  # pylint: disable=protected-access, line-too-long
 
     transfer_data = {
         "amount": -500,
@@ -935,7 +935,7 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third_status_422__ne
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
@@ -950,8 +950,8 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__ze
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 3")
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")  # noqa: typing  # pylint: disable=protected-access, line-too-long
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 3")  # noqa: typing  # pylint: disable=protected-access, line-too-long
 
     transfer_data = {
         "amount": 0,
@@ -959,7 +959,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__ze
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
@@ -970,12 +970,12 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__ze
 
 
 @pytest.mark.dependency
-async def test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found(  # noqa: E501
+async def test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found(  # noqa: E501  # pylint: disable=line-too-long
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")  # noqa: typing  # pylint: disable=protected-access
 
     # calculate, because db-call would raise NotFound Exception here, but...
     third_moneybox_id = second_moneybox_id + 1
@@ -988,7 +988,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to
 
     # ...but third_moneybox not found is expected here
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
 
@@ -1001,10 +1001,10 @@ async def test_endpoint_get_transactions_log_moneybox_second__status_200(  # noq
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 2")
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 2")  # noqa: typing  # pylint: disable=protected-access
 
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transactions",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
     content = response.json()
 
@@ -1083,12 +1083,12 @@ async def test_endpoint_get_transactions_log_moneybox_third__status_200(  # noqa
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 1")
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 3")
-    fourth_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 4")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 1")  # noqa: typing  # pylint: disable=protected-access
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 3")  # noqa: typing  # pylint: disable=protected-access
+    fourth_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 4")  # noqa: typing  # pylint: disable=protected-access
 
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{third_moneybox_id}/transactions",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{third_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
     content = response.json()
 
@@ -1172,47 +1172,47 @@ async def test_endpoint_get_transactions_log_moneybox_fifth__status_204(  # noqa
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    fifth_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 5")
+    fifth_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 5")  # noqa: typing  # pylint: disable=protected-access
 
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{fifth_moneybox_id}/transactions",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{fifth_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.dependency
-async def test_endpoint_get_transactions_log_moneybox_fourth__status_404__deleted_and_not_found(  # noqa: E501
+async def test_endpoint_get_transactions_log_moneybox_fourth__status_404__deleted_and_not_found(  # noqa: E501  # pylint: disable=line-too-long
     default_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 3")
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 3")  # noqa: typing  # pylint: disable=protected-access
 
     # Calculate id of moneybox 4. Fourth moneybox is deleted, db call would raise a NotFound
     fourth_moneybox_id = third_moneybox_id + 1
 
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{fourth_moneybox_id}/transactions",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{fourth_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
-async def test_endpoint_get_transactions_log_moneybox_sixth__status_404__not_existing_and_not_found(  # noqa: E501
+async def test_endpoint_get_transactions_log_moneybox_sixth__status_404__not_existing_and_not_found(  # noqa: E501  # pylint: disable=line-too-long
     default_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    fifth_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 5")
+    fifth_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Moneybox 5")  # noqa: typing  # pylint: disable=protected-access
 
     # Calculate id of moneybox 6. moneybox six does not exist,
     #   db call would raise a NotFound
     sith_moneybox_id = fifth_moneybox_id + 1
 
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{sith_moneybox_id}/transactions",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{sith_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
 
     assert response.status_code == status.HTTP_404_NOT_FOUND

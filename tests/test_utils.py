@@ -83,9 +83,9 @@ def test_get_app_data() -> None:
     ],
 )
 def test_equal_dict(
-        dict_1: dict[str, Any],
-        dict_2: dict[str, Any],
-        exclude_keys: list[str],
-        expected_result: bool,
+    dict_1: dict[str, Any],
+    dict_2: dict[str, Any],
+    exclude_keys: list[str],
+    expected_result: bool,
 ) -> None:
     assert equal_dict(dict_1, dict_2, exclude_keys) == expected_result
