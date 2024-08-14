@@ -28,6 +28,17 @@ class HTTPErrorResponse(BaseModel):
 
     model_config = ConfigDict(
         extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "message": "No database connection.",
+                    "details": {
+                        "message": "Connect call failed ('127.0.0.1', 5432)",
+                    },
+                },
+            ]
+        },
     )
     """The config of the model."""
 
@@ -86,6 +97,7 @@ class MoneyboxResponse(BaseModel):
 
     model_config = ConfigDict(
         extra="forbid",
+        frozen=True,
         json_schema_extra={
             "examples": [
                 {
@@ -148,11 +160,15 @@ class MoneyboxResponse(BaseModel):
 class MoneyboxesResponse(BaseModel):
     """The moneyboxes response model."""
 
-    moneyboxes: Annotated[list[MoneyboxResponse], Field(description="The list of moneyboxes.")]
+    moneyboxes: Annotated[
+        list[MoneyboxResponse],
+        Field(min_length=1, description="The list of moneyboxes.")
+    ]
     """The list of moneyboxes."""
 
     model_config = ConfigDict(
         extra="forbid",
+        frozen=True,
         json_schema_extra={
             "examples": [
                 {
@@ -266,6 +282,7 @@ class TransactionLogResponse(BaseModel):
 
     model_config = ConfigDict(
         extra="forbid",
+        frozen=True,
         json_schema_extra={
             "examples": [
                 {
@@ -376,6 +393,20 @@ class TransactionLogResponse(BaseModel):
 
         return self
 
+    @model_validator(mode="before")
+    @classmethod
+    def lowercase_enum_strings(cls, data: dict[Any, Any]) -> dict[Any, Any]:
+        """Lowercase transaction type and transaction trigger strings."""
+
+        if "transaction_type" in data and isinstance(data["transaction_type"], str):
+            data["transaction_type"] = data["transaction_type"].lower()
+
+        if "transaction_trigger" in data and isinstance(data["transaction_trigger"], str):
+            data["transaction_trigger"] = data["transaction_trigger"].lower()
+
+        return data
+
+
 
 class TransactionLogsResponse(BaseModel):
     """The transaction logs response model."""
@@ -387,6 +418,7 @@ class TransactionLogsResponse(BaseModel):
 
     model_config = ConfigDict(
         extra="forbid",
+        frozen=True,
         json_schema_extra={
             "examples": [
                 {
@@ -406,3 +438,59 @@ class TransactionLogsResponse(BaseModel):
         """The count of transaction logs."""
 
         return len(self.transaction_logs)
+
+
+class PriorityResponse(BaseModel):
+    """The priority response model."""
+
+    moneybox_id: Annotated[StrictInt, Field(description="The id of the moneybox.")]
+    """The id of the moneybox."""
+
+    name: Annotated[str, Field(min_length=1, description="The name of the moneybox.")]
+    """The name of the moneybox."""
+
+    priority: Annotated[
+        StrictInt,
+        Field(ge=0, description="The priority of the moneybox.")
+    ]
+    """The priority of the moneybox."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={"examples": [{"moneybox_id": 4, "name": "Holiday", "priority": 1}]},
+    )
+    """The config of the model."""
+
+
+class PrioritylistResponse(BaseModel):
+    """The priority list response model."""
+
+    priority_list: Annotated[
+        list[PriorityResponse],
+        Field(min_length=1, description="The priority list."),
+    ]
+    """The priority list."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "priority_list": [
+                        {
+                            "moneybox_id": 1,
+                            "name": "672c0145-c910-4ce8-8202-d6ce9ba405a4",
+                            "priority": 0,
+                        },
+                        {"moneybox_id": 2, "name": "Reserves", "priority": 2},
+                        {"moneybox_id": 4, "name": "Holiday", "priority": 1},
+                    ],
+                },
+            ],
+        },
+    )
+    """The config of the model."""
+
+

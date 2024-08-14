@@ -23,16 +23,13 @@ moneyboxes_router = APIRouter(
 )
 async def get_moneyboxes(
     request: Request,
-) -> MoneyboxesResponse | Response:
+) -> MoneyboxesResponse:
     """Endpoint for getting moneyboxes."""
 
     moneyboxes_data = await request.app.state.db_manager.get_moneyboxes()
 
-    if moneyboxes_data:
-        moneyboxes_data = {
-            "moneyboxes": moneyboxes_data,
-        }
-        moneyboxes = MoneyboxesResponse(**moneyboxes_data)
-        return moneyboxes
-
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    response_moneyboxes_data = {
+        "moneyboxes": moneyboxes_data,
+    }
+    moneyboxes = MoneyboxesResponse(**response_moneyboxes_data)
+    return moneyboxes

@@ -17,6 +17,7 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
+from src.routes.prioritylist import prioritylist_router
 from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
 from src.utils import get_app_data, get_db_settings, load_environment
 
@@ -28,6 +29,10 @@ tags_metadata = [
     {
         "name": "moneyboxes",
         "description": "All moneyboxes endpoints.",
+    },
+    {
+        "name": "prioritylist",
+        "description": "All prioritylist endpoints.",
     },
 ]
 """Metadata about the endpoints."""
@@ -150,6 +155,10 @@ def register_router(fastapi_app: FastAPI) -> None:
     )
     fastapi_app.include_router(
         moneyboxes_router,
+        prefix=f"/{EndpointRouteType.APP_ROOT}",
+    )
+    fastapi_app.include_router(
+        prioritylist_router,
         prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
 

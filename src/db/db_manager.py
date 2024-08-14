@@ -1,7 +1,7 @@
 """All database definitions are located here."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Hashable
 
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -12,8 +12,7 @@ from src.db.core import (
     create_instance,
     deactivate_instance,
     read_instance,
-    read_instances,
-    update_instance,
+    update_instance, read_instances,
 )
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
@@ -702,11 +701,11 @@ class DBManager:
 
         return moneybox.id
 
-    async def get_priority_list(self) -> dict[int, dict[str, str | int]]:
+    async def get_priority_list(self) -> list[dict[Hashable, Any]]:
         """Get the priority list (moneybox_id to priority and name map).
 
-        :return: The priority list (moneybox_id to priority and name map).
-        :type: :class:`dict[int, dict[str, str|int]]`
+        :return: The priority list (moneybox_id, priority and name key-values).
+        :type: :class:`list[dict[Hashable, Any]]`
         """
 
         stmt = select(Moneybox.id, Moneybox.priority, Moneybox.name).where(
@@ -718,36 +717,39 @@ class DBManager:
 
         priorities = result.all()
 
-        priority_map = {
-            moneybox_id: {
+        priority_map = [
+            {
+                "moneybox_id": moneybox_id,
                 "name": name,
                 "priority": priority,
             }
             for moneybox_id, priority, name in priorities
-        }
+        ]
 
         return priority_map
 
     async def update_priority_list(
-        self, priorities: dict[int, int]
-    ) -> dict[int, dict[str, str | int]]:
+        self, priorities: list[dict[int, int]]
+    ) -> list[dict[Hashable, Any]]:
         """Set new priorities by given priority list.
 
+        :param priorities: The priority list (moneybox_id to priority and name map).
+        :type priorities: :class:`list[dict[int, int]]`
         :return: The updated priority list (moneybox_id to priority and name map).
-        :type: :class:`dict[int, dict[str, str|int]]`
+        :type: :class:`list[dict[Hashable, Any]]`
         """
 
-        if 0 in set(priorities.values()):
+        if 0 in set(priority["priority"] for priority in priorities):
             raise UpdateInstanceError(
                 record_id=None,
                 message="Updating priority=0 is not allowed (reserved for Overflow Moneybox)",
-                details=priorities,  # type: ignore
+                details={"priority_list": priorities},  # type: ignore
             )
 
         async with self.async_session.begin() as session:
             reset_data = [
-                {"id": moneybox_id, "priority": None}
-                for moneybox_id, priority in priorities.items()
+                {"id": priority["moneybox_id"], "priority": None}
+                for priority in priorities
             ]
 
             # ORM Bulk UPDATE by Primary Key -> set priority to None
@@ -757,8 +759,8 @@ class DBManager:
             )
 
             data = [
-                {"id": moneybox_id, "priority": priority}
-                for moneybox_id, priority in priorities.items()
+                {"id": priority["moneybox_id"], "priority": priority["priority"]}
+                for priority in priorities
             ]
 
             # ORM Bulk UPDATE by Primary Key -> set real priorities

@@ -18,6 +18,9 @@ class EndpointRouteType(StrEnum):
     MONEYBOXES = "moneyboxes"  # /moneyboxes
     """Moneyboxes endpoint path name."""
 
+    PRIORITYLIST = "prioritylist"  # /prioritylist
+    """Prioritylist endpoint path name."""
+
 
 class EnvironmentType(StrEnum):
     """The Environment Types to handle env loading logic."""

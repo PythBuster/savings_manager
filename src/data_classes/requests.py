@@ -199,3 +199,75 @@ class TransferTransactionRequest(BaseModel):
         },
     )
     """The config of the model."""
+
+
+class PrioritylistRequest(BaseModel):
+    """The prioritylist request model"""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "amount": 50,
+                    "to_moneybox_id": 3,
+                    "description": "Delete Moneybox.",
+                }
+            ]
+        },
+    )
+    """The config of the model."""
+
+
+class PriorityRequest(BaseModel):
+    """The priority request model."""
+
+    moneybox_id: Annotated[StrictInt, Field(description="The id of the moneybox.")]
+    """The id of the moneybox."""
+
+    priority: Annotated[
+        StrictInt,
+        Field(
+            ge=0,
+            description="The priority of the moneybox.",
+        )
+    ]
+    """The priority of the moneybox."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={"examples": [{"moneybox_id": 4, "priority": 1}]},
+    )
+    """The config of the model."""
+
+
+class PrioritylistRequest(BaseModel):
+    """The priority list request model."""
+
+    priority_list: Annotated[
+        list[PriorityRequest],
+        Field(min_length=1, description="The priority list."),
+    ]
+    """The priority list."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "priority_list": [
+                        {
+                            "moneybox_id": 1,
+                            "priority": 0,
+                        },
+                        {"moneybox_id": 2, "priority": 2},
+                        {"moneybox_id": 4, "priority": 1},
+                    ],
+                },
+            ],
+        },
+    )
+    """The config of the model."""
