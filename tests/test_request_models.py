@@ -1,15 +1,20 @@
+"""All request models tests are located here."""
+
+from typing import Any
+
 import pytest
 from pydantic import ValidationError
-from typing import Any
+
 from src.data_classes.requests import (
+    DepositTransactionRequest,
     MoneyboxCreateRequest,
     MoneyboxUpdateRequest,
-    DepositTransactionRequest,
-    WithdrawTransactionRequest,
-    TransferTransactionRequest,
     PrioritylistRequest,
-    PriorityRequest
+    PriorityRequest,
+    TransferTransactionRequest,
+    WithdrawTransactionRequest,
 )
+
 
 # MoneyboxCreateRequest Tests
 @pytest.mark.parametrize(
@@ -27,19 +32,36 @@ def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
     assert response.savings_target == data["savings_target"]
     assert response.priority == data["priority"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
         {"name": "", "savings_amount": 100, "savings_target": 50000, "priority": 1},  # Invalid name
-        {"name": "Holiday", "savings_amount": -10, "savings_target": 50000, "priority": 1},  # Negative savings_amount
-        {"name": "Holiday", "savings_amount": 100, "savings_target": -1, "priority": 1},  # Negative savings_target
-        {"name": "Holiday", "savings_amount": 100, "savings_target": 50000, "priority": -1},  # Negative priority
+        {
+            "name": "Holiday",
+            "savings_amount": -10,
+            "savings_target": 50000,
+            "priority": 1,
+        },  # Negative savings_amount
+        {
+            "name": "Holiday",
+            "savings_amount": 100,
+            "savings_target": -1,
+            "priority": 1,
+        },  # Negative savings_target
+        {
+            "name": "Holiday",
+            "savings_amount": 100,
+            "savings_target": 50000,
+            "priority": -1,
+        },  # Negative priority
     ],
 )
 def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
     """Test MoneyboxCreateRequest creation with invalid data."""
     with pytest.raises(ValidationError):
         MoneyboxCreateRequest(**data)
+
 
 # MoneyboxUpdateRequest Tests
 @pytest.mark.parametrize(
@@ -58,19 +80,36 @@ def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
     assert response.savings_target == data["savings_target"]
     assert response.priority == data["priority"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
         {"name": "", "savings_amount": 200, "savings_target": 60000, "priority": 1},  # Invalid name
-        {"name": "Holiday", "savings_amount": -20, "savings_target": 60000, "priority": 1},  # Negative savings_amount
-        {"name": "Holiday", "savings_amount": 200, "savings_target": -5, "priority": 1},  # Negative savings_target
-        {"name": "Holiday", "savings_amount": 200, "savings_target": 60000, "priority": 0},  # Invalid priority
+        {
+            "name": "Holiday",
+            "savings_amount": -20,
+            "savings_target": 60000,
+            "priority": 1,
+        },  # Negative savings_amount
+        {
+            "name": "Holiday",
+            "savings_amount": 200,
+            "savings_target": -5,
+            "priority": 1,
+        },  # Negative savings_target
+        {
+            "name": "Holiday",
+            "savings_amount": 200,
+            "savings_target": 60000,
+            "priority": 0,
+        },  # Invalid priority
     ],
 )
 def test_moneybox_update_request_invalid(data: dict[str, Any]) -> None:
     """Test MoneyboxUpdateRequest creation with invalid data."""
     with pytest.raises(ValidationError):
         MoneyboxUpdateRequest(**data)
+
 
 # DepositTransactionRequest Tests
 @pytest.mark.parametrize(
@@ -86,6 +125,7 @@ def test_deposit_transaction_request_valid(data: dict[str, Any]) -> None:
     assert response.amount == data["amount"]
     assert response.description == data["description"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -97,6 +137,7 @@ def test_deposit_transaction_request_invalid(data: dict[str, Any]) -> None:
     """Test DepositTransactionRequest creation with invalid data."""
     with pytest.raises(ValidationError):
         DepositTransactionRequest(**data)
+
 
 # WithdrawTransactionRequest Tests
 @pytest.mark.parametrize(
@@ -112,6 +153,7 @@ def test_withdraw_transaction_request_valid(data: dict[str, Any]) -> None:
     assert response.amount == data["amount"]
     assert response.description == data["description"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -123,6 +165,7 @@ def test_withdraw_transaction_request_invalid(data: dict[str, Any]) -> None:
     """Test WithdrawTransactionRequest creation with invalid data."""
     with pytest.raises(ValidationError):
         WithdrawTransactionRequest(**data)
+
 
 # TransferTransactionRequest Tests
 @pytest.mark.parametrize(
@@ -139,6 +182,7 @@ def test_transfer_transaction_request_valid(data: dict[str, Any]) -> None:
     assert response.amount == data["amount"]
     assert response.description == data["description"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -149,6 +193,7 @@ def test_transfer_transaction_request_invalid(data: dict[str, Any]) -> None:
     """Test TransferTransactionRequest creation with invalid data."""
     with pytest.raises(ValidationError):
         TransferTransactionRequest(**data)
+
 
 # PriorityRequest Tests
 @pytest.mark.parametrize(
@@ -164,6 +209,7 @@ def test_priority_request_valid(data: dict[str, Any]) -> None:
     assert response.moneybox_id == data["moneybox_id"]
     assert response.priority == data["priority"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -174,6 +220,7 @@ def test_priority_request_invalid(data: dict[str, Any]) -> None:
     """Test PriorityRequest creation with invalid data."""
     with pytest.raises(ValidationError):
         PriorityRequest(**data)
+
 
 # PrioritylistRequest Tests
 @pytest.mark.parametrize(
@@ -201,6 +248,7 @@ def test_prioritylist_request_valid(data: dict[str, Any]) -> None:
     for i, item in enumerate(response.priority_list):
         assert item.moneybox_id == data["priority_list"][i]["moneybox_id"]
         assert item.priority == data["priority_list"][i]["priority"]
+
 
 @pytest.mark.parametrize(
     "data",

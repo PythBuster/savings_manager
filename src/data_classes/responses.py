@@ -161,8 +161,7 @@ class MoneyboxesResponse(BaseModel):
     """The moneyboxes response model."""
 
     moneyboxes: Annotated[
-        list[MoneyboxResponse],
-        Field(min_length=1, description="The list of moneyboxes.")
+        list[MoneyboxResponse], Field(min_length=1, description="The list of moneyboxes.")
     ]
     """The list of moneyboxes."""
 
@@ -407,7 +406,6 @@ class TransactionLogResponse(BaseModel):
         return data
 
 
-
 class TransactionLogsResponse(BaseModel):
     """The transaction logs response model."""
 
@@ -449,10 +447,7 @@ class PriorityResponse(BaseModel):
     name: Annotated[str, Field(min_length=1, description="The name of the moneybox.")]
     """The name of the moneybox."""
 
-    priority: Annotated[
-        StrictInt,
-        Field(ge=0, description="The priority of the moneybox.")
-    ]
+    priority: Annotated[StrictInt, Field(ge=0, description="The priority of the moneybox.")]
     """The priority of the moneybox."""
 
     model_config = ConfigDict(
@@ -492,5 +487,3 @@ class PrioritylistResponse(BaseModel):
         },
     )
     """The config of the model."""
-
-

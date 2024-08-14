@@ -1,7 +1,6 @@
-"""All db_manager and db core tests are located here."""
+"""All db_manager tests are located here."""
 
 from datetime import datetime
-from typing import Any
 
 import pytest
 from fastapi.encoders import jsonable_encoder
@@ -44,40 +43,40 @@ async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> 
 
 @pytest.mark.dependency(name="test_add_moneybox")
 async def test_add_moneybox(
-        load_test_data: None,
-        db_manager: DBManager
+    load_test_data: None,  # pylint:disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
     # test different combinations of initial values
     moneybox_data = [
-            {
-                "name": "Test Box 1",
-                "balance": 0,
-                "priority": 1,
-                "savings_amount": 0,
-                "savings_target": None,
-            },
-            {
-                "name": "Test Box 2",
-                "balance": 350,
-                "priority": 2,
-                "savings_amount": 0,
-                "savings_target": None,
-            },
-            {
-                "name": "Test Box 3",
-                "balance": 0,
-                "priority": 3,
-                "savings_amount": 0,
-                "savings_target": None,
-            },
-            {
-                "name": "Test Box 4",
-                "balance": 0,
-                "priority": 4,
-                "savings_amount": 0,
-                "savings_target": None,
-            },
-        ]
+        {
+            "name": "Test Box 1",
+            "balance": 0,
+            "priority": 1,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+        {
+            "name": "Test Box 2",
+            "balance": 350,
+            "priority": 2,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+        {
+            "name": "Test Box 3",
+            "balance": 0,
+            "priority": 3,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+        {
+            "name": "Test Box 4",
+            "balance": 0,
+            "priority": 4,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+    ]
 
     for data in moneybox_data:
         result_moneybox_data = await db_manager.add_moneybox(moneybox_data=data)
@@ -91,9 +90,10 @@ async def test_add_moneybox(
         expected_moneybox_data = {"id": result_moneybox_data["id"], "balance": 0} | data
         assert result_moneybox_data == expected_moneybox_data
 
+
 @pytest.mark.dependency(depends=["test_add_moneybox"])
 async def test_get_priority_list(
-        db_manager: DBManager,
+    db_manager: DBManager,
 ) -> None:
     priorities = await db_manager.get_priority_list()
     priorities = sorted(priorities, key=lambda x: x["priority"], reverse=False)
@@ -107,17 +107,34 @@ async def test_get_priority_list(
     ]
 
     assert expected_priorities[0]["priority"] == priorities[0]["priority"]
-    assert equal_dict(dict_1=expected_priorities[1], dict_2=priorities[1], exclude_keys=["moneybox_id"])
-    assert equal_dict(dict_1=expected_priorities[2], dict_2=priorities[2], exclude_keys=["moneybox_id"])
-    assert equal_dict(dict_1=expected_priorities[3], dict_2=priorities[3], exclude_keys=["moneybox_id"])
-    assert equal_dict(dict_1=expected_priorities[4], dict_2=priorities[4], exclude_keys=["moneybox_id"])
+    assert equal_dict(
+        dict_1=expected_priorities[1], dict_2=priorities[1], exclude_keys=["moneybox_id"]
+    )
+    assert equal_dict(
+        dict_1=expected_priorities[2], dict_2=priorities[2], exclude_keys=["moneybox_id"]
+    )
+    assert equal_dict(
+        dict_1=expected_priorities[3], dict_2=priorities[3], exclude_keys=["moneybox_id"]
+    )
+    assert equal_dict(
+        dict_1=expected_priorities[4], dict_2=priorities[4], exclude_keys=["moneybox_id"]
+    )
+
 
 @pytest.mark.dependency(depends=["test_get_priority_list"])
 async def test_update_priorities(db_manager: DBManager) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name("Test Box 1")
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name("Test Box 2")
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name("Test Box 3")
-    fourth_moneybox_id = await db_manager._get_moneybox_id_by_name("Test Box 4")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        "Test Box 1"
+    )
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        "Test Box 2"
+    )
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        "Test Box 3"
+    )
+    fourth_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        "Test Box 4"
+    )
 
     new_priorities_1 = [
         {"moneybox_id": first_moneybox_id, "priority": 4},
@@ -130,10 +147,10 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     del result[0]
 
     expected_priorities = [
-        {"moneybox_id": first_moneybox_id,"priority": 4, "name": "Test Box 1"},
-        {"moneybox_id": second_moneybox_id,"priority": 3, "name": "Test Box 2"},
-        {"moneybox_id": third_moneybox_id,"priority": 2, "name": "Test Box 3"},
-        {"moneybox_id": fourth_moneybox_id,"priority": 1, "name": "Test Box 4"},
+        {"moneybox_id": first_moneybox_id, "priority": 4, "name": "Test Box 1"},
+        {"moneybox_id": second_moneybox_id, "priority": 3, "name": "Test Box 2"},
+        {"moneybox_id": third_moneybox_id, "priority": 2, "name": "Test Box 3"},
+        {"moneybox_id": fourth_moneybox_id, "priority": 1, "name": "Test Box 4"},
     ]
 
     for i, expected_priority in enumerate(expected_priorities):
@@ -161,9 +178,12 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     del new_priorities_2[0]
     await db_manager.update_priority_list(priorities=new_priorities_2)
 
+
 @pytest.mark.dependency(depends=["test_update_priorities"])
 async def test_update_moneybox(db_manager: DBManager) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1"
+    )
 
     moneybox_data = {"name": "Test Box 1 - Updated"}
     result_moneybox_data = await db_manager.update_moneybox(
@@ -204,8 +224,14 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_update_moneybox"])
 async def test_get_moneybox(db_manager: DBManager) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1 - Updated")
-    result_moneybox_data = await db_manager.get_moneybox(moneybox_id=first_moneybox_id)
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1 - Updated"
+    )
+    result_moneybox_data = (
+        await db_manager.get_moneybox(  # noqa: typing  # pylint:disable=protected-access
+            moneybox_id=first_moneybox_id
+        )
+    )
 
     assert isinstance(result_moneybox_data["created_at"], datetime)
     assert isinstance(result_moneybox_data["modified_at"], datetime)
@@ -237,7 +263,9 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
 @pytest.mark.dependency(depends=["test_get_moneybox"], session="scope")
 async def test_delete_moneybox(db_manager: DBManager) -> None:
     # add amount to moneybox 3
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 3")
+    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 3"
+    )
 
     deposit_transaction = DepositTransactionRequest(
         amount=1,
@@ -278,7 +306,9 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_delete_moneybox"])
 async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1 - Updated")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1 - Updated"
+    )
 
     moneybox_data = await db_manager.get_moneybox(moneybox_id=first_moneybox_id)
     del moneybox_data["created_at"]
@@ -368,7 +398,9 @@ async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_add_amount_to_first_moneybox"])
 async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1 - Updated")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1 - Updated"
+    )
 
     moneybox_data = await db_manager.get_moneybox(moneybox_id=first_moneybox_id)
     del moneybox_data["created_at"]
@@ -478,7 +510,10 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert ex_info.value.message == f"Can't add or sub amount less than 1 '0' to Moneybox '{first_moneybox_id}'."
+    assert (
+        ex_info.value.message
+        == f"Can't add or sub amount less than 1 '0' to Moneybox '{first_moneybox_id}'."
+    )
     assert ex_info.value.details == {"amount": 0, "id": first_moneybox_id}
     assert ex_info.value.record_id == first_moneybox_id
 
@@ -492,15 +527,22 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert ex_info.value.message == f"Can't add or sub amount less than 1 '-1' to Moneybox '{first_moneybox_id}'."
+    assert (
+        ex_info.value.message
+        == f"Can't add or sub amount less than 1 '-1' to Moneybox '{first_moneybox_id}'."
+    )
     assert ex_info.value.details == {"amount": -1, "id": first_moneybox_id}
     assert ex_info.value.record_id == first_moneybox_id
 
 
 @pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
 async def test_transfer_amount(db_manager: DBManager) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1 - Updated")
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1 - Updated"
+    )
+    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 2"
+    )
 
     from_moneybox_data = await db_manager.get_moneybox(moneybox_id=second_moneybox_id)
     to_moneybox_data = await db_manager.get_moneybox(moneybox_id=first_moneybox_id)
@@ -524,8 +566,12 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     assert to_moneybox_data["balance"] + 50 == new_to_moneybox_data["balance"]
 
     # test sub transaction logs
-    transaction_logs_moneybox_1 = await db_manager.get_transaction_logs(moneybox_id=first_moneybox_id)
-    transaction_logs_moneybox_2 = await db_manager.get_transaction_logs(moneybox_id=second_moneybox_id)
+    transaction_logs_moneybox_1 = await db_manager.get_transaction_logs(
+        moneybox_id=first_moneybox_id
+    )
+    transaction_logs_moneybox_2 = await db_manager.get_transaction_logs(
+        moneybox_id=second_moneybox_id
+    )
 
     for transaction_log in transaction_logs_moneybox_1:
         del transaction_log["created_at"]
@@ -625,7 +671,11 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         )
 
     assert ex_info.value.message == "Can't transfer within the same moneybox"
-    assert ex_info.value.details == {"amount": 123, "from_moneybox_id": first_moneybox_id, "to_moneybox_id": first_moneybox_id}
+    assert ex_info.value.details == {
+        "amount": 123,
+        "from_moneybox_id": first_moneybox_id,
+        "to_moneybox_id": first_moneybox_id,
+    }
 
 
 @pytest.mark.dependency(depends=["test_transfer_amount"])

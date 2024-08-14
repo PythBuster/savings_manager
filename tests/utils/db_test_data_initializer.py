@@ -496,15 +496,11 @@ class DBTestDataInitializer:
             )
 
     async def dataset_test_get_priority_list(
-            self,
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_get_priority_list`.
         """
-
-        """The data generation function for test_case:
-                `test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found`.
-                """
 
         await self.truncate_tables()
 
@@ -520,15 +516,11 @@ class DBTestDataInitializer:
             )
 
     async def dataset_test_update_priority_list(
-            self,
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_update_priority_list`.
         """
-
-        """The data generation function for test_case:
-                `test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found`.
-                """
 
         await self.truncate_tables()
 

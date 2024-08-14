@@ -1,9 +1,7 @@
 """The moneyboxes routes."""
 
 from fastapi import APIRouter
-from starlette import status
 from starlette.requests import Request
-from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType
 from src.data_classes.responses import MoneyboxesResponse

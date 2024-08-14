@@ -1,7 +1,7 @@
 """All database definitions are located here."""
 
 from datetime import datetime
-from typing import Any, Hashable
+from typing import Any
 
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -12,7 +12,8 @@ from src.db.core import (
     create_instance,
     deactivate_instance,
     read_instance,
-    update_instance, read_instances,
+    read_instances,
+    update_instance,
 )
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
@@ -701,11 +702,11 @@ class DBManager:
 
         return moneybox.id
 
-    async def get_priority_list(self) -> list[dict[Hashable, Any]]:
+    async def get_priority_list(self) -> list[dict[str, int | str]]:
         """Get the priority list (moneybox_id to priority and name map).
 
         :return: The priority list (moneybox_id, priority and name key-values).
-        :type: :class:`list[dict[Hashable, Any]]`
+        :type: :class:`list[dict[str, int|str]]`
         """
 
         stmt = select(Moneybox.id, Moneybox.priority, Moneybox.name).where(
@@ -729,14 +730,14 @@ class DBManager:
         return priority_map
 
     async def update_priority_list(
-        self, priorities: list[dict[int, int]]
-    ) -> list[dict[Hashable, Any]]:
+        self, priorities: list[dict[str, int]]
+    ) -> list[dict[str, str | int]]:
         """Set new priorities by given priority list.
 
         :param priorities: The priority list (moneybox_id to priority and name map).
-        :type priorities: :class:`list[dict[int, int]]`
+        :type priorities: :class:`list[dict[str, int]]`
         :return: The updated priority list (moneybox_id to priority and name map).
-        :type: :class:`list[dict[Hashable, Any]]`
+        :type: :class:`list[dict[str, str|int]]`
         """
 
         if 0 in set(priority["priority"] for priority in priorities):
@@ -748,8 +749,7 @@ class DBManager:
 
         async with self.async_session.begin() as session:
             reset_data = [
-                {"id": priority["moneybox_id"], "priority": None}
-                for priority in priorities
+                {"id": priority["moneybox_id"], "priority": None} for priority in priorities
             ]
 
             # ORM Bulk UPDATE by Primary Key -> set priority to None

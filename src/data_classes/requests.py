@@ -201,25 +201,6 @@ class TransferTransactionRequest(BaseModel):
     """The config of the model."""
 
 
-class PrioritylistRequest(BaseModel):
-    """The prioritylist request model"""
-
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        json_schema_extra={
-            "examples": [
-                {
-                    "amount": 50,
-                    "to_moneybox_id": 3,
-                    "description": "Delete Moneybox.",
-                }
-            ]
-        },
-    )
-    """The config of the model."""
-
-
 class PriorityRequest(BaseModel):
     """The priority request model."""
 
@@ -231,7 +212,7 @@ class PriorityRequest(BaseModel):
         Field(
             ge=0,
             description="The priority of the moneybox.",
-        )
+        ),
     ]
     """The priority of the moneybox."""
 

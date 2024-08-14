@@ -1,16 +1,21 @@
+"""All response models tests are located here."""
+
+from datetime import datetime, timedelta, timezone
+from typing import Any
+
 import pytest
 from pydantic import ValidationError
-from typing import Any
-from datetime import datetime, timedelta, timezone
+
 from src.data_classes.responses import (
     HTTPErrorResponse,
-    MoneyboxResponse,
     MoneyboxesResponse,
+    MoneyboxResponse,
+    PrioritylistResponse,
+    PriorityResponse,
     TransactionLogResponse,
     TransactionLogsResponse,
-    PriorityResponse,
-    PrioritylistResponse
 )
+
 
 # HTTPErrorResponse Tests
 @pytest.mark.parametrize(
@@ -26,6 +31,7 @@ def test_http_error_response_valid(data: dict[str, Any]) -> None:
     assert response.message == data["message"]
     assert response.details == data["details"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -36,6 +42,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
     """Test HTTPErrorResponse creation with invalid data."""
     with pytest.raises(ValidationError):
         HTTPErrorResponse(**data)
+
 
 # MoneyboxResponse Tests
 @pytest.mark.parametrize(
@@ -49,7 +56,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "savings_target": 2000,
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
-            "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1)
+            "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1),
         },
         {
             "id": 2,
@@ -59,7 +66,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "savings_target": None,
             "priority": 2,
             "created_at": datetime.now(tz=timezone.utc),
-            "modified_at": None
+            "modified_at": None,
         },
     ],
 )
@@ -75,6 +82,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
     assert response.created_at == data["created_at"]
     assert response.modified_at == data["modified_at"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -86,7 +94,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "savings_target": 2000,
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
-            "modified_at": datetime.now(tz=timezone.utc)
+            "modified_at": datetime.now(tz=timezone.utc),
         },  # Negative balance
         {
             "id": 1,
@@ -96,7 +104,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "savings_target": 2000,
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
-            "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1)
+            "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
         },  # modified_at before created_at
     ],
 )
@@ -104,6 +112,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
     """Test MoneyboxResponse creation with invalid data."""
     with pytest.raises(ValidationError):
         MoneyboxResponse(**data)
+
 
 # MoneyboxesResponse Tests
 @pytest.mark.parametrize(
@@ -119,7 +128,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "savings_target": 2000,
                     "priority": 1,
                     "created_at": datetime.now(tz=timezone.utc),
-                    "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1)
+                    "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1),
                 },
                 {
                     "id": 2,
@@ -129,8 +138,8 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "savings_target": None,
                     "priority": 2,
                     "created_at": datetime.now(tz=timezone.utc),
-                    "modified_at": None
-                }
+                    "modified_at": None,
+                },
             ]
         },
     ],
@@ -143,18 +152,18 @@ def test_moneyboxes_response_valid(data: dict[str, Any]) -> None:
         assert box.id == data["moneyboxes"][i]["id"]
         assert box.name == data["moneyboxes"][i]["name"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
-        {
-            "moneyboxes": []
-        },
+        {"moneyboxes": []},
     ],
 )
 def test_moneyboxes_response_invalid(data: dict[str, Any]) -> None:
     """Test invalid MoneyboxesResponse creation."""
     with pytest.raises(ValidationError):
         MoneyboxesResponse(**data)
+
 
 # TransactionLogResponse Tests
 @pytest.mark.parametrize(
@@ -170,7 +179,7 @@ def test_moneyboxes_response_invalid(data: dict[str, Any]) -> None:
             "balance": 1500,
             "counterparty_moneybox_id": 2,
             "moneybox_id": 1,
-            "created_at": datetime.now(tz=timezone.utc)
+            "created_at": datetime.now(tz=timezone.utc),
         }
     ],
 )
@@ -180,6 +189,7 @@ def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
     assert response.id == data["id"]
     assert response.amount == data["amount"]
     assert response.balance == data["balance"]
+
 
 @pytest.mark.parametrize(
     "data",
@@ -194,7 +204,7 @@ def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
             "balance": 1000,
             "counterparty_moneybox_id": 2,
             "moneybox_id": 1,
-            "created_at": datetime.now(tz=timezone.utc)
+            "created_at": datetime.now(tz=timezone.utc),
         },  # Invalid amount
         {
             "id": 1,
@@ -206,7 +216,7 @@ def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
             "balance": 1100,
             "counterparty_moneybox_id": 2,
             "moneybox_id": 1,
-            "created_at": datetime.now(tz=timezone.utc)
+            "created_at": datetime.now(tz=timezone.utc),
         },  # Invalid transaction type and trigger combination
     ],
 )
@@ -214,6 +224,7 @@ def test_transaction_log_response_invalid(data: dict[str, Any]) -> None:
     """Test TransactionLogResponse creation with invalid data."""
     with pytest.raises(ValidationError):
         TransactionLogResponse(**data)
+
 
 # TransactionLogsResponse Tests
 @pytest.mark.parametrize(
@@ -231,7 +242,7 @@ def test_transaction_log_response_invalid(data: dict[str, Any]) -> None:
                     "balance": 1500,
                     "counterparty_moneybox_id": 2,
                     "moneybox_id": 1,
-                    "created_at": datetime.now(tz=timezone.utc)
+                    "created_at": datetime.now(tz=timezone.utc),
                 }
             ]
         }
@@ -243,6 +254,7 @@ def test_transaction_logs_response_valid(data: dict[str, Any]) -> None:
     assert len(response.transaction_logs) == len(data["transaction_logs"])
     for i, log in enumerate(response.transaction_logs):
         assert log.id == data["transaction_logs"][i]["id"]
+
 
 # PriorityResponse Tests
 @pytest.mark.parametrize(
@@ -259,6 +271,7 @@ def test_priority_response_valid(data: dict[str, Any]) -> None:
     assert response.priority == data["priority"]
     assert response.name == data["name"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -270,6 +283,7 @@ def test_priority_response_invalid(data: dict[str, Any]) -> None:
     """Test PriorityResponse creation with invalid data."""
     with pytest.raises(ValidationError):
         PriorityResponse(**data)
+
 
 # PrioritylistResponse Tests
 @pytest.mark.parametrize(
@@ -298,6 +312,7 @@ def test_prioritylist_response_valid(data: dict[str, Any]) -> None:
         assert item.moneybox_id == data["priority_list"][i]["moneybox_id"]
         assert item.priority == data["priority_list"][i]["priority"]
         assert item.name == data["priority_list"][i]["name"]
+
 
 @pytest.mark.parametrize(
     "data",
