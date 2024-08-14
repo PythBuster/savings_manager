@@ -3,10 +3,16 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.12.0 (2024-08-14)
+### Features:
+- add priority list GET+PATCH endpoints
+
+### Changes:
+- adapt tests, replace some and add further tests, incl. tests for priority list endpoints
+
 ## 1.11.0 (2024-08-13)
 ### Features:
 - add priority list db get/update function
-
 
 ## 1.10.0 (2024-08-13)
 ### Changes:
