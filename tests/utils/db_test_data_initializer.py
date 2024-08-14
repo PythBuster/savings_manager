@@ -22,6 +22,9 @@ class DBTestDataInitializer:
         self.db_manager = db_manager
         """Current database connection and session maker hold in db_manager."""
 
+        if "[" in test_case:
+            test_case = test_case.split("[")[0]
+
         self.test_case = test_case
         """Current function name of test case."""
 
@@ -46,6 +49,10 @@ class DBTestDataInitializer:
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found,
+            "test_get_priority_list": self.dataset_test_get_priority_list,
+            "test_update_priority_list": self.dataset_test_update_priority_list,
+            "test_create_instance": self.truncate_tables,
+            "test_add_moneybox": self.truncate_tables,
         }
         """Map test case name witch related test data generation function"""
 
@@ -474,6 +481,54 @@ class DBTestDataInitializer:
         """The data generation function for test_case:
         `test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found`.
         """
+
+        await self.truncate_tables()
+
+        # create 2 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_get_priority_list(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_get_priority_list`.
+        """
+
+        """The data generation function for test_case:
+                `test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found`.
+                """
+
+        await self.truncate_tables()
+
+        # create 2 moneyboxes
+        moneyboxes_data = [
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_update_priority_list(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_update_priority_list`.
+        """
+
+        """The data generation function for test_case:
+                `test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found`.
+                """
 
         await self.truncate_tables()
 
