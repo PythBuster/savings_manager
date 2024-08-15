@@ -6,7 +6,7 @@ from src.custom_types import TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 
 
-class DBTestDataInitializer:
+class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
     """The database test data initializer class."""
 
     def __init__(self, db_manager: DBManager, test_case: str) -> None:

@@ -357,7 +357,9 @@ async def test_endpoint_update_moneybox__invalid_priority_0(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1"
+    )
 
     moneybox_data = {
         "name": "Updated Name Test Box 4",
@@ -464,7 +466,9 @@ async def test_endpoint_first_moneybox__modified_at_checks(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1"
+    )
 
     response_1 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
@@ -503,7 +507,9 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1"
+    )
 
     # balance not allowed in update data
     moneybox_data_1 = {"name": "Updated Test Box 1", "balance": 200}
@@ -532,7 +538,9 @@ async def test_endpoint_delete_second_moneybox__status_204(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        name="Test Box 1"
+    )
 
     response_1 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
