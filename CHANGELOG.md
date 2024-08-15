@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.13.0 (2024-08-15)
+### Changes:
+- adapt priority list GET+PATCH endpoints: remove overflow moneybox from request/response data
+
 ## 1.12.0 (2024-08-14)
 ### Features:
 - add priority list GET+PATCH endpoints
