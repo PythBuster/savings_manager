@@ -725,6 +725,7 @@ class DBManager:
                 "priority": priority,
             }
             for moneybox_id, priority, name in priorities
+            if priority != 0
         ]
 
         return priority_map

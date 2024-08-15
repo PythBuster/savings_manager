@@ -20,7 +20,6 @@ async def test_get_priority_list(
     response = await client.get(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}")
     assert response.status_code == 200
     response_priority_list = response.json()["priority_list"]
-    del response_priority_list[0]  # remove overflow moneybox
 
     for i, expected_priority in enumerate(expected_priority_list):
         assert equal_dict(
@@ -52,7 +51,6 @@ async def test_update_priority_list(
     )
     assert response.status_code == 200
     response_priority_list = response.json()["priority_list"]
-    del response_priority_list[0]  # remove overflow moneybox
 
     expected_priority = [
         {"moneybox_id": first_moneybox_id, "priority": 2, "name": "Test Box 1"},

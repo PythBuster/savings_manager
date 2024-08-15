@@ -31,7 +31,7 @@ class MoneyboxCreateRequest(BaseModel):
     ]
     """"The current savings target. Is relevant for the automated distributed saving progress."""
 
-    priority: Annotated[StrictInt, Field(ge=0, description="The current priority of the moneybox.")]
+    priority: Annotated[StrictInt, Field(ge=1, description="The current priority of the moneybox.")]
     """The current priority of the moneybox."""
 
     model_config = ConfigDict(
@@ -210,7 +210,7 @@ class PriorityRequest(BaseModel):
     priority: Annotated[
         StrictInt,
         Field(
-            ge=0,
+            ge=1,
             description="The priority of the moneybox.",
         ),
     ]

@@ -447,7 +447,7 @@ class PriorityResponse(BaseModel):
     name: Annotated[str, Field(min_length=1, description="The name of the moneybox.")]
     """The name of the moneybox."""
 
-    priority: Annotated[StrictInt, Field(ge=0, description="The priority of the moneybox.")]
+    priority: Annotated[StrictInt, Field(ge=1, description="The priority of the moneybox.")]
     """The priority of the moneybox."""
 
     model_config = ConfigDict(

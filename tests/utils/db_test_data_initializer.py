@@ -34,11 +34,13 @@ class DBTestDataInitializer:
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing,
             "test_endpoint_get_moneybox_status_404_non_existing": self.truncate_tables,  # no data needed,
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100,
+            "test_endpoint_add_moneybox__invalid_with_priority_0": self.truncate_tables,
             "test_endpoint_add_moneybox__one__status_200": self.truncate_tables,  # no data needed,
             "test_endpoint_add_moneybox__two__status_200": self.truncate_tables,  # no data needed,
             "test_endpoint_add_moneybox__one__status_422__balance_postdata": self.truncate_tables,  # no data needed,
             "test_endpoint_delete_overflow_moneybox__status_405": self.dataset_test_endpoint_delete_overflow_moneybox__status_405,
             "test_endpoint_update_overflow_moneybox": self.dataset_test_endpoint_update_overflow_moneybox,
+            "test_endpoint_update_moneybox__invalid_priority_0": self.dataset_test_endpoint_update_moneybox__invalid_priority_0,
             "test_endpoint_update_moneybox__last_moneybox__namechange": self.dataset_test_endpoint_update_moneybox__last_moneybox__namechange,
             "test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields": self.dataset_test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields,
             "test_endpoint_first_moneybox__modified_at_checks": self.dataset_test_endpoint_first_moneybox__modified_at_checks,
@@ -176,6 +178,28 @@ class DBTestDataInitializer:
             transaction_type=TransactionType.DIRECT,
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
+
+    async def dataset_test_endpoint_update_moneybox__invalid_priority_0(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__invalid_priority_0`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
 
     async def dataset_test_endpoint_update_moneybox__last_moneybox__namechange(self) -> None:
         """The data generation function for test_case:

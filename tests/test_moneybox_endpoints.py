@@ -174,6 +174,29 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
 
 
 @pytest.mark.dependency
+async def test_endpoint_add_moneybox__invalid_with_priority_0(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    moneybox_data = {
+        "name": "Test Box Endpoint Add 1",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 0,
+    }
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert content["detail"][0]["msg"] == "Input should be greater than or equal to 1"
+    assert content["detail"][0]["loc"][1] == "priority"
+    assert content["detail"][0]["input"] == 0
+
+
+@pytest.mark.dependency
 async def test_endpoint_add_moneybox__one__status_200(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
@@ -329,6 +352,33 @@ async def test_endpoint_delete_overflow_moneybox__status_405(
 
 
 @pytest.mark.dependency
+async def test_endpoint_update_moneybox__invalid_priority_0(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
+
+    moneybox_data = {
+        "name": "Updated Name Test Box 4",
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 0,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert content["detail"][0]["msg"] == "Input should be greater than or equal to 1"
+    assert content["detail"][0]["loc"][1] == "priority"
+    assert content["detail"][0]["input"] == 0
+
+
+@pytest.mark.dependency
 async def test_endpoint_update_moneybox__last_moneybox__namechange(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
@@ -414,11 +464,10 @@ async def test_endpoint_first_moneybox__modified_at_checks(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    moneyboxes = await db_manager.get_moneyboxes()
-    moneybox_id = moneyboxes[1]["id"]
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
 
     response_1 = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
     )
     content_1 = response_1.json()
     assert content_1["modified_at"] is None
@@ -427,7 +476,7 @@ async def test_endpoint_first_moneybox__modified_at_checks(
         "name": "Updated Name Test Box 1",
     }
     response_2 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
         json=moneybox_data_2,
     )
     content_2 = response_2.json()
@@ -439,7 +488,7 @@ async def test_endpoint_first_moneybox__modified_at_checks(
 
     moneybox_data_3 = {"name": "RE-Updated Name Test Box 1"}
     response_3 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
         json=moneybox_data_3,
     )
     content_3 = response_3.json()
@@ -454,14 +503,13 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    moneyboxes = await db_manager.get_moneyboxes()
-    moneybox_id = moneyboxes[1]["id"]
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
 
     # balance not allowed in update data
     moneybox_data_1 = {"name": "Updated Test Box 1", "balance": 200}
 
     response_1 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
         json=moneybox_data_1,
     )
 
@@ -471,7 +519,7 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
     moneybox_data_2 = {"name": "Updated Test Box 1", "unknwon_field": "xyz"}
 
     response_2 = await client.patch(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
         json=moneybox_data_2,
     )
 
@@ -484,8 +532,7 @@ async def test_endpoint_delete_second_moneybox__status_204(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    moneyboxes = await db_manager.get_moneyboxes()
-    moneybox_id = moneyboxes[1]["id"]
+    first_moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 1")
 
     response_1 = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
@@ -495,7 +542,7 @@ async def test_endpoint_delete_second_moneybox__status_204(
     assert moneyboxes["total"] == 3  # type: ignore
 
     response_2 = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}"
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}"
     )
     assert response_2.status_code == status.HTTP_204_NO_CONTENT
 
@@ -507,7 +554,7 @@ async def test_endpoint_delete_second_moneybox__status_204(
     assert moneyboxes["total"] == 2  # type: ignore
 
     response = await client.delete(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}"
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}"
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 

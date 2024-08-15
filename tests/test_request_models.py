@@ -55,6 +55,12 @@ def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
             "savings_target": 50000,
             "priority": -1,
         },  # Negative priority
+        {
+            "name": "Holiday",
+            "savings_amount": 100,
+            "savings_target": 50000,
+            "priority": 0,
+        },  # Null priority
     ],
 )
 def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
@@ -213,7 +219,8 @@ def test_priority_request_valid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"moneybox_id": 4, "priority": -2},  # Invalid priority
+        {"moneybox_id": 4, "priority": -2},  # Invalid priority (negative)
+        {"moneybox_id": 4, "priority": 0},  # Invalid priority (zero)
     ],
 )
 def test_priority_request_invalid(data: dict[str, Any]) -> None:
@@ -228,7 +235,6 @@ def test_priority_request_invalid(data: dict[str, Any]) -> None:
     [
         {
             "priority_list": [
-                {"moneybox_id": 1, "priority": 0},
                 {"moneybox_id": 2, "priority": 2},
                 {"moneybox_id": 4, "priority": 1},
             ]
@@ -262,6 +268,12 @@ def test_prioritylist_request_valid(data: dict[str, Any]) -> None:
         {
             "priority_list": [
                 {"moneybox_id": 1, "priority": -1},  # Invalid priority, negative number
+                {"moneybox_id": 2, "priority": 2},
+            ]
+        },
+        {
+            "priority_list": [
+                {"moneybox_id": 1, "priority": 0},  # Invalid priority, zero number
                 {"moneybox_id": 2, "priority": 2},
             ]
         },

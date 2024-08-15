@@ -276,7 +276,8 @@ def test_priority_response_valid(data: dict[str, Any]) -> None:
     "data",
     [
         {"moneybox_id": -1, "priority": 1},  # Invalid moneybox_id
-        {"moneybox_id": 4, "priority": -2},  # Invalid priority
+        {"moneybox_id": 4, "priority": -2},  # Invalid priority (negative)
+        {"moneybox_id": 4, "priority": 0},  # Invalid priority (zero)
     ],
 )
 def test_priority_response_invalid(data: dict[str, Any]) -> None:
@@ -291,7 +292,6 @@ def test_priority_response_invalid(data: dict[str, Any]) -> None:
     [
         {
             "priority_list": [
-                {"moneybox_id": 1, "priority": 0, "name": "Moneybox 1"},
                 {"moneybox_id": 2, "priority": 2, "name": "Moneybox 2"},
                 {"moneybox_id": 4, "priority": 1, "name": "Moneybox 3"},
             ]
@@ -326,6 +326,12 @@ def test_prioritylist_response_valid(data: dict[str, Any]) -> None:
         {
             "priority_list": [
                 {"moneybox_id": 1, "priority": -1},  # Invalid priority, negative number
+                {"moneybox_id": 2, "priority": 2},
+            ]
+        },
+        {
+            "priority_list": [
+                {"moneybox_id": 1, "priority": 0},  # Invalid priority, zero number
                 {"moneybox_id": 2, "priority": 2},
             ]
         },
