@@ -11,11 +11,9 @@
             "id": "1bdf787dcc5f54b4",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
-                "mode": "source",
-                "source": false
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Feauture Requests/Ideas.md"
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png"
               }
             }
           }
@@ -148,9 +146,9 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
-    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "Architecture/Database App v2.md",
     "Feauture Requests/Ideas.md",
+    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "sphinx/source/conf.py.isorted",
     "Guidelines/Workflow.md",
     "TransactionLog_Creation.png",
