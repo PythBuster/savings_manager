@@ -302,17 +302,14 @@ def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
         {
             "is_automated_saving_active": True,
             "savings_amount": 1000,
-            "automated_saving_trigger_day": "first_of_month",
         },
         {
             "is_automated_saving_active": False,
             "savings_amount": 500,
-            "automated_saving_trigger_day": "last_of_month",
         },
         {
             "is_automated_saving_active": True,
             "savings_amount": 0,
-            "automated_saving_trigger_day": "middle_of_month",
         },
     ],
 )
@@ -321,7 +318,6 @@ def test_app_settings_request_valid(data: dict[str, Any]) -> None:
     response = AppSettingsRequest(**data)
     assert response.is_automated_saving_active == data["is_automated_saving_active"]
     assert response.savings_amount == data["savings_amount"]
-    assert response.automated_saving_trigger_day == data["automated_saving_trigger_day"]
 
 
 @pytest.mark.parametrize(
@@ -330,17 +326,10 @@ def test_app_settings_request_valid(data: dict[str, Any]) -> None:
         {
             "is_automated_saving_active": "sagsfg",  # Invalid boolean
             "savings_amount": 1000,
-            "automated_saving_trigger_day": "first_of_month",
         },
         {
             "is_automated_saving_active": True,
             "savings_amount": -500,  # Negative savings_amount
-            "automated_saving_trigger_day": "first_of_month",
-        },
-        {
-            "is_automated_saving_active": True,
-            "savings_amount": 1000,
-            "automated_saving_trigger_day": "unknown_day",  # Invalid trigger day
         },
     ],
 )

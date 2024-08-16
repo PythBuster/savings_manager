@@ -25,7 +25,6 @@ async def test_get_app_settings_status_200(
         "modified_at": "2024-08-11T15:03:17.312860+00:00",
         "is_automated_saving_active": True,
         "savings_amount": 0,
-        "automated_saving_trigger_day": "first_of_month",
     }
 
     app_settings = response.json()
@@ -57,7 +56,6 @@ async def test_update_app_settings_status_200(
     update_data = {
         "is_automated_saving_active": False,
         "savings_amount": 50000,
-        "automated_saving_trigger_day": "last_of_month",
     }
 
     response = await client.patch(
@@ -73,10 +71,6 @@ async def test_update_app_settings_status_200(
         == update_data["is_automated_saving_active"]
     )
     assert updated_app_settings["savings_amount"] == update_data["savings_amount"]
-    assert (
-        updated_app_settings["automated_saving_trigger_day"]
-        == update_data["automated_saving_trigger_day"]
-    )
 
 
 @pytest.mark.dependency(depends=["test_update_app_settings_status_200"])

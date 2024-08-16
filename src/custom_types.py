@@ -78,11 +78,3 @@ class TransactionType(StrEnum):
 
     DISTRIBUTION = "distribution"
     """Transaction caused by distribution strategy."""
-
-
-class TriggerDay(StrEnum):
-    """The trigger day type."""
-
-    FIRST_OF_MONTH = "first_of_month"
-    MIDDLE_OF_MONTH = "middle_of_month"
-    LAST_OF_MONTH = "last_of_month"

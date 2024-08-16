@@ -14,7 +14,7 @@ from pydantic import (
     model_validator,
 )
 
-from src.custom_types import TransactionTrigger, TransactionType, TriggerDay
+from src.custom_types import TransactionTrigger, TransactionType
 
 
 class HTTPErrorResponse(BaseModel):
@@ -522,14 +522,6 @@ class AppSettingsResponse(BaseModel):
     """The savings amount for the automated saving which will be distributed
     periodically to the moneyboxes, which have a (desired) savings amount > 0."""
 
-    automated_saving_trigger_day: Annotated[
-        TriggerDay,
-        Field(
-            description="The automated saving trigger day.",
-        ),
-    ]
-    """The automated saving trigger day."""
-
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
@@ -541,9 +533,25 @@ class AppSettingsResponse(BaseModel):
                     "modified_at": "2024-08-11 15:03:17.312860 +00:00",
                     "is_automated_saving_active": True,
                     "savings_amount": 60000,
-                    "automated_saving_trigger_day": TriggerDay.FIRST_OF_MONTH,
                 },
             ],
         },
     )
     """The config of the model."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def convert_to_strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Check if 'modified_at' and 'created_at' is type datetime."""
+
+        if isinstance(data["created_at"], str):
+            try:
+                data["created_at"] = datetime.fromisoformat(data["created_at"])
+            except (TypeError, ValueError) as ex:
+                raise ValueError(
+                    "'created_at' must be of type datetime or datetime-string."
+                ) from ex
+        elif not isinstance(data["created_at"], datetime):
+            raise ValueError("'created_at' must be of type datetime or datetime-string.")
+
+        return data

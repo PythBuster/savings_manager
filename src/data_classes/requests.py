@@ -4,7 +4,6 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
-from src.custom_types import TriggerDay
 
 
 class MoneyboxCreateRequest(BaseModel):
@@ -278,14 +277,6 @@ class AppSettingsRequest(BaseModel):
     """The savings amount for the automated saving which will be distributed
     periodically to the moneyboxes, which have a (desired) savings amount > 0."""
 
-    automated_saving_trigger_day: Annotated[
-        TriggerDay,
-        Field(
-            description="The automated saving trigger day.",
-        ),
-    ]
-    """The automated saving trigger day."""
-
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
@@ -294,7 +285,6 @@ class AppSettingsRequest(BaseModel):
                 {
                     "is_automated_saving_active": True,
                     "savings_amount": 60000,
-                    "automated_saving_trigger_day": TriggerDay.FIRST_OF_MONTH,
                 },
             ],
         },

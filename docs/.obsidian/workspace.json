@@ -13,7 +13,7 @@
             "state": {
               "type": "image",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png"
+                "file": "ui/draft/App_v2_SavingsManagerUI.png"
               }
             }
           }
@@ -83,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
+                "file": "ui/draft/App_v2_SavingsManagerUI.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
+                "file": "ui/draft/App_v2_SavingsManagerUI.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png"
+                "file": "ui/draft/App_v2_SavingsManagerUI.png"
               }
             }
           }
@@ -146,9 +146,9 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
+    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "Architecture/Database App v2.md",
     "Feauture Requests/Ideas.md",
-    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "sphinx/source/conf.py.isorted",
     "Guidelines/Workflow.md",
     "TransactionLog_Creation.png",
