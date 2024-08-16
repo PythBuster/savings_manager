@@ -16,6 +16,7 @@ from src.db.core import (
     update_instance,
 )
 from src.db.exceptions import (
+    AppSettingsNotFoundError,
     BalanceResultIsNegativeError,
     CreateInstanceError,
     DeleteInstanceError,
@@ -27,9 +28,9 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError, AppSettingsNotFoundError,
+    UpdateInstanceError,
 )
-from src.db.models import Moneybox, MoneyboxNameHistory, Transaction, AppSettings
+from src.db.models import AppSettings, Moneybox, MoneyboxNameHistory, Transaction
 from src.utils import get_database_url
 
 
@@ -772,10 +773,9 @@ class DBManager:
 
         return await self.get_priority_list()
 
-
     async def get_app_settings(
-            self,
-            app_settings_id: int,
+        self,
+        app_settings_id: int,
     ) -> dict[str, Any]:
         """Get app settings by app_settings id.
 
@@ -796,11 +796,10 @@ class DBManager:
 
         return app_settings.asdict()
 
-
     async def update_app_settings(
-            self,
-            app_settings_id: int,
-            app_settings_data: dict[str, Any],
+        self,
+        app_settings_id: int,
+        app_settings_data: dict[str, Any],
     ) -> dict[str, Any]:
         """Update app settings by app_settings id.
 

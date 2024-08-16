@@ -6,13 +6,14 @@ import pytest
 from pydantic import ValidationError
 
 from src.data_classes.requests import (
+    AppSettingsRequest,
     DepositTransactionRequest,
     MoneyboxCreateRequest,
     MoneyboxUpdateRequest,
     PrioritylistRequest,
     PriorityRequest,
     TransferTransactionRequest,
-    WithdrawTransactionRequest, AppSettingsRequest,
+    WithdrawTransactionRequest,
 )
 
 
@@ -292,6 +293,7 @@ def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
     """Test PrioritylistRequest creation with invalid data."""
     with pytest.raises(ValidationError):
         PrioritylistRequest(**data)
+
 
 # Tests for AppSettingsRequest
 @pytest.mark.parametrize(

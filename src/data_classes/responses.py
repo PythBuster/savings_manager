@@ -488,6 +488,7 @@ class PrioritylistResponse(BaseModel):
     )
     """The config of the model."""
 
+
 class AppSettingsResponse(BaseModel):
     """The app settings response model."""
 
@@ -513,19 +514,19 @@ class AppSettingsResponse(BaseModel):
         Field(
             ge=0,
             description=(
-                "The savings amount for the automated saving which will be distributed periodically "
-                "to the moneyboxes, which have a (desired) savings amount > 0."
+                "The savings amount for the automated saving which will be distributed "
+                "periodically to the moneyboxes, which have a (desired) savings amount > 0."
             ),
         ),
     ]
-    """The savings amount for the automated saving which will be distributed periodically to the moneyboxes, 
-    which have a (desired) savings amount > 0."""
+    """The savings amount for the automated saving which will be distributed
+    periodically to the moneyboxes, which have a (desired) savings amount > 0."""
 
     automated_saving_trigger_day: Annotated[
         TriggerDay,
         Field(
             description="The automated saving trigger day.",
-        )
+        ),
     ]
     """The automated saving trigger day."""
 

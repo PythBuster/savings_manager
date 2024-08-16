@@ -1,17 +1,10 @@
 """The database test data initializer."""
 
 import time
-from datetime import datetime
 from functools import partial
 
-from mako.compat import win32
-from sqlalchemy import insert
-
 from src.custom_types import TransactionTrigger, TransactionType
-from src.db.core import create_instance
 from src.db.db_manager import DBManager
-from src.db.exceptions import CreateInstanceError
-from src.db.models import AppSettings
 
 
 class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
@@ -63,7 +56,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_update_priority_list": self.dataset_test_update_priority_list,
             "test_create_instance": self.truncate_tables,
             "test_add_moneybox": self.truncate_tables,
-            "test_get_app_settings_status_200": partial(self.truncate_tables, exclude_table_names=["app_settings"]),
+            "test_get_app_settings_status_200": partial(
+                self.truncate_tables, exclude_table_names=["app_settings"]
+            ),
         }
         """Map test case name witch related test data generation function"""
 
@@ -77,7 +72,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         # sleep to get higher modified_at datetime (simulate time passing before modifying data)
         time.sleep(1)
 
-    async def truncate_tables(self, exclude_table_names: list[str]|None = None) -> None:
+    async def truncate_tables(self, exclude_table_names: list[str] | None = None) -> None:
         """Truncate tables."""
 
         print(
@@ -97,7 +92,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         await self.db_manager.add_moneybox(
             moneybox_data=overflow_moneybox_data,
         )
-
 
     async def dataset_test_endpoint_get_moneyboxes__status_200__total_6(self) -> None:
         """The data generation function for test_case:

@@ -4,7 +4,6 @@ from starlette import status
 
 from src.data_classes.responses import HTTPErrorResponse
 
-
 GET_APP_SETTINGS_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",

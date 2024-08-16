@@ -291,7 +291,9 @@ async def mocked_db_manager() -> DBManager:  # type: ignore
         engine_args={"echo": True},
     )
 
-    async def truncate_tables(self: DBManager, exclude_table_names: list[str] | None = None) -> None:
+    async def truncate_tables(
+        self: DBManager, exclude_table_names: list[str] | None = None
+    ) -> None:
         """Truncate all tables."""
 
         if exclude_table_names is None:

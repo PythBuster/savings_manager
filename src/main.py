@@ -38,7 +38,7 @@ tags_metadata = [
     {
         "name": "settings",
         "description": "All settings endpoints.",
-    }
+    },
 ]
 """Metadata about the endpoints."""
 

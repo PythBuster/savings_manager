@@ -1,3 +1,5 @@
+"""All app settings endpoint tests are located here."""
+
 import pytest
 from httpx import AsyncClient
 from starlette import status
@@ -8,8 +10,8 @@ from src.utils import equal_dict
 
 @pytest.mark.dependency
 async def test_get_app_settings_status_200(
-        load_test_data: None,
-        client: AsyncClient,
+    load_test_data: None,  # pylint: disable=unused-argument)
+    client: AsyncClient,
 ) -> None:
     """Test the get_app_settings endpoint with a valid app_settings_id."""
     app_settings_id = 1  # Assumed to be a valid ID for testing
@@ -29,11 +31,14 @@ async def test_get_app_settings_status_200(
     app_settings = response.json()
 
     assert response.status_code == status.HTTP_200_OK
-    assert equal_dict(dict_1=app_settings, dict_2=expected_data, exclude_keys=["created_at", "modified_at"])
+    assert equal_dict(
+        dict_1=app_settings, dict_2=expected_data, exclude_keys=["created_at", "modified_at"]
+    )
+
 
 @pytest.mark.dependency(depends=["test_get_app_settings_status_200"])
 async def test_get_app_settings_invalid_id(
-        client: AsyncClient,
+    client: AsyncClient,
 ) -> None:
     """Test the get_app_settings endpoint with an invalid app_settings_id."""
     app_settings_id = 9999  # Assumed to be an invalid ID for testing
@@ -42,9 +47,10 @@ async def test_get_app_settings_invalid_id(
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
+
 @pytest.mark.dependency(depends=["test_get_app_settings_invalid_id"])
 async def test_update_app_settings_status_200(
-        client: AsyncClient,
+    client: AsyncClient,
 ) -> None:
     """Test the update_app_settings endpoint with valid data."""
     app_settings_id = 1  # Assumed to be a valid ID for testing
@@ -62,9 +68,16 @@ async def test_update_app_settings_status_200(
 
     assert response.status_code == status.HTTP_200_OK
     assert updated_app_settings["id"] == app_settings_id
-    assert updated_app_settings["is_automated_saving_active"] == update_data["is_automated_saving_active"]
+    assert (
+        updated_app_settings["is_automated_saving_active"]
+        == update_data["is_automated_saving_active"]
+    )
     assert updated_app_settings["savings_amount"] == update_data["savings_amount"]
-    assert updated_app_settings["automated_saving_trigger_day"] == update_data["automated_saving_trigger_day"]
+    assert (
+        updated_app_settings["automated_saving_trigger_day"]
+        == update_data["automated_saving_trigger_day"]
+    )
+
 
 @pytest.mark.dependency(depends=["test_update_app_settings_status_200"])
 async def test_update_app_settings_invalid_data(client: AsyncClient) -> None:

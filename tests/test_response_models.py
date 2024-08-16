@@ -7,13 +7,14 @@ import pytest
 from pydantic import ValidationError
 
 from src.data_classes.responses import (
+    AppSettingsResponse,
     HTTPErrorResponse,
     MoneyboxesResponse,
     MoneyboxResponse,
     PrioritylistResponse,
     PriorityResponse,
     TransactionLogResponse,
-    TransactionLogsResponse, AppSettingsResponse,
+    TransactionLogsResponse,
 )
 
 
@@ -350,7 +351,6 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
     """Test PrioritylistResponse creation with invalid data."""
     with pytest.raises(ValidationError):
         PrioritylistResponse(**data)
-
 
 
 # Tests for AppSettingsResponse

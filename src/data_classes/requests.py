@@ -255,6 +255,7 @@ class PrioritylistRequest(BaseModel):
     )
     """The config of the model."""
 
+
 class AppSettingsRequest(BaseModel):
     """The app settings request model."""
 
@@ -269,19 +270,19 @@ class AppSettingsRequest(BaseModel):
         Field(
             ge=0,
             description=(
-                "The savings amount for the automated saving which will be distributed periodically "
-                "to the moneyboxes, which have a (desired) savings amount > 0."
+                "The savings amount for the automated saving which will be distributed "
+                "periodically to the moneyboxes, which have a (desired) savings amount > 0."
             ),
         ),
     ]
-    """The savings amount for the automated saving which will be distributed periodically to the moneyboxes, 
-    which have a (desired) savings amount > 0."""
+    """The savings amount for the automated saving which will be distributed
+    periodically to the moneyboxes, which have a (desired) savings amount > 0."""
 
     automated_saving_trigger_day: Annotated[
         TriggerDay,
         Field(
             description="The automated saving trigger day.",
-        )
+        ),
     ]
     """The automated saving trigger day."""
 
@@ -302,8 +303,14 @@ class AppSettingsRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def lower_case_enum_str_automated_saving_trigger_day(cls, data: dict[str, Any]) -> dict[str, Any]:
-        if "automated_saving_trigger_day" in data and isinstance(data["automated_saving_trigger_day"], str):
+    def lower_case_enum_str_automated_saving_trigger_day(
+        cls, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Lower case 'automated_saving_trigger_day' if type is str."""
+
+        if "automated_saving_trigger_day" in data and isinstance(
+            data["automated_saving_trigger_day"], str
+        ):
             data["automated_saving_trigger_day"] = data["automated_saving_trigger_day"].lower()
 
         return data

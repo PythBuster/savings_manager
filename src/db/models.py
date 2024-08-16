@@ -302,13 +302,13 @@ class MoneyboxNameHistory(SqlBase):  # pylint: disable=too-few-public-methods
     """The new name of the moneybox."""
 
 
-class AppSettings(SqlBase):
+class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
     """The AppSettings ORM."""
 
     __tablename__ = "app_settings"
 
-    is_automated_saving_active: Mapped[bool] = (
-        mapped_column(  # pylint: disable=unsubscriptable-object
+    is_automated_saving_active: Mapped[bool] = (  # pylint: disable=unsubscriptable-object
+        mapped_column(
             default=False,
             server_default="false",
             nullable=False,
@@ -326,17 +326,17 @@ class AppSettings(SqlBase):
             "to the moneyboxes, which have a (desired) savings amount > 0."
         ),
     )
-    """The savings amount for the automated saving which will be distributed periodically to the moneyboxes, 
-    which have a (desired) savings amount > 0."""
+    """The savings amount for the automated saving which will be distributed periodically
+    to the moneyboxes, which have a (desired) savings amount > 0."""
 
-    automated_saving_trigger_day: Mapped[TriggerDay] = mapped_column(
-        default=TriggerDay.FIRST_OF_MONTH,
-        server_default=str(TriggerDay.FIRST_OF_MONTH).upper(),
-        nullable=True,
-        comment="The automated saving trigger day.",
+    automated_saving_trigger_day: Mapped[TriggerDay] = (  # noqa: typing  # pylint: disable=unsubscriptable-object
+        mapped_column(
+            default=TriggerDay.FIRST_OF_MONTH,
+            server_default=str(TriggerDay.FIRST_OF_MONTH).upper(),
+            nullable=True,
+            comment="The automated saving trigger day.",
+        )
     )
     """The automated saving trigger day."""
 
-    __table_args__ = (
-        CheckConstraint("savings_amount >= 0", name="savings_amount_nonnegative"),
-    )
+    __table_args__ = (CheckConstraint("savings_amount >= 0", name="savings_amount_nonnegative"),)
