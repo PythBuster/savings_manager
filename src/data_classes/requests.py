@@ -5,7 +5,6 @@ from typing import Annotated, Any
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
 
-
 class MoneyboxCreateRequest(BaseModel):
     """The pydantic moneybox create request model."""
 
