@@ -9,7 +9,7 @@ from src.routes.responses.moneyboxes import GET_MONEYBOXES_RESPONSES
 
 moneyboxes_router = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOXES}",
-    tags=[EndpointRouteType.MONEYBOXES.lower()],
+    tags=[EndpointRouteType.MONEYBOXES],
 )
 """The moneyboxes router."""
 

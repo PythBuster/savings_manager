@@ -16,7 +16,7 @@ from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 
-from src.custom_types import TransactionTrigger, TransactionType
+from src.custom_types import TransactionTrigger, TransactionType, TriggerDay
 from src.utils import as_dict
 
 meta = MetaData(
@@ -300,3 +300,43 @@ class MoneyboxNameHistory(SqlBase):  # pylint: disable=too-few-public-methods
         nullable=False,
     )
     """The new name of the moneybox."""
+
+
+class AppSettings(SqlBase):
+    """The AppSettings ORM."""
+
+    __tablename__ = "app_settings"
+
+    is_automated_saving_active: Mapped[bool] = (
+        mapped_column(  # pylint: disable=unsubscriptable-object
+            default=False,
+            server_default="false",
+            nullable=False,
+            comment="Tells if automated saving is active.",
+        )
+    )
+    """Tells if automated saving is active."""
+
+    savings_amount: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
+        default=0,
+        server_default="0",
+        nullable=False,
+        comment=(
+            "The savings amount for the automated saving which will be distributed periodically "
+            "to the moneyboxes, which have a (desired) savings amount > 0."
+        ),
+    )
+    """The savings amount for the automated saving which will be distributed periodically to the moneyboxes, 
+    which have a (desired) savings amount > 0."""
+
+    automated_saving_trigger_day: Mapped[TriggerDay] = mapped_column(
+        default=TriggerDay.FIRST_OF_MONTH,
+        server_default=str(TriggerDay.FIRST_OF_MONTH).upper(),
+        nullable=True,
+        comment="The automated saving trigger day.",
+    )
+    """The automated saving trigger day."""
+
+    __table_args__ = (
+        CheckConstraint("savings_amount >= 0", name="savings_amount_nonnegative"),
+    )

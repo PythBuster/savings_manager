@@ -15,6 +15,7 @@ from src import exception_handler
 from src.constants import SPHINX_DIRECTORY
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
+from src.routes.app_settings import app_settings_router
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
@@ -34,6 +35,10 @@ tags_metadata = [
         "name": "prioritylist",
         "description": "All prioritylist endpoints.",
     },
+    {
+        "name": "settings",
+        "description": "All settings endpoints.",
+    }
 ]
 """Metadata about the endpoints."""
 
@@ -159,6 +164,10 @@ def register_router(fastapi_app: FastAPI) -> None:
     )
     fastapi_app.include_router(
         prioritylist_router,
+        prefix=f"/{EndpointRouteType.APP_ROOT}",
+    )
+    fastapi_app.include_router(
+        app_settings_router,
         prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
 

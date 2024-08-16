@@ -72,6 +72,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['moneybox_id'], ['moneyboxes.id'], name=op.f('fk_transactions_moneybox_id_moneyboxes'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_transactions'))
     )
+
     # Insert initial moneybox data with priority = NULL
     new_moneybox = {
         "name": str(uuid.uuid4()),

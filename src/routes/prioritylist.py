@@ -16,7 +16,7 @@ from src.routes.responses.prioritylist import (
 
 prioritylist_router = APIRouter(
     prefix=f"/{EndpointRouteType.PRIORITYLIST}",
-    tags=[EndpointRouteType.PRIORITYLIST.lower()],
+    tags=[EndpointRouteType.PRIORITYLIST],
 )
 """The prioritylist router."""
 

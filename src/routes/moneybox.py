@@ -30,7 +30,7 @@ from src.utils import check_existence_of_moneybox_by_id
 
 moneybox_router = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOX}",
-    tags=[EndpointRouteType.MONEYBOX.lower()],
+    tags=[EndpointRouteType.MONEYBOX],
 )
 """The moneybox router."""
 

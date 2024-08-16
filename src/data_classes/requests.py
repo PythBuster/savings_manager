@@ -1,8 +1,10 @@
 """All request models are located here."""
 
-from typing import Annotated
+from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
+
+from src.custom_types import TriggerDay
 
 
 class MoneyboxCreateRequest(BaseModel):
@@ -252,3 +254,56 @@ class PrioritylistRequest(BaseModel):
         },
     )
     """The config of the model."""
+
+class AppSettingsRequest(BaseModel):
+    """The app settings request model."""
+
+    is_automated_saving_active: Annotated[
+        bool,
+        Field(description="Tells if automated saving is active."),
+    ]
+    """Tells if automated saving is active."""
+
+    savings_amount: Annotated[
+        StrictInt,
+        Field(
+            ge=0,
+            description=(
+                "The savings amount for the automated saving which will be distributed periodically "
+                "to the moneyboxes, which have a (desired) savings amount > 0."
+            ),
+        ),
+    ]
+    """The savings amount for the automated saving which will be distributed periodically to the moneyboxes, 
+    which have a (desired) savings amount > 0."""
+
+    automated_saving_trigger_day: Annotated[
+        TriggerDay,
+        Field(
+            description="The automated saving trigger day.",
+        )
+    ]
+    """The automated saving trigger day."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "is_automated_saving_active": True,
+                    "savings_amount": 60000,
+                    "automated_saving_trigger_day": TriggerDay.FIRST_OF_MONTH,
+                },
+            ],
+        },
+    )
+    """The config of the model."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def lower_case_enum_str_automated_saving_trigger_day(cls, data: dict[str, Any]) -> dict[str, Any]:
+        if "automated_saving_trigger_day" in data and isinstance(data["automated_saving_trigger_day"], str):
+            data["automated_saving_trigger_day"] = data["automated_saving_trigger_day"].lower()
+
+        return data

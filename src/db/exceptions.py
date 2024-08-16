@@ -94,6 +94,14 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         super().__init__(record_id=moneybox_id, message=message)
 
 
+class AppSettingsNotFoundError(RecordNotFoundError):
+    """Custom AppSettingsNotFoundError Exception"""
+
+    def __init__(self, app_settings_id: int) -> None:
+        message = f"App Settings with id '{app_settings_id}' does not exist."
+        super().__init__(record_id=app_settings_id, message=message)
+
+
 class MoneyboxNotFoundByNameError(RecordNotFoundError):
     """Custom MoneyboxNotFoundByNameError Exception"""
 

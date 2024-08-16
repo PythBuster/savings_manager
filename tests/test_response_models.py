@@ -13,7 +13,7 @@ from src.data_classes.responses import (
     PrioritylistResponse,
     PriorityResponse,
     TransactionLogResponse,
-    TransactionLogsResponse,
+    TransactionLogsResponse, AppSettingsResponse,
 )
 
 
@@ -350,3 +350,88 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
     """Test PrioritylistResponse creation with invalid data."""
     with pytest.raises(ValidationError):
         PrioritylistResponse(**data)
+
+
+
+# Tests for AppSettingsResponse
+@pytest.mark.parametrize(
+    "data",
+    [
+        {
+            "id": 1,
+            "created_at": datetime(2024, 8, 11, 13, 57, 17, 941840, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 60000,
+            "automated_saving_trigger_day": "first_of_month",
+        },
+        {
+            "id": 2,
+            "created_at": datetime(2024, 8, 10, 12, 30, 0, tzinfo=timezone.utc),
+            "modified_at": None,
+            "is_automated_saving_active": False,
+            "savings_amount": 1000,
+            "automated_saving_trigger_day": "last_of_month",
+        },
+        {
+            "id": 3,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "automated_saving_trigger_day": "middle_of_month",
+        },
+    ],
+)
+def test_app_settings_response_valid(data: dict[str, Any]) -> None:
+    """Test valid AppSettingsResponse creation."""
+    response = AppSettingsResponse(**data)
+    assert response.id == data["id"]
+    assert response.created_at == data["created_at"]
+    assert response.modified_at == data["modified_at"]
+    assert response.is_automated_saving_active == data["is_automated_saving_active"]
+    assert response.savings_amount == data["savings_amount"]
+    assert response.automated_saving_trigger_day == data["automated_saving_trigger_day"]
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {
+            "id": "one",  # Invalid id type
+            "created_at": datetime(2024, 8, 11, 13, 57, 17, 941840, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 60000,
+            "automated_saving_trigger_day": "first_of_month",
+        },
+        {
+            "id": 4,
+            "created_at": "2024-08-10T12:30:00",  # Invalid datetime type
+            "modified_at": None,
+            "is_automated_saving_active": False,
+            "savings_amount": 1000,
+            "automated_saving_trigger_day": "last_of_month",
+        },
+        {
+            "id": 5,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": -100,  # Negative savings_amount
+            "automated_saving_trigger_day": "specific_day",
+        },
+        {
+            "id": 6,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 5000,
+            "automated_saving_trigger_day": "invalid_day",  # Invalid trigger day
+        },
+    ],
+)
+def test_app_settings_response_invalid(data: dict[str, Any]) -> None:
+    """Test AppSettingsResponse creation with invalid data."""
+    with pytest.raises(ValidationError):
+        AppSettingsResponse(**data)

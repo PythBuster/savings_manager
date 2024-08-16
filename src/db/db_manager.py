@@ -27,9 +27,9 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError,
+    UpdateInstanceError, AppSettingsNotFoundError,
 )
-from src.db.models import Moneybox, MoneyboxNameHistory, Transaction
+from src.db.models import Moneybox, MoneyboxNameHistory, Transaction, AppSettings
 from src.utils import get_database_url
 
 
@@ -771,3 +771,55 @@ class DBManager:
             )
 
         return await self.get_priority_list()
+
+
+    async def get_app_settings(
+            self,
+            app_settings_id: int,
+    ) -> dict[str, Any]:
+        """Get app settings by app_settings id.
+
+        :param app_settings_id: The app settings id.
+        :type app_settings_id: :class:`int`
+        :return: The app settings data.
+        :type: :class:`dict[str, Any]`
+        """
+
+        app_settings = await read_instance(
+            async_session=self.async_session,
+            orm_model=AppSettings,  # type: ignore
+            record_id=app_settings_id,
+        )
+
+        if app_settings is None:
+            raise AppSettingsNotFoundError(app_settings_id=app_settings_id)
+
+        return app_settings.asdict()
+
+
+    async def update_app_settings(
+            self,
+            app_settings_id: int,
+            app_settings_data: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Update app settings by app_settings id.
+
+        :param app_settings_id: The app settings id.
+        :type app_settings_id: :class:`int`
+        :param app_settings_data: The app settings data.
+        :type app_settings_data: :class:`dict[str, Any]`
+        :return: The updated app settings data.
+        :type: :class:`dict[str, Any]`
+        """
+
+        app_settings = await update_instance(
+            async_session=self.async_session,
+            orm_model=AppSettings,  # type: ignore
+            record_id=app_settings_id,
+            data=app_settings_data,
+        )
+
+        if app_settings is None:
+            raise AppSettingsNotFoundError(app_settings_id=app_settings_id)
+
+        return app_settings.asdict()

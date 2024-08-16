@@ -21,6 +21,9 @@ class EndpointRouteType(StrEnum):
     PRIORITYLIST = "prioritylist"  # /prioritylist
     """Prioritylist endpoint path name."""
 
+    APP_SETTINGS = "settings"  # /settings
+    """Settings endpoint path name."""
+
 
 class EnvironmentType(StrEnum):
     """The Environment Types to handle env loading logic."""
@@ -75,3 +78,9 @@ class TransactionType(StrEnum):
 
     DISTRIBUTION = "distribution"
     """Transaction caused by distribution strategy."""
+
+
+class TriggerDay(StrEnum):
+    FIRST_OF_MONTH = "first_of_month"
+    MIDDLE_OF_MONTH = "middle_of_month"
+    LAST_OF_MONTH = "last_of_month"

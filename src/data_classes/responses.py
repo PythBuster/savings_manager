@@ -14,7 +14,7 @@ from pydantic import (
     model_validator,
 )
 
-from src.custom_types import TransactionTrigger, TransactionType
+from src.custom_types import TransactionTrigger, TransactionType, TriggerDay
 
 
 class HTTPErrorResponse(BaseModel):
@@ -482,6 +482,65 @@ class PrioritylistResponse(BaseModel):
                         {"moneybox_id": 2, "name": "Reserves", "priority": 2},
                         {"moneybox_id": 4, "name": "Holiday", "priority": 1},
                     ],
+                },
+            ],
+        },
+    )
+    """The config of the model."""
+
+class AppSettingsResponse(BaseModel):
+    """The app settings response model."""
+
+    id: Annotated[StrictInt, Field(description="The ID of the app settings.")]
+    """The ID of the app settings."""
+
+    created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
+    """The creation date of the app settings."""
+
+    modified_at: Annotated[
+        AwareDatetime | None, Field(description="The modification date of the moneybox.")
+    ]
+    """The modification date of the app settings."""
+
+    is_automated_saving_active: Annotated[
+        bool,
+        Field(description="Tells if automated saving is active."),
+    ]
+    """Tells if automated saving is active."""
+
+    savings_amount: Annotated[
+        StrictInt,
+        Field(
+            ge=0,
+            description=(
+                "The savings amount for the automated saving which will be distributed periodically "
+                "to the moneyboxes, which have a (desired) savings amount > 0."
+            ),
+        ),
+    ]
+    """The savings amount for the automated saving which will be distributed periodically to the moneyboxes, 
+    which have a (desired) savings amount > 0."""
+
+    automated_saving_trigger_day: Annotated[
+        TriggerDay,
+        Field(
+            description="The automated saving trigger day.",
+        )
+    ]
+    """The automated saving trigger day."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "id": 1,
+                    "created_at": "2024-08-11 13:57:17.941840 +00:00",
+                    "modified_at": "2024-08-11 15:03:17.312860 +00:00",
+                    "is_automated_saving_active": True,
+                    "savings_amount": 60000,
+                    "automated_saving_trigger_day": TriggerDay.FIRST_OF_MONTH,
                 },
             ],
         },

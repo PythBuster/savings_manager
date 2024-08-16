@@ -291,11 +291,16 @@ async def mocked_db_manager() -> DBManager:  # type: ignore
         engine_args={"echo": True},
     )
 
-    async def truncate_tables(self: DBManager) -> None:
+    async def truncate_tables(self: DBManager, exclude_table_names: list[str] | None = None) -> None:
         """Truncate all tables."""
+
+        if exclude_table_names is None:
+            exclude_table_names = []
+
         async with self.async_session.begin() as session:
             for table in Base.metadata.sorted_tables:
-                await session.execute(table.delete())
+                if table.name not in exclude_table_names:
+                    await session.execute(table.delete())
 
     # add truncate tables help function for tests to database manager
     db_manager.truncate_tables = partial(truncate_tables, db_manager)  # type: ignore
