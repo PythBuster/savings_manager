@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.15.0 (2024-08-16)
+### Changes:
+- remove automated_trigger_day from app settings
+
 ## 1.14.0 (2024-08-16)
 ### Features:
 - add app settings table
