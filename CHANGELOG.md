@@ -3,6 +3,15 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.14.0 (2024-08-16)
+### Features:
+- add app settings table
+- implement app settings db functions
+- implement app settings endpoints
+
+### Changes:
+- adapt test data generation: allow excluding tables in truncate progress
+
 ## 1.13.0 (2024-08-15)
 ### Changes:
 - adapt priority list GET+PATCH endpoints: remove overflow moneybox from request/response data
