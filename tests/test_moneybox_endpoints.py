@@ -1204,7 +1204,8 @@ async def test_endpoint_get_transactions_log_moneybox_third__status_200(  # noqa
     )
     fourth_moneybox_id = (
         await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
-            name="Moneybox 4"
+            name="Moneybox 4",
+            only_active_instances=False,
         )
     )
     response = await client.get(

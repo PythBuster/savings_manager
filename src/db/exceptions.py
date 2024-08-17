@@ -10,6 +10,7 @@ class InconsistentDatabaseError(ABC, Exception):
 
     def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
         self.message = f"Inconsistent Database! {message}"
+        self.message = f"Inconsistent Database! {message}"
         self.details = details
 
         super().__init__(message)
@@ -188,3 +189,14 @@ class OverflowMoneyboxNotFoundError(InconsistentDatabaseError):
         super().__init__(
             message=message,
         )
+
+class AutomatedSavingsError(CrudDatabaseError):
+    """Custom AutomatedSavingsError Exception"""
+
+    def __init__(
+        self, record_id: int | None, message: str|None = None, details: dict[Hashable, Any] | None = None
+    ) -> None:
+        if message is None:
+            message = "Failed automated distribution."
+
+        super().__init__(record_id=record_id, message=message, details=details)

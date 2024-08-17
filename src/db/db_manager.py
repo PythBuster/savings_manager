@@ -1,14 +1,18 @@
 """All database definitions are located here."""
-
-from datetime import datetime
+import asyncio
+from datetime import datetime, timezone
 from pyexpat.errors import messages
 from typing import Any
 
+from fastapi.encoders import jsonable_encoder
+from mako.compat import win32
+from pydantic import with_config
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
 from src.custom_types import DBSettings, TransactionTrigger, TransactionType
+from src.data_classes.requests import DepositTransactionRequest
 from src.db.core import (
     create_instance,
     deactivate_instance,
@@ -29,7 +33,7 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError,
+    UpdateInstanceError, InconsistentDatabaseError, AutomatedSavingsError,
 )
 from src.db.models import AppSettings, Moneybox, MoneyboxNameHistory, Transaction
 from src.utils import get_database_url
@@ -200,6 +204,7 @@ class DBManager:
         :type session:: class:`AsyncSession`
 
         :return: The created moneybox history data.
+        :rtype: :class:`dict[str, Any]`
         """
 
         moneybox_name_history = await create_instance(
@@ -324,6 +329,7 @@ class DBManager:
         deposit_transaction_data: dict[str, Any],
         transaction_type: TransactionType,
         transaction_trigger: TransactionTrigger,
+        session: AsyncSession|None = None,
     ) -> dict[str, Any]:
         """DB Function to add amount to moneybox by moneybox_id.
 
@@ -335,6 +341,8 @@ class DBManager:
         :type transaction_type: :class:`TransactionType`
         :param transaction_trigger: The transaction trigger for the transaction.
         :type transaction_trigger: :class:`TransactionTrigger`
+        :param session: The current session of the db creation.
+        :type session: :class:`AsyncSession`
 
         :return: The updated moneybox data.
         :rtype: :class:`dict[str, Any]`
@@ -344,21 +352,51 @@ class DBManager:
                  :class:`NegativeAmountError`: if balance to add is negative.
         """
 
-        moneybox = await read_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=moneybox_id,
-        )
+        # Determine the session to use
+        if session is None:
+            async with self.async_session.begin() as session:
+                moneybox = await read_instance(
+                    async_session=session,
+                    orm_model=Moneybox,
+                    record_id=moneybox_id,
+                )
 
-        if moneybox is None:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+                if moneybox is None:
+                    raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-        moneybox.balance += deposit_transaction_data["amount"]
+                moneybox.balance += deposit_transaction_data["amount"]
 
-        async with self.async_session.begin() as session:
+                updated_moneybox = await update_instance(
+                    async_session=session,
+                    orm_model=Moneybox,
+                    record_id=moneybox_id,
+                    data=moneybox.asdict(),
+                )
+
+                await self._add_transfer_log(
+                    moneybox_id=moneybox_id,
+                    description=deposit_transaction_data["description"],
+                    transaction_type=transaction_type,
+                    transaction_trigger=transaction_trigger,
+                    amount=deposit_transaction_data["amount"],
+                    balance=updated_moneybox.balance,
+                    session=session,
+                )
+        else:
+            moneybox = await read_instance(
+                async_session=session,
+                orm_model=Moneybox,
+                record_id=moneybox_id,
+            )
+
+            if moneybox is None:
+                raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+
+            moneybox.balance += deposit_transaction_data["amount"]
+
             updated_moneybox = await update_instance(
                 async_session=session,
-                orm_model=Moneybox,  # type: ignore
+                orm_model=Moneybox,
                 record_id=moneybox_id,
                 data=moneybox.asdict(),
             )
@@ -369,11 +407,11 @@ class DBManager:
                 transaction_type=transaction_type,
                 transaction_trigger=transaction_trigger,
                 amount=deposit_transaction_data["amount"],
-                balance=updated_moneybox.balance,  # type: ignore
+                balance=updated_moneybox.balance,
                 session=session,
             )
 
-        return updated_moneybox.asdict()  # type: ignore
+        return updated_moneybox.asdict()
 
     async def sub_amount(  # pylint: disable=too-many-arguments
         self,
@@ -688,16 +726,28 @@ class DBManager:
 
         return moneybox_name_history.name
 
-    async def _get_moneybox_id_by_name(self, name: str) -> int:
+    async def _get_moneybox_id_by_name(
+            self,
+            name: str,
+            only_active_instances: bool = True,
+    ) -> int:
         """Get moneybox id for the given name.
 
         :param name: The name of the moneybox.
         :type name: :class:`str`
+        :param only_active_instances: If True, only active moneyboxes will be
+            returned, default to True.
+        :type only_active_instances: :class:`bool`
         :return: The moneybox id for the given name.
         :rtype: :class:`int`
         """
 
-        stmt = select(Moneybox).where(Moneybox.name == name)
+        stmt = select(Moneybox).where(
+            Moneybox.name == name,
+        )
+
+        if only_active_instances:
+            stmt = stmt.where(Moneybox.is_active.is_(True))
 
         async with self.async_session() as session:
             result = await session.execute(stmt)
@@ -713,7 +763,7 @@ class DBManager:
         """Get the priority list (moneybox_id to priority and name map).
 
         :return: The priority list (moneybox_id, priority and name key-values).
-        :type: :class:`list[dict[str, int|str]]`
+        :rtype: :class:`list[dict[str, int|str]]`
         """
 
         stmt = select(Moneybox.id, Moneybox.priority, Moneybox.name).where(
@@ -745,7 +795,7 @@ class DBManager:
         :param priorities: The priority list (moneybox_id to priority and name map).
         :type priorities: :class:`list[dict[str, int]]`
         :return: The updated priority list (moneybox_id to priority and name map).
-        :type: :class:`list[dict[str, str|int]]`
+        :rtype: :class:`list[dict[str, str|int]]`
         """
 
         updating_data = [
@@ -827,7 +877,7 @@ class DBManager:
         :param app_settings_id: The app settings id.
         :type app_settings_id: :class:`int`
         :return: The app settings data.
-        :type: :class:`dict[str, Any]`
+        :rtype: :class:`dict[str, Any]`
         """
 
         app_settings = await read_instance(
@@ -853,7 +903,7 @@ class DBManager:
         :param app_settings_data: The app settings data.
         :type app_settings_data: :class:`dict[str, Any]`
         :return: The updated app settings data.
-        :type: :class:`dict[str, Any]`
+        :rtype: :class:`dict[str, Any]`
         """
 
         app_settings = await update_instance(
@@ -867,3 +917,114 @@ class DBManager:
             raise AppSettingsNotFoundError(app_settings_id=app_settings_id)
 
         return app_settings.asdict()
+
+    async def _get_all_app_settings(self) -> list[AppSettings]:
+        """Get all active app settings records.
+
+        :return: The active app settings records.
+        :rtype: :class:`list[AppSettings]`
+        """
+
+        stmt = select(AppSettings).where(AppSettings.is_active.is_(True))
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        return list(result.scalars().all())
+
+    async def automated_savings(self) -> bool:
+        """The automated savings algorithm.
+
+        App savings amount will distribute to moneyboxes in priority order (excepted the
+        Overflow Moneybox). If there is a leftover that could not been distributed,
+        the overflow moneybox will get the leftover.
+
+        :return: True, if distribution is done, false, if automated savings is deactivated.
+        """
+
+        all_app_settings = await self._get_all_app_settings()
+
+        if not all_app_settings:
+            raise InconsistentDatabaseError(
+                message="No app settings found."
+            )
+
+        # get the single app setting
+        app_settings = all_app_settings[0]
+
+        if not app_settings.is_automated_saving_active:
+            return False
+
+        app_savings_amount = app_settings.savings_amount
+        moneyboxes = await self.get_moneyboxes()
+        sorted_moneyboxes = sorted(moneyboxes, key=lambda item: item["priority"])
+
+        async with self.async_session.begin() as session:
+            for moneybox in sorted_moneyboxes[1:]:  # skip overflow moneybox (priority=0)
+                await asyncio.sleep(2)
+                if app_savings_amount <= 0:
+                    break
+
+                desired_savings_amount = moneybox["savings_amount"]
+                amount_to_distribute = min(desired_savings_amount, app_savings_amount)
+
+                if moneybox["savings_target"] is not None:
+                    missing_amount_until_target = moneybox["savings_target"] - moneybox["balance"]
+
+                    if missing_amount_until_target > 0:
+                        amount_to_distribute = min(amount_to_distribute, missing_amount_until_target)
+                    else:
+                        # Moneybox is full (reached amount target )
+                        continue
+
+                updated_moneybox = await self.add_amount(
+                    session=session,
+                    moneybox_id=moneybox["id"],
+                    deposit_transaction_data={
+                        "amount": amount_to_distribute,
+                        "description": f"Automated savings.",
+                    },
+                    transaction_type=TransactionType.DISTRIBUTION,
+                    transaction_trigger=TransactionTrigger.AUTOMATICALLY,
+                )
+
+                old_moneybox_balance = moneybox["balance"]
+
+                if updated_moneybox["balance"] != old_moneybox_balance + amount_to_distribute:
+                    raise AutomatedSavingsError(
+                        record_id=moneybox["id"],
+                        details={
+                            "amount_to_distribute": amount_to_distribute,
+                            "moneybox": jsonable_encoder(moneybox),
+                        },
+                    )
+
+                app_savings_amount -= amount_to_distribute
+
+            # add the rest of app_savings_amount to overflow_moneybox if there is a rest
+            if app_savings_amount > 0:
+                overflow_moneybox = await self._get_overflow_moneybox()
+
+                updated_overflow_moneybox = await self.add_amount(
+                    session=session,
+                    moneybox_id=overflow_moneybox.id,
+                    deposit_transaction_data={
+                        "amount": app_savings_amount,
+                        "description": f"Automated savings.",
+                    },
+                    transaction_type=TransactionType.DISTRIBUTION,
+                    transaction_trigger=TransactionTrigger.AUTOMATICALLY,
+                )
+
+                old_overflow_moneybox_balance = overflow_moneybox.balance
+
+                if updated_overflow_moneybox["balance"] != old_overflow_moneybox_balance + app_savings_amount:
+                    raise AutomatedSavingsError(
+                        record_id=moneybox["id"],
+                        details={
+                            "amount_to_distribute": amount_to_distribute,
+                            "moneybox": jsonable_encoder(moneybox),
+                        },
+                    )
+
+            return True

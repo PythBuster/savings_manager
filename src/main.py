@@ -64,7 +64,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     register_router(fastapi_app=fastapi_app)
 
     print("Start background tasks.")
-    await fastapi_app.state.background_tasks_runner.start_tasks()
+    await fastapi_app.state.background_tasks_runner.run()
 
     yield
 
