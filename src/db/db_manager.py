@@ -38,19 +38,25 @@ from src.utils import get_database_url
 class DBManager:
     """All db manager logic are located here."""
 
-    def __init__(self, db_settings: DBSettings, engine_args: dict[str, Any] | None = None) -> None:
+    def __init__(
+            self,
+            db_settings: DBSettings | None,
+            engine_args: dict[str, Any] | None = None
+    ) -> None:
         if engine_args is None:
             engine_args = {}
 
         self.db_settings = db_settings
-        self.async_engine = create_async_engine(
-            url=self.db_connection_string,
-            **engine_args,
-        )
-        self.async_session = async_sessionmaker(
-            bind=self.async_engine,
-            expire_on_commit=False,
-        )
+
+        if db_settings is not None:
+            self.async_engine = create_async_engine(
+                url=self.db_connection_string,
+                **engine_args,
+            )
+            self.async_session = async_sessionmaker(
+                bind=self.async_engine,
+                expire_on_commit=False,
+            )
 
     @property
     def db_connection_string(self) -> str:

@@ -53,6 +53,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found,
             "test_get_priority_list": self.dataset_test_get_priority_list,
+            "test_get_empty_priority_list": self.truncate_tables,
             "test_update_priority_list": self.dataset_test_update_priority_list,
             "test_create_instance": self.truncate_tables,
             "test_add_moneybox": self.truncate_tables,

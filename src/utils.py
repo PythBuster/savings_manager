@@ -33,21 +33,40 @@ async def check_existence_of_moneybox_by_id(
     return moneybox_id
 
 
-def get_db_settings() -> DBSettings:
+def get_db_settings() -> DBSettings | None:
     """A :class:`DBSettings` spawner.
 
     :return: Creates a :class:`DBSettings` by loading os.environ settings
         and return a :class:`DBSettings` instance.
-    :rtype: :class:`DBSettings`
+    :rtype: :class:`DBSettings` | :class:`None`
     """
 
+    db_driver=os.getenv("DB_DRIVER")
+    db_name=os.getenv("DB_NAME")
+    db_host=os.getenv("DB_HOST")
+    db_port=os.getenv("DB_PORT")
+    db_user=os.getenv("DB_USER")
+    db_password=os.getenv("DB_PASSWORD")
+
+    envs = [
+        db_driver,
+        db_name,
+        db_host,
+        db_port,
+        db_user,
+        db_password,
+    ]
+
+    if None in envs:
+        return None
+
     return DBSettings(
-        db_driver=os.getenv("DB_DRIVER", ""),
-        db_name=os.getenv("DB_NAME", ""),
-        db_host=os.getenv("DB_HOST", ""),
-        db_port=os.getenv("DB_PORT", ""),
-        db_user=os.getenv("DB_USER", ""),
-        db_password=os.getenv("DB_PASSWORD", ""),
+        db_driver=db_driver,
+        db_name=db_name,
+        db_host=db_host,
+        db_port=db_port,
+        db_user=db_user,
+        db_password=db_password,
     )
 
 
@@ -88,22 +107,25 @@ def load_environment() -> EnvironmentType:
     :rtype: :class:`EnvironmentType`
     """
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--environment",
-        required=False,
-        default=EnvironmentType.TEST,
-        help="Loads environment variables depending on this flag",
-        type=EnvironmentType,
-    )
-    args = parser.parse_args()
+    try:
+        parser = argparse.ArgumentParser()
+        parser.add_argument(
+            "--environment",
+            required=False,
+            default=EnvironmentType.TEST,
+            help="Loads environment variables depending on this flag",
+            type=EnvironmentType,
+        )
+        args = parser.parse_args()
 
-    if args.environment == EnvironmentType.LIVE:
-        dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
-        load_dotenv(dotenv_path=dotenv_path)
-        print(f"Loaded {dotenv_path}")
+        if args.environment == EnvironmentType.LIVE:
+            dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+            load_dotenv(dotenv_path=dotenv_path)
+            print(f"Loaded {dotenv_path}")
 
-    return args.environment
+        return args.environment
+    except:
+        return EnvironmentType.TEST
 
 
 def create_envfile_from_envvars() -> None:
