@@ -8,6 +8,9 @@ GET_PRIORITYLIST_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",
     },
+    status.HTTP_204_NO_CONTENT: {
+        "description": "No Content",
+    },
     status.HTTP_400_BAD_REQUEST: {
         "description": "No database connection.",
         "content": {
@@ -30,6 +33,19 @@ GET_PRIORITYLIST_RESPONSES = {
 UPDATE_PRIORITYLIST_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",
+    },
+    status.HTTP_405_METHOD_NOT_ALLOWED: {
+        "description": "Method Not Allowed",
+        "content": {
+            "application/json": {
+                "example": HTTPErrorResponse(
+                    message="Updating overflow moneybox is not allowed/possible!",
+                    details={
+                        "moneybox_id": 1,
+                    },
+                ),
+            }
+        },
     },
     status.HTTP_400_BAD_REQUEST: {
         "description": "No database connection.",

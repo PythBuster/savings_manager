@@ -1,6 +1,7 @@
 """All database definitions are located here."""
 
 from datetime import datetime
+from pyexpat.errors import messages
 from typing import Any
 
 from sqlalchemy import and_, desc, insert, select, update
@@ -742,6 +743,18 @@ class DBManager:
         :type: :class:`list[dict[str, str|int]]`
         """
 
+        updating_data = [
+            {"id": priority["moneybox_id"], "priority": priority["priority"]}
+            for priority in priorities
+        ]
+
+        _overflow_moneybox = await self._get_overflow_moneybox()
+
+        if _overflow_moneybox.id in (d["id"] for d in updating_data):
+            raise OverflowMoneyboxCantBeUpdatedError(
+                moneybox_id=_overflow_moneybox.id,
+            )
+
         if 0 in set(priority["priority"] for priority in priorities):
             raise UpdateInstanceError(
                 record_id=None,
@@ -755,23 +768,50 @@ class DBManager:
             ]
 
             # ORM Bulk UPDATE by Primary Key -> set priority to None
-            await session.execute(
-                update(Moneybox),
-                params=reset_data,
+            pre_updated_moneyboxes_result = await session.execute(
+                update(Moneybox)
+                .where(Moneybox.id.in_([item["id"] for item in reset_data]))
+                .values(priority=None)
+                .returning(Moneybox.name, Moneybox.id, Moneybox.priority)
             )
+            pre_updated_moneyboxes = pre_updated_moneyboxes_result.fetchall()
 
-            data = [
-                {"id": priority["moneybox_id"], "priority": priority["priority"]}
-                for priority in priorities
-            ]
+            if len(pre_updated_moneyboxes) < len(priorities):
+                raise UpdateInstanceError(
+                    record_id=None,
+                    message="Updating priorities failed. Some moneybox_ids may not exist.",
+                    details={"prioritiy_list": priorities},
+                )
 
-            # ORM Bulk UPDATE by Primary Key -> set real priorities
-            await session.execute(
-                update(Moneybox),
-                params=data,
-            )
+            updated_moneyboxes = []
 
-        return await self.get_priority_list()
+            for entry in updating_data:
+                updated_moneybox = await session.execute(
+                    update(Moneybox)
+                    .where(Moneybox.id == entry["id"])
+                    .values(priority=entry["priority"])
+                    .returning(Moneybox.id, Moneybox.priority, Moneybox.name)
+                )
+
+                updated_moneyboxes.append(updated_moneybox.fetchone())
+
+            if len(updated_moneyboxes) < len(priorities):
+                raise UpdateInstanceError(
+                    record_id=None,
+                    message="Updating priorities failed. Some moneybox_ids may not exist.",
+                    details={"prioritiy_list": priorities},
+                )
+
+        priority_map = [
+            {
+                "moneybox_id": moneybox_id,
+                "name": name,
+                "priority": priority,
+            }
+            for moneybox_id, priority, name in updated_moneyboxes
+        ]
+
+        return priority_map
 
     async def get_app_settings(
         self,

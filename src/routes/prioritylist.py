@@ -3,7 +3,9 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Body
+from starlette import status
 from starlette.requests import Request
+from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType
 from src.data_classes.requests import PrioritylistRequest
@@ -28,13 +30,17 @@ prioritylist_router = APIRouter(
 )
 async def get_priority_list(
     request: Request,
-) -> PrioritylistResponse:
+) -> PrioritylistResponse | Response:
     """Endpoint for getting priority list."""
 
     db_manager: DBManager = request.app.state.db_manager
     priority_list = await db_manager.get_priority_list()
 
-    return PrioritylistResponse(priority_list=priority_list)
+    if priority_list:
+        return PrioritylistResponse(priority_list=priority_list)
+    else:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 
 
 @prioritylist_router.patch(

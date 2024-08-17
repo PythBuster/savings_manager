@@ -20,6 +20,7 @@ from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
 from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
+from src.singleton import db_manager
 from src.utils import get_app_data, get_db_settings, load_environment
 
 tags_metadata = [
@@ -118,11 +119,7 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     :rtype fastapi_app: FastAPI
     """
 
-    load_environment()
-
-    fastapi_app.state.db_manager = DBManager(
-        db_settings=get_db_settings(),
-    )
+    fastapi_app.state.db_manager = db_manager
 
     set_custom_openapi_schema(fastapi_app=fastapi_app)
 
