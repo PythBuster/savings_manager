@@ -38,9 +38,8 @@ async def get_priority_list(
 
     if priority_list:
         return PrioritylistResponse(priority_list=priority_list)
-    else:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @prioritylist_router.patch(

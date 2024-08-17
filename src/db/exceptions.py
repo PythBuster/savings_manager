@@ -190,11 +190,15 @@ class OverflowMoneyboxNotFoundError(InconsistentDatabaseError):
             message=message,
         )
 
+
 class AutomatedSavingsError(CrudDatabaseError):
     """Custom AutomatedSavingsError Exception"""
 
     def __init__(
-        self, record_id: int | None, message: str|None = None, details: dict[Hashable, Any] | None = None
+        self,
+        record_id: int | None,
+        message: str | None = None,
+        details: dict[Hashable, Any] | None = None,
     ) -> None:
         if message is None:
             message = "Failed automated distribution."

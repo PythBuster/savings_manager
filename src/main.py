@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import AsyncGenerator, Callable
 
 import uvicorn
-from IPython.utils.tz import utcnow
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from requests import Response
@@ -126,10 +125,12 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     """
 
     db_manager = DBManager(
-        db_settings=get_db_settings(),
+        db_settings=get_db_settings(),  # type: ignore
     )
-    fastapi_app.state.db_manager = db_manager
-    fastapi_app.state.background_tasks_runner = BackgroundTaskRunner(db_manager=db_manager)
+    fastapi_app.state.db_manager = db_manager  # type: ignore
+    fastapi_app.state.background_tasks_runner = BackgroundTaskRunner(  # type: ignore
+        db_manager=db_manager,
+    )
 
     set_custom_openapi_schema(fastapi_app=fastapi_app)
 

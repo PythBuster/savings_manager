@@ -4,19 +4,20 @@ from datetime import datetime
 from typing import Any, List
 
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     DateTime,
     ForeignKey,
     Index,
     MetaData,
     func,
-    text, JSON,
+    text,
 )
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 
-from src.custom_types import TransactionTrigger, TransactionType, ActionType
+from src.custom_types import ActionType, TransactionTrigger, TransactionType
 from src.utils import as_dict
 
 meta = MetaData(
@@ -337,26 +338,22 @@ class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "automated_savings_logs"
 
-    action_at: Mapped[datetime] = mapped_column(
+    action_at: Mapped[datetime] = mapped_column(  # pylint: disable=unsubscriptable-object)
         DateTime(timezone=True),
         nullable=False,
         comment="The utc datetime of the action.",
     )
     """The utc datetime of the action."""
 
-    action: Mapped[ActionType] = mapped_column(  # pylint: disable=E1136
+    action: Mapped[ActionType] = mapped_column(  # pylint: disable=unsubscriptable-object)
         nullable=False,
-        comment=(
-            "The action type within the automated savings and automated savings logs."
-        ),
+        comment=("The action type within the automated savings and automated savings logs."),
     )
     """The action type within the automated savings and automated savings logs."""
 
     details: Mapped[dict] = mapped_column(  # pylint: disable=E1136
         JSON,
         nullable=True,
-        comment=(
-            "Metadata for the action, like app settings data."
-        ),
+        comment=("Metadata for the action, like app settings data."),
     )
     """Metadata for the action, like app settings data."""

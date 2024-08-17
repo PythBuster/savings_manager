@@ -258,13 +258,13 @@ class AppSettingsRequest(BaseModel):
     """The app settings request model."""
 
     is_automated_saving_active: Annotated[
-        bool|None,
+        bool | None,
         Field(description="Tells if automated saving is active."),
     ] = None
     """Tells if automated saving is active."""
 
     savings_amount: Annotated[
-        StrictInt|None,
+        StrictInt | None,
         Field(
             ge=0,
             description=(

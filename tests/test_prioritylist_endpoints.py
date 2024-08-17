@@ -20,7 +20,9 @@ async def test_get_priority_list(
 
     response = await client.get(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}")
 
-    if response.status_code == status.HTTP_204_NO_CONTENT:  # Handle the case where no priority list is available
+    if (
+        response.status_code == status.HTTP_204_NO_CONTENT
+    ):  # Handle the case where no priority list is available
         assert response.json() == {}  # Expecting an empty JSON response
         return  # Exit the test early if status code is 204
 
@@ -32,20 +34,16 @@ async def test_get_priority_list(
             dict_1=response_priority_list[i], dict_2=expected_priority, exclude_keys=["moneybox_id"]
         )
 
+
 async def test_get_empty_priority_list(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
-    expected_priority_list = [
-        {"name": "Test Box 1", "priority": 1},
-        {"name": "Test Box 2", "priority": 2},
-    ]
-
     response = await client.get(f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-async def test_update_priority_list(
+async def test_update_priority_list(  # pylint:disable=too-many-locals
     load_test_data: None,  # pylint:disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,

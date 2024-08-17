@@ -1,13 +1,11 @@
+"""The background task runner logic."""
+
 import asyncio
 import inspect
-from argparse import Action
-from asyncio import current_task
-
 from datetime import datetime
 
-from mypy.dmypy.client import action
-
 from src.custom_types import ActionType
+from src.db.db_manager import DBManager
 
 
 class BackgroundTaskRunner:
@@ -22,24 +20,25 @@ class BackgroundTaskRunner:
      (if endless task is wanted) and its own date trigger.
     """
 
-    def __init__(self, db_manager):
+    def __init__(self, db_manager: DBManager) -> None:
         self.db_manager = db_manager
-        self.sleep_time = 5  # 60*60  # each hour
-        self.background_tasks = set()
+        self.sleep_time = 60 * 60  # each hour
+        self.background_tasks: set[asyncio.Task] = set()
 
-    async def run(self):
-        # Collect all async methods of the class that start with 'task_'
+    async def run(self) -> None:
+        """Collect all async methods of the class that start with 'task_'"""
+
         task_methods = [
-            getattr(self, method_name) for method_name in dir(self)
-            if method_name.startswith('task_') and
-               inspect.iscoroutinefunction(getattr(self, method_name))
+            getattr(self, method_name)
+            for method_name in dir(self)
+            if method_name.startswith("task_")
+            and inspect.iscoroutinefunction(getattr(self, method_name))
         ]
 
         for task_method in task_methods:
             task = asyncio.create_task(task_method())
             self.background_tasks.add(task)
             task.add_done_callback(self.background_tasks.discard)
-
 
     async def task_automated_savings(self) -> None:
         """This is the endless task for automated savings.
@@ -49,21 +48,17 @@ class BackgroundTaskRunner:
         """
 
         # Get the name of the current method
-        current_method_name = inspect.currentframe().f_code.co_name.upper()
+        current_method_name = inspect.currentframe().f_code.co_name.upper()  # type: ignore
 
-        await self.print_task(
-            task_name=current_method_name,
-            message="Start task ..."
-        )
+        await self.print_task(task_name=current_method_name, message="Start task ...")
 
         while True:
             today = datetime.today()
-
             already_done = False
 
             if today.day == 1 and today.hour >= 12:
                 automated_action_logs = await self.db_manager.get_automated_savings_logs(
-                    action=ActionType.APPLIED_AUTOMATED_SAVING,
+                    action_type=ActionType.APPLIED_AUTOMATED_SAVING,
                 )
 
                 if automated_action_logs:
@@ -80,21 +75,22 @@ class BackgroundTaskRunner:
 
                     if result:
                         await self.print_task(
-                            task_name=current_method_name,
-                            message="Automated savings run."
+                            task_name=current_method_name, message="Automated savings run."
                         )
                     else:
                         await self.print_task(
                             task_name=current_method_name,
-                            message="Nothing to do. Automated savings is deactivated."
+                            message="Nothing to do. Automated savings is deactivated.",
                         )
 
             await asyncio.sleep(self.sleep_time)
 
-        await self.print_task(
+        await self.print_task(  # type: ignore
             task_name=current_method_name,
             message="Task finished."
         )
 
     async def print_task(self, task_name: str, message: str) -> None:
+        """The background task runner is responsible for printing out the task information."""
+
         print(f"{datetime.now()} - {task_name.strip()}: {message.strip()}", flush=True)

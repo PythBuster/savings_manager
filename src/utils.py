@@ -1,16 +1,14 @@
 """All helper functions are located here."""
 
-import argparse
 import os
 import tomllib
 from pathlib import Path
 from typing import Annotated, Any
 
 from dictalchemy import asdict
-from dotenv import load_dotenv
 from starlette.requests import Request
 
-from src.custom_types import DBSettings, EnvironmentType
+from src.custom_types import DBSettings
 
 
 async def check_existence_of_moneybox_by_id(
@@ -33,7 +31,7 @@ async def check_existence_of_moneybox_by_id(
     return moneybox_id
 
 
-def get_db_settings() -> DBSettings | None:
+def get_db_settings() -> DBSettings:
     """A :class:`DBSettings` spawner.
 
     :return: Creates a :class:`DBSettings` by loading os.environ settings
@@ -41,12 +39,12 @@ def get_db_settings() -> DBSettings | None:
     :rtype: :class:`DBSettings` | :class:`None`
     """
 
-    db_driver=os.getenv("DB_DRIVER")
-    db_name=os.getenv("DB_NAME")
-    db_host=os.getenv("DB_HOST")
-    db_port=os.getenv("DB_PORT")
-    db_user=os.getenv("DB_USER")
-    db_password=os.getenv("DB_PASSWORD")
+    db_driver = os.getenv("DB_DRIVER")
+    db_name = os.getenv("DB_NAME")
+    db_host = os.getenv("DB_HOST")
+    db_port = os.getenv("DB_PORT")
+    db_user = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
 
     envs = [
         db_driver,
@@ -58,9 +56,7 @@ def get_db_settings() -> DBSettings | None:
     ]
 
     if None in envs:
-        raise ValueError(
-            "Missing environment variables for db_settings."
-        )
+        raise ValueError("Missing environment variables for db_settings.")
 
     return DBSettings(
         db_driver=db_driver,
@@ -100,6 +96,7 @@ def get_app_data() -> dict[str, Any]:
         pyproject_data = tomllib.load(pyproject_file)
 
     return pyproject_data["tool"]["poetry"]
+
 
 def create_envfile_from_envvars() -> None:
     """Helper function to create .env file for database credentials

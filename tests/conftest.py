@@ -35,8 +35,9 @@ db_settings = get_db_settings()
 
 
 @asynccontextmanager
-async def noop_lifespan(app: FastAPI):
-    # No-op context manager for lifespan
+async def noop_lifespan(_: FastAPI):   # type: ignore
+    """No-op context manager for lifespan"""
+
     yield
 
 

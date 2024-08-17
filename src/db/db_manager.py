@@ -1,19 +1,15 @@
 """All database definitions are located here."""
+
 import asyncio
 from datetime import datetime, timezone
-from pyexpat.errors import messages
 from typing import Any
 
 from fastapi.encoders import jsonable_encoder
-from mako.compat import win32
-from mypy.dmypy.client import action
-from pydantic import with_config
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
-from src.custom_types import DBSettings, TransactionTrigger, TransactionType, ActionType
-from src.data_classes.requests import DepositTransactionRequest
+from src.custom_types import ActionType, DBSettings, TransactionTrigger, TransactionType
 from src.db.core import (
     create_instance,
     deactivate_instance,
@@ -23,10 +19,12 @@ from src.db.core import (
 )
 from src.db.exceptions import (
     AppSettingsNotFoundError,
+    AutomatedSavingsError,
     BalanceResultIsNegativeError,
     CreateInstanceError,
     DeleteInstanceError,
     HasBalanceError,
+    InconsistentDatabaseError,
     MoneyboxNotFoundByNameError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
@@ -34,20 +32,22 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError, InconsistentDatabaseError, AutomatedSavingsError,
+    UpdateInstanceError,
 )
-from src.db.models import AppSettings, Moneybox, MoneyboxNameHistory, Transaction, AutomatedSavingsLog
+from src.db.models import (
+    AppSettings,
+    AutomatedSavingsLog,
+    Moneybox,
+    MoneyboxNameHistory,
+    Transaction,
+)
 from src.utils import get_database_url
 
 
 class DBManager:
     """All db manager logic are located here."""
 
-    def __init__(
-            self,
-            db_settings: DBSettings,
-            engine_args: dict[str, Any] | None = None
-    ) -> None:
+    def __init__(self, db_settings: DBSettings, engine_args: dict[str, Any] | None = None) -> None:
         if engine_args is None:
             engine_args = {}
 
@@ -324,13 +324,13 @@ class DBManager:
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
     #  sub_amount are almost identical, combine in one function?
-    async def add_amount(
+    async def add_amount(  # pylint:disable=too-many-locals, too-many-arguments
         self,
         moneybox_id: int,
         deposit_transaction_data: dict[str, Any],
         transaction_type: TransactionType,
         transaction_trigger: TransactionTrigger,
-        session: AsyncSession|None = None,
+        session: AsyncSession | None = None,
     ) -> dict[str, Any]:
         """DB Function to add amount to moneybox by moneybox_id.
 
@@ -358,7 +358,7 @@ class DBManager:
             async with self.async_session.begin() as session:
                 moneybox = await read_instance(
                     async_session=session,
-                    orm_model=Moneybox,
+                    orm_model=Moneybox,  # type: ignore
                     record_id=moneybox_id,
                 )
 
@@ -369,7 +369,7 @@ class DBManager:
 
                 updated_moneybox = await update_instance(
                     async_session=session,
-                    orm_model=Moneybox,
+                    orm_model=Moneybox,  # type: ignore
                     record_id=moneybox_id,
                     data=moneybox.asdict(),
                 )
@@ -380,13 +380,13 @@ class DBManager:
                     transaction_type=transaction_type,
                     transaction_trigger=transaction_trigger,
                     amount=deposit_transaction_data["amount"],
-                    balance=updated_moneybox.balance,
+                    balance=updated_moneybox.balance,  # type: ignore
                     session=session,
                 )
         else:
             moneybox = await read_instance(
                 async_session=session,
-                orm_model=Moneybox,
+                orm_model=Moneybox,  # type: ignore
                 record_id=moneybox_id,
             )
 
@@ -397,7 +397,7 @@ class DBManager:
 
             updated_moneybox = await update_instance(
                 async_session=session,
-                orm_model=Moneybox,
+                orm_model=Moneybox,  # type: ignore
                 record_id=moneybox_id,
                 data=moneybox.asdict(),
             )
@@ -408,11 +408,11 @@ class DBManager:
                 transaction_type=transaction_type,
                 transaction_trigger=transaction_trigger,
                 amount=deposit_transaction_data["amount"],
-                balance=updated_moneybox.balance,
+                balance=updated_moneybox.balance,  # type: ignore
                 session=session,
             )
 
-        return updated_moneybox.asdict()
+        return updated_moneybox.asdict()  # type: ignore
 
     async def sub_amount(  # pylint: disable=too-many-arguments
         self,
@@ -728,9 +728,9 @@ class DBManager:
         return moneybox_name_history.name
 
     async def _get_moneybox_id_by_name(
-            self,
-            name: str,
-            only_active_instances: bool = True,
+        self,
+        name: str,
+        only_active_instances: bool = True,
     ) -> int:
         """Get moneybox id for the given name.
 
@@ -920,7 +920,11 @@ class DBManager:
 
             if "is_automated_saving_active" in app_settings_data:
                 activate = app_settings.is_automated_saving_active
-                action_type = ActionType.ACTIVATED_AUTOMATED_SAVING if activate else ActionType.DEACTIVATED_AUTOMATED_SAVING
+                action_type = (
+                    ActionType.ACTIVATED_AUTOMATED_SAVING
+                    if activate
+                    else ActionType.DEACTIVATED_AUTOMATED_SAVING
+                )
                 automated_savings_log_data = {
                     "action": action_type,
                     "action_at": datetime.now(tz=timezone.utc),
@@ -935,7 +939,9 @@ class DBManager:
                     raise AutomatedSavingsError(
                         record_id=None,
                         details={
-                            "automated_savings_log_data": jsonable_encoder(automated_savings_log_data),
+                            "automated_savings_log_data": jsonable_encoder(
+                                automated_savings_log_data
+                            ),
                         },
                     )
 
@@ -954,7 +960,9 @@ class DBManager:
                     raise AutomatedSavingsError(
                         record_id=None,
                         details={
-                            "automated_savings_log_data": jsonable_encoder(automated_savings_log_data),
+                            "automated_savings_log_data": jsonable_encoder(
+                                automated_savings_log_data
+                            ),
                         },
                     )
 
@@ -974,7 +982,7 @@ class DBManager:
 
         return list(result.scalars().all())
 
-    async def automated_savings(self) -> bool:
+    async def automated_savings(self) -> bool:  # pylint:disable=too-many-locals
         """The automated savings algorithm.
 
         App savings amount will distribute to moneyboxes in priority order (excepted the
@@ -987,9 +995,7 @@ class DBManager:
         all_app_settings = await self._get_all_app_settings()
 
         if not all_app_settings:
-            raise InconsistentDatabaseError(
-                message="No app settings found."
-            )
+            raise InconsistentDatabaseError(message="No app settings found.")
 
         # get the single app setting
         app_settings = all_app_settings[0]
@@ -1014,7 +1020,9 @@ class DBManager:
                     missing_amount_until_target = moneybox["savings_target"] - moneybox["balance"]
 
                     if missing_amount_until_target > 0:
-                        amount_to_distribute = min(amount_to_distribute, missing_amount_until_target)
+                        amount_to_distribute = min(
+                            amount_to_distribute, missing_amount_until_target
+                        )
                     else:
                         # Moneybox is full (reached amount target )
                         continue
@@ -1024,7 +1032,7 @@ class DBManager:
                     moneybox_id=moneybox["id"],
                     deposit_transaction_data={
                         "amount": amount_to_distribute,
-                        "description": f"Automated savings.",
+                        "description": "Automated savings.",
                     },
                     transaction_type=TransactionType.DISTRIBUTION,
                     transaction_trigger=TransactionTrigger.AUTOMATICALLY,
@@ -1052,7 +1060,7 @@ class DBManager:
                     moneybox_id=overflow_moneybox.id,
                     deposit_transaction_data={
                         "amount": app_savings_amount,
-                        "description": f"Automated savings.",
+                        "description": "Automated savings.",
                     },
                     transaction_type=TransactionType.DISTRIBUTION,
                     transaction_trigger=TransactionTrigger.AUTOMATICALLY,
@@ -1060,12 +1068,14 @@ class DBManager:
 
                 old_overflow_moneybox_balance = overflow_moneybox.balance
 
-                if updated_overflow_moneybox["balance"] != old_overflow_moneybox_balance + app_savings_amount:
+                if (
+                    updated_overflow_moneybox["balance"]
+                    != old_overflow_moneybox_balance + app_savings_amount
+                ):
                     raise AutomatedSavingsError(
-                        record_id=moneybox["id"],
+                        record_id=None,
                         details={
                             "amount_to_distribute": amount_to_distribute,
-                            "moneybox": jsonable_encoder(moneybox),
                         },
                     )
 
@@ -1089,21 +1099,25 @@ class DBManager:
 
         return True
 
-    async def get_automated_savings_logs(self, action: ActionType) -> list[dict[str, Any]]:
+    async def get_automated_savings_logs(self, action_type: ActionType) -> list[dict[str, Any]]:
         """Get automated savings logs by action.
 
-        :param action: Action type.
-        :type action: :class:`ActionType`
+        :param action_type: Action type.
+        :type action_type: :class:`ActionType`
         :return: The automated savings logs data.
         :rtype: :class:`list[dict[str, Any]]`
         """
 
-        stmt = select(AutomatedSavingsLog).where(
-            and_(
-                AutomatedSavingsLog.action == action,
-                AutomatedSavingsLog.is_active.is_(True),
+        stmt = (
+            select(AutomatedSavingsLog)
+            .where(
+                and_(
+                    AutomatedSavingsLog.action == action_type,
+                    AutomatedSavingsLog.is_active.is_(True),
+                )
             )
-        ).order_by(AutomatedSavingsLog.action_at.desc())
+            .order_by(AutomatedSavingsLog.action_at.desc())
+        )
 
         async with self.async_session() as session:
             result = await session.execute(stmt)
@@ -1115,10 +1129,10 @@ class DBManager:
         ]
 
     async def add_automated_savings_logs(
-            self,
-            automated_savings_log_data: dict[str, Any],
-            session: AsyncSession|None = None,
-    ) -> list[dict[str, Any]]:
+        self,
+        automated_savings_log_data: dict[str, Any],
+        session: AsyncSession | None = None,
+    ) -> dict[str, Any]:
         """Add automated savings logs data into database.
 
         :param automated_savings_log_data: Automated savings log data.
@@ -1126,7 +1140,7 @@ class DBManager:
         :param session: Database session.
         :type session: :class:`AsyncSession`
         :return: The created automated savings logs data.
-        :rtype: :class:`list[dict[str, Any]]`
+        :rtype: :class:`dict[str, Any]`
         """
 
         if session is None:
