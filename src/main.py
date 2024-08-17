@@ -1,9 +1,12 @@
 """The start module of the savings manager app."""
-
+import asyncio
+import inspect
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import AsyncGenerator, Callable
 
 import uvicorn
+from IPython.utils.tz import utcnow
 from fastapi import FastAPI
 from requests import Response
 from starlette.middleware.cors import CORSMiddleware
@@ -14,14 +17,14 @@ from starlette.staticfiles import StaticFiles
 from src import exception_handler
 from src.constants import SPHINX_DIRECTORY
 from src.custom_types import EndpointRouteType
-from src.db.db_manager import DBManager
 from src.routes.app_settings import app_settings_router
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
 from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
 from src.singleton import db_manager
-from src.utils import get_app_data, get_db_settings, load_environment
+from src.task_runner import BackgroundTaskRunner
+from src.utils import get_app_data
 
 tags_metadata = [
     {
@@ -59,6 +62,9 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
 
     print(f"Register routers (id={id(fastapi_app)}) ...", flush=True)
     register_router(fastapi_app=fastapi_app)
+
+    print("Start background tasks.")
+    await fastapi_app.state.background_tasks_runner.start_tasks()
 
     yield
 
@@ -120,6 +126,7 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     """
 
     fastapi_app.state.db_manager = db_manager
+    fastapi_app.state.background_tasks_runner = BackgroundTaskRunner(db_manager=db_manager)
 
     set_custom_openapi_schema(fastapi_app=fastapi_app)
 
