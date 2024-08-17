@@ -15,6 +15,7 @@ from src.data_classes.requests import (
     TransferTransactionRequest,
     WithdrawTransactionRequest,
 )
+from src.utils import equal_dict
 
 
 # MoneyboxCreateRequest Tests
@@ -311,13 +312,20 @@ def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
             "is_automated_saving_active": True,
             "savings_amount": 0,
         },
+        {
+            "is_automated_saving_active": False,
+        },
+        {
+            "savings_amount": 1230,
+        },
     ],
 )
 def test_app_settings_request_valid(data: dict[str, Any]) -> None:
     """Test valid AppSettingsRequest creation."""
     response = AppSettingsRequest(**data)
-    assert response.is_automated_saving_active == data["is_automated_saving_active"]
-    assert response.savings_amount == data["savings_amount"]
+    set_attributes = response.model_dump(exclude_unset=True)
+
+    assert equal_dict(dict_1=set_attributes, dict_2=data)
 
 
 @pytest.mark.parametrize(

@@ -60,6 +60,6 @@ async def update_app_settings(
     db_manager: DBManager = request.app.state.db_manager
     app_settings_data = await db_manager.update_app_settings(
         app_settings_id=app_settings_id,
-        app_settings_data=app_settings_request.model_dump(),
+        app_settings_data=app_settings_request.model_dump(exclude_unset=True),
     )
     return AppSettingsResponse(**app_settings_data)

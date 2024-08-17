@@ -1,12 +1,12 @@
 """The start module of the savings manager app."""
-import asyncio
-import inspect
+
 from contextlib import asynccontextmanager
-from datetime import datetime
+from pathlib import Path
 from typing import AsyncGenerator, Callable
 
 import uvicorn
 from IPython.utils.tz import utcnow
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from requests import Response
 from starlette.middleware.cors import CORSMiddleware
@@ -17,14 +17,14 @@ from starlette.staticfiles import StaticFiles
 from src import exception_handler
 from src.constants import SPHINX_DIRECTORY
 from src.custom_types import EndpointRouteType
+from src.db.db_manager import DBManager
 from src.routes.app_settings import app_settings_router
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
 from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
-from src.singleton import db_manager
 from src.task_runner import BackgroundTaskRunner
-from src.utils import get_app_data
+from src.utils import get_app_data, get_db_settings
 
 tags_metadata = [
     {
@@ -125,6 +125,9 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     :rtype fastapi_app: FastAPI
     """
 
+    db_manager = DBManager(
+        db_settings=get_db_settings(),
+    )
     fastapi_app.state.db_manager = db_manager
     fastapi_app.state.background_tasks_runner = BackgroundTaskRunner(db_manager=db_manager)
 
@@ -178,6 +181,11 @@ def register_router(fastapi_app: FastAPI) -> None:
 
 def main() -> None:
     """Entry point of the app."""
+
+    # load live env
+    dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+    load_dotenv(dotenv_path=dotenv_path)
+    print(f"Loaded {dotenv_path}")
 
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(

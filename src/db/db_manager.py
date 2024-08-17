@@ -40,7 +40,7 @@ class DBManager:
 
     def __init__(
             self,
-            db_settings: DBSettings | None,
+            db_settings: DBSettings,
             engine_args: dict[str, Any] | None = None
     ) -> None:
         if engine_args is None:
@@ -48,15 +48,14 @@ class DBManager:
 
         self.db_settings = db_settings
 
-        if db_settings is not None:
-            self.async_engine = create_async_engine(
-                url=self.db_connection_string,
-                **engine_args,
-            )
-            self.async_session = async_sessionmaker(
-                bind=self.async_engine,
-                expire_on_commit=False,
-            )
+        self.async_engine = create_async_engine(
+            url=self.db_connection_string,
+            **engine_args,
+        )
+        self.async_session = async_sessionmaker(
+            bind=self.async_engine,
+            expire_on_commit=False,
+        )
 
     @property
     def db_connection_string(self) -> str:

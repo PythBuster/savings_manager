@@ -30,17 +30,25 @@ class BackgroundTaskRunner:
         - do task on each 1st of month
         """
 
-        print("Start task for automated savings...", flush=True)
+        # Get the name of the current method
+        current_method_name = inspect.currentframe().f_code.co_name.upper()
+
+        print(
+            f"{current_method_name}: Start task ...", flush=True,
+        )
 
         while True:
             todays_month_day = datetime.today().day
 
             if todays_month_day == 1:
-                moneyboxes = await self.db_manager.get_moneyboxes()
-                print("Moneyboxes:", len(moneyboxes), flush=True)
-            else:
-                print("Nothing to do", flush=True)
+                pass
+                # TODO:
+                # - get logs and check (-> from db_manager),
+                #       if distribution for this month is done: do nothing,
+                #       if not, do job
+                # - implement savings distribution logic (-> in db manager)
+                # - call app saving amount distribution (-> call db_manager function)
 
             await asyncio.sleep(self.sleep_time)
 
-        print("Finished task for automated savings...")
+        print(f"{current_method_name}: Task finished.", flush=True)

@@ -58,7 +58,9 @@ def get_db_settings() -> DBSettings | None:
     ]
 
     if None in envs:
-        return None
+        raise ValueError(
+            "Missing environment variables for db_settings."
+        )
 
     return DBSettings(
         db_driver=db_driver,
@@ -98,35 +100,6 @@ def get_app_data() -> dict[str, Any]:
         pyproject_data = tomllib.load(pyproject_file)
 
     return pyproject_data["tool"]["poetry"]
-
-
-def load_environment() -> EnvironmentType:
-    """Helper function to load the current env file, depending on deploy environment.
-
-    :return: The detected environment type.
-    :rtype: :class:`EnvironmentType`
-    """
-
-    try:
-        parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "--environment",
-            required=False,
-            default=EnvironmentType.TEST,
-            help="Loads environment variables depending on this flag",
-            type=EnvironmentType,
-        )
-        args = parser.parse_args()
-
-        if args.environment == EnvironmentType.LIVE:
-            dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
-            load_dotenv(dotenv_path=dotenv_path)
-            print(f"Loaded {dotenv_path}")
-
-        return args.environment
-    except:
-        return EnvironmentType.TEST
-
 
 def create_envfile_from_envvars() -> None:
     """Helper function to create .env file for database credentials
