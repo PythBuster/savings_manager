@@ -3,6 +3,12 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.16.0 (2024-08-17)
+### Features:
+- implement automated savings logic and scheduler, that runs every hour on the 1st of month
+  (note: the automated savings scheduler does not check whether the task has already been completed for the day,
+  it will run on every hour for now, this will be resolved in next app versions).
+
 ## 1.15.0 (2024-08-16)
 ### Changes:
 - remove automated_trigger_day from app settings
