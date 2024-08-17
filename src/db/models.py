@@ -10,13 +10,13 @@ from sqlalchemy import (
     Index,
     MetaData,
     func,
-    text,
+    text, JSON,
 )
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 
-from src.custom_types import TransactionTrigger, TransactionType
+from src.custom_types import TransactionTrigger, TransactionType, ActionType
 from src.utils import as_dict
 
 meta = MetaData(
@@ -330,3 +330,33 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
     to the moneyboxes, which have a (desired) savings amount > 0."""
 
     __table_args__ = (CheckConstraint("savings_amount >= 0", name="savings_amount_nonnegative"),)
+
+
+class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
+    """The AutomatedSavingsLog ORM."""
+
+    __tablename__ = "automated_savings_logs"
+
+    action_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        comment="The utc datetime of the action.",
+    )
+    """The utc datetime of the action."""
+
+    action: Mapped[ActionType] = mapped_column(  # pylint: disable=E1136
+        nullable=False,
+        comment=(
+            "The action type within the automated savings and automated savings logs."
+        ),
+    )
+    """The action type within the automated savings and automated savings logs."""
+
+    details: Mapped[dict] = mapped_column(  # pylint: disable=E1136
+        JSON,
+        nullable=True,
+        comment=(
+            "Metadata for the action, like app settings data."
+        ),
+    )
+    """Metadata for the action, like app settings data."""

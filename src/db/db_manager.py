@@ -6,12 +6,13 @@ from typing import Any
 
 from fastapi.encoders import jsonable_encoder
 from mako.compat import win32
+from mypy.dmypy.client import action
 from pydantic import with_config
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
-from src.custom_types import DBSettings, TransactionTrigger, TransactionType
+from src.custom_types import DBSettings, TransactionTrigger, TransactionType, ActionType
 from src.data_classes.requests import DepositTransactionRequest
 from src.db.core import (
     create_instance,
@@ -35,7 +36,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError, InconsistentDatabaseError, AutomatedSavingsError,
 )
-from src.db.models import AppSettings, Moneybox, MoneyboxNameHistory, Transaction
+from src.db.models import AppSettings, Moneybox, MoneyboxNameHistory, Transaction, AutomatedSavingsLog
 from src.utils import get_database_url
 
 
@@ -906,15 +907,56 @@ class DBManager:
         :rtype: :class:`dict[str, Any]`
         """
 
-        app_settings = await update_instance(
-            async_session=self.async_session,
-            orm_model=AppSettings,  # type: ignore
-            record_id=app_settings_id,
-            data=app_settings_data,
-        )
+        async with self.async_session.begin() as session:
+            app_settings = await update_instance(
+                async_session=session,
+                orm_model=AppSettings,  # type: ignore
+                record_id=app_settings_id,
+                data=app_settings_data,
+            )
 
-        if app_settings is None:
-            raise AppSettingsNotFoundError(app_settings_id=app_settings_id)
+            if app_settings is None:
+                raise AppSettingsNotFoundError(app_settings_id=app_settings_id)
+
+            if "is_automated_saving_active" in app_settings_data:
+                activate = app_settings.is_automated_saving_active
+                action_type = ActionType.ACTIVATED_AUTOMATED_SAVING if activate else ActionType.DEACTIVATED_AUTOMATED_SAVING
+                automated_savings_log_data = {
+                    "action": action_type,
+                    "action_at": datetime.now(tz=timezone.utc),
+                    "details": jsonable_encoder(app_settings.asdict()),
+                }
+                automated_savings_log = await self.add_automated_savings_logs(
+                    session=session,
+                    automated_savings_log_data=automated_savings_log_data,
+                )
+
+                if automated_savings_log is None:
+                    raise AutomatedSavingsError(
+                        record_id=None,
+                        details={
+                            "automated_savings_log_data": jsonable_encoder(automated_savings_log_data),
+                        },
+                    )
+
+            if "savings_amount" in app_settings_data:
+                automated_savings_log_data = {
+                    "action": ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT,
+                    "action_at": datetime.now(tz=timezone.utc),
+                    "details": jsonable_encoder(app_settings.asdict()),
+                }
+                automated_savings_log = await self.add_automated_savings_logs(
+                    session=session,
+                    automated_savings_log_data=automated_savings_log_data,
+                )
+
+                if automated_savings_log is None:
+                    raise AutomatedSavingsError(
+                        record_id=None,
+                        details={
+                            "automated_savings_log_data": jsonable_encoder(automated_savings_log_data),
+                        },
+                    )
 
         return app_settings.asdict()
 
@@ -1027,4 +1069,84 @@ class DBManager:
                         },
                     )
 
-            return True
+            automated_savings_log_data = {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "action_at": datetime.now(tz=timezone.utc),
+                "details": jsonable_encoder(app_settings.asdict()),
+            }
+            automated_savings_log = await self.add_automated_savings_logs(
+                session=session,
+                automated_savings_log_data=automated_savings_log_data,
+            )
+
+            if automated_savings_log is None:
+                raise AutomatedSavingsError(
+                    record_id=None,
+                    details={
+                        "automated_savings_log_data": jsonable_encoder(automated_savings_log_data),
+                    },
+                )
+
+        return True
+
+    async def get_automated_savings_logs(self, action: ActionType) -> list[dict[str, Any]]:
+        """Get automated savings logs by action.
+
+        :param action: Action type.
+        :type action: :class:`ActionType`
+        :return: The automated savings logs data.
+        :rtype: :class:`list[dict[str, Any]]`
+        """
+
+        stmt = select(AutomatedSavingsLog).where(
+            and_(
+                AutomatedSavingsLog.action == action,
+                AutomatedSavingsLog.is_active.is_(True),
+            )
+        ).order_by(AutomatedSavingsLog.action_at.desc())
+
+        async with self.async_session() as session:
+            result = await session.execute(stmt)
+
+        automated_savings_logs = result.scalars().all()
+        return [
+            get_automated_savings_log.asdict()
+            for get_automated_savings_log in automated_savings_logs
+        ]
+
+    async def add_automated_savings_logs(
+            self,
+            automated_savings_log_data: dict[str, Any],
+            session: AsyncSession|None = None,
+    ) -> list[dict[str, Any]]:
+        """Add automated savings logs data into database.
+
+        :param automated_savings_log_data: Automated savings log data.
+        :type automated_savings_log_data: :class:`dict[str, Any]`
+        :param session: Database session.
+        :type session: :class:`AsyncSession`
+        :return: The created automated savings logs data.
+        :rtype: :class:`list[dict[str, Any]]`
+        """
+
+        if session is None:
+            automated_savings_logs = await create_instance(
+                async_session=self.async_session,
+                orm_model=AutomatedSavingsLog,  # type: ignore
+                data=automated_savings_log_data,
+            )
+        else:
+            automated_savings_logs = await create_instance(
+                async_session=session,
+                orm_model=AutomatedSavingsLog,  # type: ignore
+                data=automated_savings_log_data,
+            )
+
+        if automated_savings_logs is None:
+            raise CreateInstanceError(
+                record_id=None,
+                message="Failed to create automated_savings_log.",
+                details=automated_savings_log_data,
+            )
+
+        return automated_savings_logs.asdict()

@@ -1,8 +1,13 @@
 import asyncio
 import inspect
+from argparse import Action
 from asyncio import current_task
 
 from datetime import datetime
+
+from mypy.dmypy.client import action
+
+from src.custom_types import ActionType
 
 
 class BackgroundTaskRunner:
@@ -19,7 +24,7 @@ class BackgroundTaskRunner:
 
     def __init__(self, db_manager):
         self.db_manager = db_manager
-        self.sleep_time = 10  # each hour
+        self.sleep_time = 5  # 60*60  # each hour
         self.background_tasks = set()
 
     async def run(self):
@@ -50,31 +55,39 @@ class BackgroundTaskRunner:
             task_name=current_method_name,
             message="Start task ..."
         )
+
         while True:
-            today_month_day = datetime.today().day
+            today = datetime.today()
 
-            if today_month_day == 1:
-                # TODO: check mal ob für diesen monat zum 1. bereits verteilt
+            already_done = False
 
-                result = await self.db_manager.automated_savings()
+            if today.day == 1 and today.hour >= 12:
+                automated_action_logs = await self.db_manager.get_automated_savings_logs(
+                    action=ActionType.APPLIED_AUTOMATED_SAVING,
+                )
 
-                if result:
-                    await self.print_task(
-                        task_name=current_method_name,
-                        message="Automated savings run."
-                    )
-                else:
-                    await self.print_task(
-                        task_name=current_method_name,
-                        message="Nothing to do. Automated savings is deactivated."
-                    )
+                if automated_action_logs:
+                    automated_action_logs_dates = [
+                        automated_action_log["action_at"].date()
+                        for automated_action_log in automated_action_logs
+                    ]
 
-                # TODO:
-                # - get logs and check (-> from db_manager),
-                #       if distribution for this month is done: do nothing,
-                #       if not, do job
-                # - implement savings distribution logic (-> in db manager)
-                # - call app saving amount distribution (-> call db_manager function)
+                    if today.date() in automated_action_logs_dates:
+                        already_done = True
+
+                if not already_done:
+                    result = await self.db_manager.automated_savings()
+
+                    if result:
+                        await self.print_task(
+                            task_name=current_method_name,
+                            message="Automated savings run."
+                        )
+                    else:
+                        await self.print_task(
+                            task_name=current_method_name,
+                            message="Nothing to do. Automated savings is deactivated."
+                        )
 
             await asyncio.sleep(self.sleep_time)
 

@@ -11,9 +11,11 @@
             "id": "1bdf787dcc5f54b4",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png"
+                "file": "Architecture/Database App v2.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png",
+                "file": "Architecture/Database App v2.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png",
+                "file": "Architecture/Database App v2.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ui/draft/App_v2_SavingsManagerUI.png"
+                "file": "Architecture/Database App v2.md"
               }
             }
           }
@@ -146,6 +148,7 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
+    "ui/draft/App_v2_SavingsManagerUI.png",
     "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "Architecture/Database App v2.md",
     "Feauture Requests/Ideas.md",
