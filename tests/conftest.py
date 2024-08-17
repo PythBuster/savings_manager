@@ -3,6 +3,7 @@
 import asyncio
 import subprocess
 import time
+from contextlib import asynccontextmanager
 from functools import partial
 from pathlib import Path
 from typing import AsyncGenerator
@@ -10,6 +11,7 @@ from typing import AsyncGenerator
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 from dotenv import load_dotenv
+from fastapi import FastAPI
 from httpx import AsyncClient
 
 from src.constants import WORKING_DIR
@@ -30,6 +32,12 @@ load_dotenv(dotenv_path=dotenv_path)
 
 db_settings = get_db_settings()
 """The database settings."""
+
+
+@asynccontextmanager
+async def noop_lifespan(app: FastAPI):
+    # No-op context manager for lifespan
+    yield
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -241,11 +249,13 @@ async def mocked_client(db_manager: DBManager) -> AsyncGenerator:
     :rtype: AsyncGenerator
     """
 
-    register_router(fastapi_app=app)
+    app.router.lifespan_context = noop_lifespan
     app.state.db_manager = db_manager
     set_custom_openapi_schema(fastapi_app=app)
 
-    async with AsyncClient(app=app, base_url="http://127.0.0.1:8000") as client:
+    register_router(fastapi_app=app)
+
+    async with AsyncClient(app=app, base_url="http://127.0.0.1:8999") as client:
         yield client
 
 

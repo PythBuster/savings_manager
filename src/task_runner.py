@@ -19,11 +19,9 @@ class BackgroundTaskRunner:
 
         for task_method in task_methods:
             task = asyncio.create_task(task_method())
+            self.background_tasks.add(task)
             task.add_done_callback(self.background_tasks.discard)
 
-            self.background_tasks.add(
-                task
-            )
 
     async def task_automated_savings(self) -> None:
         """This is the endless task for automated savings.
@@ -32,7 +30,7 @@ class BackgroundTaskRunner:
         - do task on each 1st of month
         """
 
-        print("Start task for automated savings...")
+        print("Start task for automated savings...", flush=True)
 
         while True:
             todays_month_day = datetime.today().day
