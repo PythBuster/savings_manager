@@ -3,6 +3,13 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.19.0 (2024-08-18)
+### Features:
+- implement modes for overflow moneybox for automated savings
+
+### Changes:
+- refactor db functions for automated savings distribution
+
 ## 1.18.0 (2024-08-18)
 ### Features:
 - added overflow_moneybox_automated_savings_mode column to AppSettings table # db migration
