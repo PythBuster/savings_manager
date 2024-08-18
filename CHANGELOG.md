@@ -3,6 +3,18 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.18.0 (2024-08-18)
+### Features:
+- added overflow_moneybox_automated_savings_mode column to AppSettings table # db migration
+
+### Changes:
+- adapted pydantic request/response models for AppSettings
+- adapted unit tests
+
+## 1.17.0 (2024-08-17)
+### Features:
+- added automated_savings_logs_table and log actions like: automated saving, app settings change
+
 ## 1.16.0 (2024-08-17)
 ### Features:
 - implement automated savings logic and scheduler, that runs every hour on the 1st of month
