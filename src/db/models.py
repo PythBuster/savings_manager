@@ -335,8 +335,8 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
     """The savings amount for the automated saving which will be distributed periodically
     to the moneyboxes, which have a (desired) savings amount > 0."""
 
-    overflow_moneybox_automated_savings_mode: Mapped[OverflowMoneyboxAutomatedSavingsModeType] = (
-        mapped_column(  # noqa: ignore  # pylint: disable=line-too-long, unsubscriptable-object
+    overflow_moneybox_automated_savings_mode: Mapped[OverflowMoneyboxAutomatedSavingsModeType] = (  # pylint: disable=line-too-long, unsubscriptable-object
+        mapped_column(  # noqa: ignore
             nullable=False,
             default=OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
             server_default=str(OverflowMoneyboxAutomatedSavingsModeType.COLLECT).upper(),

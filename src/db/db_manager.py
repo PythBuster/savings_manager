@@ -2,7 +2,6 @@
 
 """All database definitions are located here."""
 
-import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
@@ -11,8 +10,13 @@ from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
-from src.custom_types import ActionType, DBSettings, TransactionTrigger, TransactionType, \
-    OverflowMoneyboxAutomatedSavingsModeType
+from src.custom_types import (
+    ActionType,
+    DBSettings,
+    OverflowMoneyboxAutomatedSavingsModeType,
+    TransactionTrigger,
+    TransactionType,
+)
 from src.db.core import (
     create_instance,
     deactivate_instance,
@@ -1021,6 +1025,9 @@ class DBManager:
         the overflow moneybox will get the leftover.
 
         :return: True, if distribution is done, false, if automated savings is deactivated.
+        :rtype: :class:`bool`
+
+        :raises AutomatedSavingsError: is something went wrong while session transactions
         """
 
         all_app_settings = await self._get_all_app_settings()
@@ -1034,7 +1041,7 @@ class DBManager:
         if not app_settings.is_automated_saving_active:
             return False
 
-        overflow_moneybox = await self._get_overflow_moneybox()
+        overflow_moneybox: Moneybox | dict[str, Any] | None = await self._get_overflow_moneybox()
         moneyboxes = await self.get_moneyboxes()
         sorted_moneyboxes = sorted(moneyboxes, key=lambda item: item["priority"])
         distributed_amount = 0
@@ -1042,19 +1049,22 @@ class DBManager:
         async with self.async_session.begin() as session:
             # 1. automated savings
             # - check if overflow moneybox mode is "add_to_automated_savings_amount" and add amount
-            if app_settings.overflow_moneybox_automated_savings_mode is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT:
-                distribute_amount = app_settings.savings_amount + overflow_moneybox.balance
+            if (
+                app_settings.overflow_moneybox_automated_savings_mode
+                is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT
+            ):
+                distribute_amount = app_settings.savings_amount + overflow_moneybox.balance  # type: ignore  # noqa: ignore  # pylint:disable=line-too-long
 
                 withdraw_transaction_data = {
-                    "amount": overflow_moneybox.balance,
+                    "amount": overflow_moneybox.balance,  # type: ignore
                     "description": (
                         "Automated Savings with Overflow Moneybox Mode: "
-                        f"{OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT}"
-                    )
+                        f"{OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT}"  # noqa: ignore  # pylint:disable=line-too-long
+                    ),
                 }
                 updated_overflow_moneybox = await self.sub_amount(
                     session=session,
-                    moneybox_id=overflow_moneybox.id,
+                    moneybox_id=overflow_moneybox.id,  # type: ignore
                     withdraw_transaction_data=withdraw_transaction_data,
                     transaction_type=TransactionType.DISTRIBUTION,
                     transaction_trigger=TransactionTrigger.AUTOMATICALLY,
@@ -1063,30 +1073,36 @@ class DBManager:
                 if updated_overflow_moneybox is None:
                     raise AutomatedSavingsError(
                         record_id=overflow_moneybox.id,
-                        message="AutomatedSavings failed while sub_amount() from overflow moneybox.",
+                        message=(
+                            "AutomatedSavings failed while sub_amount() from overflow moneybox."
+                        ),
                         details={
                             "withdraw_transaction_data": withdraw_transaction_data,
                             "overflow_moneybox": jsonable_encoder(overflow_moneybox.asdict()),
-                            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+                            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint:disable=line-too-long
                             "app_settings": jsonable_encoder(app_settings.asdict()),
                         },
                     )
             else:
                 distribute_amount = app_settings.savings_amount
 
-            _, updated_overflow_moneybox, updated_moneyboxes = await self._distribute_automated_savings_amount(
-                session=session,
-                sorted_moneyboxes=sorted_moneyboxes,
-                overflow_moneybox=overflow_moneybox,
-                respect_moneybox_savings_amount=True,
-                distribute_amount=distribute_amount,
+            _, updated_overflow_moneybox, updated_moneyboxes = (
+                await self._distribute_automated_savings_amount(  # type: ignore
+                    session=session,
+                    sorted_moneyboxes=sorted_moneyboxes,
+                    overflow_moneybox=overflow_moneybox,  # type: ignore
+                    respect_moneybox_savings_amount=True,
+                    distribute_amount=distribute_amount,
+                )
             )
-
 
             # 2. POST STEP! Run step 1 first, and afterward, step 2 can try to work:
             #   distribute overflow balance if app_settings.overflow_moneybox_automated_savings_mode
             #   is "fill_limited_moneyboxes"
-            if app_settings.overflow_moneybox_automated_savings_mode is OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES:
+            if (
+                app_settings.overflow_moneybox_automated_savings_mode
+                is OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
+            ):
                 overflow_moneybox = updated_overflow_moneybox  # get updated overflow moneybox data
 
                 savings_limited_by_savings_target_moneyboxes = [
@@ -1095,7 +1111,9 @@ class DBManager:
                     if moneybox["savings_target"] is not None and moneybox["savings_target"] > 0
                 ]
                 savings_limited_by_savings_target_moneyboxes.append(overflow_moneybox)
-                sorted_moneyboxes = sorted(savings_limited_by_savings_target_moneyboxes, key=lambda item: item["priority"])
+                sorted_moneyboxes = sorted(
+                    savings_limited_by_savings_target_moneyboxes, key=lambda item: item["priority"]
+                )
 
                 distributed_amount, _, _ = await self._distribute_automated_savings_amount(
                     session=session,
@@ -1110,44 +1128,47 @@ class DBManager:
                     "description": (
                         "Automated Savings with Overflow Moneybox Mode: "
                         f"{OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES}"
-                    )
+                    ),
                 }
 
                 await session.commit()
 
-                updated_overflow_moneybox = await self.sub_amount(
-                    moneybox_id=overflow_moneybox["id"],
-                    withdraw_transaction_data=withdraw_transaction_data,
-                    transaction_type=TransactionType.DISTRIBUTION,
-                    transaction_trigger=TransactionTrigger.AUTOMATICALLY,
-                )
-
-                if updated_overflow_moneybox is None:
-
+                try:
+                    await self.sub_amount(
+                        moneybox_id=overflow_moneybox["id"],
+                        withdraw_transaction_data=withdraw_transaction_data,
+                        transaction_type=TransactionType.DISTRIBUTION,
+                        transaction_trigger=TransactionTrigger.AUTOMATICALLY,
+                    )
+                except Exception as ex:
                     await session.rollback()
 
                     raise AutomatedSavingsError(
                         record_id=overflow_moneybox["id"],
-                        message="AutomatedSavings failed while sub_amount() from overflow moneybox.",
+                        message=(
+                            "AutomatedSavings failed while sub_amount() from overflow moneybox."
+                        ),
                         details={
                             "withdraw_transaction_data": withdraw_transaction_data,
                             "overflow_moneybox": jsonable_encoder(overflow_moneybox),
-                            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+                            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint:disable=line-too-long
                             "app_settings": jsonable_encoder(app_settings.asdict()),
                         },
-                    )
+                    ) from ex
 
             automated_savings_log_data = {
                 "action": ActionType.APPLIED_AUTOMATED_SAVING,
                 "action_at": datetime.now(tz=timezone.utc),
-                "details": jsonable_encoder(app_settings.asdict() | {"distributed_amount": distributed_amount}),
+                "details": jsonable_encoder(
+                    app_settings.asdict() | {"distributed_amount": distributed_amount}
+                ),
             }
-            automated_savings_log = await self.add_automated_savings_logs(
-                automated_savings_log_data=automated_savings_log_data,
-            )
 
-            if automated_savings_log is None:
-
+            try:
+                await self.add_automated_savings_logs(
+                    automated_savings_log_data=automated_savings_log_data,
+                )
+            except Exception as ex:
                 await session.rollback()
 
                 raise AutomatedSavingsError(
@@ -1155,7 +1176,7 @@ class DBManager:
                     details={
                         "automated_savings_log_data": jsonable_encoder(automated_savings_log_data),
                     },
-                )
+                ) from ex
 
         return True
 
@@ -1188,17 +1209,37 @@ class DBManager:
             for get_automated_savings_log in automated_savings_logs
         ]
 
-    async def _distribute_automated_savings_amount(
-            self,
-            session: AsyncSession,
-            sorted_moneyboxes: list[dict[str, Any]],
-            overflow_moneybox: Moneybox|dict[str, Any],
-            respect_moneybox_savings_amount: bool,
-            distribute_amount: int,
-    ) -> tuple[int, dict[str, Any]|None, list[dict[str, Any]]]:
-        # return: tuple of sum_distributed_amount, updated overflow moneybox, list of updated moneyboxes
+    async def _distribute_automated_savings_amount(  # noqa: ignore  # pylint:disable=too-many-locals, too-many-arguments
+        self,
+        session: AsyncSession,
+        sorted_moneyboxes: list[dict[str, Any]],
+        overflow_moneybox: Moneybox | dict[str, Any],
+        respect_moneybox_savings_amount: bool,
+        distribute_amount: int,
+    ) -> tuple[int, dict[str, Any] | None, list[dict[str, Any]]]:
+        """A separate helper function tu distribute amount to given moneyboxes.
+
+        :param session: Database session.
+        :type session: :class:`AsyncSession`
+        :param sorted_moneyboxes: A list of moneyboxes sorted by priority (the overflow
+            moneybox included).
+        :type sorted_moneyboxes: :class:`list[dict[str, Any]]`
+        :param overflow_moneybox: The overflow moneybox.
+        :type overflow_moneybox: :class:`Moneybox`
+        :param respect_moneybox_savings_amount: Flag to indicate if savings amount
+            of moneyboxes shall be respected.
+        :type respect_moneybox_savings_amount: bool
+        :param distribute_amount: The distributing amount.
+        :type distribute_amount: int
+        :return: tuple of sum_distributed_amount, updated overflow moneybox,
+            list of updated moneyboxes
+        :rtype: :class:`tuple[int, dict[str, Any] | None, list[dict[str, Any]]]`
+
+        :raises AutomatedSavingsError: is something went wrong while session transactions.
+        """
+
         if distribute_amount < 0:
-             return 0, None, None
+            return 0, None, []
 
         sum_distributed_amount = 0
         updated_overflow_moneybox = None
@@ -1220,9 +1261,7 @@ class DBManager:
                 missing_amount_until_target = moneybox["savings_target"] - moneybox["balance"]
 
                 if missing_amount_until_target > 0:
-                    amount_to_distribute = min(
-                        amount_to_distribute, missing_amount_until_target
-                    )
+                    amount_to_distribute = min(amount_to_distribute, missing_amount_until_target)
                 else:
                     # Moneybox is full (reached amount target )
                     continue
@@ -1269,10 +1308,7 @@ class DBManager:
 
             old_overflow_moneybox_balance = overflow_moneybox["balance"]
 
-            if (
-                    updated_overflow_moneybox["balance"]
-                    != old_overflow_moneybox_balance + rest
-            ):
+            if updated_overflow_moneybox["balance"] != old_overflow_moneybox_balance + rest:
                 raise AutomatedSavingsError(
                     record_id=None,
                     details={
