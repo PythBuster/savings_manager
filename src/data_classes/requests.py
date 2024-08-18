@@ -287,7 +287,7 @@ class AppSettingsRequest(BaseModel):
         Field(
             default=None,
             description="The mode for automated savings.",
-        )
+        ),
     ]
     """"The mode for automated savings."""
 
@@ -299,7 +299,7 @@ class AppSettingsRequest(BaseModel):
                 {
                     "is_automated_saving_active": True,
                     "savings_amount": 60000,
-                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
                 },
             ],
         },
@@ -319,8 +319,10 @@ class AppSettingsRequest(BaseModel):
             data["automated_saving_trigger_day"] = data["automated_saving_trigger_day"].lower()
 
         if "overflow_moneybox_automated_savings_mode" in data and isinstance(
-                data["overflow_moneybox_automated_savings_mode"], str
+            data["overflow_moneybox_automated_savings_mode"], str
         ):
-            data["overflow_moneybox_automated_savings_mode"] = data["overflow_moneybox_automated_savings_mode"].lower()
+            data["overflow_moneybox_automated_savings_mode"] = data[
+                "overflow_moneybox_automated_savings_mode"
+            ].lower()
 
         return data

@@ -365,7 +365,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 60000,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
         },
         {
             "id": 2,
@@ -373,7 +373,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,  # noqa: ignore  # pylint: disable=line-too-long
         },
         {
             "id": 3,
@@ -381,7 +381,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 0,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint: disable=line-too-long
         },
     ],
 )

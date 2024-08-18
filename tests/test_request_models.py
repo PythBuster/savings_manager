@@ -316,14 +316,14 @@ def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
         },
         {
             "savings_amount": 1230,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
         },
         {
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,  # noqa: ignore  # pylint: disable=line-too-long
         },
         {
             "overflow_moneybox_automated_savings_mode": "collect",
-        }
+        },
     ],
 )
 def test_app_settings_request_valid(data: dict[str, Any]) -> None:
@@ -346,8 +346,8 @@ def test_app_settings_request_valid(data: dict[str, Any]) -> None:
             "savings_amount": -500,  # Negative savings_amount
         },
         {
-            "overflow_moneybox_automated_savings_mode": "unknown", # unknown mode
-        }
+            "overflow_moneybox_automated_savings_mode": "unknown",  # unknown mode
+        },
     ],
 )
 def test_app_settings_request_invalid(data: dict[str, Any]) -> None:

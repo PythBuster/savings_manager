@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 """All database definitions are located here."""
 
 import asyncio

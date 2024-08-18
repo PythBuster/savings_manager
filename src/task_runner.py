@@ -86,8 +86,7 @@ class BackgroundTaskRunner:
             await asyncio.sleep(self.sleep_time)
 
         await self.print_task(  # type: ignore
-            task_name=current_method_name,
-            message="Task finished."
+            task_name=current_method_name, message="Task finished."
         )
 
     async def print_task(self, task_name: str, message: str) -> None:

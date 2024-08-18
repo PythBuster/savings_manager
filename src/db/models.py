@@ -17,7 +17,12 @@ from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import String
 
-from src.custom_types import ActionType, TransactionTrigger, TransactionType, OverflowMoneyboxAutomatedSavingsModeType
+from src.custom_types import (
+    ActionType,
+    OverflowMoneyboxAutomatedSavingsModeType,
+    TransactionTrigger,
+    TransactionType,
+)
 from src.utils import as_dict
 
 meta = MetaData(
@@ -330,14 +335,16 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
     """The savings amount for the automated saving which will be distributed periodically
     to the moneyboxes, which have a (desired) savings amount > 0."""
 
-    overflow_moneybox_automated_savings_mode: Mapped[OverflowMoneyboxAutomatedSavingsModeType] = mapped_column(
-        nullable=False,
-        default=OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
-        server_default=str(OverflowMoneyboxAutomatedSavingsModeType.COLLECT).upper(),
-        comment=(
-            "The mode for the overflow moneybox, which will have an influence on the "
-            "automated savings process."
-        ),
+    overflow_moneybox_automated_savings_mode: Mapped[OverflowMoneyboxAutomatedSavingsModeType] = (
+        mapped_column(  # noqa: ignore  # pylint: disable=line-too-long, unsubscriptable-object
+            nullable=False,
+            default=OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            server_default=str(OverflowMoneyboxAutomatedSavingsModeType.COLLECT).upper(),
+            comment=(
+                "The mode for the overflow moneybox, which will have an influence on the "
+                "automated savings process."
+            ),
+        )
     )
 
     __table_args__ = (CheckConstraint("savings_amount >= 0", name="savings_amount_nonnegative"),)
