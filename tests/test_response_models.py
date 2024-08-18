@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
+from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 from src.data_classes.responses import (
     AppSettingsResponse,
     HTTPErrorResponse,
@@ -364,6 +365,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 60000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
         },
         {
             "id": 2,
@@ -371,6 +373,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
         },
         {
             "id": 3,
@@ -378,6 +381,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
         },
     ],
 )

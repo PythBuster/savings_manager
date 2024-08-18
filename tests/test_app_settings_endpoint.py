@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient
 from starlette import status
 
-from src.custom_types import EndpointRouteType
+from src.custom_types import EndpointRouteType, OverflowMoneyboxAutomatedSavingsModeType
 from src.utils import equal_dict
 
 
@@ -25,6 +25,7 @@ async def test_get_app_settings_status_200(
         "modified_at": "2024-08-11T15:03:17.312860+00:00",
         "is_automated_saving_active": True,
         "savings_amount": 0,
+        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
     }
 
     app_settings = response.json()

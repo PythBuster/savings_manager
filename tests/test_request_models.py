@@ -5,6 +5,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
+from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 from src.data_classes.requests import (
     AppSettingsRequest,
     DepositTransactionRequest,
@@ -76,17 +77,15 @@ def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
     "data",
     [
         {"name": "Holiday", "savings_amount": 200, "savings_target": 60000, "priority": 1},
-        {"name": None, "savings_amount": 150, "savings_target": None, "priority": 2},
-        {"name": "Savings", "savings_amount": None, "savings_target": None, "priority": None},
+        {"savings_amount": 150, "savings_target": None, "priority": 2},
+        {"name": "Savings", "savings_target": None},
     ],
 )
 def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
     """Test valid MoneyboxUpdateRequest creation."""
     response = MoneyboxUpdateRequest(**data)
-    assert response.name == data["name"]
-    assert response.savings_amount == data["savings_amount"]
-    assert response.savings_target == data["savings_target"]
-    assert response.priority == data["priority"]
+
+    assert equal_dict(dict_1=data, dict_2=response.model_dump(exclude_unset=True))
 
 
 @pytest.mark.parametrize(
@@ -317,7 +316,14 @@ def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
         },
         {
             "savings_amount": 1230,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
         },
+        {
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+        },
+        {
+            "overflow_moneybox_automated_savings_mode": "collect",
+        }
     ],
 )
 def test_app_settings_request_valid(data: dict[str, Any]) -> None:
@@ -339,6 +345,9 @@ def test_app_settings_request_valid(data: dict[str, Any]) -> None:
             "is_automated_saving_active": True,
             "savings_amount": -500,  # Negative savings_amount
         },
+        {
+            "overflow_moneybox_automated_savings_mode": "unknown", # unknown mode
+        }
     ],
 )
 def test_app_settings_request_invalid(data: dict[str, Any]) -> None:

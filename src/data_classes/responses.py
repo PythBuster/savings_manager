@@ -14,7 +14,7 @@ from pydantic import (
     model_validator,
 )
 
-from src.custom_types import TransactionTrigger, TransactionType
+from src.custom_types import TransactionTrigger, TransactionType, OverflowMoneyboxAutomatedSavingsModeType
 
 
 class HTTPErrorResponse(BaseModel):
@@ -522,6 +522,14 @@ class AppSettingsResponse(BaseModel):
     """The savings amount for the automated saving which will be distributed
     periodically to the moneyboxes, which have a (desired) savings amount > 0."""
 
+    overflow_moneybox_automated_savings_mode: Annotated[
+        OverflowMoneyboxAutomatedSavingsModeType,
+        Field(
+            description="The mode for automated savings.",
+        )
+    ]
+    """"The mode for automated savings."""
+
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
@@ -533,6 +541,7 @@ class AppSettingsResponse(BaseModel):
                     "modified_at": "2024-08-11 15:03:17.312860 +00:00",
                     "is_automated_saving_active": True,
                     "savings_amount": 60000,
+                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
                 },
             ],
         },

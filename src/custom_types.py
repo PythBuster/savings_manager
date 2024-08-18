@@ -98,3 +98,19 @@ class ActionType(StrEnum):
 
     CHANGED_AUTOMATED_SAVINGS_AMOUNT = "changed_automated_savings_amount"
     """Action for changing the savings amount in app settings."""
+
+
+class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
+    """The transaction type."""
+
+    COLLECT = "collect"
+    """Just collect amounts in overflow moneybox.."""
+
+    ADD_TO_AUTOMATED_SAVINGS_AMOUNT = "add_to_automated_savings_amount"
+    """Push up the initial automated savings amount and add all balance to
+    distributing savings amount."""
+
+    FILL_UP_LIMITED_MONEYBOXES = "fill_up_limited_moneyboxes"
+    """After the automated savings process, the entire balance from the overflow
+    moneybox should be distributed to the moneyboxes with upper limits, in the order of
+    the priority list. Try to fill them up."""

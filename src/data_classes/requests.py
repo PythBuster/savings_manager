@@ -4,6 +4,8 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
 
+from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
+
 
 class MoneyboxCreateRequest(BaseModel):
     """The pydantic moneybox create request model."""
@@ -55,7 +57,7 @@ class MoneyboxUpdateRequest(BaseModel):
     """The pydantic moneybox update request model."""
 
     name: Annotated[
-        str | None,
+        str,
         Field(
             default=None, min_length=1, description="The name of the moneybox. Has to be unique."
         ),
@@ -63,7 +65,7 @@ class MoneyboxUpdateRequest(BaseModel):
     """The name of the moneybox. Has to be unique."""
 
     savings_amount: Annotated[
-        StrictInt | None,
+        StrictInt,
         Field(default=None, ge=0, description="The current savings amount of the moneybox."),
     ]
     """The current savings amount of the moneybox."""
@@ -258,23 +260,36 @@ class AppSettingsRequest(BaseModel):
     """The app settings request model."""
 
     is_automated_saving_active: Annotated[
-        bool | None,
-        Field(description="Tells if automated saving is active."),
-    ] = None
+        bool,
+        Field(
+            default=None,
+            description="Tells if automated saving is active.",
+        ),
+    ]
     """Tells if automated saving is active."""
 
     savings_amount: Annotated[
-        StrictInt | None,
+        StrictInt,
         Field(
+            default=None,
             ge=0,
             description=(
                 "The savings amount for the automated saving which will be distributed "
                 "periodically to the moneyboxes, which have a (desired) savings amount > 0."
             ),
         ),
-    ] = None
+    ]
     """The savings amount for the automated saving which will be distributed
     periodically to the moneyboxes, which have a (desired) savings amount > 0."""
+
+    overflow_moneybox_automated_savings_mode: Annotated[
+        OverflowMoneyboxAutomatedSavingsModeType,
+        Field(
+            default=None,
+            description="The mode for automated savings.",
+        )
+    ]
+    """"The mode for automated savings."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -284,6 +299,7 @@ class AppSettingsRequest(BaseModel):
                 {
                     "is_automated_saving_active": True,
                     "savings_amount": 60000,
+                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
                 },
             ],
         },
@@ -301,5 +317,10 @@ class AppSettingsRequest(BaseModel):
             data["automated_saving_trigger_day"], str
         ):
             data["automated_saving_trigger_day"] = data["automated_saving_trigger_day"].lower()
+
+        if "overflow_moneybox_automated_savings_mode" in data and isinstance(
+                data["overflow_moneybox_automated_savings_mode"], str
+        ):
+            data["overflow_moneybox_automated_savings_mode"] = data["overflow_moneybox_automated_savings_mode"].lower()
 
         return data
