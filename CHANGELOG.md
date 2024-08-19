@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.19.2 (2024-08-19)
+### Changes:
+- clean code and update fastapi & uvicorn dependencies
+
 ## 1.19.1 (2024-08-19)
 ### Changes:
 - fix automated savings algorithm
