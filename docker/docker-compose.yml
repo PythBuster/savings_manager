@@ -9,6 +9,8 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=savings_manager
+    networks:
+      - savings_manager_network
 
   test_postgres_database:
     image: postgres:16
@@ -38,6 +40,12 @@ services:
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+    networks:
+      - savings_manager_network
+
+networks:
+  savings_manager_network:
+    driver: bridge
 
 volumes:
   postgres-data:
