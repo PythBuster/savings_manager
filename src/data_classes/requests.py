@@ -1,8 +1,8 @@
 """All request models are located here."""
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator, EmailStr, field_validator
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 
@@ -259,6 +259,24 @@ class PrioritylistRequest(BaseModel):
 class AppSettingsRequest(BaseModel):
     """The app settings request model."""
 
+    send_reports_via_email: Annotated[
+        bool,
+        Field(
+            default=None,
+            description="Tells if receiving reports via email is desired.",
+        ),
+    ]
+    """Tells if receiving reports via email is desired."""
+
+    user_email_address: Annotated[
+        EmailStr | None,
+        Field(
+            default=None,
+            description="Users email address. Will used for receiving reports."
+        ),
+    ]
+    """Users email address. Will used for receiving reports."""
+
     is_automated_saving_active: Annotated[
         bool,
         Field(
@@ -297,6 +315,8 @@ class AppSettingsRequest(BaseModel):
         json_schema_extra={
             "examples": [
                 {
+                    "send_reports_via_email": True,
+                    "user_email_address": "pythbuster@gmail.com",
                     "is_automated_saving_active": True,
                     "savings_amount": 60000,
                     "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long

@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 from typing import Any
+from xmlrpc.client import Fault
 
 import pytest
 from pydantic import ValidationError
@@ -366,6 +367,8 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "is_automated_saving_active": True,
             "savings_amount": 60000,
             "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+            "send_reports_via_email": False,
+            "user_email_address": None,
         },
         {
             "id": 2,
@@ -374,6 +377,8 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "is_automated_saving_active": False,
             "savings_amount": 1000,
             "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,  # noqa: ignore  # pylint: disable=line-too-long
+            "send_reports_via_email": False,
+            "user_email_address": None,
         },
         {
             "id": 3,
@@ -382,6 +387,8 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "is_automated_saving_active": True,
             "savings_amount": 0,
             "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint: disable=line-too-long
+            "send_reports_via_email": True,
+            "user_email_address": "pythbuster@gmail.com",
         },
     ],
 )
@@ -391,6 +398,8 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
     assert response.id == data["id"]
     assert response.created_at == data["created_at"]
     assert response.modified_at == data["modified_at"]
+    assert response.send_reports_via_email == data["send_reports_via_email"]
+    assert response.user_email_address == data["user_email_address"]
     assert response.is_automated_saving_active == data["is_automated_saving_active"]
     assert response.savings_amount == data["savings_amount"]
 
@@ -404,6 +413,8 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 60000,
+            "send_reports_via_email": True,
+            "user_mail_address": "pythbuster@gmail.com",
         },
         {
             "id": 4,
@@ -411,6 +422,8 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
+            "send_reports_via_email": True,
+            "user_email_address": "pythbuster@gmail.com",
         },
         {
             "id": 5,
@@ -418,6 +431,26 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,  # Negative savings_amount
+            "send_reports_via_email": True,
+            "user_email_address": "pythbuster@gmail.com",
+        },
+        {
+            "id": 5,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": -100,
+            "send_reports_via_email": False,
+            "user_email_address": "1",  # invalid email address
+        },
+        {
+            "id": 6,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": -100,
+            "send_reports_via_email": True,  # is true, but email not set
+            "user_email_address": None,
         },
     ],
 )

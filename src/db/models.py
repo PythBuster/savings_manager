@@ -313,6 +313,19 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "app_settings"
 
+    send_reports_via_email: Mapped[bool] = mapped_column(  # pylint: disable=unsubscriptable-object
+        default=False,
+        server_default="false",
+        nullable=False,
+        comment="Tells if receiving reports via email is desired.",
+    )
+    """Tells if receiving reports via email is desired."""
+
+    user_email_address: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
+        nullable=True, comment="Users mail address. Will used for receiving reports."
+    )
+    """Users email address. Will used for receiving reports."""
+
     is_automated_saving_active: Mapped[bool] = (  # pylint: disable=unsubscriptable-object
         mapped_column(
             default=False,
@@ -348,7 +361,16 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
         )
     )
 
-    __table_args__ = (CheckConstraint("savings_amount >= 0", name="savings_amount_nonnegative"),)
+    __table_args__ = (
+        CheckConstraint(sqltext="savings_amount >= 0", name="savings_amount_nonnegative"),
+        CheckConstraint(
+            sqltext=(
+                "(send_reports_via_email = True AND user_email_address IS NOT NULL) OR "
+                "send_reports_via_email = False"
+            ),
+            name="check_send_reports_via_email_requires_mail_address",
+        ),
+    )
 
 
 class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods

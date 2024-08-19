@@ -11,7 +11,7 @@ from pydantic import (
     StrictInt,
     computed_field,
     field_validator,
-    model_validator,
+    model_validator, EmailStr,
 )
 
 from src.custom_types import (
@@ -503,6 +503,17 @@ class AppSettingsResponse(BaseModel):
     ]
     """The modification date of the app settings."""
 
+    send_reports_via_email: Annotated[
+        bool, Field(description="Tells if receiving reports via email is desired.")
+    ]
+    """Tells if receiving reports via email is desired."""
+
+    user_email_address: Annotated[
+        EmailStr | None,
+        Field(description="Users email address. Will used for receiving reports."),
+    ]
+    """Users email address. Will used for receiving reports."""
+
     is_automated_saving_active: Annotated[
         bool,
         Field(description="Tells if automated saving is active."),
@@ -539,6 +550,8 @@ class AppSettingsResponse(BaseModel):
                     "id": 1,
                     "created_at": "2024-08-11 13:57:17.941840 +00:00",
                     "modified_at": "2024-08-11 15:03:17.312860 +00:00",
+                    "send_reports_via_email": False,
+                    "user_email_address": "pythbuster@gmail.com",
                     "is_automated_saving_active": True,
                     "savings_amount": 60000,
                     "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
@@ -564,3 +577,12 @@ class AppSettingsResponse(BaseModel):
             raise ValueError("'created_at' must be of type datetime or datetime-string.")
 
         return data
+
+    @model_validator(mode="after")
+    def check_if_email_is_set(self) -> Self:
+        if self.send_reports_via_email and self.user_email_address is None:
+            raise ValueError(
+                "Can't activate receiving mails, user mail address is not set!"
+            )
+
+        return self

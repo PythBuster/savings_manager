@@ -24,6 +24,8 @@ async def response_exception(exception: Exception) -> JSONResponse:
     :rtype: :class:`JSONResponse`
     """
 
+    logging.exception(exception)
+
     if isinstance(exception, InconsistentDatabaseError):
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -89,8 +91,6 @@ async def response_exception(exception: Exception) -> JSONResponse:
                 )
             ),
         )
-
-    logging.exception(exception)
 
     # fastapi will catch any unhandled exception and will
     # map it to a 500 Internal Server Error response

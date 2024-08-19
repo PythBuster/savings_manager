@@ -23,6 +23,8 @@ async def test_get_app_settings_status_200(
         "id": app_settings_id,
         "created_at": "2024-08-11T13:57:17.941840+00:00",
         "modified_at": "2024-08-11T15:03:17.312860+00:00",
+        "send_reports_via_email": False,
+        "user_email_address": None,
         "is_automated_saving_active": True,
         "savings_amount": 0,
         "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
