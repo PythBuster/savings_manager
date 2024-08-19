@@ -1051,7 +1051,7 @@ class DBManager:
 
         return app_settings.savings_amount
 
-    async def _get_app_settings(self) -> AppSettings | None:
+    async def _get_app_settings(self) -> AppSettings:
         """Get app settings if automated savings.
 
         :return: The app settings.
@@ -1065,10 +1065,6 @@ class DBManager:
 
         # get the single app setting
         app_settings = all_app_settings[0]
-
-        if not app_settings.is_automated_saving_active:
-            return None
-
         return app_settings
 
     async def _overflow_moneybox_add(
