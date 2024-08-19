@@ -62,17 +62,17 @@ async def read_instance(
     """
 
     if only_active_instances:
-        stmt = select(orm_model).where(
-            and_(orm_model.id == record_id, orm_model.is_active.is_(True))
+        stmt = select(orm_model).where(  # type: ignore
+            and_(orm_model.id == record_id, orm_model.is_active.is_(True))  # type: ignore
         )
     else:
-        stmt = select(orm_model).where(orm_model.id == record_id)
+        stmt = select(orm_model).where(orm_model.id == record_id)  # type: ignore
 
     if isinstance(async_session, AsyncSession):
-        result = await async_session.execute(stmt)
+        result = await async_session.execute(stmt)  # type: ignore
     else:
         async with async_session.begin() as session:
-            result = await session.execute(stmt)
+            result = await session.execute(stmt)  # type: ignore
 
     instance = result.scalars().one_or_none()
     return instance
@@ -99,15 +99,17 @@ async def read_instances(
     """
 
     if only_active_instances:
-        stmt = select(orm_model).where(orm_model.is_active.is_(True))
+        stmt = select(orm_model).where(  # type: ignore
+            orm_model.is_active.is_(True)  # type: ignore
+        )
     else:
-        stmt = select(orm_model)
+        stmt = select(orm_model)  # type: ignore
 
     if isinstance(async_session, AsyncSession):
-        result = await async_session.execute(stmt)
+        result = await async_session.execute(stmt)  # type: ignore
     else:
         async with async_session.begin() as session:
-            result = await session.execute(stmt)
+            result = await session.execute(stmt)  # type: ignore
 
     instances = result.scalars().all()
     return instances

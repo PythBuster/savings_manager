@@ -743,7 +743,7 @@ class DBManager:
         """
 
         stmt = (
-            select(MoneyboxNameHistory)
+            select(MoneyboxNameHistory)  # type: ignore
             .order_by(desc(MoneyboxNameHistory.created_at))  # type: ignore
             .limit(1)
         )

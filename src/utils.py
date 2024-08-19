@@ -14,7 +14,7 @@ from src.custom_types import DBSettings
 async def check_existence_of_moneybox_by_id(
     request: Request,
     moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to be processed.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be processed.")  # type: ignore
     ],
 ) -> int:
     """FastAPI dependency for checking existence of moneybox by id.

@@ -275,7 +275,7 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
         transaction_trigger=TransactionTrigger.MANUALLY,
     )
 
-    with pytest.raises(HasBalanceError) as ex_info:
+    with pytest.raises(HasBalanceError):
         await db_manager.delete_moneybox(moneybox_id=third_moneybox_id)
 
     # sub amount from moneybox 3 for deletion

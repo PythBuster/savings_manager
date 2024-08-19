@@ -250,8 +250,8 @@ async def mocked_client(db_manager: DBManager) -> AsyncGenerator:
     :rtype: AsyncGenerator
     """
 
-    app.router.lifespan_context = noop_lifespan
-    app.state.db_manager = db_manager
+    app.router.lifespan_context = noop_lifespan  # type: ignore
+    app.state.db_manager = db_manager  # type: ignore
     set_custom_openapi_schema(fastapi_app=app)
 
     register_router(fastapi_app=app)

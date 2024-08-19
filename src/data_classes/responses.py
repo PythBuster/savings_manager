@@ -333,8 +333,7 @@ class TransactionLogResponse(BaseModel):
         return data
 
     @model_validator(mode="after")
-    @classmethod
-    def check_transaction_trigger_and_type_combination(cls, self: Self) -> Self:
+    def check_transaction_trigger_and_type_combination(self) -> Self:
         """Check for combinations:
         - TransactionType.DIRECT + TransactionTrigger.AUTOMATICALLY
         - TransactionType.DISTRIBUTION + TransactionTrigger.DIRECT
@@ -362,8 +361,7 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    @classmethod
-    def check_counterparty_moneybox(cls, self: Self) -> Self:
+    def check_counterparty_moneybox(self) -> Self:
         """If counterparty_moneybox_name is set, counterparty_moneybox_id need to be set too."""
 
         if (self.counterparty_moneybox_name is None) != (self.counterparty_moneybox_id is None):
@@ -372,8 +370,7 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    @classmethod
-    def check_moneybox_id(cls, self: Self) -> Self:
+    def check_moneybox_id(self) -> Self:
         """moneybox_id must not be the same as counterparty_moneybox_id"""
 
         if self.moneybox_id == self.counterparty_moneybox_id:
@@ -382,8 +379,7 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    @classmethod
-    def check_new_balance(cls, self: Self) -> Self:
+    def check_new_balance(self) -> Self:
         """Check balance
         - if amount is positive, balance must be at least greater than or equal to amount.
 

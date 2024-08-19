@@ -63,7 +63,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     register_router(fastapi_app=fastapi_app)
 
     print("Start background tasks.")
-    await fastapi_app.state.background_tasks_runner.run()
+    await fastapi_app.state.background_tasks_runner.run()  # type: ignore
 
     yield
 
@@ -109,7 +109,7 @@ app.middleware("http")(catch_exceptions_middleware)
 
 _origins = ["*"]
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,  # type: ignore
     allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],

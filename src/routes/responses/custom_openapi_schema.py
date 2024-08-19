@@ -10,7 +10,7 @@ def custom_422_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
         return fastapi_app.openapi_schema
 
     # call original openapi get the openapi schema
-    original_openapi = fastapi_app.openapi_original()
+    original_openapi = fastapi_app.openapi_original()  # type: ignore
 
     for path in original_openapi["paths"]:
         for method in original_openapi["paths"][path]:

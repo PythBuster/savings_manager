@@ -18,7 +18,7 @@ async def test_create_instance(
         "savings_target": None,
     }
 
-    created_instance: Moneybox = await create_instance(
+    created_instance: Moneybox = await create_instance(  # type: ignore
         async_session=db_manager.async_session,
         orm_model=Moneybox,  # type: ignore
         data=moneybox_data,

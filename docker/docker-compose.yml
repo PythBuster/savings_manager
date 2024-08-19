@@ -2,7 +2,7 @@ services:
   postgres_database:
     image: postgres:16
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
@@ -15,7 +15,7 @@ services:
   test_postgres_database:
     image: postgres:16
     ports:
-      - 8765:5432
+      - "8765:5432"
     environment:
       - POSTGRES_PASSWORD=test_postgres
       - POSTGRES_USER=test_postgres
@@ -32,7 +32,7 @@ services:
     links:
       - postgres_database
     ports:
-      - 8001:8001
+      - "8001:8001"
     environment:
       - DB_DRIVER=postgresql+asyncpg
       - DB_NAME=savings_manager

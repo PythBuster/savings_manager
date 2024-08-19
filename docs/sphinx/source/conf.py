@@ -20,7 +20,6 @@ sys.path.insert(0, os.path.abspath('../../../src'))
 extensions = ['sphinx.ext.autodoc', "sphinx_rtd_theme"]
 
 templates_path = ['_templates']
-html_static_path = ['_static']
 exclude_patterns = ["main.rst"]
 
 

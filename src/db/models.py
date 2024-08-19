@@ -54,7 +54,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     """The primary ID of the row."""
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+        DateTime(timezone=True),  # type: ignore
         default=func.now(),  # pylint: disable=not-callable
         server_default=func.now(),  # pylint: disable=not-callable
         nullable=False,
@@ -63,7 +63,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     """The created utc datetime."""
 
     modified_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True),
+        DateTime(timezone=True),  # type: ignore
         default=None,
         onupdate=func.now(),  # pylint: disable=not-callable
         nullable=True,
@@ -80,7 +80,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     """Flag to mark instance as deleted."""
 
     note: Mapped[str] = mapped_column(
-        String,
+        String,  # type: ignore
         default="",
         server_default="",
         nullable=False,
@@ -272,13 +272,13 @@ class Transaction(SqlBase):  # pylint: disable=too-few-public-methods
     counterparty_moneybox_id, if set."""
 
     moneybox_id: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
-        ForeignKey("moneyboxes.id", ondelete="CASCADE"),
+        ForeignKey("moneyboxes.id", ondelete="CASCADE"),  # type: ignore
     )
     """The foreign key to moneybox."""
 
     moneybox: Mapped["Moneybox"] = relationship(  # pylint: disable=unsubscriptable-object
         back_populates="transactions_log",
-        foreign_keys=[moneybox_id],
+        foreign_keys=[moneybox_id],  # type: ignore
         passive_deletes=True,
     )
 
@@ -291,13 +291,13 @@ class MoneyboxNameHistory(SqlBase):  # pylint: disable=too-few-public-methods
     __tablename__ = "moneybox_name_histories"
 
     moneybox_id: Mapped[int] = mapped_column(  # pylint: disable=unsubscriptable-object
-        ForeignKey("moneyboxes.id", ondelete="CASCADE"),
+        ForeignKey("moneyboxes.id", ondelete="CASCADE"),  # type: ignore
     )
     """The foreign key to moneybox."""
 
     moneybox: Mapped["Moneybox"] = relationship(  # pylint: disable=unsubscriptable-object
         back_populates="moneybox_name_history",
-        foreign_keys=[moneybox_id],
+        foreign_keys=[moneybox_id],  # type: ignore
         passive_deletes=True,
     )
 
@@ -357,7 +357,7 @@ class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
     __tablename__ = "automated_savings_logs"
 
     action_at: Mapped[datetime] = mapped_column(  # pylint: disable=unsubscriptable-object)
-        DateTime(timezone=True),
+        DateTime(timezone=True),  # type: ignore
         nullable=False,
         comment="The utc datetime of the action.",
     )
@@ -370,7 +370,7 @@ class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
     """The action type within the automated savings and automated savings logs."""
 
     details: Mapped[dict] = mapped_column(  # pylint: disable=E1136
-        JSON,
+        JSON,  # type: ignore
         nullable=True,
         comment="Metadata for the action, like app settings data.",
     )
