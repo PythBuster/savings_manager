@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.19.1 (2024-08-19)
+### Changes:
+- fix automated savings algorithm
+
 ## 1.19.0 (2024-08-18)
 ### Features:
 - implement modes for overflow moneybox for automated savings
