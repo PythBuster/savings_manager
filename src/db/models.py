@@ -103,7 +103,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
         if exclude is None:
             exclude = []
 
-        # always exlude these columns
+        # always exclude these columns
         exclude.append("is_active")
         exclude.append("note")
 
@@ -335,8 +335,9 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
     """The savings amount for the automated saving which will be distributed periodically
     to the moneyboxes, which have a (desired) savings amount > 0."""
 
-    overflow_moneybox_automated_savings_mode: Mapped[OverflowMoneyboxAutomatedSavingsModeType] = (  # pylint: disable=line-too-long, unsubscriptable-object
-        mapped_column(  # noqa: ignore
+    # noqa: ignore  # pylint: disable=line-too-long, unsubscriptable-object
+    overflow_moneybox_automated_savings_mode: Mapped[OverflowMoneyboxAutomatedSavingsModeType] = (
+        mapped_column(
             nullable=False,
             default=OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
             server_default=str(OverflowMoneyboxAutomatedSavingsModeType.COLLECT).upper(),
@@ -364,13 +365,13 @@ class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
 
     action: Mapped[ActionType] = mapped_column(  # pylint: disable=unsubscriptable-object)
         nullable=False,
-        comment=("The action type within the automated savings and automated savings logs."),
+        comment="The action type within the automated savings and automated savings logs.",
     )
     """The action type within the automated savings and automated savings logs."""
 
     details: Mapped[dict] = mapped_column(  # pylint: disable=E1136
         JSON,
         nullable=True,
-        comment=("Metadata for the action, like app settings data."),
+        comment="Metadata for the action, like app settings data.",
     )
     """Metadata for the action, like app settings data."""
