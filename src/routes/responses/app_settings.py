@@ -39,7 +39,7 @@ GET_APP_SETTINGS_RESPONSES = {
         "content": {
             "application/json": {
                 "example": HTTPErrorResponse(
-                    message= "new row for relation \"app_settings\" violates check constraint \"ck_app_settings_send_reports_via_email_requires_email_address\"",
+                    message='new row for relation "app_settings" violates check constraint "ck_app_settings_send_reports_via_email_requires_email_address"',
                     details={
                         "exception": "(sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.CheckViolationError'>",
                         "params": [True, None, 1],
@@ -91,7 +91,7 @@ UPDATE_APP_SETTINGS_RESPONSES = {
         "content": {
             "application/json": {
                 "example": HTTPErrorResponse(
-                    message= "new row for relation \"app_settings\" violates check constraint \"ck_app_settings_send_reports_via_email_requires_email_address\"",
+                    message='new row for relation "app_settings" violates check constraint "ck_app_settings_send_reports_via_email_requires_email_address"',
                     details={
                         "exception": "(sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.CheckViolationError'>",
                         "params": [True, None, 1],

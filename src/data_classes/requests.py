@@ -1,8 +1,15 @@
 """All request models are located here."""
 
-from typing import Annotated, Any, Self
+from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, model_validator, EmailStr, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    StrictInt,
+    model_validator,
+)
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 
@@ -263,19 +270,19 @@ class AppSettingsRequest(BaseModel):
         bool,
         Field(
             default=None,
-            description="Tells if receiving reports via email is desired.",
+            description="Tells if receiving reports via report_sender is desired.",
         ),
     ]
-    """Tells if receiving reports via email is desired."""
+    """Tells if receiving reports via report_sender is desired."""
 
     user_email_address: Annotated[
         EmailStr | None,
         Field(
             default=None,
-            description="Users email address. Will used for receiving reports."
+            description="Users report_sender address. Will used for receiving reports.",
         ),
     ]
-    """Users email address. Will used for receiving reports."""
+    """Users report_sender address. Will used for receiving reports."""
 
     is_automated_saving_active: Annotated[
         bool,

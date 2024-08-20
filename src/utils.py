@@ -3,12 +3,14 @@
 import os
 import tomllib
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Sequence
 
+import tabulate
 from dictalchemy import asdict
+from pandas.core.interchange.dataframe_protocol import DataFrame
 from starlette.requests import Request
 
-from src.custom_types import DBSettings
+from src.custom_types import AppEnvVariables
 
 
 async def check_existence_of_moneybox_by_id(
@@ -31,48 +33,11 @@ async def check_existence_of_moneybox_by_id(
     return moneybox_id
 
 
-def get_db_settings() -> DBSettings:
-    """A :class:`DBSettings` spawner.
-
-    :return: Creates a :class:`DBSettings` by loading os.environ settings
-        and return a :class:`DBSettings` instance.
-    :rtype: :class:`DBSettings` | :class:`None`
-    """
-
-    db_driver = os.getenv("DB_DRIVER")
-    db_name = os.getenv("DB_NAME")
-    db_host = os.getenv("DB_HOST")
-    db_port = os.getenv("DB_PORT")
-    db_user = os.getenv("DB_USER")
-    db_password = os.getenv("DB_PASSWORD")
-
-    envs = [
-        db_driver,
-        db_name,
-        db_host,
-        db_port,
-        db_user,
-        db_password,
-    ]
-
-    if None in envs:
-        raise ValueError("Missing environment variables for db_settings.")
-
-    return DBSettings(
-        db_driver=db_driver,
-        db_name=db_name,
-        db_host=db_host,
-        db_port=db_port,
-        db_user=db_user,
-        db_password=db_password,
-    )
-
-
-def get_database_url(db_settings: DBSettings) -> str:
+def get_database_url(db_settings: AppEnvVariables) -> str:
     """Create a database connection string based on db_settings.
 
     :param db_settings: Includes the database credentials.
-    :type db_settings: :class:`DBSettings`
+    :type db_settings: :class:`AppEnvVariables`
     :return: A database connection string
     :rtype: :class:`str`
     """
@@ -159,4 +124,14 @@ def as_dict(  # type: ignore  # pylint: disable=missing-function-docstring, too-
         include=include,
         only=only,
         **kwargs,
+    )
+
+
+def tabulate_str(headers: Sequence, rows: Sequence, showindex: bool = False) -> str:
+    tabulate.MIN_PADDING = 35
+    return tabulate.tabulate(
+        headers=headers,
+        tabular_data=rows,
+        tablefmt="plain",
+        showindex=showindex,
     )

@@ -7,11 +7,12 @@ from pydantic import (
     AwareDatetime,
     BaseModel,
     ConfigDict,
+    EmailStr,
     Field,
     StrictInt,
     computed_field,
     field_validator,
-    model_validator, EmailStr,
+    model_validator,
 )
 
 from src.custom_types import (
@@ -504,15 +505,15 @@ class AppSettingsResponse(BaseModel):
     """The modification date of the app settings."""
 
     send_reports_via_email: Annotated[
-        bool, Field(description="Tells if receiving reports via email is desired.")
+        bool, Field(description="Tells if receiving reports via report_sender is desired.")
     ]
-    """Tells if receiving reports via email is desired."""
+    """Tells if receiving reports via report_sender is desired."""
 
     user_email_address: Annotated[
         EmailStr | None,
-        Field(description="Users email address. Will used for receiving reports."),
+        Field(description="Users report_sender address. Will used for receiving reports."),
     ]
-    """Users email address. Will used for receiving reports."""
+    """Users report_sender address. Will used for receiving reports."""
 
     is_automated_saving_active: Annotated[
         bool,
@@ -581,8 +582,6 @@ class AppSettingsResponse(BaseModel):
     @model_validator(mode="after")
     def check_if_email_is_set(self) -> Self:
         if self.send_reports_via_email and self.user_email_address is None:
-            raise ValueError(
-                "Can't activate receiving mails, user mail address is not set!"
-            )
+            raise ValueError("Can't activate receiving mails, user mail address is not set!")
 
         return self

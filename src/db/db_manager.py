@@ -11,7 +11,7 @@ from sqlalchemy.orm import joinedload
 
 from src.custom_types import (
     ActionType,
-    DBSettings,
+    AppEnvVariables,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
     TransactionType,
@@ -53,7 +53,9 @@ from src.utils import get_database_url
 class DBManager:
     """All db manager logic are located here."""
 
-    def __init__(self, db_settings: DBSettings, engine_args: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self, db_settings: AppEnvVariables, engine_args: dict[str, Any] | None = None
+    ) -> None:
         if engine_args is None:
             engine_args = {}
 

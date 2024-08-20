@@ -317,14 +317,14 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
         default=False,
         server_default="false",
         nullable=False,
-        comment="Tells if receiving reports via email is desired.",
+        comment="Tells if receiving reports via report_sender is desired.",
     )
-    """Tells if receiving reports via email is desired."""
+    """Tells if receiving reports via report_sender is desired."""
 
     user_email_address: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
-        nullable=True, comment="Users mail address. Will used for receiving reports."
+        nullable=True, comment="Users email address. Will used for receiving reports."
     )
-    """Users email address. Will used for receiving reports."""
+    """Users report_sender address. Will used for receiving reports."""
 
     is_automated_saving_active: Mapped[bool] = (  # pylint: disable=unsubscriptable-object
         mapped_column(

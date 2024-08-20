@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from src.db.models import Base
-from src.utils import get_database_url, get_db_settings
+from src.utils import get_database_url
+from src.custom_types import AppEnvVariables
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -36,18 +37,16 @@ from dotenv import load_dotenv
 is_testing = context.get_x_argument(as_dictionary=True).get('testing')
 
 if is_testing is None:
-    dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+    env_file = Path(__file__).resolve().parent.parent / "envs" / ".env"
 else:
-    dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
+    env_file = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
 
-print(dotenv_path)
-load_dotenv(dotenv_path=dotenv_path)
-print(f"Loaded {dotenv_path}", flush=True)
+app_env_variables = AppEnvVariables(_env_file=env_file)
+print(f"Loaded {env_file}", flush=True)
 
-db_settings = get_db_settings()
-database_url = get_database_url(db_settings=db_settings)
+database_url = get_database_url(db_settings=app_env_variables)
 config.set_main_option("sqlalchemy.url", database_url)
-print(f"{db_settings.db_driver=}, {db_settings.db_host=}, {db_settings.db_port=}", flush=True)
+print(f"{app_env_variables.db_driver=}, {app_env_variables.db_host=}, {app_env_variables.db_port=}", flush=True)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

@@ -4,18 +4,23 @@ from typing import Any
 
 import pytest
 
-from src.custom_types import DBSettings
+from src.custom_types import AppEnvVariables
 from src.utils import equal_dict, get_app_data, get_database_url
 
 
 def test_db_settings() -> None:  # pylint: disable= unused-argument
-    db_settings = DBSettings(
+    db_settings = AppEnvVariables(
         db_driver="postgresql+asyncpg",
         db_name="test_db",
         db_host="mylocalhost",
         db_port=8765,
         db_user="postgres",
         db_password="<PASSWORD>",
+        smtp_server="mylocalsmtp",
+        smtp_method="TLS",
+        smtp_port=1225,
+        smtp_user_name="smtp user",
+        smtp_password="<PASSWORD>",
     )
 
     expected_database_url = "postgresql+asyncpg://postgres:<PASSWORD>@mylocalhost:8765/test_db"
@@ -24,13 +29,18 @@ def test_db_settings() -> None:  # pylint: disable= unused-argument
 
     # not supported driver
     unsupported_db_driver = "unknown"
-    db_settings = DBSettings(
+    db_settings = AppEnvVariables(
         db_driver=unsupported_db_driver,
         db_name="test_db",
         db_host="mylocalhost",
         db_port=8765,
         db_user="postgres",
         db_password="<PASSWORD>",
+        smtp_server="mylocalsmtp",
+        smtp_method="TLS",
+        smtp_port=1225,
+        smtp_user_name="smtp user",
+        smtp_password="<PASSWORD>",
     )
 
     with pytest.raises(ValueError) as ex_info:

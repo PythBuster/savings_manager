@@ -2,7 +2,6 @@
 
 from datetime import datetime, timedelta, timezone
 from typing import Any
-from xmlrpc.client import Fault
 
 import pytest
 from pydantic import ValidationError
@@ -441,7 +440,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "is_automated_saving_active": True,
             "savings_amount": -100,
             "send_reports_via_email": False,
-            "user_email_address": "1",  # invalid email address
+            "user_email_address": "1",  # invalid report_sender address
         },
         {
             "id": 6,
@@ -449,7 +448,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,
-            "send_reports_via_email": True,  # is true, but email not set
+            "send_reports_via_email": True,  # is true, but report_sender not set
             "user_email_address": None,
         },
     ],

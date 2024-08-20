@@ -14,16 +14,17 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src import exception_handler
-from src.constants import SPHINX_DIRECTORY
-from src.custom_types import EndpointRouteType
+from src.constants import SPHINX_DIRECTORY, WORKING_DIR
+from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.db.db_manager import DBManager
+from src.report_sender.email_sender.sender import EmailSender
 from src.routes.app_settings import app_settings_router
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
 from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
 from src.task_runner import BackgroundTaskRunner
-from src.utils import get_app_data, get_db_settings
+from src.utils import get_app_data
 
 tags_metadata = [
     {
@@ -49,7 +50,7 @@ app_data = get_app_data()
 """Reference to the app data."""
 
 author_name, author_mail = app_data["authors"][0].split()
-"""Reference to the author's name and email address.'"""
+"""Reference to the author's name and report_sender address.'"""
 
 
 @asynccontextmanager
@@ -77,7 +78,7 @@ app = FastAPI(
     version=app_data["version"],
     contact={
         "name": author_name[1:-1],
-        "email": author_mail[2:-2],
+        "report_sender": author_mail[2:-2],
     },
     openapi_tags=tags_metadata,
     # swagger_ui_parameters={"defaultModelsExpandDepth": -1},
@@ -124,12 +125,21 @@ def initialize_app(fastapi_app: FastAPI) -> None:
     :rtype fastapi_app: FastAPI
     """
 
+    app_env_variables = AppEnvVariables(_env_file=WORKING_DIR / "envs" / ".env")
+
     db_manager = DBManager(
-        db_settings=get_db_settings(),  # type: ignore
+        db_settings=app_env_variables,  # type: ignore
     )
+    email_sender = EmailSender(
+        db_manager=db_manager,
+        smtp_settings=app_env_variables,
+    )
+
     fastapi_app.state.db_manager = db_manager  # type: ignore
+    fastapi_app.state.email_sender = email_sender  # type: ignore
     fastapi_app.state.background_tasks_runner = BackgroundTaskRunner(  # type: ignore
         db_manager=db_manager,
+        email_sender=email_sender,
     )
 
     set_custom_openapi_schema(fastapi_app=fastapi_app)

@@ -6,7 +6,7 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
-from src.custom_types import DBSettings, TransactionTrigger, TransactionType
+from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
 from src.data_classes.requests import (
     DepositTransactionRequest,
     TransferTransactionRequest,
@@ -33,7 +33,7 @@ async def test_if_test_db_is_used(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency
-async def test_create_db_manager_with_engine_args(db_settings_1: DBSettings) -> None:
+async def test_create_db_manager_with_engine_args(db_settings_1: AppEnvVariables) -> None:
     db_manager = DBManager(db_settings=db_settings_1, engine_args={"echo": True})
     assert db_manager is not None
 

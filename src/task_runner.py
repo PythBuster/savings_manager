@@ -6,6 +6,8 @@ from datetime import datetime
 
 from src.custom_types import ActionType
 from src.db.db_manager import DBManager
+from src.db.models import AppSettings
+from src.report_sender.email_sender.sender import EmailSender
 
 
 class BackgroundTaskRunner:
@@ -20,8 +22,9 @@ class BackgroundTaskRunner:
      (if endless task is wanted) and its own date trigger.
     """
 
-    def __init__(self, db_manager: DBManager) -> None:
+    def __init__(self, db_manager: DBManager, email_sender: EmailSender) -> None:
         self.db_manager = db_manager
+        self.email_sender = email_sender
         self.sleep_time = 60 * 60  # each hour
         self.background_tasks: set[asyncio.Task] = set()
 
@@ -77,6 +80,13 @@ class BackgroundTaskRunner:
                         await self.print_task(
                             task_name=current_method_name, message="Automated savings run."
                         )
+
+                        app_settings: AppSettings = self.db_manager._get_app_settings()  # type: ignore
+
+                        if app_settings.send_reports_via_email:
+                            await self.email_sender.send_email_automated_savings_done_successfully(
+                                to=app_settings.user_email_address,
+                            )
                     else:
                         await self.print_task(
                             task_name=current_method_name,

@@ -1,8 +1,9 @@
 """All custom types are located here."""
 
 from enum import StrEnum
+from typing import Self
 
-from pydantic import ConfigDict, SecretStr
+from pydantic import ConfigDict, SecretStr, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -35,8 +36,11 @@ class EnvironmentType(StrEnum):
     """Testing Environment."""
 
 
-class DBSettings(BaseSettings):
-    """The database credentials."""
+class AppEnvVariables(BaseSettings):
+    """The app env vars, with all settings/credentials for:
+    - database
+    - smtp
+    """
 
     db_driver: str
     """Database driver."""
@@ -56,8 +60,28 @@ class DBSettings(BaseSettings):
     db_password: SecretStr
     """Database password."""
 
+    smtp_server: str
+    """The address of the smtp server."""
+
+    smtp_method: str
+    """The smtp method, supported: STARTTLS and TLS."""
+
+    smtp_port: int
+    """The port name of the smtp server."""
+
+    smtp_user_name: str
+    """The user name of the smtp server."""
+
+    smtp_password: str
+    """The user password."""
+
     model_config = ConfigDict(extra="forbid")
     """Model config."""
+
+    @model_validator(mode="after")
+    def lowercase_smtp_method(self) -> Self:
+        self.smtp_method = self.smtp_method.lower()
+        return self
 
 
 class TransactionTrigger(StrEnum):
@@ -114,3 +138,10 @@ class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
     """After the automated savings process, the entire balance from the overflow
     moneybox should be distributed to the moneyboxes with upper limits, in the order of
     the priority list. Try to fill them up."""
+
+
+class ReceiverType(StrEnum):
+    """The receiver types. Currently supported: EMAIL"""
+
+    EMAIL = "email"
+    """Indicates that receiver shall get message via email."""

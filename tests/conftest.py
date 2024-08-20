@@ -10,16 +10,14 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from httpx import AsyncClient
 
 from src.constants import WORKING_DIR
-from src.custom_types import DBSettings, TransactionTrigger, TransactionType
+from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
 from src.main import app, register_router, set_custom_openapi_schema
-from src.utils import get_db_settings
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
 
 pytest_plugins = ("pytest_asyncio",)
@@ -28,9 +26,9 @@ pytest_plugins = ("pytest_asyncio",)
 dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
 """The test env file path."""
 
-load_dotenv(dotenv_path=dotenv_path)
-
-db_settings = get_db_settings()
+app_env_variables = AppEnvVariables(
+    _env_file=dotenv_path,
+)
 """The database settings."""
 
 
@@ -268,13 +266,18 @@ async def example_1_db_settings() -> AsyncGenerator:
     :rtype: AsyncGenerator
     """
 
-    yield DBSettings(
+    yield AppEnvVariables(
         db_driver="postgresql+asyncpg",
         db_name="test_db",
         db_host="mylocalhost",
         db_port=1234,
         db_user="postgres",
         db_password="<PASSWORD>",
+        smtp_server="mylocalsmtp",
+        smtp_method="TLS",
+        smtp_port=1225,
+        smtp_user_name="smtp user",
+        smtp_password="<PASSWORD>",
     )
 
 
@@ -298,7 +301,7 @@ async def mocked_db_manager() -> DBManager:  # type: ignore
     time.sleep(wait_for_docker)
 
     db_manager = DBManager(
-        db_settings=db_settings,
+        db_settings=app_env_variables,
         engine_args={"echo": True},
     )
 

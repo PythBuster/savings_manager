@@ -149,8 +149,7 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    moneyboxes = await db_manager.get_moneyboxes()
-    moneybox_id = moneyboxes[-1]["id"]
+    moneybox_id = await db_manager._get_moneybox_id_by_name(name="Test Box 2")
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}",
     )
