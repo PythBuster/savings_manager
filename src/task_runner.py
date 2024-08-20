@@ -82,7 +82,7 @@ class BackgroundTaskRunner:
                         )
 
                         app_settings: AppSettings = (
-                            self.db_manager._get_app_settings()  # type: ignore  # noqa: ignore  # pylint:disable=protected-access, line-too-long
+                            await self.db_manager._get_app_settings()  # type: ignore  # noqa: ignore  # pylint:disable=protected-access, line-too-long
                         )
 
                         if app_settings.send_reports_via_email:
