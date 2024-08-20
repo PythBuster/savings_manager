@@ -581,6 +581,9 @@ class AppSettingsResponse(BaseModel):
 
     @model_validator(mode="after")
     def check_if_email_is_set(self) -> Self:
+        """Check if email exists, when send_reports_via_email is set to true,
+        if not, raise ValueError."""
+
         if self.send_reports_via_email and self.user_email_address is None:
             raise ValueError("Can't activate receiving mails, user mail address is not set!")
 

@@ -81,7 +81,9 @@ class BackgroundTaskRunner:
                             task_name=current_method_name, message="Automated savings run."
                         )
 
-                        app_settings: AppSettings = self.db_manager._get_app_settings()  # type: ignore
+                        app_settings: AppSettings = (
+                            self.db_manager._get_app_settings()  # type: ignore  # noqa: ignore  # pylint:disable=protected-access, line-too-long
+                        )
 
                         if app_settings.send_reports_via_email:
                             await self.email_sender.send_email_automated_savings_done_successfully(

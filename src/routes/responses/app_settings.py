@@ -39,11 +39,20 @@ GET_APP_SETTINGS_RESPONSES = {
         "content": {
             "application/json": {
                 "example": HTTPErrorResponse(
-                    message='new row for relation "app_settings" violates check constraint "ck_app_settings_send_reports_via_email_requires_email_address"',
+                    message=(
+                        'new row for relation "app_settings" violates check constraint '
+                        '"ck_app_settings_send_reports_via_email_requires_email_address"'
+                    ),
                     details={
-                        "exception": "(sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.CheckViolationError'>",
+                        "exception": (
+                            "(sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) "
+                            "<class 'asyncpg.exceptions.CheckViolationError'>"
+                        ),
                         "params": [True, None, 1],
-                        "detail": "Failing row contains (t, 100, 1, 2024-08-18 082142.077403+00, 2024-08-19 154906.714368+00, t, , COLLECT, t, null).",
+                        "detail": (
+                            "Failing row contains (t, 100, 1, 2024-08-18 082142.077403+00, "
+                            "2024-08-19 154906.714368+00, t, , COLLECT, t, null)."
+                        ),
                     },
                 )
             }
@@ -91,11 +100,20 @@ UPDATE_APP_SETTINGS_RESPONSES = {
         "content": {
             "application/json": {
                 "example": HTTPErrorResponse(
-                    message='new row for relation "app_settings" violates check constraint "ck_app_settings_send_reports_via_email_requires_email_address"',
+                    message=(
+                        'new row for relation "app_settings" violates check constraint '
+                        '"ck_app_settings_send_reports_via_email_requires_email_address"'
+                    ),
                     details={
-                        "exception": "(sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.CheckViolationError'>",
+                        "exception": (
+                            "(sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) "
+                            "<class 'asyncpg.exceptions.CheckViolationError'>"
+                        ),
                         "params": [True, None, 1],
-                        "detail": "Failing row contains (t, 100, 1, 2024-08-18 082142.077403+00, 2024-08-19 154906.714368+00, t, , COLLECT, t, null).",
+                        "detail": (
+                            "Failing row contains (t, 100, 1, 2024-08-18 082142.077403+00, "
+                            "2024-08-19 154906.714368+00, t, , COLLECT, t, null)."
+                        ),
                     },
                 )
             }

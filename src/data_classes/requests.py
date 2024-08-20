@@ -2,14 +2,7 @@
 
 from typing import Annotated, Any
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    EmailStr,
-    Field,
-    StrictInt,
-    model_validator,
-)
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictInt, model_validator
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 

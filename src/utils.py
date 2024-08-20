@@ -7,7 +7,6 @@ from typing import Annotated, Any, Sequence
 
 import tabulate
 from dictalchemy import asdict
-from pandas.core.interchange.dataframe_protocol import DataFrame
 from starlette.requests import Request
 
 from src.custom_types import AppEnvVariables
@@ -128,6 +127,18 @@ def as_dict(  # type: ignore  # pylint: disable=missing-function-docstring, too-
 
 
 def tabulate_str(headers: Sequence, rows: Sequence, showindex: bool = False) -> str:
+    """Helper function to get a ascii table based on headers and rows.
+
+    :param headers: The headers of the table.
+    :type headers: :class:`Sequence`
+    :param rows: The row data of the table.
+    :type rows: :class:`Sequence`
+    :param showindex: Flag to show indexes in table.
+    :type showindex: :class:`bool`
+    :return: The generated string table.
+    :rtype: :class:`str`
+    """
+
     tabulate.MIN_PADDING = 35
     return tabulate.tabulate(
         headers=headers,

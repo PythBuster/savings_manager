@@ -1,3 +1,5 @@
+"""The Email Sender stuff is located here."""
+
 from datetime import datetime, timezone
 from email.message import EmailMessage
 from typing import Any
@@ -12,6 +14,8 @@ from src.report_sender.sender import ReportSender
 
 
 class EmailSender(ReportSender):
+    """The EmailSender class is responsible for sending emails."""
+
     def __init__(
         self,
         db_manager: DBManager,
@@ -31,12 +35,17 @@ class EmailSender(ReportSender):
         )
 
     async def send_email_automated_savings_done_successfully(self, to: str) -> None:
+        """The send mail function which will be called after automated savings
+        is done successfully.
+
+        :param to: The email recipient.
+        :type to: :class:`str`
+        """
+
         template_file = "automated_savings_done.html"
         today_dt_str = datetime.now(tz=timezone.utc).isoformat(sep=" ", timespec="seconds")
 
-        message_data = {
-            "moneyboxes": await self.db_manager.get_moneyboxes()
-        }
+        message_data = {"moneyboxes": await self.db_manager.get_moneyboxes()}
 
         message = await self.render_report(
             message_data=message_data,

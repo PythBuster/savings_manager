@@ -80,6 +80,8 @@ class AppEnvVariables(BaseSettings):
 
     @model_validator(mode="after")
     def lowercase_smtp_method(self) -> Self:
+        """Lowercase the smtp method."""
+
         self.smtp_method = self.smtp_method.lower()
         return self
 

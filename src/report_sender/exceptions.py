@@ -1,3 +1,6 @@
+"""The email sender exceptions are located here."""
+
+
 class UnsupportedReceiverTypeError(Exception):
     """The UnsupportedReceiverType exception clas."""
 
