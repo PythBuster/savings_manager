@@ -162,7 +162,8 @@ async def update_instance(
         raise UpdateInstanceError(
             record_id=record_id,
             message=str(ex),
-            details= data | {
+            details=data
+            | {
                 "exception": jsonable_encoder(ex),
             },
         ) from ex

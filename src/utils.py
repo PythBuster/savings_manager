@@ -1,6 +1,5 @@
 """All helper functions are located here."""
 
-import os
 import tomllib
 from pathlib import Path
 from typing import Annotated, Any, Sequence

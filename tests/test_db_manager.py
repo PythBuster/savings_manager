@@ -6,22 +6,26 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
-from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType, \
-    OverflowMoneyboxAutomatedSavingsModeType
+from src.custom_types import (
+    AppEnvVariables,
+    OverflowMoneyboxAutomatedSavingsModeType,
+    TransactionTrigger,
+    TransactionType,
+)
 from src.data_classes.requests import (
     DepositTransactionRequest,
     TransferTransactionRequest,
     WithdrawTransactionRequest,
 )
-from src.data_classes.responses import AppSettingsResponse
 from src.db.db_manager import DBManager
 from src.db.exceptions import (
+    AppSettingsNotFoundError,
     BalanceResultIsNegativeError,
     HasBalanceError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError, AppSettingsNotFoundError,
+    UpdateInstanceError,
 )
 from src.utils import equal_dict
 
@@ -736,9 +740,11 @@ async def test_get_transactions_logs_with_counterparty_to_deleted_moneybox(
     await db_manager.delete_moneybox(result_moneybox_data_4["id"])
 
 
-@pytest.mark.dependency(depends=["test_get_transactions_logs_with_counterparty_to_deleted_moneybox"])
+@pytest.mark.dependency(
+    depends=["test_get_transactions_logs_with_counterparty_to_deleted_moneybox"]
+)
 async def test_get_app_settings_valid(db_manager: DBManager) -> None:
-    _app_settings = await db_manager._get_app_settings()
+    _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
     app_settings = await db_manager.get_app_settings(app_settings_id=_app_settings.id)
 
     expected_data = {
@@ -747,7 +753,7 @@ async def test_get_app_settings_valid(db_manager: DBManager) -> None:
         "id": _app_settings.id,
         "send_reports_via_email": False,
         "user_email_address": None,
-        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore   # pylint: disable=line-too-long
     }
 
     assert equal_dict(
@@ -756,9 +762,10 @@ async def test_get_app_settings_valid(db_manager: DBManager) -> None:
         exclude_keys=["created_at", "modified_at"],
     )
 
+
 @pytest.mark.dependency(depends=["test_get_app_settings_valid"])
 async def test_update_app_settings_valid(db_manager: DBManager) -> None:
-    _app_settings = await db_manager._get_app_settings()
+    _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
 
     update_data = {
         "savings_amount": 0,
@@ -775,7 +782,7 @@ async def test_update_app_settings_valid(db_manager: DBManager) -> None:
         "id": _app_settings.id,
         "send_reports_via_email": False,
         "user_email_address": None,
-        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore   # pylint: disable=line-too-long
     }
 
     assert equal_dict(
@@ -784,9 +791,10 @@ async def test_update_app_settings_valid(db_manager: DBManager) -> None:
         exclude_keys=["created_at", "modified_at"],
     )
 
+
 @pytest.mark.dependency(depends=["test_update_app_settings_valid"])
 async def test_update_app_settings_invalid(db_manager: DBManager) -> None:
-    _app_settings = await db_manager._get_app_settings()
+    _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
 
     update_data = {
         # results to asyncpg.exceptions.InvalidTextRepresentationError
@@ -799,10 +807,11 @@ async def test_update_app_settings_invalid(db_manager: DBManager) -> None:
             app_settings_data=update_data,
         )
 
+
 @pytest.mark.dependency(depends=["test_update_app_settings_valid"])
 async def test_get_app_settings_invalid(
-        load_test_data: None,
-        db_manager: DBManager,
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
     # we assume an app_settings_id = 1
     with pytest.raises(AppSettingsNotFoundError):

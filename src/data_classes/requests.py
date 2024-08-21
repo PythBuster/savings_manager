@@ -328,9 +328,7 @@ class AppSettingsRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def lower_case_enum_strings(
-        cls, data: dict[str, Any]
-    ) -> dict[str, Any]:
+    def lower_case_enum_strings(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Lower case enum strings."""
 
         if "overflow_moneybox_automated_savings_mode" in data and isinstance(

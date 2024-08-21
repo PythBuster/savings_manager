@@ -12,7 +12,9 @@ from src.db.db_manager import DBManager
 from src.utils import equal_dict
 
 
-@pytest.mark.dependency(depends=["tests/test_db_manager.py::test_update_app_settings_valid"], scope="session")
+@pytest.mark.dependency(
+    depends=["tests/test_db_manager.py::test_update_app_settings_valid"], scope="session"
+)
 async def test_endpoint_get_moneyboxes__status_200__total_6(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
@@ -149,9 +151,9 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    moneybox_id = await db_manager._get_moneybox_id_by_name(
-        name="Test Box 2"
-    )  # noqa: ignore  # pylint:disable=protected-access, line-too-long
+    moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: ignore  # pylint:disable=protected-access, line-too-long
+        name="Test Box 2",
+    )
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}",
     )
