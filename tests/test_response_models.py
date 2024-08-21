@@ -412,6 +412,8 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 60000,
+            "overflow_moneybox_automated_savings_mode": "collect",
+            # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,
             "user_mail_address": "pythbuster@gmail.com",
         },
@@ -421,6 +423,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
+            "overflow_moneybox_automated_savings_mode": "collect",
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -430,6 +433,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,  # Negative savings_amount
+            "overflow_moneybox_automated_savings_mode": "collect",
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -439,6 +443,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,
+            "overflow_moneybox_automated_savings_mode": "collect",
             "send_reports_via_email": False,
             "user_email_address": "1",  # invalid report_sender address
         },
@@ -448,6 +453,17 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,
+            "overflow_moneybox_automated_savings_mode": "unknown",
+            "send_reports_via_email": False,
+            "user_email_address": None,
+        },
+        {
+            "id": 7,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 100,
+            "overflow_moneybox_automated_savings_mode": "collect",
             "send_reports_via_email": True,  # is true, but report_sender not set
             "user_email_address": None,
         },

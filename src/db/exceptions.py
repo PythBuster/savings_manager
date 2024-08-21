@@ -10,7 +10,6 @@ class InconsistentDatabaseError(ABC, Exception):
 
     def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
         self.message = f"Inconsistent Database! {message}"
-        self.message = f"Inconsistent Database! {message}"
         self.details = details
 
         super().__init__(message)

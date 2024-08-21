@@ -134,10 +134,8 @@ via:
 - for development: `poetry install`
 
 you should be able to start the app from root directory of the project by using the following command:
-`poetry run python -m src.main --environment live`
+`poetry run python -m src.main`
 
-Argument `--environment live` is required to load the .env file in `/envs` dir (see section: **Deployment/Contribution**).
-If argument is missing, app will load the .env.test credentials which will only work for pytest.
 
 This will start a service on:
 `http://localhost:8001`

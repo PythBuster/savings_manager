@@ -58,7 +58,7 @@ async def test_update_app_settings_status_200(
     app_settings_id = 1  # Assumed to be a valid ID for testing
     update_data = {
         "is_automated_saving_active": False,
-        "savings_amount": 50000,
+        "savings_amount": 50_000,
     }
 
     response = await client.patch(

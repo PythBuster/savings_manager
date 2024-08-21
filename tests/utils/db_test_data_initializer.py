@@ -55,11 +55,16 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_get_priority_list": self.dataset_test_get_priority_list,
             "test_get_empty_priority_list": self.truncate_tables,
             "test_update_priority_list": self.dataset_test_update_priority_list,
-            "test_create_instance": self.truncate_tables,
-            "test_add_moneybox": self.truncate_tables,
+            "test_create_instance": partial(
+                self.truncate_tables, exclude_table_names=["app_settings"]
+            ),
+            "test_add_moneybox": partial(
+                self.truncate_tables, exclude_table_names=["app_settings"]
+            ),
             "test_get_app_settings_status_200": partial(
                 self.truncate_tables, exclude_table_names=["app_settings"]
             ),
+            "test_get_app_settings_invalid": self.truncate_tables,
         }
         """Map test case name witch related test data generation function"""
 

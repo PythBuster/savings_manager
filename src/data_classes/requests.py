@@ -328,15 +328,10 @@ class AppSettingsRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def lower_case_enum_str_automated_saving_trigger_day(
+    def lower_case_enum_strings(
         cls, data: dict[str, Any]
     ) -> dict[str, Any]:
-        """Lower case 'automated_saving_trigger_day' if type is str."""
-
-        if "automated_saving_trigger_day" in data and isinstance(
-            data["automated_saving_trigger_day"], str
-        ):
-            data["automated_saving_trigger_day"] = data["automated_saving_trigger_day"].lower()
+        """Lower case enum strings."""
 
         if "overflow_moneybox_automated_savings_mode" in data and isinstance(
             data["overflow_moneybox_automated_savings_mode"], str

@@ -6,12 +6,14 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
-from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
+from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType, \
+    OverflowMoneyboxAutomatedSavingsModeType
 from src.data_classes.requests import (
     DepositTransactionRequest,
     TransferTransactionRequest,
     WithdrawTransactionRequest,
 )
+from src.data_classes.responses import AppSettingsResponse
 from src.db.db_manager import DBManager
 from src.db.exceptions import (
     BalanceResultIsNegativeError,
@@ -19,7 +21,7 @@ from src.db.exceptions import (
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError,
+    UpdateInstanceError, AppSettingsNotFoundError,
 )
 from src.utils import equal_dict
 
@@ -732,3 +734,76 @@ async def test_get_transactions_logs_with_counterparty_to_deleted_moneybox(
     )
 
     await db_manager.delete_moneybox(result_moneybox_data_4["id"])
+
+
+@pytest.mark.dependency(depends=["test_get_transactions_logs_with_counterparty_to_deleted_moneybox"])
+async def test_get_app_settings_valid(db_manager: DBManager) -> None:
+    _app_settings = await db_manager._get_app_settings()
+    app_settings = await db_manager.get_app_settings(app_settings_id=_app_settings.id)
+
+    expected_data = {
+        "is_automated_saving_active": False,
+        "savings_amount": 50_000,
+        "id": _app_settings.id,
+        "send_reports_via_email": False,
+        "user_email_address": None,
+        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+    }
+
+    assert equal_dict(
+        dict_1=app_settings,
+        dict_2=expected_data,
+        exclude_keys=["created_at", "modified_at"],
+    )
+
+@pytest.mark.dependency(depends=["test_get_app_settings_valid"])
+async def test_update_app_settings_valid(db_manager: DBManager) -> None:
+    _app_settings = await db_manager._get_app_settings()
+
+    update_data = {
+        "savings_amount": 0,
+    }
+
+    updated_app_settings = await db_manager.update_app_settings(
+        app_settings_id=_app_settings.id,
+        app_settings_data=update_data,
+    )
+
+    expected_data = {
+        "is_automated_saving_active": False,
+        "savings_amount": 0,
+        "id": _app_settings.id,
+        "send_reports_via_email": False,
+        "user_email_address": None,
+        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+    }
+
+    assert equal_dict(
+        dict_1=updated_app_settings,
+        dict_2=expected_data,
+        exclude_keys=["created_at", "modified_at"],
+    )
+
+@pytest.mark.dependency(depends=["test_update_app_settings_valid"])
+async def test_update_app_settings_invalid(db_manager: DBManager) -> None:
+    _app_settings = await db_manager._get_app_settings()
+
+    update_data = {
+        # results to asyncpg.exceptions.InvalidTextRepresentationError
+        "overflow_moneybox_automated_savings_mode": "unknown_mode",
+    }
+
+    with pytest.raises(UpdateInstanceError):
+        await db_manager.update_app_settings(
+            app_settings_id=_app_settings.id,
+            app_settings_data=update_data,
+        )
+
+@pytest.mark.dependency(depends=["test_update_app_settings_valid"])
+async def test_get_app_settings_invalid(
+        load_test_data: None,
+        db_manager: DBManager,
+) -> None:
+    # we assume an app_settings_id = 1
+    with pytest.raises(AppSettingsNotFoundError):
+        await db_manager.get_app_settings(app_settings_id=1)

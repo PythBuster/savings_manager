@@ -167,6 +167,9 @@ class DBManager:
 
         :return: The added moneybox data.
         :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`CreateInstanceError`: when something went wrong while
+            creating instance in database.
         """
 
         async with self.async_session.begin() as session:
@@ -202,36 +205,6 @@ class DBManager:
 
         return moneybox.asdict()
 
-    async def _create_moneybox_name_history(
-        self,
-        moneybox_id: int,
-        name: str,
-        session: AsyncSession,
-    ) -> dict[str, Any]:
-        """DB Function to create a moneybox history for a moneybox id.
-
-        :param moneybox_id: The id of the moneybox.
-        :type moneybox_id: :class:`int`
-        :param name: The name of the moneybox.
-        :type name: :class:`str`
-        :param session: The current session of the db creation.
-        :type session: class:`AsyncSession`
-
-        :return: The created moneybox history data.
-        :rtype: :class:`dict[str, Any]`
-        """
-
-        moneybox_name_history = await create_instance(
-            async_session=session,
-            orm_model=MoneyboxNameHistory,  # type: ignore
-            data={
-                "moneybox_id": moneybox_id,
-                "name": name,
-            },
-        )
-
-        return moneybox_name_history.asdict()
-
     async def update_moneybox(
         self,
         moneybox_id: int,
@@ -249,6 +222,10 @@ class DBManager:
 
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
             was not found in database.
+                :class:`OverflowMoneyboxCantBeUpdatedError`: when something went
+            wrong while updating the overflow moneybox in db transaction.
+                :class:`UpdateInstanceError`: when something went
+            wrong while updating progress in db transaction.
         """
 
         # get overflow moneybox and protect updating it
@@ -296,6 +273,14 @@ class DBManager:
 
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
             was not found in database.
+                 :class:`OverflowMoneyboxCantBeDeletedError`: overflow moneybox
+            is not allowed to be deleted.
+                :class:`HasBalanceError`: a moneybox with a balance > 0
+            is not allowed to be deleted.
+                :class:`UpdateInstanceError`: when something went
+            wrong while updating progress in db transaction.
+                :class:`DeleteInstanceError`: when something went
+            wrong while deleting progress in db transaction.
         """
 
         moneybox = await self.get_moneybox(moneybox_id=moneybox_id)
@@ -363,7 +348,6 @@ class DBManager:
 
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
                     was not found in database.
-                 :class:`NegativeAmountError`: if balance to add is negative.
         """
 
         # Determine the session to use
@@ -451,11 +435,11 @@ class DBManager:
         :rtype: :class:`dict[str, Any]`
 
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
-                    was not found in database.
-                 :class:`NegativeAmountError`:
-                    if balance to sub  is negative.
+            was not found in database.
+                 :class:`NonPositiveAmountError`:
+            if amount to sub is negative.
                  :class:`BalanceResultIsNegativeError`:
-                    if result of withdraw is negative.
+            if result of withdraw is negative.
         """
 
         amount = withdraw_transaction_data["amount"]
@@ -541,12 +525,12 @@ class DBManager:
         :param transaction_trigger: The transaction trigger for the transaction.
         :type transaction_trigger: :class:`TransactionTrigger`
 
-        :raises: :class:`NegativeTransferAmountError`:
-                    if balance to transfer is negative.
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+            was not found in database.
                  :class:`BalanceResultIsNegativeError`:
-                    if result of withdraws from_moneybox_id is negative.
+            if result of withdraws from_moneybox_id is negative.
                 :class:`TransferEqualMoneyboxError`:
-                    if transfer shall happen within the same moneybox.
+            if transfer shall happen within the same moneybox.
         """
 
         to_moneybox_id = transfer_transaction_data["to_moneybox_id"]
@@ -742,6 +726,9 @@ class DBManager:
         :type from_datetime: :class:`datetime.datetime` | :class:`None`
         :return: The historical moneybox name for the given moneybox id within given datetime.
         :rtype: :class:`str`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
+            was not found in database.
         """
 
         stmt = (
@@ -786,6 +773,9 @@ class DBManager:
         :type only_active_instances: :class:`bool`
         :return: The moneybox id for the given name.
         :rtype: :class:`int`
+
+        :raises: :class:`MoneyboxNotFoundError`: if given moneybox name
+            was not found in database.
         """
 
         stmt = select(Moneybox).where(  # type: ignore
@@ -842,6 +832,11 @@ class DBManager:
         :type priorities: :class:`list[dict[str, int]]`
         :return: The updated priority list (moneybox_id to priority and name map).
         :rtype: :class:`list[dict[str, str|int]]`
+
+        :raises: :class:`OverflowMoneyboxCantBeUpdatedError`: when something went
+            wrong while updating the overflow moneybox in db transaction.
+                 :class:`UpdateInstanceError`: when something went
+            wrong while updating progress in db transaction.
         """
 
         updating_data = [
@@ -924,6 +919,9 @@ class DBManager:
         :type app_settings_id: :class:`int`
         :return: The app settings data.
         :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`AppSettingsNotFoundError`: if there are no overflow moneybox in the
+            database, missing moneybox with priority = 0.
         """
 
         app_settings = await read_instance(
@@ -950,6 +948,11 @@ class DBManager:
         :type app_settings_data: :class:`dict[str, Any]`
         :return: The updated app settings data.
         :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`AppSettingsNotFoundError`: if there are no overflow moneybox
+            in the database, missing moneybox with priority = 0.
+                 :class:`AutomatedSavingsError`: when something went wrong while session
+            transactions.
         """
 
         async with self.async_session.begin() as session:
@@ -1027,37 +1030,14 @@ class DBManager:
 
         return list(result.scalars().all())
 
-    async def _determine_distribution_amount(
-        self,
-        app_settings: AppSettings,
-        overflow_moneybox: dict[str, Any],
-    ) -> int:
-        """Determine distribution amount by checking the OverflowMoneyboxAutomatedSavingsModeType of
-        the overflow moneybox, which will then eventually add overflow.balance to app.saving_amount.
-
-        :param app_settings: The app settings.
-        :type app_settings: :class:`AppSettings`
-        :param overflow_moneybox: The overflow moneybox.
-        :type overflow_moneybox: :class:`dict[str, Any]`
-        :return: The distribution amount.
-        :rtype: :class:`int`
-        """
-
-        action = app_settings.overflow_moneybox_automated_savings_mode
-
-        if (
-            action is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT
-            and overflow_moneybox["balance"] > 0
-        ):
-            return app_settings.savings_amount + overflow_moneybox["balance"]
-
-        return app_settings.savings_amount
-
     async def _get_app_settings(self) -> AppSettings:
         """Get app settings if automated savings.
 
         :return: The app settings.
         :rtype: :class:`AppSettings`
+
+        :raises: :class:`InconsistentDatabaseError` when data in database
+            are inconsistent.
         """
 
         all_app_settings = await self._get_all_app_settings()
@@ -1069,14 +1049,29 @@ class DBManager:
         app_settings = all_app_settings[0]
         return app_settings
 
-    async def _overflow_moneybox_add(
+    async def _overflow_moneybox_add_amount(
         self,
         app_settings: AppSettings,
         overflow_moneybox: dict[str, Any],
         add_amount: int,
         session: AsyncSession,
     ) -> dict[str, Any]:
+        """Helper function for adding amount the overflow moneybox.
 
+        :param app_settings: The app settings.
+        :type app_settings: :class:`AppSettings`
+        :param overflow_moneybox: The overflow moneybox.
+        :type overflow_moneybox: :class:`dict[str, Any]`
+        :param add_amount: The amount to add.
+        :type add_amount: :class:`int`
+        :param session: The current database session.
+        :type session: :class:`AsyncSession`
+        :return: The updated overflow moneybox.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`AutomatedSavingsError`: when something went wrong while session
+            transactions.
+        """
         if add_amount <= 0:
             return overflow_moneybox
 
@@ -1097,7 +1092,6 @@ class DBManager:
                 transaction_trigger=TransactionTrigger.AUTOMATICALLY,
             )
         except Exception as ex:
-
             raise AutomatedSavingsError(
                 record_id=overflow_moneybox["id"],
                 message="AutomatedSavings failed while sub_amount() from overflow moneybox.",
@@ -1111,13 +1105,29 @@ class DBManager:
 
         return updated_overflow_moneybox
 
-    async def _overflow_moneybox_sub(
+    async def _overflow_moneybox_sub_amount(
         self,
         app_settings: AppSettings,
         overflow_moneybox: dict[str, Any],
         sub_amount: int,
         session: AsyncSession,
     ) -> dict[str, Any]:
+        """Helper function for subbing amount the overflow moneybox.
+
+        :param app_settings: The app settings.
+        :type app_settings: :class:`AppSettings`
+        :param overflow_moneybox: The overflow moneybox.
+        :type overflow_moneybox: :class:`dict[str, Any]`
+        :param sub_amount: The amount to sub.
+        :type sub_amount: :class:`int`
+        :param session: The current database session.
+        :type session: :class:`AsyncSession`
+        :return: The updated overflow moneybox.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`AutomatedSavingsError`: when something went wrong while session
+            transactions.
+        """
 
         if sub_amount <= 0:
             return overflow_moneybox
@@ -1162,7 +1172,8 @@ class DBManager:
         :return: True, if distribution is done, false, if automated savings is deactivated.
         :rtype: :class:`bool`
 
-        :raises AutomatedSavingsError: is something went wrong while session transactions
+        :raises: :class:`AutomatedSavingsError`: is something went wrong while session
+            transactions.
         """
 
         app_settings = await self._get_app_settings()
@@ -1188,7 +1199,7 @@ class DBManager:
                 # remove balance from overflow moneybox
                 from_overflow_moneybox_distributed_amount: int = sorted_moneyboxes[0]["balance"]
 
-                sorted_moneyboxes[0] = await self._overflow_moneybox_sub(
+                sorted_moneyboxes[0] = await self._overflow_moneybox_sub_amount(
                     session=session,
                     app_settings=app_settings,
                     overflow_moneybox=sorted_moneyboxes[0],
@@ -1223,7 +1234,7 @@ class DBManager:
                 old_overflow_moneybox_balance: int = updated_moneyboxes[0]["balance"]
 
                 # remove balance from overflow moneybox
-                updated_moneyboxes[0] = await self._overflow_moneybox_sub(
+                updated_moneyboxes[0] = await self._overflow_moneybox_sub_amount(
                     session=session,
                     app_settings=app_settings,
                     overflow_moneybox=sorted_moneyboxes[0],
@@ -1288,13 +1299,13 @@ class DBManager:
             overflow moneybox included).
         :rtype: :class:`list[dict[str, Any]]`
 
-        :raises AutomatedSavingsError: when something went wrong while session transactions.
+        :raises: :class:`AutomatedSavingsError`: when something went wrong while
+            session transactions.
         """
 
         if distribute_amount <= 0:
             return sorted_moneyboxes
 
-        sum_distributed_amount = 0
         updated_moneyboxes = [sorted_moneyboxes[0]]  # add initially the overflow moneybox
 
         for moneybox in sorted_moneyboxes[1:]:  # skip overflow moneybox (priority=0)
@@ -1341,14 +1352,13 @@ class DBManager:
                     },
                 )
 
-            sum_distributed_amount += amount_to_distribute
             distribute_amount -= amount_to_distribute
 
         # add the rest of app_savings_amount to overflow_moneybox if there is a rest
         rest_amount: int = distribute_amount
 
         if rest_amount > 0:
-            updated_moneyboxes[0] = await self._overflow_moneybox_add(
+            updated_moneyboxes[0] = await self._overflow_moneybox_add_amount(
                 session=session,
                 app_settings=app_settings,
                 overflow_moneybox=updated_moneyboxes[0],
@@ -1400,7 +1410,7 @@ class DBManager:
         :return: The created automated savings logs data.
         :rtype: :class:`dict[str, Any]`
 
-        :raises: CreateInstanceError: if something went wrong while
+        :raises: :class:`CreateInstanceError`: if something went wrong while
             creating database instance.
         """
 

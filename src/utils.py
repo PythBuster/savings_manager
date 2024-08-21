@@ -62,21 +62,6 @@ def get_app_data() -> dict[str, Any]:
     return pyproject_data["tool"]["poetry"]
 
 
-def create_envfile_from_envvars() -> None:
-    """Helper function to create .env file for database credentials
-    in /envs dir by reading environment variables."""
-
-    envfile_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
-
-    with envfile_path.open(mode="w") as env_file:
-        env_file.write(f"DB_DRIVER={os.getenv('DB_DRIVER')}\n")
-        env_file.write(f"DB_NAME={os.getenv('DB_NAME')}\n")
-        env_file.write(f"DB_HOST={os.getenv('DB_HOST')}\n")
-        env_file.write(f"DB_PORT={os.getenv('DB_PORT')}\n")
-        env_file.write(f"DB_USER={os.getenv('DB_USER')}\n")
-        env_file.write(f"DB_PASSWORD={os.getenv('DB_PASSWORD')}\n")
-
-
 def equal_dict(
     dict_1: dict,
     dict_2: dict,

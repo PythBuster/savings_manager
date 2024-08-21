@@ -2,9 +2,13 @@
 
 from typing import Any
 
+from asyncpg import InvalidTextRepresentationError
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import Sequence, and_, insert, select, update
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from src.db.exceptions import UpdateInstanceError
 from src.db.models import SqlBase
 
 
@@ -148,11 +152,20 @@ async def update_instance(
 
     stmt = update(orm_model).where(orm_model.id == record_id).values(data).returning(orm_model)
 
-    if isinstance(async_session, AsyncSession):
-        result = await async_session.execute(stmt)
-    else:
-        async with async_session.begin() as session:
-            result = await session.execute(stmt)
+    try:
+        if isinstance(async_session, AsyncSession):
+            result = await async_session.execute(stmt)
+        else:
+            async with async_session.begin() as session:
+                result = await session.execute(stmt)
+    except (DBAPIError, InvalidTextRepresentationError) as ex:
+        raise UpdateInstanceError(
+            record_id=record_id,
+            message=str(ex),
+            details= data | {
+                "exception": jsonable_encoder(ex),
+            },
+        ) from ex
 
     instance = result.scalars().one_or_none()
     return instance

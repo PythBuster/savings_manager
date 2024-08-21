@@ -26,16 +26,6 @@ class EndpointRouteType(StrEnum):
     """Settings endpoint path name."""
 
 
-class EnvironmentType(StrEnum):
-    """The Environment Types to handle env loading logic."""
-
-    LIVE = "live"
-    """Live Environment (including DEV, STAGE, PROD)."""
-
-    TEST = "test"
-    """Testing Environment."""
-
-
 class AppEnvVariables(BaseSettings):
     """The app env vars, with all settings/credentials for:
     - database
@@ -119,9 +109,6 @@ class ActionType(StrEnum):
     APPLIED_AUTOMATED_SAVING = "applied_automated_saving"
     """Action for executing the automated savings."""
 
-    CATCHED_UP_AUTOMATED_SAVING = "catched_up_automated_saving"
-    """Action for catching up passed automated savings."""
-
     CHANGED_AUTOMATED_SAVINGS_AMOUNT = "changed_automated_savings_amount"
     """Action for changing the savings amount in app settings."""
 
@@ -140,10 +127,3 @@ class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
     """After the automated savings process, the entire balance from the overflow
     moneybox should be distributed to the moneyboxes with upper limits, in the order of
     the priority list. Try to fill them up."""
-
-
-class ReceiverType(StrEnum):
-    """The receiver types. Currently supported: EMAIL"""
-
-    EMAIL = "email"
-    """Indicates that receiver shall get message via email."""
