@@ -1,6 +1,6 @@
 """All db_manager tests are located here."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from fastapi.encoders import jsonable_encoder
@@ -10,7 +10,7 @@ from src.custom_types import (
     AppEnvVariables,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType,
+    TransactionType, ActionType,
 )
 from src.data_classes.requests import (
     DepositTransactionRequest,
@@ -816,3 +816,111 @@ async def test_get_app_settings_invalid(
     # we assume an app_settings_id = 1
     with pytest.raises(AppSettingsNotFoundError):
         await db_manager.get_app_settings(app_settings_id=1)
+
+@pytest.mark.dependency(depends=["test_get_app_settings_invalid"])
+async def test_add_automated_savings_log_valid_without_session(db_manager: DBManager) -> None:
+    action_at = datetime.now(tz=timezone.utc)
+    automated_savings_log_data_collection = [
+        {
+            "action": ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT,
+            "action_at": action_at,
+            "details": {"meta": "data 1"},
+        },
+        {
+            "action": ActionType.APPLIED_AUTOMATED_SAVING,
+            "action_at": action_at,
+            "details": {"meta": "data 2"},
+        }
+    ]
+
+    for i, automated_savings_log_data in enumerate(automated_savings_log_data_collection):
+        automated_savings_log = await db_manager.add_automated_savings_logs(
+            automated_savings_log_data=automated_savings_log_data,
+        )
+
+        assert equal_dict(
+            dict_1=automated_savings_log,
+            dict_2=automated_savings_log_data_collection[i],
+            exclude_keys=["created_at", "modified_at", "id"],
+        )
+
+@pytest.mark.dependency(depends=["test_add_automated_savings_log_valid_without_session"])
+async def test_add_automated_savings_log_valid_with_session(db_manager: DBManager) -> None:
+    action_at = datetime.now(tz=timezone.utc)
+    automated_savings_log_data_collection = [
+        {
+            "action": ActionType.DEACTIVATED_AUTOMATED_SAVING,
+            "action_at": action_at,
+            "details": {"meta": "data 3"},
+        },
+        {
+            "action": ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT,
+            "action_at": action_at,
+            "details": {"meta": "data 4"},
+        }
+    ]
+
+    async with db_manager.async_session.begin() as session:
+        for i, automated_savings_log_data in enumerate(automated_savings_log_data_collection):
+            automated_savings_log = await db_manager.add_automated_savings_logs(
+                session=session,
+                automated_savings_log_data=automated_savings_log_data,
+            )
+
+            assert equal_dict(
+                dict_1=automated_savings_log,
+                dict_2=automated_savings_log_data_collection[i],
+                exclude_keys=["created_at", "modified_at", "id"],
+            )
+
+@pytest.mark.parametrize(
+    "action_type",
+    [
+        ActionType.APPLIED_AUTOMATED_SAVING,
+        ActionType.DEACTIVATED_AUTOMATED_SAVING
+    ],
+)
+@pytest.mark.dependency(depends=["test_add_automated_savings_log_valid_with_session"])
+async def test_get_automated_savings_logs(db_manager: DBManager, action_type: ActionType) -> None:
+    expected_data = {
+        ActionType.APPLIED_AUTOMATED_SAVING: [
+            {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "details": {"meta": "data 2"},
+            },
+
+        ],
+        ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT: [
+            {
+                "action": ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT,
+                "details": {"meta": "data 1"},
+            },
+            {
+                "action": ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT,
+                "details": {"meta": "data 4"},
+            },
+        ],
+        ActionType.DEACTIVATED_AUTOMATED_SAVING: [
+            {
+                "action": ActionType.DEACTIVATED_AUTOMATED_SAVING,
+                "details": {"meta": "data 3"},
+            },
+        ]
+    }
+
+
+    automated_savings_logs = await db_manager.get_automated_savings_logs(
+        action_type=action_type,
+    )
+
+    automated_savings_logs = sorted(automated_savings_logs, key= lambda item: item["details"]["meta"])
+
+    for i, automated_savings_log in enumerate(automated_savings_logs):
+        assert "action_at" in automated_savings_log
+        assert isinstance(automated_savings_log["action_at"], datetime)
+
+        assert equal_dict(
+            dict_1=automated_savings_log,
+            dict_2=expected_data[action_type][i],
+            exclude_keys=["created_at", "modified_at", "id", "action_at"],
+        )
