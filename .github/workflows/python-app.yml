@@ -33,4 +33,4 @@ jobs:
         poetry install --with dev
 
     - name: Run tests
-      run: poetry run pytest --cov-fail-under=80
+      run: poetry run pytest --cov-fail-under=90
