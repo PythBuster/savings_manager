@@ -3,10 +3,13 @@
 ## x.y.z (unreleased)
 ...
 
+## 1.21.0 (2024-08-27)
+### Features:
+- setup global logger and write exceptions in ../src/errors.log
+
 ## 1.20.0 (2024-08-26)
 ### Features:
 - send email after automated savings scheduled (if flag is enabled for receiving emails in app settings)
-
 
 ## 1.19.2 (2024-08-19)
 ### Changes:
