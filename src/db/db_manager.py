@@ -1319,7 +1319,7 @@ class DBManager:
                     updated_moneyboxes.append(moneybox)
                     continue
 
-            if moneybox["savings_target"] is not None and moneybox["savings_target"] > 0:
+            if moneybox["savings_target"] is not None:
                 missing_amount_until_target = moneybox["savings_target"] - moneybox["balance"]
 
                 if missing_amount_until_target > 0:

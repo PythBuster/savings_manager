@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from functools import partial
 from pathlib import Path
 from typing import AsyncGenerator
+from unittest.mock import patch
 
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
@@ -18,6 +19,7 @@ from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionTyp
 from src.db.db_manager import DBManager
 from src.db.models import Base
 from src.main import app, register_router, set_custom_openapi_schema
+from src.report_sender.email_sender.sender import EmailSender
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
 
 pytest_plugins = ("pytest_asyncio",)
@@ -62,7 +64,7 @@ async def default_test_data(db_manager: DBManager) -> None:
     # add 5 moneyboxes + initial overflow moneybox
     moneyboxes_data = [
         {
-            "name": "1bd2a9ee-26a1-4630-a068-19865cf2ca62",
+            "name": "Overflow Moneybox",
             "savings_amount": 0,
             "savings_target": None,
             "priority": 0,
@@ -239,6 +241,21 @@ async def load_test_data(request: FixtureRequest, db_manager: DBManager) -> None
     )
     await test_data_initializer_.run()
 
+@pytest_asyncio.fixture(scope="session", name="smtp_settings")
+async def mocked_smtp_settings(db_settings_1: AppEnvVariables) -> AsyncGenerator:
+    yield db_settings_1
+
+@pytest_asyncio.fixture(scope="session", name="email_sender")
+async def mocked_email_sender(
+        db_manager: DBManager,
+        smtp_settings: AppEnvVariables,
+) -> AsyncGenerator:
+    email_sender = EmailSender(
+        db_manager=db_manager,
+        smtp_settings=smtp_settings,
+    )
+    #email_sender.send_message = lambda *args, **kwargs: None
+    yield email_sender
 
 @pytest_asyncio.fixture(scope="session", name="client")
 async def mocked_client(db_manager: DBManager) -> AsyncGenerator:

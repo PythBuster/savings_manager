@@ -26,7 +26,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
         "total": 6,
         "moneyboxes": [
             {
-                "name": "1bd2a9ee-26a1-4630-a068-19865cf2ca62",
+                "name": "Overflow Moneybox",
                 "id": 1,
                 "balance": 0,
                 "savings_amount": 0,

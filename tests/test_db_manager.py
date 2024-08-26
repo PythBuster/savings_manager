@@ -767,16 +767,16 @@ async def test_get_app_settings_valid(db_manager: DBManager) -> None:
 async def test_update_app_settings_valid(db_manager: DBManager) -> None:
     _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
 
-    update_data = {
+    update_data_1 = {
         "savings_amount": 0,
     }
 
-    updated_app_settings = await db_manager.update_app_settings(
+    updated_app_settings_1 = await db_manager.update_app_settings(
         app_settings_id=_app_settings.id,
-        app_settings_data=update_data,
+        app_settings_data=update_data_1,
     )
 
-    expected_data = {
+    expected_data_1 = {
         "is_automated_saving_active": False,
         "savings_amount": 0,
         "id": _app_settings.id,
@@ -786,8 +786,32 @@ async def test_update_app_settings_valid(db_manager: DBManager) -> None:
     }
 
     assert equal_dict(
-        dict_1=updated_app_settings,
-        dict_2=expected_data,
+        dict_1=updated_app_settings_1,
+        dict_2=expected_data_1,
+        exclude_keys=["created_at", "modified_at"],
+    )
+
+    update_data_2 = {
+        "is_automated_saving_active": True,
+    }
+
+    updated_app_settings_2 = await db_manager.update_app_settings(
+        app_settings_id=_app_settings.id,
+        app_settings_data=update_data_2,
+    )
+
+    expected_data_2 = {
+        "is_automated_saving_active": True,
+        "savings_amount": 0,
+        "id": _app_settings.id,
+        "send_reports_via_email": False,
+        "user_email_address": None,
+        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore   # pylint: disable=line-too-long
+    }
+
+    assert equal_dict(
+        dict_1=updated_app_settings_2,
+        dict_2=expected_data_2,
         exclude_keys=["created_at", "modified_at"],
     )
 
@@ -873,6 +897,7 @@ async def test_add_automated_savings_log_valid_with_session(db_manager: DBManage
                 exclude_keys=["created_at", "modified_at", "id"],
             )
 
+@pytest.mark.dependency(name="test_get_automated_savings_logs", depends=["test_add_automated_savings_log_valid_with_session"])
 @pytest.mark.parametrize(
     "action_type",
     [
@@ -880,7 +905,6 @@ async def test_add_automated_savings_log_valid_with_session(db_manager: DBManage
         ActionType.DEACTIVATED_AUTOMATED_SAVING
     ],
 )
-@pytest.mark.dependency(depends=["test_add_automated_savings_log_valid_with_session"])
 async def test_get_automated_savings_logs(db_manager: DBManager, action_type: ActionType) -> None:
     expected_data = {
         ActionType.APPLIED_AUTOMATED_SAVING: [
@@ -924,3 +948,67 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
             dict_2=expected_data[action_type][i],
             exclude_keys=["created_at", "modified_at", "id", "action_at"],
         )
+
+@pytest.mark.dependency(depends=["test_get_automated_savings_logs"])
+async def test_automated_savings_overflow_moneybox_mode_collect(
+        load_test_data: None,
+        db_manager: DBManager,
+) -> None:
+    await db_manager.automated_savings()
+
+    moneyboxes = await db_manager.get_moneyboxes()
+    expected_data = {
+        "Overflow Moneybox": 105,
+        "Test Box 1": 5,
+        "Test Box 2": 5,
+        "Test Box 3": 15,
+        "Test Box 4": 20,
+        "Test Box 5": 0,
+        "Test Box 6": 0,
+    }
+
+    for moneybox in moneyboxes:
+        assert moneybox["balance"] == expected_data[moneybox["name"]]
+
+@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_collect"])
+async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
+        load_test_data: None,
+        db_manager: DBManager,
+) -> None:
+    await db_manager.automated_savings()
+
+    moneyboxes = await db_manager.get_moneyboxes()
+    expected_data = {
+        "Overflow Moneybox": 105,
+        "Test Box 1": 5,
+        "Test Box 2": 5,
+        "Test Box 3": 15,
+        "Test Box 4": 20,
+        "Test Box 5": 0,
+        "Test Box 6": 0,
+    }
+
+    for moneybox in moneyboxes:
+        assert moneybox["balance"] == expected_data[moneybox["name"]]
+
+
+@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_add_to_amount"])
+async def test_automated_savings_overflow_moneybox_mode_fill_up(
+        load_test_data: None,
+        db_manager: DBManager,
+) -> None:
+    await db_manager.automated_savings()
+
+    moneyboxes = await db_manager.get_moneyboxes()
+    expected_data = {
+        "Overflow Moneybox": 75,
+        "Test Box 1": 5,
+        "Test Box 2": 5,
+        "Test Box 3": 15,
+        "Test Box 4": 50,
+        "Test Box 5": 0,
+        "Test Box 6": 0,
+    }
+
+    for moneybox in moneyboxes:
+        assert moneybox["balance"] == expected_data[moneybox["name"]]
