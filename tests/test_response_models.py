@@ -536,6 +536,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
     with pytest.raises(ValidationError):
         PrioritylistResponse(**data)
 
+
 # Tests for AppSettingsResponse
 @pytest.mark.parametrize(
     "data",
@@ -546,7 +547,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 60000,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": False,
             "user_email_address": None,
         },
@@ -556,7 +557,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": False,
             "user_email_address": None,
         },
@@ -566,7 +567,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": "2024-08-10 11:45:00+00:00",  # Valid datetime string
             "is_automated_saving_active": True,
             "savings_amount": 0,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -592,6 +593,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
     assert response.is_automated_saving_active == data["is_automated_saving_active"]
     assert response.savings_amount == data["savings_amount"]
 
+
 @pytest.mark.parametrize(
     "data",
     [
@@ -611,7 +613,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -621,7 +623,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,  # Negative savings_amount
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -631,7 +633,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": False,
             "user_email_address": "1",  # Invalid email address
         },
@@ -651,7 +653,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 100,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,  # True, but user_email_address is not set
             "user_email_address": None,
         },
@@ -661,7 +663,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 100,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,
             "user_email_address": "",  # Empty email address (Invalid)
         },
@@ -691,8 +693,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 100,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
-            # noqa: ignore  # pylint: disable=line-too-long
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,  # True, but user_email_address is not set
             "user_email_address": None,
         },
@@ -702,8 +703,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": {},
             "is_automated_saving_active": True,
             "savings_amount": 100,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
-            # noqa: ignore  # pylint: disable=line-too-long
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
             "send_reports_via_email": True,  # True, but user_email_address is not set
             "user_email_address": None,
         },
