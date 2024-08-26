@@ -70,6 +70,36 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": None,
         },
+        {
+            "id": 3,
+            "name": "Holiday",
+            "balance": 1000,
+            "savings_amount": 500,
+            "savings_target": 2000,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1),
+        },  # Valid datetimes
+        {
+            "id": 4,
+            "name": "Emergency Fund",
+            "balance": 200,
+            "savings_amount": 100,
+            "savings_target": None,
+            "priority": 2,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": None,
+        },  # None modified_at
+        {
+            "id": 5,
+            "name": "Vacation",
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc).isoformat(),
+            "modified_at": (datetime.now(tz=timezone.utc) + timedelta(days=2)).isoformat(),
+        },  # ISO format strings for datetimes
     ],
 )
 def test_moneybox_response_valid(data: dict[str, Any]) -> None:
@@ -81,8 +111,16 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
     assert response.savings_amount == data["savings_amount"]
     assert response.savings_target == data["savings_target"]
     assert response.priority == data["priority"]
-    assert response.created_at == data["created_at"]
-    assert response.modified_at == data["modified_at"]
+
+    if isinstance(data["created_at"], str):
+        assert response.created_at == datetime.fromisoformat(data["created_at"])
+    else:
+        assert response.created_at == data["created_at"]
+
+    if isinstance(data["modified_at"], str):
+        assert response.modified_at == datetime.fromisoformat(data["modified_at"])
+    else:
+        assert response.modified_at == data["modified_at"]
 
 
 @pytest.mark.parametrize(
@@ -99,7 +137,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime.now(tz=timezone.utc),
         },  # Negative balance
         {
-            "id": 1,
+            "id": 2,
             "name": "Holiday",
             "balance": 1000,
             "savings_amount": 500,
@@ -107,7 +145,57 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
+        },  # modified_at before created_at,
+        {
+            "id": 3,
+            "name": "Holiday",
+            "balance": 1000,
+            "savings_amount": 500,
+            "savings_target": 2000,
+            "priority": 1,
+            "created_at": "2024-08-11 13:57:17.941840+00:00",
+            "modified_at": "not-a-datetime",
+        },  # Invalid modified_at format
+        {
+            "id": 4,
+            "name": "Emergency Fund",
+            "balance": 200,
+            "savings_amount": 100,
+            "savings_target": None,
+            "priority": 2,
+            "created_at": "not-a-datetime",
+            "modified_at": None,
+        },  # Invalid created_at format
+        {
+            "id": 5,
+            "name": "Vacation",
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
         },  # modified_at before created_at
+        {
+            "id": 6,
+            "name": "Vacation",
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": {},  # incorrect type
+            "modified_at": datetime.now(tz=timezone.utc),
+        },
+        {
+            "id": 7,
+            "name": "Vacation",
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": {},  # incorrect type
+        },
     ],
 )
 def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
@@ -144,6 +232,30 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                 },
             ]
         },
+        {
+            "moneyboxes": [
+                {
+                    "id": 1,
+                    "name": "Holiday",
+                    "balance": 1000,
+                    "savings_amount": 500,
+                    "savings_target": 2000,
+                    "priority": 1,
+                    "created_at": (datetime.now(tz=timezone.utc) - timedelta(days=1)).isoformat(),
+                    "modified_at": (datetime.now(tz=timezone.utc)).isoformat(),
+                },
+                {
+                    "id": 2,
+                    "name": "Emergency Fund",
+                    "balance": 200,
+                    "savings_amount": 100,
+                    "savings_target": None,
+                    "priority": 2,
+                    "created_at": (datetime.now(tz=timezone.utc) - timedelta(days=1)).isoformat(),
+                    "modified_at": None,
+                },
+            ]
+        },  # Valid ISO format datetimes
     ],
 )
 def test_moneyboxes_response_valid(data: dict[str, Any]) -> None:
@@ -153,12 +265,41 @@ def test_moneyboxes_response_valid(data: dict[str, Any]) -> None:
     for i, box in enumerate(response.moneyboxes):
         assert box.id == data["moneyboxes"][i]["id"]
         assert box.name == data["moneyboxes"][i]["name"]
+    assert response.total == len(data["moneyboxes"])  # Validate the computed `total` property
 
 
 @pytest.mark.parametrize(
     "data",
     [
-        {"moneyboxes": []},
+        {"moneyboxes": []},  # Empty moneyboxes list
+        {
+            "moneyboxes": [
+                {
+                    "id": 1,
+                    "name": "Holiday",
+                    "balance": 1000,
+                    "savings_amount": 500,
+                    "savings_target": 2000,
+                    "priority": 1,
+                    "created_at": "not-a-datetime",
+                    "modified_at": datetime.now(tz=timezone.utc),
+                },
+            ]
+        },  # Invalid created_at format (string not a datetime)
+        {
+            "moneyboxes": [
+                {
+                    "id": 2,
+                    "name": "Emergency Fund",
+                    "balance": 200,
+                    "savings_amount": 100,
+                    "savings_target": None,
+                    "priority": 2,
+                    "created_at": datetime.now(tz=timezone.utc),
+                    "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
+                },
+            ]
+        },  # Invalid: modified_at is before created_at
     ],
 )
 def test_moneyboxes_response_invalid(data: dict[str, Any]) -> None:
@@ -182,7 +323,19 @@ def test_moneyboxes_response_invalid(data: dict[str, Any]) -> None:
             "counterparty_moneybox_id": 2,
             "moneybox_id": 1,
             "created_at": datetime.now(tz=timezone.utc),
-        }
+        },
+        {
+            "id": 2,
+            "counterparty_moneybox_name": "Savings Box",
+            "description": "Automated savings",
+            "transaction_type": "distribution",
+            "transaction_trigger": "automatically",
+            "amount": 1000,
+            "balance": 2000,
+            "counterparty_moneybox_id": 3,
+            "moneybox_id": 2,
+            "created_at": (datetime.now(tz=timezone.utc) - timedelta(days=1)).isoformat(),
+        },  # Valid ISO format datetime
     ],
 )
 def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
@@ -191,6 +344,11 @@ def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
     assert response.id == data["id"]
     assert response.amount == data["amount"]
     assert response.balance == data["balance"]
+
+    if isinstance(data["created_at"], str):
+        assert response.created_at == datetime.fromisoformat(data["created_at"])
+    else:
+        assert response.created_at == data["created_at"]
 
 
 @pytest.mark.parametrize(
@@ -209,7 +367,7 @@ def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
             "created_at": datetime.now(tz=timezone.utc),
         },  # Invalid amount
         {
-            "id": 1,
+            "id": 2,
             "counterparty_moneybox_name": "Other Box",
             "description": "Test transaction",
             "transaction_type": "DISTRIBUTION",
@@ -220,6 +378,30 @@ def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
             "moneybox_id": 1,
             "created_at": datetime.now(tz=timezone.utc),
         },  # Invalid transaction type and trigger combination
+        {
+            "id": 3,
+            "counterparty_moneybox_name": "Invalid Date",
+            "description": "Test transaction",
+            "transaction_type": "direct",
+            "transaction_trigger": "manually",
+            "amount": 100,
+            "balance": 1100,
+            "counterparty_moneybox_id": 2,
+            "moneybox_id": 1,
+            "created_at": "not-a-datetime",
+        },  # Invalid created_at format (string not a datetime)
+        {
+            "id": 4,
+            "counterparty_moneybox_name": "Savings Box",
+            "description": "Automated savings",
+            "transaction_type": "distribution",
+            "transaction_trigger": "automatically",
+            "amount": 1000,
+            "balance": 2000,
+            "counterparty_moneybox_id": 3,
+            "moneybox_id": 2,
+            "created_at": 1621621621,
+        },  # Invalid created_at format (timestamp)
     ],
 )
 def test_transaction_log_response_invalid(data: dict[str, Any]) -> None:
@@ -354,7 +536,6 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
     with pytest.raises(ValidationError):
         PrioritylistResponse(**data)
 
-
 # Tests for AppSettingsResponse
 @pytest.mark.parametrize(
     "data",
@@ -365,27 +546,27 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 60000,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
             "send_reports_via_email": False,
             "user_email_address": None,
         },
         {
             "id": 2,
-            "created_at": datetime(2024, 8, 10, 12, 30, 0, tzinfo=timezone.utc),
+            "created_at": "2024-08-10 12:30:00+00:00",  # Valid datetime string
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,  # noqa: ignore  # pylint: disable=line-too-long
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
             "send_reports_via_email": False,
             "user_email_address": None,
         },
         {
             "id": 3,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
-            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "modified_at": "2024-08-10 11:45:00+00:00",  # Valid datetime string
             "is_automated_saving_active": True,
             "savings_amount": 0,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint: disable=line-too-long
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -395,13 +576,21 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
     """Test valid AppSettingsResponse creation."""
     response = AppSettingsResponse(**data)
     assert response.id == data["id"]
-    assert response.created_at == data["created_at"]
-    assert response.modified_at == data["modified_at"]
+
+    if isinstance(data["created_at"], str):
+        assert response.created_at == datetime.fromisoformat(data["created_at"])
+    else:
+        assert response.created_at == data["created_at"]
+
+    if isinstance(data["modified_at"], str):
+        assert response.modified_at == datetime.fromisoformat(data["modified_at"])
+    else:
+        assert response.modified_at == data["modified_at"]
+
     assert response.send_reports_via_email == data["send_reports_via_email"]
     assert response.user_email_address == data["user_email_address"]
     assert response.is_automated_saving_active == data["is_automated_saving_active"]
     assert response.savings_amount == data["savings_amount"]
-
 
 @pytest.mark.parametrize(
     "data",
@@ -412,18 +601,17 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 11, 15, 3, 17, 312860, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 60000,
-            "overflow_moneybox_automated_savings_mode": "collect",
-            # noqa: ignore  # pylint: disable=line-too-long
+            "overflow_moneybox_automated_savings_mode": "collect",  # Invalid enum value
             "send_reports_via_email": True,
-            "user_mail_address": "pythbuster@gmail.com",
+            "user_email_address": "pythbuster@gmail.com",
         },
         {
             "id": 4,
-            "created_at": "2024-08-10T12:30:00",  # Invalid datetime type
+            "created_at": "invalid-datetime",  # Invalid datetime string
             "modified_at": None,
             "is_automated_saving_active": False,
             "savings_amount": 1000,
-            "overflow_moneybox_automated_savings_mode": "collect",
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -433,7 +621,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,  # Negative savings_amount
-            "overflow_moneybox_automated_savings_mode": "collect",
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
             "send_reports_via_email": True,
             "user_email_address": "pythbuster@gmail.com",
         },
@@ -443,17 +631,17 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": -100,
-            "overflow_moneybox_automated_savings_mode": "collect",
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
             "send_reports_via_email": False,
-            "user_email_address": "1",  # invalid report_sender address
+            "user_email_address": "1",  # Invalid email address
         },
         {
             "id": 6,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
-            "savings_amount": -100,
-            "overflow_moneybox_automated_savings_mode": "unknown",
+            "savings_amount": 100,
+            "overflow_moneybox_automated_savings_mode": "unknown",  # Invalid enum value
             "send_reports_via_email": False,
             "user_email_address": None,
         },
@@ -463,8 +651,60 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
             "savings_amount": 100,
-            "overflow_moneybox_automated_savings_mode": "collect",
-            "send_reports_via_email": True,  # is true, but report_sender not set
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "send_reports_via_email": True,  # True, but user_email_address is not set
+            "user_email_address": None,
+        },
+        {
+            "id": 8,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 100,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "send_reports_via_email": True,
+            "user_email_address": "",  # Empty email address (Invalid)
+        },
+        {
+            "id": 9,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": "dsf",
+            "is_automated_saving_active": True,
+            "savings_amount": 100,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+            "send_reports_via_email": True,  # True, but user_email_address is not set
+            "user_email_address": None,
+        },
+        {
+            "id": 10,
+            "created_at": "dsf",
+            "modified_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 100,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+            "send_reports_via_email": True,  # True, but user_email_address is not set
+            "user_email_address": None,
+        },
+        {
+            "id": 11,
+            "created_at": {},
+            "modified_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "is_automated_saving_active": True,
+            "savings_amount": 100,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            # noqa: ignore  # pylint: disable=line-too-long
+            "send_reports_via_email": True,  # True, but user_email_address is not set
+            "user_email_address": None,
+        },
+        {
+            "id": 13,
+            "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
+            "modified_at": {},
+            "is_automated_saving_active": True,
+            "savings_amount": 100,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            # noqa: ignore  # pylint: disable=line-too-long
+            "send_reports_via_email": True,  # True, but user_email_address is not set
             "user_email_address": None,
         },
     ],

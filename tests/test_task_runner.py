@@ -28,7 +28,7 @@ async def test_task_automated_savings_schedule(
     # Event to signal when send_message has been called
     send_message_called = asyncio.Event()
 
-    async def mock_send_message(*args, **kwargs) -> None:  # pylint: disable=unused-code
+    async def mock_send_message(*args, **kwargs) -> None:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
         send_message_called.set()  # Signal that send_message was called
 
     with (

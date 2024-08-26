@@ -868,7 +868,7 @@ async def test_add_automated_savings_log_valid_without_session(db_manager: DBMan
 
         assert equal_dict(
             dict_1=automated_savings_log,  # pylint: disable=unnecessary-list-index-lookup
-            dict_2=automated_savings_log_data_collection[ # pylint: disable=unnecessary-list-index-lookup
+            dict_2=automated_savings_log_data_collection[  # noqa: ignore  # pylint: disable=unnecessary-list-index-lookup, line-too-long
                 i
             ],
             exclude_keys=["created_at", "modified_at", "id"],
@@ -900,7 +900,7 @@ async def test_add_automated_savings_log_valid_with_session(db_manager: DBManage
 
             assert equal_dict(
                 dict_1=automated_savings_log,
-                dict_2=automated_savings_log_data_collection[  # pylint: disable=unnecessary-list-index-lookup
+                dict_2=automated_savings_log_data_collection[  # noqa: ignore  # pylint: disable=unnecessary-list-index-lookup, line-too-long
                     i
                 ],
                 exclude_keys=["created_at", "modified_at", "id"],

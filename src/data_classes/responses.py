@@ -319,7 +319,7 @@ class TransactionLogResponse(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def convert_to_strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
-        """Check if 'modified_at' and 'created_at' is type datetime."""
+        """Check if 'created_at' is type datetime."""
 
         if isinstance(data["created_at"], str):
             try:
@@ -566,6 +566,17 @@ class AppSettingsResponse(BaseModel):
     @classmethod
     def convert_to_strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Check if 'modified_at' and 'created_at' is type datetime."""
+
+        if data["modified_at"] is not None:
+            if isinstance(data["modified_at"], str):
+                try:
+                    data["modified_at"] = datetime.fromisoformat(data["modified_at"])
+                except (TypeError, ValueError) as ex:
+                    raise ValueError(
+                        "'created_at' must be of type datetime or datetime-string."
+                    ) from ex
+            elif not isinstance(data["modified_at"], datetime):
+                raise ValueError("'modified_at' must be of type datetime or datetime-string.")
 
         if isinstance(data["created_at"], str):
             try:
