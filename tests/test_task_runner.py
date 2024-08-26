@@ -28,7 +28,7 @@ async def test_task_automated_savings_schedule(
     # Event to signal when send_message has been called
     send_message_called = asyncio.Event()
 
-    async def mock_send_message() -> None:
+    async def mock_send_message(*args, **kwargs) -> None:  # pylint: disable=unused-code
         send_message_called.set()  # Signal that send_message was called
 
     with (
@@ -71,13 +71,8 @@ async def test_task_automated_savings_dont_schedule(
     email_sender_path = EmailSender.__module__
     sender_class_name = EmailSender.__qualname__
 
-    async def mock_send_message() -> None:
-        pass
-
     with (
-        patch(
-            f"{email_sender_path}.{sender_class_name}.send_message", side_effect=mock_send_message
-        ) as mock_send,
+        patch(f"{email_sender_path}.{sender_class_name}.send_message") as mock_send,
         patch(f"{module_path}.datetime") as mock_datetime,
     ):
         fake_today = datetime(2022, 1, 2, 15)
