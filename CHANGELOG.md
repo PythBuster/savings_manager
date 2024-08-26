@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 2.0.0 (2024-08-27)
+### Changed:
+- fix docker compose app service, so savings manager can run into a docker container
+
 ## 1.21.0 (2024-08-27)
 ### Features:
 - setup global logger and write exceptions in ../src/errors.log
