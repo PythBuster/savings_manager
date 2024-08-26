@@ -7,6 +7,8 @@ from typing import AsyncGenerator, Callable
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from requests import Response
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
@@ -14,6 +16,7 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src import exception_handler
+from src.app_logger import logger
 from src.constants import SPHINX_DIRECTORY, WORKING_DIR
 from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.db.db_manager import DBManager
@@ -71,6 +74,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     # deconstruct app here
 
 
+# Initialize the fastAPI app
 app = FastAPI(
     lifespan=lifespan,
     title=app_data["name"],
@@ -84,6 +88,23 @@ app = FastAPI(
     # swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
 """Reference to the fastapi app."""
+
+
+# Custom handler for RequestValidationError
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,  # pylint: disable=unused-argument
+    exc: RequestValidationError,
+) -> JSONResponse:
+    """Custom request validation handler.
+
+    Logs exception before responding."""
+
+    logger.exception(exc)
+    return JSONResponse(
+        status_code=422,
+        content=jsonable_encoder({"detail": exc.errors()}),
+    )
 
 
 # exception handler

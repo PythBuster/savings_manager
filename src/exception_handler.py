@@ -1,12 +1,11 @@
 """All exception_handler logic are located here."""
 
-import logging
-
 import sqlalchemy
 from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
 
+from src.app_logger import logger
 from src.data_classes.responses import HTTPErrorResponse
 from src.db.exceptions import (
     CrudDatabaseError,
@@ -24,7 +23,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
     :rtype: :class:`JSONResponse`
     """
 
-    logging.exception(exception)
+    logger.exception(exception)
 
     if isinstance(exception, InconsistentDatabaseError):
         return JSONResponse(
