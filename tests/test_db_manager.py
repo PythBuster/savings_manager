@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 """All db_manager tests are located here."""
 
 from datetime import datetime, timezone
@@ -7,10 +9,11 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
 from src.custom_types import (
+    ActionType,
     AppEnvVariables,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType, ActionType,
+    TransactionType,
 )
 from src.data_classes.requests import (
     DepositTransactionRequest,
@@ -841,6 +844,7 @@ async def test_get_app_settings_invalid(
     with pytest.raises(AppSettingsNotFoundError):
         await db_manager.get_app_settings(app_settings_id=1)
 
+
 @pytest.mark.dependency(depends=["test_get_app_settings_invalid"])
 async def test_add_automated_savings_log_valid_without_session(db_manager: DBManager) -> None:
     action_at = datetime.now(tz=timezone.utc)
@@ -854,7 +858,7 @@ async def test_add_automated_savings_log_valid_without_session(db_manager: DBMan
             "action": ActionType.APPLIED_AUTOMATED_SAVING,
             "action_at": action_at,
             "details": {"meta": "data 2"},
-        }
+        },
     ]
 
     for i, automated_savings_log_data in enumerate(automated_savings_log_data_collection):
@@ -863,10 +867,13 @@ async def test_add_automated_savings_log_valid_without_session(db_manager: DBMan
         )
 
         assert equal_dict(
-            dict_1=automated_savings_log,
-            dict_2=automated_savings_log_data_collection[i],
+            dict_1=automated_savings_log,  # pylint: disable=unnecessary-list-index-lookup
+            dict_2=automated_savings_log_data_collection[ # pylint: disable=unnecessary-list-index-lookup
+                i
+            ],
             exclude_keys=["created_at", "modified_at", "id"],
         )
+
 
 @pytest.mark.dependency(depends=["test_add_automated_savings_log_valid_without_session"])
 async def test_add_automated_savings_log_valid_with_session(db_manager: DBManager) -> None:
@@ -881,7 +888,7 @@ async def test_add_automated_savings_log_valid_with_session(db_manager: DBManage
             "action": ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT,
             "action_at": action_at,
             "details": {"meta": "data 4"},
-        }
+        },
     ]
 
     async with db_manager.async_session.begin() as session:
@@ -893,17 +900,20 @@ async def test_add_automated_savings_log_valid_with_session(db_manager: DBManage
 
             assert equal_dict(
                 dict_1=automated_savings_log,
-                dict_2=automated_savings_log_data_collection[i],
+                dict_2=automated_savings_log_data_collection[  # pylint: disable=unnecessary-list-index-lookup
+                    i
+                ],
                 exclude_keys=["created_at", "modified_at", "id"],
             )
 
-@pytest.mark.dependency(name="test_get_automated_savings_logs", depends=["test_add_automated_savings_log_valid_with_session"])
+
+@pytest.mark.dependency(
+    name="test_get_automated_savings_logs",
+    depends=["test_add_automated_savings_log_valid_with_session"],
+)
 @pytest.mark.parametrize(
     "action_type",
-    [
-        ActionType.APPLIED_AUTOMATED_SAVING,
-        ActionType.DEACTIVATED_AUTOMATED_SAVING
-    ],
+    [ActionType.APPLIED_AUTOMATED_SAVING, ActionType.DEACTIVATED_AUTOMATED_SAVING],
 )
 async def test_get_automated_savings_logs(db_manager: DBManager, action_type: ActionType) -> None:
     expected_data = {
@@ -912,7 +922,6 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
                 "action": ActionType.APPLIED_AUTOMATED_SAVING,
                 "details": {"meta": "data 2"},
             },
-
         ],
         ActionType.CHANGED_AUTOMATED_SAVINGS_AMOUNT: [
             {
@@ -929,15 +938,16 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
                 "action": ActionType.DEACTIVATED_AUTOMATED_SAVING,
                 "details": {"meta": "data 3"},
             },
-        ]
+        ],
     }
-
 
     automated_savings_logs = await db_manager.get_automated_savings_logs(
         action_type=action_type,
     )
 
-    automated_savings_logs = sorted(automated_savings_logs, key= lambda item: item["details"]["meta"])
+    automated_savings_logs = sorted(
+        automated_savings_logs, key=lambda item: item["details"]["meta"]
+    )
 
     for i, automated_savings_log in enumerate(automated_savings_logs):
         assert "action_at" in automated_savings_log
@@ -949,10 +959,11 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
             exclude_keys=["created_at", "modified_at", "id", "action_at"],
         )
 
+
 @pytest.mark.dependency(depends=["test_get_automated_savings_logs"])
 async def test_automated_savings_overflow_moneybox_mode_collect(
-        load_test_data: None,
-        db_manager: DBManager,
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
     await db_manager.automated_savings()
 
@@ -970,10 +981,11 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
     for moneybox in moneyboxes:
         assert moneybox["balance"] == expected_data[moneybox["name"]]
 
+
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_collect"])
 async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
-        load_test_data: None,
-        db_manager: DBManager,
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
     await db_manager.automated_savings()
 
@@ -994,8 +1006,8 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_add_to_amount"])
 async def test_automated_savings_overflow_moneybox_mode_fill_up(
-        load_test_data: None,
-        db_manager: DBManager,
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
     await db_manager.automated_savings()
 

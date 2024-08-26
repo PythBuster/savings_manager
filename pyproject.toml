@@ -101,6 +101,7 @@ load-plugins=[
 
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
 [tool.pylint-per-file-ignores]
+"test_task_runner.py"="missing-function-docstring"
 "test_db_core.py"="missing-function-docstring"
 "test_db_manager.py"="missing-function-docstring"
 "test_moneybox_endpoints.py"="missing-function-docstring, too-many-locals, too-many-lines"

@@ -1,14 +1,15 @@
 """The database test data initializer."""
 
 import time
-from datetime import datetime
 from functools import partial
 
 from sqlalchemy import insert
-from sqlalchemy.testing.config import db_url
-from typing_extensions import override
 
-from src.custom_types import TransactionTrigger, TransactionType, OverflowMoneyboxAutomatedSavingsModeType
+from src.custom_types import (
+    OverflowMoneyboxAutomatedSavingsModeType,
+    TransactionTrigger,
+    TransactionType,
+)
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
 
@@ -582,7 +583,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_automated_savings_valid(self):
+    async def dataset_test_automated_savings_valid(self) -> None:
         """The data generation function for test_case:
         `test_automated_savings_valid`.
         """
@@ -618,7 +619,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_automated_savings_overflow_moneybox_mode_add_to_amount(self):
+    async def dataset_test_automated_savings_overflow_moneybox_mode_add_to_amount(self) -> None:
         """The data generation function for test_case:
         `test_automated_savings_overflow_moneybox_mode_add_to_amount`.
         """
@@ -640,7 +641,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
-        overflow_moneybox = await self.db_manager._get_overflow_moneybox()
+        overflow_moneybox = (
+            await self.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        )
         await self.db_manager.add_amount(
             moneybox_id=overflow_moneybox.id,
             deposit_transaction_data={
@@ -665,7 +668,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_automated_savings_overflow_moneybox_mode_fill_up(self):
+    async def dataset_test_automated_savings_overflow_moneybox_mode_fill_up(self) -> None:
         """The data generation function for test_case:
         `dataset_test_automated_savings_overflow_moneybox_mode_fill_up`.
         """
@@ -701,7 +704,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_task_automated_savings_schedule(self):
+    async def dataset_test_task_automated_savings_schedule(self) -> None:
         """The data generation function for test_case:
         `test_task_automated_savings_schedule`.
         """
@@ -737,7 +740,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_task_automated_savings_dont_schedule(self):
+    async def dataset_test_task_automated_savings_dont_schedule(self) -> None:
         """The data generation function for test_case:
         `test_task_automated_savings_dont_schedule`.
         """
@@ -773,7 +776,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_task_automated_savings_no_email_send(self):
+    async def dataset_test_task_automated_savings_no_email_send(self) -> None:
         """The data generation function for test_case:
         `test_task_automated_savings_no_email_send`.
         """
@@ -809,7 +812,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_task_automated_savings_no_savings_active(self):
+    async def dataset_test_task_automated_savings_no_savings_active(self) -> None:
         """The data generation function for test_case:
         `test_task_automated_savings_no_savings_active`.
         """

@@ -7,7 +7,6 @@ from contextlib import asynccontextmanager
 from functools import partial
 from pathlib import Path
 from typing import AsyncGenerator
-from unittest.mock import patch
 
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
@@ -241,21 +240,28 @@ async def load_test_data(request: FixtureRequest, db_manager: DBManager) -> None
     )
     await test_data_initializer_.run()
 
+
 @pytest_asyncio.fixture(scope="session", name="smtp_settings")
 async def mocked_smtp_settings(db_settings_1: AppEnvVariables) -> AsyncGenerator:
+    """SMTP settings fixture"""
+
     yield db_settings_1
+
 
 @pytest_asyncio.fixture(scope="session", name="email_sender")
 async def mocked_email_sender(
-        db_manager: DBManager,
-        smtp_settings: AppEnvVariables,
+    db_manager: DBManager,
+    smtp_settings: AppEnvVariables,
 ) -> AsyncGenerator:
+    """The email sender fixture."""
+
     email_sender = EmailSender(
         db_manager=db_manager,
         smtp_settings=smtp_settings,
     )
-    #email_sender.send_message = lambda *args, **kwargs: None
+    # email_sender.send_message = lambda *args, **kwargs: None
     yield email_sender
+
 
 @pytest_asyncio.fixture(scope="session", name="client")
 async def mocked_client(db_manager: DBManager) -> AsyncGenerator:
