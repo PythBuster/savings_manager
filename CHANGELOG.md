@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 2.2.0 (2024-08-27)
+### Changed:
+- remove app settings id from /settings endpoints, currently there are only one app settings instance in database
+
 ## 2.1.0 (2024-08-27)
 ### Feature:
 - added send testmail endpoint
