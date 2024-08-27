@@ -3,6 +3,12 @@
 ## x.y.z (unreleased)
 ...
 
+## 2.0.1 (2024-08-27)
+### Changed:
+- protect enabling email receiving if smtp settings in .env are missing
+- fix tests
+- update README.md by adding a description for app start and SMTP settings (.env file)
+
 ## 2.0.0 (2024-08-27)
 ### Changed:
 - fix docker compose app service, so savings manager can run into a docker container
