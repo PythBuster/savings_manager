@@ -6,7 +6,7 @@ from typing import Any
 from jinja2 import Environment
 
 from src.db.db_manager import DBManager
-from src.utils import tabulate_str
+from src.utils import get_app_data, tabulate_str
 
 
 class ReportSender(ABC):
@@ -20,12 +20,26 @@ class ReportSender(ABC):
         self.db_manager = db_manager
         self.jinja_env = jinja_env
 
+        app_data = get_app_data()
+        self.versioned_app_name = f"{app_data['name']} v{app_data['version']}"
+
     async def render_report(
         self,
         message_data: dict[str, Any],
         jinja_template_file: str,  # pylint: disable=unused-argument
     ) -> str:
-        """Render message and sends it to receiver."""
+        """General render message function, which renders given html jinja by applying
+        given message_data.
+
+        :param message_data: The message data
+        :type message_data: :class:`dict[str, Any]`
+        :param jinja_template_file: The jinja template file
+        :type jinja_template_file: :class:`str`
+        :return: The rendered message.
+        :rtype: :class:`str`
+        """
+
+        # TODO render html jinja! But for now, build automated savings plain email
 
         # sort by priority
         message_data["moneyboxes"] = sorted(
@@ -59,7 +73,7 @@ class ReportSender(ABC):
         rows = [data.values() for data in message_data["moneyboxes"]]
 
         return_contents = [
-            "Automated savings done. :)\nYour new moneybox balances:\n\n",
+            f"{self.versioned_app_name}: automated savings done. :)\nYour new moneybox balances:\n\n",
             tabulate_str(headers=headers, rows=rows),
             f"\n\nTotal Balance: {total_balance_str:<15}",
         ]

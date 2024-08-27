@@ -1,0 +1,33 @@
+"""The email sender routes."""
+
+from fastapi import APIRouter
+from starlette import status
+from starlette.requests import Request
+from starlette.responses import Response
+
+from src.custom_types import EndpointRouteType
+from src.db.db_manager import DBManager
+from src.report_sender.email_sender.sender import EmailSender
+from src.routes.responses.email_sender import SEND_TESTMAIL_RESPONSES
+
+email_sender_router = APIRouter(
+    prefix=f"/{EndpointRouteType.EMAIL_SENDER}",
+    tags=[EndpointRouteType.EMAIL_SENDER],
+)
+"""The moneybox router."""
+
+@email_sender_router.patch(
+    "/send-testmail",
+    responses=SEND_TESTMAIL_RESPONSES,
+)
+async def send_testmail(request: Request) -> Response:
+    email_sender: EmailSender = request.app.state.email_sender
+    db_manager: DBManager = request.app.state.db_manager
+
+    app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
+    succeeded = await email_sender.send_testmail(to=app_settings.user_email_address)
+
+    if succeeded:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    return Response(status_code=status.HTTP_409_CONFLICT)

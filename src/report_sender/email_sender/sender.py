@@ -6,7 +6,9 @@ from typing import Any
 
 from aiosmtplib import SMTP
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from pyexpat.errors import messages
 
+from src.app_logger import logger
 from src.custom_types import AppEnvVariables
 from src.db.db_manager import DBManager
 from src.report_sender.consants import SENDER_DIR_PATH
@@ -34,6 +36,29 @@ class EmailSender(ReportSender):
             jinja_env=jinja_env,
         )
 
+    async def send_testmail(self, to: str) -> bool:
+        """The test mail sender function.
+
+        :param to: The email address to send the test mail to.
+        :type to: :class:`str`
+        :return: True, if send was successfully, otherwise returns False.
+        :rtype: :class:`bool`"""
+
+        try:
+            today_dt_str = datetime.now(tz=timezone.utc).isoformat(sep=" ", timespec="seconds")
+            message = """This is a testmail.\nYour SMTP outgoing data are correct, congratulations! :)"""
+
+            receiver = {
+                "to": to,
+                "subj": f"Test Mail from {self.versioned_app_name} ({today_dt_str})",
+            }
+
+            await self.send_message(message=message, receiver=receiver)
+            return True
+        except Exception as ex:
+            logger.exception(ex)
+            return False
+
     async def send_email_automated_savings_done_successfully(self, to: str) -> None:
         """The send mail function which will be called after automated savings
         is done successfully.
@@ -44,7 +69,6 @@ class EmailSender(ReportSender):
 
         template_file = "automated_savings_done.html"
         today_dt_str = datetime.now(tz=timezone.utc).isoformat(sep=" ", timespec="seconds")
-
         message_data = {"moneyboxes": await self.db_manager.get_moneyboxes()}
 
         message = await self.render_report(
@@ -76,7 +100,7 @@ class EmailSender(ReportSender):
             hostname=self.smtp_settings.smtp_server,
             port=self.smtp_settings.smtp_port,
             username=self.smtp_settings.smtp_user_name,
-            password=self.smtp_settings.smtp_password,
+            password=self.smtp_settings.smtp_password.get_secret_value(),
             start_tls=self.smtp_settings.smtp_method == "starttls",
             use_tls=self.smtp_settings.smtp_method == "tls",
         ) as client:

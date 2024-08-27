@@ -25,6 +25,8 @@ class EndpointRouteType(StrEnum):
     APP_SETTINGS = "settings"  # /settings
     """Settings endpoint path name."""
 
+    EMAIL_SENDER = "email"  # /email
+
 
 class AppEnvVariables(BaseSettings):
     """The app env vars, with all settings/credentials for:

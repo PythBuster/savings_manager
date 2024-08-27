@@ -1,5 +1,6 @@
 """All fastAOI route exceptions are located here."""
 
+
 class MissingSMTPSettingsError(Exception):
     """The MissingSMTPSettingsError class."""
 
