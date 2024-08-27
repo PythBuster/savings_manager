@@ -29,4 +29,3 @@ SEND_TESTMAIL_RESPONSES = {
     },
 }
 """The possible responses for endpoint GET: /settings."""
-

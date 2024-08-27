@@ -6,7 +6,6 @@ from typing import Any
 
 from aiosmtplib import SMTP
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from pyexpat.errors import messages
 
 from src.app_logger import logger
 from src.custom_types import AppEnvVariables
@@ -46,7 +45,9 @@ class EmailSender(ReportSender):
 
         try:
             today_dt_str = datetime.now(tz=timezone.utc).isoformat(sep=" ", timespec="seconds")
-            message = """This is a testmail.\nYour SMTP outgoing data are correct, congratulations! :)"""
+            message = (
+                """This is a testmail.\nYour SMTP outgoing data are correct, congratulations! :)"""
+            )
 
             receiver = {
                 "to": to,
@@ -55,7 +56,7 @@ class EmailSender(ReportSender):
 
             await self.send_message(message=message, receiver=receiver)
             return True
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-exception-caught
             logger.exception(ex)
             return False
 
@@ -100,7 +101,7 @@ class EmailSender(ReportSender):
             hostname=self.smtp_settings.smtp_server,
             port=self.smtp_settings.smtp_port,
             username=self.smtp_settings.smtp_user_name,
-            password=self.smtp_settings.smtp_password.get_secret_value(),
+            password=self.smtp_settings.smtp_password.get_secret_value(),  # type: ignore
             start_tls=self.smtp_settings.smtp_method == "starttls",
             use_tls=self.smtp_settings.smtp_method == "tls",
         ) as client:

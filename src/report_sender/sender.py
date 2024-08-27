@@ -73,7 +73,8 @@ class ReportSender(ABC):
         rows = [data.values() for data in message_data["moneyboxes"]]
 
         return_contents = [
-            f"{self.versioned_app_name}: automated savings done. :)\nYour new moneybox balances:\n\n",
+            f"{self.versioned_app_name}: automated savings done. :)\n"
+            "Your new moneybox balances:\n\n",
             tabulate_str(headers=headers, rows=rows),
             f"\n\nTotal Balance: {total_balance_str:<15}",
         ]

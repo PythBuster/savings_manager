@@ -16,6 +16,7 @@ email_sender_router = APIRouter(
 )
 """The moneybox router."""
 
+
 @email_sender_router.patch(
     "/send-testmail",
     responses=SEND_TESTMAIL_RESPONSES,
