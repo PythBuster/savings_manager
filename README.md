@@ -192,3 +192,9 @@ ou can start the Savings Manager as a Docker container. After cloning the main r
 Navigate to `savings_manager/docker` and run:
 `docker compose up --build -d` 
 This will rebuild your container if necessary and start the container as a daemon (in the background).
+
+Alternatively you can use the `START_SAVINGS_MANAGER.sh` script to start the savings manager into as a Docker container:
+Navigate to `savings_manager/scripts` and run:
+`./START_SAVINGS_MANAGER.sh`
+
+(in windows, run the .bat file)
