@@ -51,7 +51,7 @@ DB_USER=     [YOUR_POSTGRES_DB_USER]
 DB_PASSWORD= [YOUR_POSTGRES_DB_PASSWORD]
 
 
-# smtp - the outgoing SMTP mail server data
+# smtp - the outgoing SMTP email server data
 # -> SMTP_METHOD: only STARTTLS and TLS supported
 SMTP_SERVER=
 SMTP_PORT=
@@ -69,7 +69,7 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
 
-# smtp - the outgoing SMTP mail server data
+# smtp - the outgoing SMTP email server data
 # -> SMTP_METHOD: only STARTTLS and TLS supported
 SMTP_SERVER=
 SMTP_PORT=
@@ -154,11 +154,11 @@ In project root dir `poetry run alembic upgrade head`
 Savings Manager v2 is able to email you after automated savings is done.
 
 If you want to receiver an email you have to use your email outgoing SMTP server, so the app will be able to send you an email.
-You can obtain the outgoing SMTP mail server data from your provider.
+You can obtain the outgoing SMTP email server data from your provider.
 
 To use the email sender of the app, you need to add the smtp data in `/envs/.env`, like:
 
-```# smtp - the outgoing SMTP mail server data
+```# smtp - the outgoing SMTP email server data
 # -> SMTP_METHOD: only STARTTLS and TLS supported
 SMTP_SERVER=smtp.web.com
 SMTP_PORT=465

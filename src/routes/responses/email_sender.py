@@ -4,7 +4,7 @@ from starlette import status
 
 from src.data_classes.responses import HTTPErrorResponse
 
-SEND_TESTMAIL_RESPONSES = {
+SEND_TESTEMAIL_RESPONSES = {
     status.HTTP_204_NO_CONTENT: {
         "description": "No Content",
     },

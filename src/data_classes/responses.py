@@ -596,6 +596,6 @@ class AppSettingsResponse(BaseModel):
         if not, raise ValueError."""
 
         if self.send_reports_via_email and self.user_email_address is None:
-            raise ValueError("Can't activate receiving mails, user mail address is not set!")
+            raise ValueError("Can't activate receiving emails, user email address is not set!")
 
         return self

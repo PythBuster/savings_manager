@@ -35,10 +35,10 @@ class EmailSender(ReportSender):
             jinja_env=jinja_env,
         )
 
-    async def send_testmail(self, to: str) -> bool:
-        """The test mail sender function.
+    async def send_testemail(self, to: str) -> bool:
+        """The test email sender function.
 
-        :param to: The email address to send the test mail to.
+        :param to: The email address to send the test email to.
         :type to: :class:`str`
         :return: True, if send was successfully, otherwise returns False.
         :rtype: :class:`bool`"""
@@ -46,12 +46,12 @@ class EmailSender(ReportSender):
         try:
             today_dt_str = datetime.now(tz=timezone.utc).isoformat(sep=" ", timespec="seconds")
             message = (
-                """This is a testmail.\nYour SMTP outgoing data are correct, congratulations! :)"""
+                """This is a test email.\nYour SMTP outgoing data are correct, congratulations! :)"""
             )
 
             receiver = {
                 "to": to,
-                "subj": f"Test Mail from {self.versioned_app_name} ({today_dt_str})",
+                "subj": f"Test Email from {self.versioned_app_name} ({today_dt_str})",
             }
 
             await self.send_message(message=message, receiver=receiver)
@@ -61,7 +61,7 @@ class EmailSender(ReportSender):
             return False
 
     async def send_email_automated_savings_done_successfully(self, to: str) -> None:
-        """The send mail function which will be called after automated savings
+        """The send email function which will be called after automated savings
         is done successfully.
 
         :param to: The email recipient.
