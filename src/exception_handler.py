@@ -12,6 +12,7 @@ from src.db.exceptions import (
     InconsistentDatabaseError,
     RecordNotFoundError,
 )
+from src.routes.exceptions import MissingSMTPSettingsError
 
 
 async def response_exception(exception: Exception) -> JSONResponse:
@@ -87,6 +88,18 @@ async def response_exception(exception: Exception) -> JSONResponse:
                         "params": exception.params,
                         "detail": detail.strip(),
                     },  # type: ignore
+                )
+            ),
+        )
+
+    if isinstance(exception, MissingSMTPSettingsError):
+        error_message = exception.args[0]
+
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=error_message,
                 )
             ),
         )

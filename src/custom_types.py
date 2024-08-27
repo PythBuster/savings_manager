@@ -1,7 +1,7 @@
 """All custom types are located here."""
 
 from enum import StrEnum
-from typing import Self
+from typing import Self, Any
 
 from pydantic import ConfigDict, SecretStr, model_validator
 from pydantic_settings import BaseSettings
@@ -50,29 +50,63 @@ class AppEnvVariables(BaseSettings):
     db_password: SecretStr
     """Database password."""
 
-    smtp_server: str
+    smtp_server: str|None = None
     """The address of the smtp server."""
 
-    smtp_method: str
+    smtp_method: str|None = None
     """The smtp method, supported: STARTTLS and TLS."""
 
-    smtp_port: int
+    smtp_port: int|None = None
     """The port name of the smtp server."""
 
-    smtp_user_name: str
+    smtp_user_name: str|None = None
     """The user name of the smtp server."""
 
-    smtp_password: str
+    smtp_password: SecretStr|None = None
     """The user password."""
 
     model_config = ConfigDict(extra="forbid")
     """Model config."""
 
+    @property
+    def smtp_ready(self):
+        return not any(
+            (
+                self.smtp_server is None,
+                self.smtp_method is None,
+                self.smtp_port is None,
+                self.smtp_user_name is None,
+                self.smtp_password is None,
+            )
+        )
+
+    @model_validator(mode="before")
+    @classmethod
+    def smtp_data_empty_to_none(cls, data: dict[str, Any]) -> dict[str, Any]:
+        if data["smtp_server"] == "":
+            data["smtp_server"] = None
+
+        if data["smtp_method"] == "":
+            data["smtp_method"] = None
+
+        if data["smtp_port"] == "":
+            data["smtp_port"] = None
+
+        if data["smtp_user_name"] == "":
+            data["smtp_user_name"] = None
+
+        if data["smtp_password"] == "":
+            data["smtp_password"] = None
+
+        return data
+
     @model_validator(mode="after")
     def lowercase_smtp_method(self) -> Self:
         """Lowercase the smtp method."""
 
-        self.smtp_method = self.smtp_method.lower()
+        if self.smtp_method is not None:
+            self.smtp_method = self.smtp_method.lower()
+
         return self
 
 

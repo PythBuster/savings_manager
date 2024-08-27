@@ -9,6 +9,8 @@ from src.custom_types import EndpointRouteType
 from src.data_classes.requests import AppSettingsRequest
 from src.data_classes.responses import AppSettingsResponse
 from src.db.db_manager import DBManager
+from src.report_sender.email_sender.sender import EmailSender
+from src.routes.exceptions import MissingSMTPSettingsError
 from src.routes.responses.app_settings import (
     GET_APP_SETTINGS_RESPONSES,
     UPDATE_APP_SETTINGS_RESPONSES,
@@ -58,6 +60,11 @@ async def update_app_settings(
     """Endpoint for updating app settings by app_settings_id."""
 
     db_manager: DBManager = request.app.state.db_manager
+    email_sender: EmailSender = request.app.state.email_sender
+
+    if app_settings_request.send_reports_via_email and not email_sender.smtp_settings.smtp_ready:
+        raise MissingSMTPSettingsError()
+
     app_settings_data = await db_manager.update_app_settings(
         app_settings_id=app_settings_id,
         app_settings_data=app_settings_request.model_dump(exclude_unset=True),
