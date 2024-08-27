@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 2.2.1 (2024-08-27)
+### Changed:
+- use own app logger to avoid logging SQLAlchemy transaction logs
+
 ## 2.2.0 (2024-08-27)
 ### Changed:
 - remove app settings id from /settings endpoints, currently there are only one app settings instance in database
