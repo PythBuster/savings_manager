@@ -1,46 +1,45 @@
 # Savings Manager
 
-The "Savings Manager" helps you to manage your savings. With the help of virtual accounts, budgets can be saved for various goals, and this is completely automated.
+The "Savings Manager" helps you manage your savings. With the use of virtual accounts, budgets can be allocated for various goals, and this process is entirely automated.
 
-By setting a fixed monthly savings amount, you can determine the maximum monthly amount that can be saved in the overall system. By assigning desired savings amounts for each moneybox and upper savings limits, the monthly savings amount is automatically distributed across the moneyboxes at the beginning of each month. By setting a fixed priority, you can achieve a savings constellation that helps you achieve certain savings goals faster than others.
+By setting a fixed monthly savings amount, you can determine the maximum amount that can be saved across the system each month. Desired savings amounts for each moneybox and upper savings limits allow the monthly savings to be automatically distributed across the moneyboxes at the beginning of each month. By setting fixed priorities, you can achieve a savings strategy that helps you reach certain savings goals faster than others.
 
-The strength here: if you withdraw a certain amount from a cash box, the priority list of cash boxes will automatically create a balance that ensures that this just emptied cash box is quickly refilled.
+A key feature is that if you withdraw a certain amount from a moneybox, the priority list of moneyboxes will automatically adjust to ensure that the emptied moneybox is quickly refilled.
 
-This makes it easy to save and you can watch as each moneybox is gradually refilled. Of course, amounts can be moved between the moneyboxes and manual deposits into the moneyboxes are always possible!
-
-Translated with DeepL.com (free version)
+This makes saving easy, allowing you to watch as each moneybox is gradually replenished. Of course, amounts can be transferred between the moneyboxes, and manual deposits into the moneyboxes are always possible!
 
 ## Deployment / Contribution
 
 ### Docker
-1. jump into docker dir: `cd docker`
-2. call: `docker compose up -d` to run postgres and savings_manager app
-App will be exposed to: `localhost:8000`
+1. Navigate to the Docker directory: `cd docker`
+2. Run: `docker compose up -d` to start the PostgreSQL database and the Savings Manager app.  
+   The app will be accessible at: `localhost:8000`
 
-SwaggerUI: `localhost:8000/docs`
-Sphinx: `localhost:8000/sphinx`
+   - SwaggerUI: `localhost:8000/docs`
+   - Sphinx: `localhost:8000/sphinx`
 
-To get the newest repo, just pull it and rebuilt docker:
+To get the latest version of the repository, simply pull it and rebuild the Docker container:  
 `docker compose up --build`
 
 ### Manually
-#### poetry
 
-[Poetry](https://python-poetry.org/) is used as deployment and dependency manager.
+#### Poetry
+
+[Poetry](https://python-poetry.org/) is used as the deployment and dependency manager.
 
 ##### Linux (Ubuntu 22.04):
-1. Install python 3.11 on your OS and add python 3.11 to PATH
+1. Install Python 3.11 on your OS and add Python 3.11 to PATH.
 2. Install pipx: `sudo apt update && sudo apt install pipx`
-3. Install poetry: `pipx install poetry --python 311`
-4. Install project dependencies:
-   `cd PROJECT_ROOT`
-   `poetry install`
+3. Install Poetry: `pipx install poetry --python 311`
+4. Install project dependencies:  
+   ```bash
+   cd PROJECT_ROOT
+   poetry install
 
 
 
 ##### Database
-A postgres database is needed. To connect to the database, add a `.env` file
-in: `/src/envs` with following information:
+A PostgreSQL database is required. To connect to the database, add a `.env` file in `/src/envs` with the following information:
 
 ```
 DB_DRIVER=postgresql+asyncpg
@@ -50,6 +49,15 @@ DB_HOST=     [YOUR_HOSTADDRESS]
 DB_PORT=     [YOUR_POSTGRES_DB_PORT]
 DB_USER=     [YOUR_POSTGRES_DB_USER]
 DB_PASSWORD= [YOUR_POSTGRES_DB_PASSWORD]
+
+
+# smtp - the outgoing SMTP mail server data
+# -> SMTP_METHOD: only STARTTLS and TLS supported
+SMTP_SERVER=
+SMTP_PORT=
+SMTP_METHOD=
+SMTP_USER_NAME=
+SMTP_PASSWORD=
 ```
 
 Example:
@@ -60,17 +68,25 @@ DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
-```
 
+# smtp - the outgoing SMTP mail server data
+# -> SMTP_METHOD: only STARTTLS and TLS supported
+SMTP_SERVER=
+SMTP_PORT=
+SMTP_METHOD=
+SMTP_USER_NAME=
+SMTP_PASSWORD=
+```
+The SMTP settings will be explained later.
 
 ###### SqlAlchemy (ORM)
-We will use SqlAlchemy to manage and access the SQL database. 
+We will use SQLAlchemy to manage and access the SQL database.
 
-To create and migrate the database tables, you need to use alembic 
-by using the command:
-In project root dir `poetry run alembic upgrade head`
+To create and migrate the database tables, use Alembic with the following command:
+From the project root directory:
+`poetry run alembic upgrade head`
 
-**Hint**: The database must be reachable.
+**Note: The database must be reachable.**
 
 ## CI/CD
 
@@ -128,6 +144,32 @@ Just for documentation: `alembic init -t async alembic` in project root dir will
 
 # RUN
 
+## .env file:We will use SqlAlchemy to manage and access the SQL database. 
+
+To create and migrate the database tables, you need to use alembic 
+by using the command:
+In project root dir `poetry run alembic upgrade head`
+
+**Hint**: The database must be reachable.
+Savings Manager v2 is able to email you after automated savings is done.
+
+If you want to receiver an email you have to use your email outgoing SMTP server, so the app will be able to send you an email.
+You can obtain the outgoing SMTP mail server data from your provider.
+
+To use the email sender of the app, you need to add the smtp data in `/envs/.env`, like:
+
+```# smtp - the outgoing SMTP mail server data
+# -> SMTP_METHOD: only STARTTLS and TLS supported
+SMTP_SERVER=smtp.web.com
+SMTP_PORT=465
+SMTP_METHOD=STARTTLS
+SMTP_USER_NAME=your.email@address.com
+SMTP_PASSWORD=your-email-password
+```
+
+**Note: make sure that only you have access to your .env file !!!** 
+
+## Run savings manager in python environment:
 If poetry environment is initialized and all dependencies are initially installed
 via:
 - for production (usage only): `poetry install --without dev`
@@ -143,4 +185,10 @@ This will start a service on:
 To see the API documentation or use the API via SwaggerUI, visit:
 `http://localhost:8001/docs`
 
-``
+
+## Run savings manager as docker:
+ou can start the Savings Manager as a Docker container. After cloning the main repository and adding/adapting your `.env` file in `savings_manager/envs/`, you will be able to start the Docker service using the following command:
+
+Navigate to `savings_manager/docker` and run:
+`docker compose up --build -d` 
+This will rebuild your container if necessary and start the container as a daemon (in the background).
