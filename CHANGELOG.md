@@ -3,6 +3,10 @@
 ## x.y.z (unreleased)
 ...
 
+## 2.1.0 (2024-08-27)
+### Feature:
+- added send testmail endpoint
+
 ## 2.0.1 (2024-08-27)
 ### Changed:
 - protect enabling email receiving if smtp settings in .env are missing
