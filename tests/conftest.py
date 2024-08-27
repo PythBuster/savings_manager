@@ -264,7 +264,7 @@ async def mocked_email_sender(
 
 
 @pytest_asyncio.fixture(scope="session", name="client")
-async def mocked_client(db_manager: DBManager) -> AsyncGenerator:
+async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> AsyncGenerator:
     """A fixture that creates a fastapi test client.
 
     :return: A test client.
@@ -273,6 +273,7 @@ async def mocked_client(db_manager: DBManager) -> AsyncGenerator:
 
     app.router.lifespan_context = noop_lifespan  # type: ignore
     app.state.db_manager = db_manager  # type: ignore
+    app.state.email_sender = email_sender  # type: ignore
     set_custom_openapi_schema(fastapi_app=app)
 
     register_router(fastapi_app=app)
