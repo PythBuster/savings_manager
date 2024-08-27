@@ -937,13 +937,10 @@ class DBManager:
 
     async def update_app_settings(
         self,
-        app_settings_id: int,
         app_settings_data: dict[str, Any],
     ) -> dict[str, Any]:
         """Update app settings by app_settings id.
 
-        :param app_settings_id: The app settings id.
-        :type app_settings_id: :class:`int`
         :param app_settings_data: The app settings data.
         :type app_settings_data: :class:`dict[str, Any]`
         :return: The updated app settings data.
@@ -955,16 +952,19 @@ class DBManager:
             transactions.
         """
 
+        app_settings = await self._get_app_settings()
+
         async with self.async_session.begin() as session:
             app_settings = await update_instance(
                 async_session=session,
                 orm_model=AppSettings,  # type: ignore
-                record_id=app_settings_id,
+                record_id=app_settings.id,
                 data=app_settings_data,
             )
 
             if app_settings is None:
-                raise AppSettingsNotFoundError(app_settings_id=app_settings_id)
+                # TODO: adapt app_settings_id value later, if multiple settings are available
+                raise AppSettingsNotFoundError(app_settings_id=-1)
 
             if "is_automated_saving_active" in app_settings_data:
                 activate = app_settings.is_automated_saving_active  # type: ignore

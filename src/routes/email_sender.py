@@ -22,6 +22,8 @@ email_sender_router = APIRouter(
     responses=SEND_TESTMAIL_RESPONSES,
 )
 async def send_testmail(request: Request) -> Response:
+    """Endpoint for sending a test email."""
+
     email_sender: EmailSender = request.app.state.email_sender
     db_manager: DBManager = request.app.state.db_manager
 

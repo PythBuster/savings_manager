@@ -751,8 +751,8 @@ async def test_get_app_settings_valid(db_manager: DBManager) -> None:
     app_settings = await db_manager.get_app_settings(app_settings_id=_app_settings.id)
 
     expected_data = {
-        "is_automated_saving_active": False,
-        "savings_amount": 50_000,
+        "is_automated_saving_active": True,
+        "savings_amount": 0,
         "id": _app_settings.id,
         "send_reports_via_email": False,
         "user_email_address": None,
@@ -768,21 +768,18 @@ async def test_get_app_settings_valid(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_get_app_settings_valid"])
 async def test_update_app_settings_valid(db_manager: DBManager) -> None:
-    _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
-
     update_data_1 = {
         "savings_amount": 0,
+        "is_automated_saving_active": False,
     }
 
     updated_app_settings_1 = await db_manager.update_app_settings(
-        app_settings_id=_app_settings.id,
         app_settings_data=update_data_1,
     )
 
     expected_data_1 = {
         "is_automated_saving_active": False,
         "savings_amount": 0,
-        "id": _app_settings.id,
         "send_reports_via_email": False,
         "user_email_address": None,
         "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore   # pylint: disable=line-too-long
@@ -791,7 +788,7 @@ async def test_update_app_settings_valid(db_manager: DBManager) -> None:
     assert equal_dict(
         dict_1=updated_app_settings_1,
         dict_2=expected_data_1,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["created_at", "modified_at", "id"],
     )
 
     update_data_2 = {
@@ -799,14 +796,12 @@ async def test_update_app_settings_valid(db_manager: DBManager) -> None:
     }
 
     updated_app_settings_2 = await db_manager.update_app_settings(
-        app_settings_id=_app_settings.id,
         app_settings_data=update_data_2,
     )
 
     expected_data_2 = {
         "is_automated_saving_active": True,
         "savings_amount": 0,
-        "id": _app_settings.id,
         "send_reports_via_email": False,
         "user_email_address": None,
         "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore   # pylint: disable=line-too-long
@@ -815,14 +810,12 @@ async def test_update_app_settings_valid(db_manager: DBManager) -> None:
     assert equal_dict(
         dict_1=updated_app_settings_2,
         dict_2=expected_data_2,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["created_at", "modified_at", "id"],
     )
 
 
 @pytest.mark.dependency(depends=["test_update_app_settings_valid"])
 async def test_update_app_settings_invalid(db_manager: DBManager) -> None:
-    _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
-
     update_data = {
         # results to asyncpg.exceptions.InvalidTextRepresentationError
         "overflow_moneybox_automated_savings_mode": "unknown_mode",
@@ -830,7 +823,6 @@ async def test_update_app_settings_invalid(db_manager: DBManager) -> None:
 
     with pytest.raises(UpdateInstanceError):
         await db_manager.update_app_settings(
-            app_settings_id=_app_settings.id,
             app_settings_data=update_data,
         )
 
