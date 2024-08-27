@@ -57,7 +57,7 @@ class DBManager:
         self, db_settings: AppEnvVariables, engine_args: dict[str, Any] | None = None
     ) -> None:
         if engine_args is None:
-            engine_args={"echo": False}
+            engine_args = {"echo": False}
 
         self.db_settings = db_settings
 

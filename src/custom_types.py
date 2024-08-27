@@ -1,7 +1,7 @@
 """All custom types are located here."""
 
 from enum import StrEnum
-from typing import Self, Any
+from typing import Any, Self
 
 from pydantic import ConfigDict, SecretStr, model_validator
 from pydantic_settings import BaseSettings
@@ -50,26 +50,28 @@ class AppEnvVariables(BaseSettings):
     db_password: SecretStr
     """Database password."""
 
-    smtp_server: str|None = None
+    smtp_server: str | None = None
     """The address of the smtp server."""
 
-    smtp_method: str|None = None
+    smtp_method: str | None = None
     """The smtp method, supported: STARTTLS and TLS."""
 
-    smtp_port: int|None = None
+    smtp_port: int | None = None
     """The port name of the smtp server."""
 
-    smtp_user_name: str|None = None
+    smtp_user_name: str | None = None
     """The user name of the smtp server."""
 
-    smtp_password: SecretStr|None = None
+    smtp_password: SecretStr | None = None
     """The user password."""
 
     model_config = ConfigDict(extra="forbid")
     """Model config."""
 
     @property
-    def smtp_ready(self):
+    def smtp_ready(self) -> bool:
+        """Property to check smtp readiness."""
+
         return not any(
             (
                 self.smtp_server is None,
@@ -83,6 +85,8 @@ class AppEnvVariables(BaseSettings):
     @model_validator(mode="before")
     @classmethod
     def smtp_data_empty_to_none(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Convert emtpy string to None in smtp data."""
+
         if data["smtp_server"] == "":
             data["smtp_server"] = None
 
