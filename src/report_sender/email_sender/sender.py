@@ -7,7 +7,7 @@ from typing import Any
 from aiosmtplib import SMTP
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from src.app_logger import logger
+from src.app_logger import app_logger
 from src.custom_types import AppEnvVariables
 from src.db.db_manager import DBManager
 from src.report_sender.consants import SENDER_DIR_PATH
@@ -57,7 +57,7 @@ class EmailSender(ReportSender):
             await self.send_message(message=message, receiver=receiver)
             return True
         except Exception as ex:  # pylint: disable=broad-exception-caught
-            logger.exception(ex)
+            app_logger.exception(ex)
             return False
 
     async def send_email_automated_savings_done_successfully(self, to: str) -> None:

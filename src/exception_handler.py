@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
 
-from src.app_logger import logger
+from src.app_logger import app_logger
 from src.data_classes.responses import HTTPErrorResponse
 from src.db.exceptions import (
     CrudDatabaseError,
@@ -24,7 +24,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
     :rtype: :class:`JSONResponse`
     """
 
-    logger.exception(exception)
+    app_logger.exception(exception)
 
     if isinstance(exception, InconsistentDatabaseError):
         return JSONResponse(

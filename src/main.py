@@ -16,7 +16,7 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src import exception_handler
-from src.app_logger import logger
+from src.app_logger import app_logger
 from src.constants import SPHINX_DIRECTORY, WORKING_DIR
 from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.db.db_manager import DBManager
@@ -105,7 +105,7 @@ async def validation_exception_handler(
 
     Logs exception before responding."""
 
-    logger.exception(exc)
+    app_logger.exception(exc)
     return JSONResponse(
         status_code=422,
         content=jsonable_encoder({"detail": exc.errors()}),
