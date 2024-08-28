@@ -198,3 +198,16 @@ Navigate to `savings_manager/scripts` and run:
 `./START_SAVINGS_MANAGER.sh`
 
 (in windows, run the .bat file)
+
+The savings manager into the docker will run on port 64000 and you will reach the servcie at: http://localhost:64000
+
+API documentation: http://localhost:64000/docs
+Code documentation: http://localhost:64000/sphinx
+
+## Bug-Report:
+Please join my discord (https://discord.gg/PyqQhJ2d34).
+You can send me bug reports on the following discord text channel: 🐞-bugs-savings-manager
+
+
+Enjoy! :)
+
