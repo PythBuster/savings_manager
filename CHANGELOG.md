@@ -3,6 +3,12 @@
 ## x.y.z (unreleased)
 ...
 
+## 2.2.2 (2024-08-29)
+### Changed:
+- update code documentation (sphinx)
+- change docker container app port to 64000
+- update README.md
+
 ## 2.2.1 (2024-08-27)
 ### Changed:
 - use own app logger to avoid logging SQLAlchemy transaction logs
