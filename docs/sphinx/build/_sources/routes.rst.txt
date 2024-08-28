@@ -12,6 +12,30 @@ Subpackages
 Submodules
 ----------
 
+routes.app\_settings module
+---------------------------
+
+.. automodule:: routes.app_settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+routes.email\_sender module
+---------------------------
+
+.. automodule:: routes.email_sender
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+routes.exceptions module
+------------------------
+
+.. automodule:: routes.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 routes.moneybox module
 ----------------------
 
@@ -24,6 +48,14 @@ routes.moneyboxes module
 ------------------------
 
 .. automodule:: routes.moneyboxes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+routes.prioritylist module
+--------------------------
+
+.. automodule:: routes.prioritylist
    :members:
    :undoc-members:
    :show-inheritance:
