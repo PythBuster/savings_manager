@@ -3,6 +3,12 @@
 ## x.y.z (unreleased)
 ...
 
+## 2.3.0 (2024-08-29)
+### Changed:
+- remove priority from create/update moneybox
+- add new moneyboxes at the end of the priority list
+- reset/refresh priority numbers by keeping priority order if moneybox is deleted
+
 ## 2.2.2 (2024-08-29)
 ### Changed:
 - update code documentation (sphinx)
