@@ -159,6 +159,39 @@ class DBManager:
 
         return moneybox  # type: ignore
 
+    async def _add_overflow_moneybox(
+        self,
+        moneybox_data: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Helper DB Function to add the overflow moneybox into database.
+
+        :param moneybox_data: The overflow moneybox data.
+        :type moneybox_data: :class:`dict[str, Any]`
+
+        :return: The added overflow moneybox data.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises: :class:`CreateInstanceError`: when something went wrong while
+            creating instance in database.
+        """
+
+        async with self.async_session.begin() as session:
+            moneybox_data["priority"] = 0
+            moneybox = await create_instance(
+                async_session=session,
+                orm_model=Moneybox,  # type: ignore
+                data=moneybox_data,
+            )
+
+            if moneybox is None:
+                raise CreateInstanceError(
+                    record_id=None,
+                    message="Failed to create moneybox.",
+                    details=moneybox_data,
+                )
+
+        return moneybox.asdict()
+
     async def add_moneybox(self, moneybox_data: dict[str, Any]) -> dict[str, Any]:
         """DB Function to add a new moneybox into database.
 
@@ -173,6 +206,11 @@ class DBManager:
         """
 
         async with self.async_session.begin() as session:
+            priority_list = await self.get_priority_list()
+            moneybox_data["priority"] = (
+                1 if not priority_list else priority_list[-1]["priority"] + 1  # type: ignore
+            )
+
             moneybox = await create_instance(
                 async_session=session,
                 orm_model=Moneybox,  # type: ignore
@@ -319,6 +357,26 @@ class DBManager:
                     message="Failed to delete (deactivate) moneybox.",
                     details={"deactivated": deactivated},
                 )
+
+            sorted_by_priority_prioritylist = await self.get_priority_list()
+            sorted_by_priority_prioritylist = [
+                priority_data
+                for priority_data in sorted_by_priority_prioritylist
+                if priority_data["moneybox_id"] != moneybox_id
+            ]
+
+            new_priorities: list[dict[str, int]] = [
+                {
+                    "moneybox_id": priority_data["moneybox_id"],  # type: ignore
+                    "priority": i + 1,
+                }
+                for i, priority_data in enumerate(sorted_by_priority_prioritylist)
+            ]
+
+            await self.update_priority_list(
+                priorities=new_priorities,
+                session=session,
+            )
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
     #  sub_amount are almost identical, combine in one function?
@@ -688,6 +746,8 @@ class DBManager:
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
+        _overflow_moneybox = await self._get_overflow_moneybox()
+
         # TODO: save resolved names on a cache?
         #   map like:  id  -> datetimerange -> name
         async def resolve_moneybox_name(
@@ -696,6 +756,9 @@ class DBManager:
         ) -> str | None:
             if counterparty_moneybox_id_ is None:
                 return None
+
+            if counterparty_moneybox_id_ == _overflow_moneybox.id:
+                return _overflow_moneybox.name
 
             counterparty_moneybox_name = await self._get_historical_moneybox_name(
                 moneybox_id=counterparty_moneybox_id_,
@@ -796,14 +859,18 @@ class DBManager:
         return moneybox.id
 
     async def get_priority_list(self) -> list[dict[str, int | str]]:
-        """Get the priority list (moneybox_id to priority and name map).
+        """Get the priority list ASC ordered by priority.
 
-        :return: The priority list (moneybox_id, priority and name key-values).
+        :return: The priority list.
         :rtype: :class:`list[dict[str, int|str]]`
         """
 
-        stmt = select(Moneybox.id, Moneybox.priority, Moneybox.name).where(  # type: ignore
-            Moneybox.is_active.is_(True),
+        stmt = (
+            select(Moneybox.id, Moneybox.priority, Moneybox.name)
+            .where(  # type: ignore
+                Moneybox.is_active.is_(True),
+            )
+            .order_by(Moneybox.priority)
         )
 
         async with self.async_session() as session:
@@ -824,12 +891,16 @@ class DBManager:
         return priority_map
 
     async def update_priority_list(
-        self, priorities: list[dict[str, int]]
+        self,
+        priorities: list[dict[str, int]],
+        session: AsyncSession | None = None,
     ) -> list[dict[str, str | int]]:
         """Set new priorities by given priority list.
 
         :param priorities: The priority list (moneybox_id to priority and name map).
         :type priorities: :class:`list[dict[str, int]]`
+        :param session: The current session of the db creation, defaults to None.
+        :type session: :class:`AsyncSession`|:class:`None`
         :return: The updated priority list (moneybox_id to priority and name map).
         :rtype: :class:`list[dict[str, str|int]]`
 
@@ -858,11 +929,45 @@ class DBManager:
                 details={"priority_list": priorities},  # type: ignore
             )
 
-        async with self.async_session.begin() as session:
-            reset_data = [
-                {"id": priority["moneybox_id"], "priority": None} for priority in priorities
-            ]
+        reset_data = [{"id": priority["moneybox_id"], "priority": None} for priority in priorities]
 
+        if session is None:
+            async with self.async_session.begin() as session:
+                # ORM Bulk UPDATE by Primary Key -> set priority to None
+                pre_updated_moneyboxes_result = await session.execute(
+                    update(Moneybox)
+                    .where(Moneybox.id.in_([item["id"] for item in reset_data]))
+                    .values(priority=None)
+                    .returning(Moneybox.name, Moneybox.id, Moneybox.priority)
+                )
+                pre_updated_moneyboxes = pre_updated_moneyboxes_result.fetchall()
+
+                if len(pre_updated_moneyboxes) < len(priorities):
+                    raise UpdateInstanceError(
+                        record_id=None,
+                        message="Updating priorities failed. Some moneybox_ids may not exist.",
+                        details={"priority_list": priorities},
+                    )
+
+                updated_moneyboxes = []
+
+                for entry in updating_data:
+                    updated_moneybox = await session.execute(
+                        update(Moneybox)
+                        .where(Moneybox.id == entry["id"])
+                        .values(priority=entry["priority"])
+                        .returning(Moneybox.id, Moneybox.priority, Moneybox.name)
+                    )
+
+                    updated_moneyboxes.append(updated_moneybox.fetchone())
+
+                if len(updated_moneyboxes) < len(priorities):
+                    raise UpdateInstanceError(
+                        record_id=None,
+                        message="Updating priorities failed. Some moneybox_ids may not exist.",
+                        details={"priority_list": priorities},
+                    )
+        else:
             # ORM Bulk UPDATE by Primary Key -> set priority to None
             pre_updated_moneyboxes_result = await session.execute(
                 update(Moneybox)

@@ -109,7 +109,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "priority": 0,
         }
 
-        await self.db_manager.add_moneybox(
+        await self.db_manager._add_overflow_moneybox(  # noqa: ignore  # pylint: disable=line-too-long, protected-access
             moneybox_data=overflow_moneybox_data,
         )
 

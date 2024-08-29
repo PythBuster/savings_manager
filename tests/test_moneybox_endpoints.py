@@ -177,29 +177,6 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
 
 
 @pytest.mark.dependency
-async def test_endpoint_add_moneybox__invalid_with_priority_0(
-    load_test_data: None,  # pylint: disable=unused-argument
-    client: AsyncClient,
-) -> None:
-    moneybox_data = {
-        "name": "Test Box Endpoint Add 1",
-        "savings_amount": 0,
-        "savings_target": None,
-        "priority": 0,
-    }
-    response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
-    )
-
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-
-    content = response.json()
-    assert content["detail"][0]["msg"] == "Input should be greater than or equal to 1"
-    assert content["detail"][0]["loc"][1] == "priority"
-    assert content["detail"][0]["input"] == 0
-
-
-@pytest.mark.dependency
 async def test_endpoint_add_moneybox__one__status_200(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
@@ -208,7 +185,6 @@ async def test_endpoint_add_moneybox__one__status_200(
         "name": "Test Box Endpoint Add 1",
         "savings_amount": 0,
         "savings_target": None,
-        "priority": 1,
     }
     response = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
@@ -241,7 +217,6 @@ async def test_endpoint_add_moneybox__two__status_200(
         "name": "Test Box Endpoint Add 1",
         "savings_amount": 0,
         "savings_target": None,
-        "priority": 1,
     }
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
@@ -268,7 +243,6 @@ async def test_endpoint_add_moneybox__two__status_200(
         "name": "Test Box Endpoint Add 2",
         "savings_amount": 0,
         "savings_target": None,
-        "priority": 2,
     }
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",

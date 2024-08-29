@@ -51,31 +51,34 @@ def event_loop() -> asyncio.AbstractEventLoop:  # type: ignore
 @pytest_asyncio.fixture(scope="function")
 async def default_test_data(db_manager: DBManager) -> None:
     """The default test data fixture.
+    delete_moneybox
+        Loads a fix dataset of testdata.
 
-    Loads a fix dataset of testdata.
-
-    :param db_manager: The database manager.
-    :type db_manager: :class:`DBManager`
+        :param db_manager: The database manager.
+        :type db_manager: :class:`DBManager`
     """
 
     await db_manager.truncate_tables()  # type: ignore
 
+    overflow_moneybox_data = {
+        "name": "Overflow Moneybox",
+        "savings_amount": 0,
+        "savings_target": None,
+    }
+    overflow_moneybox = await db_manager._add_overflow_moneybox(  # noqa: ignore  # pylint: disable=line-too-long, protected-access
+        moneybox_data=overflow_moneybox_data
+    )
+    moneyboxes = [overflow_moneybox]
+
     # add 5 moneyboxes + initial overflow moneybox
     moneyboxes_data = [
-        {
-            "name": "Overflow Moneybox",
-            "savings_amount": 0,
-            "savings_target": None,
-            "priority": 0,
-        },  # id: 1
-        {"name": "Moneybox 1", "priority": 1},  # id: 2
-        {"name": "Moneybox 2", "priority": 2},  # id: 3
-        {"name": "Moneybox 3", "priority": 3},  # id: 4
-        {"name": "Moneybox 4", "priority": 4},  # id: 5
-        {"name": "Moneybox 5", "priority": 5},  # id: 6
+        {"name": "Moneybox 1"},  # id: 2
+        {"name": "Moneybox 2"},  # id: 3
+        {"name": "Moneybox 3"},  # id: 4
+        {"name": "Moneybox 4"},  # id: 5
+        {"name": "Moneybox 5"},  # id: 6
     ]
 
-    moneyboxes = []
     for moneybox_data in moneyboxes_data:
         moneybox = await db_manager.add_moneybox(
             moneybox_data=moneybox_data,

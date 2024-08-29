@@ -60,34 +60,30 @@ async def test_add_moneybox(
         {
             "name": "Test Box 1",
             "balance": 0,
-            "priority": 1,
             "savings_amount": 0,
             "savings_target": None,
         },
         {
             "name": "Test Box 2",
             "balance": 350,
-            "priority": 2,
             "savings_amount": 0,
             "savings_target": None,
         },
         {
             "name": "Test Box 3",
             "balance": 0,
-            "priority": 3,
             "savings_amount": 0,
             "savings_target": None,
         },
         {
             "name": "Test Box 4",
             "balance": 0,
-            "priority": 4,
             "savings_amount": 0,
             "savings_target": None,
         },
     ]
 
-    for data in moneybox_data:
+    for priority, data in enumerate(moneybox_data):
         result_moneybox_data = await db_manager.add_moneybox(moneybox_data=data)
 
         assert isinstance(result_moneybox_data["created_at"], datetime)
@@ -96,7 +92,11 @@ async def test_add_moneybox(
         del result_moneybox_data["created_at"]
         del result_moneybox_data["modified_at"]
 
-        expected_moneybox_data = {"id": result_moneybox_data["id"], "balance": 0} | data
+        expected_moneybox_data = {
+            "priority": priority + 1,
+            "id": result_moneybox_data["id"],
+            "balance": 0,
+        } | data
         assert result_moneybox_data == expected_moneybox_data
 
 

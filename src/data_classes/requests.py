@@ -33,9 +33,6 @@ class MoneyboxCreateRequest(BaseModel):
     ]
     """"The current savings target. Is relevant for the automated distributed saving progress."""
 
-    priority: Annotated[StrictInt, Field(ge=1, description="The current priority of the moneybox.")]
-    """The current priority of the moneybox."""
-
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
@@ -45,7 +42,6 @@ class MoneyboxCreateRequest(BaseModel):
                     "name": "Holiday",
                     "savings_amount": 0,
                     "savings_target": 50000,
-                    "priority": 1,
                 }
             ]
         },

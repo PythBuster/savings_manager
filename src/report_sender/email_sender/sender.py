@@ -46,7 +46,7 @@ class EmailSender(ReportSender):
         try:
             today_dt_str = datetime.now(tz=timezone.utc).isoformat(sep=" ", timespec="seconds")
             message = (
-                """This is a test email.\nYour SMTP outgoing data are correct, congratulations! :)"""
+                "This is a test email.\nYour SMTP outgoing data are correct, congratulations! :)"
             )
 
             receiver = {

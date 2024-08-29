@@ -23,8 +23,8 @@ from src.utils import equal_dict
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "Holiday", "savings_amount": 100, "savings_target": 50000, "priority": 1},
-        {"name": "Emergency Fund", "savings_amount": 0, "savings_target": None, "priority": 2},
+        {"name": "Holiday", "savings_amount": 100, "savings_target": 50000},
+        {"name": "Emergency Fund", "savings_amount": 0, "savings_target": None},
     ],
 )
 def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
@@ -33,7 +33,6 @@ def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
     assert response.name == data["name"]
     assert response.savings_amount == data["savings_amount"]
     assert response.savings_target == data["savings_target"]
-    assert response.priority == data["priority"]
 
 
 @pytest.mark.parametrize(
@@ -44,26 +43,12 @@ def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
             "name": "Holiday",
             "savings_amount": -10,
             "savings_target": 50000,
-            "priority": 1,
         },  # Negative savings_amount
         {
             "name": "Holiday",
             "savings_amount": 100,
             "savings_target": -1,
-            "priority": 1,
         },  # Negative savings_target
-        {
-            "name": "Holiday",
-            "savings_amount": 100,
-            "savings_target": 50000,
-            "priority": -1,
-        },  # Negative priority
-        {
-            "name": "Holiday",
-            "savings_amount": 100,
-            "savings_target": 50000,
-            "priority": 0,
-        },  # Null priority
     ],
 )
 def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
@@ -76,8 +61,8 @@ def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "Holiday", "savings_amount": 200, "savings_target": 60000, "priority": 1},
-        {"savings_amount": 150, "savings_target": None, "priority": 2},
+        {"name": "Holiday", "savings_amount": 200, "savings_target": 60000},
+        {"savings_amount": 150, "savings_target": None},
         {"name": "Savings", "savings_target": None},
     ],
 )
@@ -96,20 +81,12 @@ def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
             "name": "Holiday",
             "savings_amount": -20,
             "savings_target": 60000,
-            "priority": 1,
         },  # Negative savings_amount
         {
             "name": "Holiday",
             "savings_amount": 200,
             "savings_target": -5,
-            "priority": 1,
         },  # Negative savings_target
-        {
-            "name": "Holiday",
-            "savings_amount": 200,
-            "savings_target": 60000,
-            "priority": 0,
-        },  # Invalid priority
     ],
 )
 def test_moneybox_update_request_invalid(data: dict[str, Any]) -> None:
