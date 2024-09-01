@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.5.0 (2024-09-01)
+### Changed:
+- send multipart (plain+html) emails for automated savings report
+
 ## 2.4.0 (2024-09-01)
 ### Changed:
 - adapt GET/UPDATE prioritylist endpoint: return prioritylist sorted by priority
