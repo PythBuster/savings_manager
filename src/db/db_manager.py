@@ -9,6 +9,7 @@ from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
+from src.app_logger import app_logger
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -1184,7 +1185,7 @@ class DBManager:
             "amount": add_amount,
             "description": (
                 "Automated Savings with Overflow Moneybox Mode: "
-                f"{OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES}"
+                f"{app_settings.overflow_moneybox_automated_savings_mode}"
             ),
         }
 

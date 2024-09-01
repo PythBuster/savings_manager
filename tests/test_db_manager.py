@@ -973,6 +973,21 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
     for moneybox in moneyboxes:
         assert moneybox["balance"] == expected_data[moneybox["name"]]
 
+    # >>>  test case for bug: issue #71
+    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
+    overflow_moneybox = await db_manager._get_overflow_moneybox()
+    overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
+        moneybox_id=overflow_moneybox.id,
+    )
+
+    last_transaction_log = overflow_moneybox_transaction_logs[-1]
+    expected_description = (
+        "Automated Savings with Overflow Moneybox Mode: "
+        f"{OverflowMoneyboxAutomatedSavingsModeType.COLLECT}"
+    )
+    assert last_transaction_log["description"] == expected_description
+    # <<<
+
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_collect"])
 async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
@@ -995,6 +1010,21 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
     for moneybox in moneyboxes:
         assert moneybox["balance"] == expected_data[moneybox["name"]]
 
+    # >>>  test case for bug: issue #71
+    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
+    overflow_moneybox = await db_manager._get_overflow_moneybox()
+    overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
+        moneybox_id=overflow_moneybox.id,
+    )
+
+    last_transaction_log = overflow_moneybox_transaction_logs[-1]
+    expected_description = (
+        "Automated Savings with Overflow Moneybox Mode: "
+        f"{OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT}"
+    )
+    assert last_transaction_log["description"] == expected_description
+    # <<<
+
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_add_to_amount"])
 async def test_automated_savings_overflow_moneybox_mode_fill_up(
@@ -1016,3 +1046,18 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
 
     for moneybox in moneyboxes:
         assert moneybox["balance"] == expected_data[moneybox["name"]]
+
+    # >>> test case for bug: issue #71
+    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
+    overflow_moneybox = await db_manager._get_overflow_moneybox()
+    overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
+        moneybox_id=overflow_moneybox.id,
+    )
+
+    last_transaction_log = overflow_moneybox_transaction_logs[-1]
+    expected_description = (
+        "Automated Savings with Overflow Moneybox Mode: "
+        f"{OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES}"
+    )
+    assert last_transaction_log["description"] == expected_description
+    # <<<

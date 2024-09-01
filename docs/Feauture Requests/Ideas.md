@@ -25,6 +25,6 @@
 
 # Different Concurrencies
 
+# Endpoint for error logs
 
-
-
+# Bug Report Endpoint / UI ockup needed?
