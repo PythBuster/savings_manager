@@ -54,7 +54,8 @@ async def update_priority_list(
         Body(title="Update Data", description="The updating priority list data."),
     ],
 ) -> PrioritylistResponse:
-    """Endpoint for updating priority list. Note: Returns the updated list SORTED by priority (asc)."""
+    """Endpoint for updating priority list. Note: Returns the updated list
+    SORTED by priority (asc)."""
 
     db_manager: DBManager = request.app.state.db_manager
     updated_priority_list = await db_manager.update_priority_list(

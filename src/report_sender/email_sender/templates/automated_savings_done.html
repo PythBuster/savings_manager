@@ -1,11 +1,52 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moneybox Table</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 25px 0px;
+            font-size: 12px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .right-align {
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-<p>Hey {{ receiver_email_address }}!</p>
+{{ header_string_1 }}<br>
+{{ header_string_2 }}<br>
+<table>
+    <thead>
+        <tr>
+            {% for header in moneyboxes_table_header %}
+                <th>{{ header }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in moneyboxes_table_data %}
+            <tr>
+                {% for header in moneyboxes_table_header %}
+                    <td class="{% if header == 'balance' %}right-align{% endif %}">
+                        {{ row[header] }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+Total Balance: <span style="font-weight: bold;">{{ total_balance }}</span>
 
 </body>
 </html>

@@ -33,7 +33,7 @@ async def test_task_automated_savings_schedule(
 
     with (
         patch(
-            f"{email_sender_path}.{sender_class_name}.send_message", side_effect=mock_send_message
+            f"{email_sender_path}.{sender_class_name}._send_message", side_effect=mock_send_message
         ) as mock_send,
         patch(f"{module_path}.datetime") as mock_datetime,
     ):
@@ -72,7 +72,7 @@ async def test_task_automated_savings_dont_schedule(
     sender_class_name = EmailSender.__qualname__
 
     with (
-        patch(f"{email_sender_path}.{sender_class_name}.send_message") as mock_send,
+        patch(f"{email_sender_path}.{sender_class_name}._send_message") as mock_send,
         patch(f"{module_path}.datetime") as mock_datetime,
     ):
         fake_today = datetime(2022, 1, 2, 15)
@@ -122,7 +122,7 @@ async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many
     with (
         patch(f"{task_runner_module_path}.datetime") as mock_datetime_1,
         patch(f"{db_manager_module_path}.datetime") as mock_datetime_2,
-        patch(f"{email_sender_path}.{sender_class_name}.send_message") as mock_send,
+        patch(f"{email_sender_path}.{sender_class_name}._send_message") as mock_send,
         patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled) as mock_sleep,
     ):
         fake_today = datetime(2022, 1, 1, 15)
@@ -175,7 +175,7 @@ async def test_task_automated_savings_no_savings_active(  # pylint: disable=too-
     with (
         patch(f"{task_runner_module_path}.datetime") as mock_datetime_1,
         patch(f"{db_manager_module_path}.datetime") as mock_datetime_2,
-        patch(f"{email_sender_path}.{sender_class_name}.send_message") as mock_send,
+        patch(f"{email_sender_path}.{sender_class_name}._send_message") as mock_send,
         patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled),
     ):
         fake_today = datetime(2022, 1, 1, 15)

@@ -9,7 +9,6 @@ from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
-from src.app_logger import app_logger
 from src.custom_types import (
     ActionType,
     AppEnvVariables,

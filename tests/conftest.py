@@ -262,7 +262,7 @@ async def mocked_email_sender(
         db_manager=db_manager,
         smtp_settings=smtp_settings,
     )
-    # email_sender.send_message = lambda *args, **kwargs: None
+    # email_sender._send_message = lambda *args, **kwargs: None
     yield email_sender
 
 
