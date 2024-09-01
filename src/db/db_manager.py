@@ -1013,6 +1013,7 @@ class DBManager:
             for moneybox_id, priority, name in updated_moneyboxes
         ]
 
+        priority_map.sort(key=lambda x: x["priority"])
         return priority_map
 
     async def get_app_settings(

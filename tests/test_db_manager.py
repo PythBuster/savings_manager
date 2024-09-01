@@ -107,12 +107,16 @@ async def test_get_priority_list(
     priorities = await db_manager.get_priority_list()
     priorities = sorted(priorities, key=lambda x: x["priority"], reverse=False)
 
-    expected_priorities = [
-        {"priority": 1, "name": "Test Box 1"},
-        {"priority": 2, "name": "Test Box 2"},
-        {"priority": 3, "name": "Test Box 3"},
-        {"priority": 4, "name": "Test Box 4"},
-    ]
+    # sort and check if result is sorted by priority
+    expected_priorities = sorted(
+        [
+            {"priority": 4, "name": "Test Box 4"},
+            {"priority": 3, "name": "Test Box 3"},
+            {"priority": 2, "name": "Test Box 2"},
+            {"priority": 1, "name": "Test Box 1"},
+        ],
+        key=lambda x: x["priority"],
+    )
 
     assert equal_dict(
         dict_1=expected_priorities[0], dict_2=priorities[0], exclude_keys=["moneybox_id"]
@@ -152,12 +156,16 @@ async def test_update_priorities(db_manager: DBManager) -> None:
 
     result = await db_manager.update_priority_list(priorities=new_priorities_1)
 
-    expected_priorities = [
-        {"moneybox_id": first_moneybox_id, "priority": 4, "name": "Test Box 1"},
-        {"moneybox_id": second_moneybox_id, "priority": 3, "name": "Test Box 2"},
-        {"moneybox_id": third_moneybox_id, "priority": 2, "name": "Test Box 3"},
-        {"moneybox_id": fourth_moneybox_id, "priority": 1, "name": "Test Box 4"},
-    ]
+    # sort and check if result is sorted by priority
+    expected_priorities = sorted(
+        [
+            {"moneybox_id": first_moneybox_id, "priority": 4, "name": "Test Box 1"},
+            {"moneybox_id": second_moneybox_id, "priority": 3, "name": "Test Box 2"},
+            {"moneybox_id": third_moneybox_id, "priority": 2, "name": "Test Box 3"},
+            {"moneybox_id": fourth_moneybox_id, "priority": 1, "name": "Test Box 4"},
+        ],
+        key=lambda x: x["priority"],
+    )
 
     for i, expected_priority in enumerate(expected_priorities):
         assert equal_dict(
