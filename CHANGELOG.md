@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.4.0 (2024-09-01)
+### Changed:
+- adapt GET/UPDATE prioritylist endpoint: return prioritylist sorted by priority
+
 ## 2.3.1 (2024-09-01)
 ### Changed:
 - Fix: write correct mode in transaction log description for overflow moneybox
