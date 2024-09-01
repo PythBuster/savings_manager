@@ -1,7 +1,10 @@
 # CHANGELOG.md
 
 ## x.y.z (unreleased)
-...
+
+## 2.3.1 (2024-09-01)
+### Changed:
+- Fix: write correct mode in transaction log description for overflow moneybox
 
 ## 2.3.0 (2024-08-29)
 ### Changed:
