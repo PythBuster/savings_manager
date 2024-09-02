@@ -293,7 +293,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="routes.prioritylist.get_priority_list">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">routes.prioritylist.</span></span><span class="sig-name descname"><span class="pre">get_priority_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="src.data_classes.html#src.data_classes.responses.PrioritylistResponse" title="src.data_classes.responses.PrioritylistResponse"><span class="pre">PrioritylistResponse</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Response</span></span></span><a class="headerlink" href="#routes.prioritylist.get_priority_list" title="Link to this definition"></a></dt>
-<dd><p>Endpoint for getting priority list.</p>
+<dd><p>Endpoint for getting priority list. Note: Returns a list SORTED by priority (asc).</p>
 </dd></dl>
 
 <dl class="py data">
@@ -305,7 +305,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="routes.prioritylist.update_priority_list">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">routes.prioritylist.</span></span><span class="sig-name descname"><span class="pre">update_priority_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="src.data_classes.html#src.data_classes.requests.PrioritylistRequest" title="src.data_classes.requests.PrioritylistRequest"><span class="pre">PrioritylistRequest</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Body</span><span class="p"><span class="pre">(</span></span><span class="pre">PydanticUndefined</span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="src.data_classes.html#src.data_classes.responses.PrioritylistResponse" title="src.data_classes.responses.PrioritylistResponse"><span class="pre">PrioritylistResponse</span></a></span></span><a class="headerlink" href="#routes.prioritylist.update_priority_list" title="Link to this definition"></a></dt>
-<dd><p>Endpoint for updating priority list.</p>
+<dd><p>Endpoint for updating priority list. Note: Returns the updated list
+SORTED by priority (asc).</p>
 </dd></dl>
 
 </section>
