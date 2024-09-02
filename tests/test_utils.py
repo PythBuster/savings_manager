@@ -10,6 +10,7 @@ from src.utils import equal_dict, get_app_data, get_database_url
 
 def test_db_settings() -> None:  # pylint: disable= unused-argument
     db_settings = AppEnvVariables(
+        environment="test",
         db_driver="postgresql+asyncpg",
         db_name="test_db",
         db_host="mylocalhost",
@@ -30,6 +31,7 @@ def test_db_settings() -> None:  # pylint: disable= unused-argument
     # not supported driver
     unsupported_db_driver = "unknown"
     db_settings = AppEnvVariables(
+        environment="test",
         db_driver=unsupported_db_driver,
         db_name="test_db",
         db_host="mylocalhost",
