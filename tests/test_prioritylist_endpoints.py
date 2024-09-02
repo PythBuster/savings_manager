@@ -69,13 +69,11 @@ async def test_update_priority_list(  # pylint:disable=too-many-locals
     assert response.status_code == status.HTTP_200_OK
     response_priority_list = response.json()["priority_list"]
 
-    expected_priority = sorted(
-        [
-            {"moneybox_id": first_moneybox_id, "priority": 2, "name": "Test Box 1"},
-            {"moneybox_id": second_moneybox_id, "priority": 1, "name": "Test Box 2"},
-        ],
-        key=lambda x: x["priority"],
-    )
+    expected_priority = [
+        {"moneybox_id": first_moneybox_id, "priority": 2, "name": "Test Box 1"},
+        {"moneybox_id": second_moneybox_id, "priority": 1, "name": "Test Box 2"},
+    ]
+    expected_priority.sort(key=lambda x: x["priority"])  # type: ignore
 
     for i, priority in enumerate(expected_priority):
         assert equal_dict(

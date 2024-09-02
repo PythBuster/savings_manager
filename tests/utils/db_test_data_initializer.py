@@ -345,25 +345,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_endpoint_delete_moneybox_2__non_existing_after_success_deletion__status_204_and_404(
-        self,
-    ) -> None:
-        """The data generation function for test_case:
-        `test_endpoint_delete_moneybox_2__non_existing_after_success_deletion__status_200_and_404`.
-        """
-
-        await self.truncate_tables()
-
-        # create 1 moneybox
-        moneyboxes_data = [
-            {"name": "Test Box 1", "priority": 1},
-        ]
-
-        for moneybox_data in moneyboxes_data:
-            await self.db_manager.add_moneybox(
-                moneybox_data=moneybox_data,
-            )
-
     async def dataset_test_endpoint_deposit_first_moneybox__status_200(
         self,
     ) -> None:

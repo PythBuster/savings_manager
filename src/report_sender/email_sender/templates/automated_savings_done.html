@@ -23,13 +23,13 @@
     </style>
 </head>
 <body>
-{{ header_string_1 }}<br>
+<span style="font-weight: bold; color: black;">{{ app_name }}</span> <span style="font-weight: bold; color: red;">v{{ app_version }}</span> {{ header_string_1 }}<br><br>
 {{ header_string_2 }}<br>
 <table>
     <thead>
         <tr>
             {% for header in moneyboxes_table_header %}
-                <th>{{ header }}</th>
+                <th>{{ header|upper }}</th>
             {% endfor %}
         </tr>
     </thead>

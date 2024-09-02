@@ -12,7 +12,7 @@ from src.custom_types import AppEnvVariables
 from src.db.db_manager import DBManager
 from src.report_sender.consants import SENDER_DIR_PATH
 from src.report_sender.sender import ReportSender
-from src.utils import tabulate_str
+from src.utils import get_app_data, tabulate_str
 
 
 class EmailSender(ReportSender):
@@ -144,10 +144,13 @@ class EmailSender(ReportSender):
         ]
         plain_message = "".join(plain_message_parts)
 
-        header_string_1 = header_string.split("\n")[0]
-        header_string_2 = header_string.split("\n")[1]
+        header_string_1 = "automated savings done. :)"
+        header_string_2 = "Your new moneybox balances:"
 
+        app_data_info = get_app_data()
         html_message = self.jinja_env.get_template(jinja_template_file).render(
+            app_name=app_data_info["name"],
+            app_version=app_data_info["version"],
             header_string_1=header_string_1,
             header_string_2=header_string_2,
             moneyboxes_table_header=[header.lower() for header in headers],

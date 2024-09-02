@@ -108,15 +108,13 @@ async def test_get_priority_list(
     priorities = sorted(priorities, key=lambda x: x["priority"], reverse=False)
 
     # sort and check if result is sorted by priority
-    expected_priorities = sorted(
-        [
-            {"priority": 4, "name": "Test Box 4"},
-            {"priority": 3, "name": "Test Box 3"},
-            {"priority": 2, "name": "Test Box 2"},
-            {"priority": 1, "name": "Test Box 1"},
-        ],
-        key=lambda x: x["priority"],
-    )
+    expected_priorities = [
+        {"priority": 4, "name": "Test Box 4"},
+        {"priority": 3, "name": "Test Box 3"},
+        {"priority": 2, "name": "Test Box 2"},
+        {"priority": 1, "name": "Test Box 1"},
+    ]
+    expected_priorities.sort(key=lambda x: x["priority"])  # type: ignore
 
     assert equal_dict(
         dict_1=expected_priorities[0], dict_2=priorities[0], exclude_keys=["moneybox_id"]
@@ -157,15 +155,13 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     result = await db_manager.update_priority_list(priorities=new_priorities_1)
 
     # sort and check if result is sorted by priority
-    expected_priorities = sorted(
-        [
-            {"moneybox_id": first_moneybox_id, "priority": 4, "name": "Test Box 1"},
-            {"moneybox_id": second_moneybox_id, "priority": 3, "name": "Test Box 2"},
-            {"moneybox_id": third_moneybox_id, "priority": 2, "name": "Test Box 3"},
-            {"moneybox_id": fourth_moneybox_id, "priority": 1, "name": "Test Box 4"},
-        ],
-        key=lambda x: x["priority"],
-    )
+    expected_priorities = [
+        {"moneybox_id": first_moneybox_id, "priority": 4, "name": "Test Box 1"},
+        {"moneybox_id": second_moneybox_id, "priority": 3, "name": "Test Box 2"},
+        {"moneybox_id": third_moneybox_id, "priority": 2, "name": "Test Box 3"},
+        {"moneybox_id": fourth_moneybox_id, "priority": 1, "name": "Test Box 4"},
+    ]
+    expected_priorities.sort(key=lambda x: x["priority"])  # type: ignore
 
     for i, expected_priority in enumerate(expected_priorities):
         assert equal_dict(
@@ -983,7 +979,7 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
 
     # >>>  test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()
+    overflow_moneybox = await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
     overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
@@ -1020,7 +1016,7 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
 
     # >>>  test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()
+    overflow_moneybox = await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
     overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
@@ -1057,7 +1053,7 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
 
     # >>> test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()
+    overflow_moneybox = await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
     overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )

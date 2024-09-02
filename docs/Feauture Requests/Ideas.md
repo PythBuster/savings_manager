@@ -1,6 +1,5 @@
 
-# Deactivation of automatic savings/distribution
-
+# ~~Deactivation of automatic savings/distribution~~  - DONE
 
 # Export of Savings History as CSV / Excel
 
@@ -23,8 +22,8 @@
 - --> "Auto Detection of Savings"- in der App bestimmten VERWENDUNGSZWECK speichert, der auf dem physik. Konto alle Eingänge beobachtet und Einzahlung mit dem festgelegenen Verwendungszweck automatisch als "Sparzyklus" betrachtet, statt in der App fest monatlich automatisch zu sparen (und davon auszugehen, dass die Summer tatsächlich auf dem physik. Konto gelandet ist.)
 
 
-# Different Concurrencies
+# Different Currencies
 
 # Endpoint for error logs
 
-# Bug Report Endpoint / UI ockup needed?
+# Bug Report Endpoint / UI Mockup needed?

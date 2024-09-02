@@ -1,6 +1,7 @@
 """All helper functions are located here."""
 
 import tomllib
+from functools import cache
 from pathlib import Path
 from typing import Annotated, Any, Sequence
 
@@ -46,6 +47,7 @@ def get_database_url(db_settings: AppEnvVariables) -> str:
     raise ValueError(f"Not supported database driver: {db_settings.db_driver}")
 
 
+@cache
 def get_app_data() -> dict[str, Any]:
     """Extract app information from pyproject.toml.
 

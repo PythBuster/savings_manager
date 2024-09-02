@@ -1,15 +1,14 @@
 """The abstract class ReportSender is located here."""
 
 from abc import ABC
-from typing import Any
 
 from jinja2 import Environment
 
 from src.db.db_manager import DBManager
-from src.utils import get_app_data, tabulate_str
+from src.utils import get_app_data
 
 
-class ReportSender(ABC):
+class ReportSender(ABC):  # pylint: disable=too-few-methods
     """The abstract base class for all message sender."""
 
     def __init__(
