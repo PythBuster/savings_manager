@@ -2,6 +2,8 @@
 *.db
 *.sqlite
 *.sqlite3
+.env.prod
+.env.dev
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template

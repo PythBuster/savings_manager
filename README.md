@@ -42,6 +42,8 @@ To get the latest version of the repository, simply pull it and rebuild the Dock
 A PostgreSQL database is required. To connect to the database, add a `.env` file in `/src/envs` with the following information:
 
 ```
+ENVIRONMENT=prod|dev|test
+
 DB_DRIVER=postgresql+asyncpg
 DB_NAME=savings_manager
 
@@ -62,6 +64,8 @@ SMTP_PASSWORD=
 
 Example:
 ```
+ENVIRONMENT=prod
+
 DB_DRIVER=postgresql+asyncpg
 DB_NAME=savings_manager
 DB_HOST=127.0.0.1
@@ -78,6 +82,13 @@ SMTP_USER_NAME=
 SMTP_PASSWORD=
 ```
 The SMTP settings will be explained later.
+
+The ENVIRONMENT variable in .env file will deactivate the uvicorn access logs, if value is set to: prod.
+All other values will activate the access logs.
+
+`uvicorn "main:app" [--no-access-log]`
+
+`uvicorn.run("...", ... , access_log=False|True)`
 
 ###### SqlAlchemy (ORM)
 We will use SQLAlchemy to manage and access the SQL database.

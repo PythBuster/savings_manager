@@ -29,5 +29,4 @@ async def get_moneyboxes(
     response_moneyboxes_data = {
         "moneyboxes": moneyboxes_data,
     }
-    moneyboxes = MoneyboxesResponse(**response_moneyboxes_data)
-    return moneyboxes
+    return response_moneyboxes_data  # type: ignore

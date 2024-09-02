@@ -36,7 +36,7 @@ async def get_app_settings(
     db_manager: DBManager = request.app.state.db_manager
     # use protected method for now
     app_settings_data = await db_manager._get_app_settings()  # pylint: disable=protected-access
-    return AppSettingsResponse(**app_settings_data.asdict())
+    return app_settings_data.asdict()  # type: ignore
 
 
 @app_settings_router.patch(
@@ -61,4 +61,4 @@ async def update_app_settings(
     app_settings_data = await db_manager.update_app_settings(
         app_settings_data=app_settings_request.model_dump(exclude_unset=True),
     )
-    return AppSettingsResponse(**app_settings_data)
+    return app_settings_data  # type: ignore

@@ -49,7 +49,7 @@ async def get_moneybox(
     """Endpoint for getting moneybox by moneybox_id."""
 
     moneybox_data = await request.app.state.db_manager.get_moneybox(moneybox_id=moneybox_id)
-    return MoneyboxResponse(**moneybox_data)
+    return moneybox_data  # type: ignore
 
 
 @moneybox_router.post(
@@ -68,7 +68,7 @@ async def add_moneybox(
     moneybox_data = await request.app.state.db_manager.add_moneybox(
         moneybox_data=moneybox_create_request.model_dump()
     )
-    return MoneyboxResponse(**moneybox_data)
+    return moneybox_data  # type: ignore
 
 
 @moneybox_router.patch(
@@ -89,7 +89,7 @@ async def update_moneybox(
         moneybox_id=moneybox_id,
         moneybox_data=moneybox_update_request.model_dump(exclude_unset=True),
     )
-    return MoneyboxResponse(**moneybox_data)
+    return moneybox_data  # type: ignore
 
 
 @moneybox_router.delete(
@@ -137,7 +137,7 @@ async def deposit_moneybox(
         transaction_type=TransactionType.DIRECT,
         transaction_trigger=TransactionTrigger.MANUALLY,
     )
-    return MoneyboxResponse(**moneybox_data)
+    return moneybox_data  # type: ignore
 
 
 @moneybox_router.post(
@@ -169,7 +169,7 @@ async def withdraw_moneybox(
         transaction_type=TransactionType.DIRECT,
         transaction_trigger=TransactionTrigger.MANUALLY,
     )
-    return MoneyboxResponse(**moneybox_data)
+    return moneybox_data  # type: ignore
 
 
 @moneybox_router.post(
@@ -226,8 +226,6 @@ async def get_moneybox_transaction_logs(
         transaction_logs_data = {
             "transaction_logs": transaction_logs_data,
         }
-
-        transaction_logs = TransactionLogsResponse(**transaction_logs_data)
-        return transaction_logs
+        return transaction_logs_data  # type: ignore
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

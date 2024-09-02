@@ -28,12 +28,26 @@ class EndpointRouteType(StrEnum):
     EMAIL_SENDER = "email"  # /email
 
 
+class Environment(StrEnum):
+    """App environment types/names."""
+
+    PROD = "prod"
+    DEV = "dev"
+    TEST = "test"
+
+
 class AppEnvVariables(BaseSettings):
     """The app env vars, with all settings/credentials for:
+    - general
     - database
     - smtp
     """
 
+    # GENERAL
+    environment: Environment
+    """Apps running environment."""
+
+    # DATABASE
     db_driver: str
     """Database driver."""
 
@@ -52,6 +66,7 @@ class AppEnvVariables(BaseSettings):
     db_password: SecretStr
     """Database password."""
 
+    # SMTP
     smtp_server: str | None = None
     """The address of the smtp server."""
 

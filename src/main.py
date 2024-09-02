@@ -1,10 +1,13 @@
 """The start module of the savings manager app."""
 
+import asyncio
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Callable
 
 import uvicorn
+import uvloop
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -29,6 +32,8 @@ from src.routes.prioritylist import prioritylist_router
 from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 tags_metadata = [
     {
@@ -233,8 +238,9 @@ def main() -> None:
         "src.main:app",
         host="0.0.0.0",
         port=8001,
-        loop="asyncio",
+        loop="uvloop",
         workers=1,
+        access_log=os.environ["ENVIRONMENT"] != "prod",  # disable access log for prod
     )
     print("Stop uvicorn server.", flush=True)
 

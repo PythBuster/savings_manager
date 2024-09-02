@@ -24,7 +24,7 @@ from tests.utils.db_test_data_initializer import DBTestDataInitializer
 pytest_plugins = ("pytest_asyncio",)
 """The pytest plugins which should be used to run tests."""
 
-dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
+dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.prod.test"
 """The test env file path."""
 
 app_env_variables = AppEnvVariables(

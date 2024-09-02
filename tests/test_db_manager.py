@@ -979,7 +979,9 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
 
     # >>>  test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    overflow_moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    )
     overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
@@ -1016,7 +1018,9 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
 
     # >>>  test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    overflow_moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    )
     overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
@@ -1053,7 +1057,9 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
 
     # >>> test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    overflow_moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    )
     overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
