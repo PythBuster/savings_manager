@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.6.0 (2024-09-02)
+### Changed:
+- performance: added uvloop dependency and use uvloop
+- performance: deactivate uvicorn access logs for production mode (environment)
+- performance: small optimizations in endpoint returns
+
 ## 2.5.1 (2024-09-02)
 ### Changed:
 - small design changes in automated savings email html
