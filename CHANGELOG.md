@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.5.1 (2024-09-02)
+### Changed:
+- small design changes in automated savings email html
+
 ## 2.5.0 (2024-09-01)
 ### Changed:
 - send multipart (plain+html) emails for automated savings report
