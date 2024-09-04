@@ -9,7 +9,7 @@ async def test_create_instance(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
 ) -> None:
-    prioritylist = await db_manager.get_priority_list()
+    prioritylist = await db_manager.get_prioritylist()
 
     moneybox_data = {
         "id": 1,
@@ -25,7 +25,7 @@ async def test_create_instance(
         data=moneybox_data,
     )
 
-    prioritylist = await db_manager.get_priority_list()
+    prioritylist = await db_manager.get_prioritylist()
     prioritylist_map = {
         priority_data["moneybox_id"]: priority_data["priority"] for priority_data in prioritylist
     }

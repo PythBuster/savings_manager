@@ -101,10 +101,10 @@ async def test_add_moneybox(
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox"])
-async def test_get_priority_list(
+async def test_get_prioritylist(
     db_manager: DBManager,
 ) -> None:
-    priorities = await db_manager.get_priority_list()
+    priorities = await db_manager.get_prioritylist()
     priorities = sorted(priorities, key=lambda x: x["priority"], reverse=False)
 
     # sort and check if result is sorted by priority
@@ -130,7 +130,7 @@ async def test_get_priority_list(
     )
 
 
-@pytest.mark.dependency(depends=["test_get_priority_list"])
+@pytest.mark.dependency(depends=["test_get_prioritylist"])
 async def test_update_priorities(db_manager: DBManager) -> None:
     first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
         "Test Box 1"
@@ -152,7 +152,7 @@ async def test_update_priorities(db_manager: DBManager) -> None:
         {"moneybox_id": fourth_moneybox_id, "priority": 1},
     ]
 
-    result = await db_manager.update_priority_list(priorities=new_priorities_1)
+    result = await db_manager.update_prioritylist(priorities=new_priorities_1)
 
     # sort and check if result is sorted by priority
     expected_priorities = [
@@ -178,7 +178,7 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     ]
 
     with pytest.raises(UpdateInstanceError) as ex_info:
-        await db_manager.update_priority_list(priorities=new_priorities_2)
+        await db_manager.update_prioritylist(priorities=new_priorities_2)
 
     assert (
         ex_info.value.message
@@ -186,7 +186,7 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     )
 
     del new_priorities_2[0]
-    await db_manager.update_priority_list(priorities=new_priorities_2)
+    await db_manager.update_prioritylist(priorities=new_priorities_2)
 
 
 @pytest.mark.dependency(depends=["test_update_priorities"])

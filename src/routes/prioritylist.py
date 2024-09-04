@@ -28,16 +28,16 @@ prioritylist_router = APIRouter(
     response_model=PrioritylistResponse,
     responses=GET_PRIORITYLIST_RESPONSES,
 )
-async def get_priority_list(
+async def get_prioritylist(
     request: Request,
 ) -> PrioritylistResponse | Response:
-    """Endpoint for getting priority list. Note: Returns a list SORTED by priority (asc)."""
+    """Endpoint for getting prioritylist. Note: Returns a list SORTED by priority (asc)."""
 
     db_manager: DBManager = request.app.state.db_manager
-    priority_list = await db_manager.get_priority_list()
+    priority_list = await db_manager.get_prioritylist()
 
     if priority_list:
-        return {"priority_list": priority_list}  # type: ignore
+        return {"prioritylist": priority_list}  # type: ignore
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -47,9 +47,9 @@ async def get_priority_list(
     response_model=PrioritylistResponse,
     responses=UPDATE_PRIORITYLIST_RESPONSES,
 )
-async def update_priority_list(
+async def update_prioritylist(
     request: Request,
-    priority_list: Annotated[
+    prioritylist: Annotated[
         PrioritylistRequest,
         Body(title="Update Data", description="The updating priority list data."),
     ],
@@ -58,8 +58,8 @@ async def update_priority_list(
     SORTED by priority (asc)."""
 
     db_manager: DBManager = request.app.state.db_manager
-    updated_priority_list = await db_manager.update_priority_list(
-        priorities=priority_list.model_dump()["priority_list"],
+    updated_priority_list = await db_manager.update_prioritylist(
+        priorities=prioritylist.model_dump()["prioritylist"],
     )
 
-    return {"priority_list": updated_priority_list}  # type: ignore
+    return {"prioritylist": updated_priority_list}  # type: ignore

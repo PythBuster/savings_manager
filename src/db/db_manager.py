@@ -206,7 +206,7 @@ class DBManager:
         """
 
         async with self.async_session.begin() as session:
-            priority_list = await self.get_priority_list()
+            priority_list = await self.get_prioritylist()
             moneybox_data["priority"] = (
                 1 if not priority_list else priority_list[-1]["priority"] + 1  # type: ignore
             )
@@ -358,7 +358,7 @@ class DBManager:
                     details={"deactivated": deactivated},
                 )
 
-            sorted_by_priority_prioritylist = await self.get_priority_list()
+            sorted_by_priority_prioritylist = await self.get_prioritylist()
             sorted_by_priority_prioritylist = [
                 priority_data
                 for priority_data in sorted_by_priority_prioritylist
@@ -373,7 +373,7 @@ class DBManager:
                 for i, priority_data in enumerate(sorted_by_priority_prioritylist)
             ]
 
-            await self.update_priority_list(
+            await self.update_prioritylist(
                 priorities=new_priorities,
                 session=session,
             )
@@ -858,7 +858,7 @@ class DBManager:
 
         return moneybox.id
 
-    async def get_priority_list(self) -> list[dict[str, int | str]]:
+    async def get_prioritylist(self) -> list[dict[str, int | str]]:
         """Get the priority list ASC ordered by priority.
 
         :return: The priority list.
@@ -890,7 +890,7 @@ class DBManager:
 
         return priority_map
 
-    async def update_priority_list(
+    async def update_prioritylist(
         self,
         priorities: list[dict[str, int]],
         session: AsyncSession | None = None,
@@ -926,7 +926,7 @@ class DBManager:
             raise UpdateInstanceError(
                 record_id=None,
                 message="Updating priority=0 is not allowed (reserved for Overflow Moneybox)",
-                details={"priority_list": priorities},  # type: ignore
+                details={"prioritylist": priorities},  # type: ignore
             )
 
         reset_data = [{"id": priority["moneybox_id"], "priority": None} for priority in priorities]
@@ -946,7 +946,7 @@ class DBManager:
                     raise UpdateInstanceError(
                         record_id=None,
                         message="Updating priorities failed. Some moneybox_ids may not exist.",
-                        details={"priority_list": priorities},
+                        details={"prioritylist": priorities},
                     )
 
                 updated_moneyboxes = []
@@ -965,7 +965,7 @@ class DBManager:
                     raise UpdateInstanceError(
                         record_id=None,
                         message="Updating priorities failed. Some moneybox_ids may not exist.",
-                        details={"priority_list": priorities},
+                        details={"prioritylist": priorities},
                     )
         else:
             # ORM Bulk UPDATE by Primary Key -> set priority to None
@@ -981,7 +981,7 @@ class DBManager:
                 raise UpdateInstanceError(
                     record_id=None,
                     message="Updating priorities failed. Some moneybox_ids may not exist.",
-                    details={"priority_list": priorities},
+                    details={"prioritylist": priorities},
                 )
 
             updated_moneyboxes = []
@@ -1000,7 +1000,7 @@ class DBManager:
                 raise UpdateInstanceError(
                     record_id=None,
                     message="Updating priorities failed. Some moneybox_ids may not exist.",
-                    details={"priority_list": priorities},
+                    details={"prioritylist": priorities},
                 )
 
         priority_map = [

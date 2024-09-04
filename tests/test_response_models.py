@@ -475,13 +475,13 @@ def test_priority_response_invalid(data: dict[str, Any]) -> None:
     "data",
     [
         {
-            "priority_list": [
+            "prioritylist": [
                 {"moneybox_id": 2, "priority": 2, "name": "Moneybox 2"},
                 {"moneybox_id": 4, "priority": 1, "name": "Moneybox 3"},
             ]
         },
         {
-            "priority_list": [
+            "prioritylist": [
                 {"moneybox_id": 10, "priority": 1, "name": "Moneybox 4"},
                 {"moneybox_id": 11, "priority": 3, "name": "Moneybox 5"},
             ]
@@ -491,42 +491,42 @@ def test_priority_response_invalid(data: dict[str, Any]) -> None:
 def test_prioritylist_response_valid(data: dict[str, Any]) -> None:
     """Test valid PrioritylistResponse creation."""
     response = PrioritylistResponse(**data)
-    assert len(response.priority_list) == len(data["priority_list"])
-    for i, item in enumerate(response.priority_list):
-        assert item.moneybox_id == data["priority_list"][i]["moneybox_id"]
-        assert item.priority == data["priority_list"][i]["priority"]
-        assert item.name == data["priority_list"][i]["name"]
+    assert response.total == len(data["prioritylist"])
+    for i, item in enumerate(response.prioritylist):
+        assert item.moneybox_id == data["prioritylist"][i]["moneybox_id"]
+        assert item.priority == data["prioritylist"][i]["priority"]
+        assert item.name == data["prioritylist"][i]["name"]
 
 
 @pytest.mark.parametrize(
     "data",
     [
         {
-            "priority_list": [
+            "prioritylist": [
                 {"moneybox_id": "one", "priority": 1},  # Invalid type for moneybox_id
                 {"moneybox_id": 2, "priority": 2},
             ]
         },
         {
-            "priority_list": [
+            "prioritylist": [
                 {"moneybox_id": 1, "priority": -1},  # Invalid priority, negative number
                 {"moneybox_id": 2, "priority": 2},
             ]
         },
         {
-            "priority_list": [
+            "prioritylist": [
                 {"moneybox_id": 1, "priority": 0},  # Invalid priority, zero number
                 {"moneybox_id": 2, "priority": 2},
             ]
         },
         {
-            "priority_list": [
+            "prioritylist": [
                 {"priority": 1},  # Missing moneybox_id
                 {"moneybox_id": 2, "priority": 2},
             ]
         },
         {
-            "priority_list": [],  # Empty list
+            "prioritylist": [],  # Empty list
         },
     ],
 )

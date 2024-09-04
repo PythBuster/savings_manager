@@ -59,9 +59,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found,
-            "test_get_priority_list": self.dataset_test_get_priority_list,
-            "test_get_empty_priority_list": self.truncate_tables,
-            "test_update_priority_list": self.dataset_test_update_priority_list,
+            "test_get_prioritylist": self.dataset_test_get_prioritylist,
+            "test_get_empty_prioritylist": self.truncate_tables,
+            "test_update_prioritylist": self.dataset_test_update_prioritylist,
             "test_create_instance": partial(
                 self.truncate_tables, exclude_table_names=["app_settings"]
             ),
@@ -524,7 +524,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_get_priority_list(
+    async def dataset_test_get_prioritylist(
         self,
     ) -> None:
         """The data generation function for test_case:
@@ -544,7 +544,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_update_priority_list(
+    async def dataset_test_update_prioritylist(
         self,
     ) -> None:
         """The data generation function for test_case:

@@ -223,13 +223,13 @@ class PriorityRequest(BaseModel):
 
 
 class PrioritylistRequest(BaseModel):
-    """The priority list request model."""
+    """The prioritylist request model."""
 
-    priority_list: Annotated[
+    prioritylist: Annotated[
         list[PriorityRequest],
-        Field(min_length=1, description="The priority list."),
+        Field(min_length=1, description="The prioritylist."),
     ]
-    """The priority list."""
+    """The prioritylist."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -237,7 +237,7 @@ class PrioritylistRequest(BaseModel):
         json_schema_extra={
             "examples": [
                 {
-                    "priority_list": [
+                    "prioritylist": [
                         {
                             "moneybox_id": 1,
                             "priority": 0,

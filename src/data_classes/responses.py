@@ -462,7 +462,7 @@ class PriorityResponse(BaseModel):
 class PrioritylistResponse(BaseModel):
     """The priority list response model."""
 
-    priority_list: Annotated[
+    prioritylist: Annotated[
         list[PriorityResponse],
         Field(min_length=1, description="The priority list."),
     ]
@@ -474,7 +474,8 @@ class PrioritylistResponse(BaseModel):
         json_schema_extra={
             "examples": [
                 {
-                    "priority_list": [
+                    "total": 3,
+                    "prioritylist": [
                         {
                             "moneybox_id": 1,
                             "name": "672c0145-c910-4ce8-8202-d6ce9ba405a4",
@@ -488,6 +489,13 @@ class PrioritylistResponse(BaseModel):
         },
     )
     """The config of the model."""
+
+    @computed_field  # type: ignore
+    @property
+    def total(self) -> int:
+        """The len of prioritylist."""
+
+        return len(self.prioritylist)
 
 
 class AppSettingsResponse(BaseModel):
