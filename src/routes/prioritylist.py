@@ -37,7 +37,7 @@ async def get_priority_list(
     priority_list = await db_manager.get_priority_list()
 
     if priority_list:
-        return PrioritylistResponse(priority_list=priority_list)
+        return {"priority_list": priority_list}  # type: ignore
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -62,4 +62,4 @@ async def update_priority_list(
         priorities=priority_list.model_dump()["priority_list"],
     )
 
-    return PrioritylistResponse(priority_list=updated_priority_list)
+    return {"priority_list": updated_priority_list}  # type: ignore
