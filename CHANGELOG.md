@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.7.0 (2024-09-04)
+### Changed:
+- adapt /prioritylist endpoints by adding "total" in response data
+
 ## 2.6.1 (2024-09-04)
 ### Changed:
 - performance: adapt /prioritylist endpoints and let fastAPI implicitly cast return data
