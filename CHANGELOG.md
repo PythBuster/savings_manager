@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.6.1 (2024-09-04)
+### Changed:
+- performance: adapt /prioritylist endpoints and let fastAPI implicitly cast return data
+
 ## 2.6.0 (2024-09-02)
 ### Changed:
 - performance: added uvloop dependency and use uvloop
