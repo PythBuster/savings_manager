@@ -25,12 +25,13 @@ from src.data_classes.responses import (
     [
         {"message": "No database connection.", "details": {"info": "DB offline"}},
         {"message": "Error occurred.", "details": None},
+        {"message": "   Error occurred.   ", "details": None},  # with whitespace
     ],
 )
 def test_http_error_response_valid(data: dict[str, Any]) -> None:
     """Test valid HTTPErrorResponse creation."""
     response = HTTPErrorResponse(**data)
-    assert response.message == data["message"]
+    assert response.message == data["message"].strip()
     assert response.details == data["details"]
 
 
@@ -195,6 +196,26 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": {},  # incorrect type
+        },
+        {
+            "id": 8,
+            "name": " Box 1", # leading whitespace
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": None,
+        },
+        {
+            "id": 9,
+            "name": "Box 1 ",  # trailing whitespace
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": None,
         },
     ],
 )

@@ -12,20 +12,29 @@ from pydantic import (
     StrictInt,
     computed_field,
     field_validator,
-    model_validator,
+    model_validator, StringConstraints,
 )
+from pydantic.alias_generators import to_camel
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
     TransactionType,
 )
+from src.utils import to_camel_cleaned_suffix
 
 
 class HTTPErrorResponse(BaseModel):
     """The http error response model"""
 
-    message: Annotated[str, Field(min_length=1, description="The error message.")]
+    message: Annotated[
+        str,
+        StringConstraints(  # type: ignore
+            min_length=1,
+            strip_whitespace=True,
+        ),
+        Field(description="The error message.")  # additional field metadata
+    ]
     """The error message."""
 
     details: Annotated[dict[str, Any] | None, Field(default=None, description="The error details.")]
@@ -34,6 +43,7 @@ class HTTPErrorResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
         json_schema_extra={
             "examples": [
                 {
@@ -51,7 +61,7 @@ class HTTPErrorResponse(BaseModel):
 class MoneyboxResponse(BaseModel):
     """The pydantic moneybox response model"""
 
-    id: Annotated[StrictInt, Field(description="The id of the moneybox.")]
+    id_: Annotated[StrictInt, Field(description="The id of the moneybox.")]
     """The id of the moneybox."""
 
     name: Annotated[
@@ -96,24 +106,31 @@ class MoneyboxResponse(BaseModel):
     """The creation date of the moneybox."""
 
     modified_at: Annotated[
-        AwareDatetime | None, Field(description="The modification date of the moneybox.")
+        AwareDatetime | None,
+        Field(
+            description="The modification date of the moneybox.",
+        )
+
     ]
     """The modification date of the moneybox."""
 
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        populate_by_name=True,
         json_schema_extra={
             "examples": [
                 {
                     "id": 1,
                     "name": "Holiday",
                     "balance": 0,
-                    "savings_amount": 0,
-                    "savings_target": 50000,
+                    "savingsAmount": 0,
+                    "savingsTarget": 50000,
                     "priority": 1,
-                    "created_at": "2024-08-11 13:57:17.941840 +00:00",
-                    "modified_at": "2024-08-11 15:03:17.312860 +00:00",
+                    "createdAt": "2024-08-11 13:57:17.941840 +00:00",
+                    "modifiedAt": "2024-08-11 15:03:17.312860 +00:00",
                 }
             ]
         },
@@ -131,7 +148,7 @@ class MoneyboxResponse(BaseModel):
                     data["modified_at"] = datetime.fromisoformat(data["modified_at"])
                 except (TypeError, ValueError) as ex:
                     raise ValueError(
-                        "'created_at' must be of type datetime or datetime-string."
+                        "'modified_at' must be of type datetime or datetime-string."
                     ) from ex
             elif not isinstance(data["modified_at"], datetime):
                 raise ValueError("'modified_at' must be of type datetime or datetime-string.")
@@ -160,6 +177,14 @@ class MoneyboxResponse(BaseModel):
             raise ValueError(msg)
 
         return self
+
+    @field_validator("name")
+    @classmethod
+    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+        if value != value.strip():
+            raise ValueError("Leading and trailing spaces in name are not allowed.")
+
+        return value
 
 
 class MoneyboxesResponse(BaseModel):
@@ -216,7 +241,9 @@ class MoneyboxesResponse(BaseModel):
 class TransactionLogResponse(BaseModel):
     """The transaction log response model."""
 
-    id: Annotated[StrictInt, Field(description="The ID of the transaction.")]
+    id: Annotated[StrictInt, Field(
+        description="The ID of the transaction.",
+    )]
     """The ID of the transaction."""
 
     counterparty_moneybox_name: Annotated[
@@ -287,6 +314,7 @@ class TransactionLogResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        populate_by_name=True,
         json_schema_extra={
             "examples": [
                 {

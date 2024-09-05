@@ -29,48 +29,48 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "name": "Overflow Moneybox",
                 "id": 1,
                 "balance": 0,
-                "savings_amount": 0,
-                "savings_target": None,
+                "savingsAmount": 0,
+                "savingsTarget": None,
                 "priority": 0,
             },
             {
                 "name": "Test Box 1",
                 "id": 2,
                 "balance": 0,
-                "savings_amount": 0,
-                "savings_target": None,
+                "savingsAmount": 0,
+                "savingsTarget": None,
                 "priority": 1,  # pylint: disable=duplicate-code
             },
             {
                 "name": "Test Box 2",
                 "id": 3,
                 "balance": 0,
-                "savings_amount": 0,
-                "savings_target": None,
+                "savingsAmount": 0,
+                "savingsTarget": None,
                 "priority": 2,
             },
             {
                 "name": "Test Box 3",
                 "id": 4,
                 "balance": 0,
-                "savings_amount": 0,
-                "savings_target": None,
+                "savingsAmount": 0,
+                "savingsTarget": None,
                 "priority": 3,
             },
             {
                 "name": "Test Box 4",
                 "id": 5,
                 "balance": 0,
-                "savings_amount": 0,
-                "savings_target": None,
+                "savingsAmount": 0,
+                "savingsTarget": None,
                 "priority": 4,
             },
             {
                 "name": "Test Box 5",
                 "id": 6,
                 "balance": 0,
-                "savings_amount": 0,
-                "savings_target": None,
+                "savingsAmount": 0,
+                "savingsTarget": None,
                 "priority": 5,
             },
         ],
@@ -87,7 +87,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
         assert equal_dict(
             dict_1=dict_1,
             dict_2=dict_2,
-            exclude_keys=["created_at", "modified_at", "id"],
+            exclude_keys=["createdAt", "modifiedAt", "id"],
         )
 
 
@@ -121,8 +121,8 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing(
         "name": "Test Box 1",
         "id": moneybox_id,
         "balance": 0,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 1,
     }
 
@@ -130,7 +130,7 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing(
     assert equal_dict(
         dict_1=moneybox,
         dict_2=expected_moneybox_data,  # type: ignore
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
 
@@ -163,8 +163,8 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
         "name": "Test Box 2",
         "id": moneybox_id,
         "balance": 100,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 2,
     }
 
@@ -172,7 +172,7 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
     assert equal_dict(
         dict_1=moneybox,
         dict_2=expected_moneybox_data,  # type: ignore
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
 
@@ -183,8 +183,8 @@ async def test_endpoint_add_moneybox__one__status_200(
 ) -> None:
     moneybox_data = {
         "name": "Test Box Endpoint Add 1",
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
     }
     response = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
@@ -195,8 +195,8 @@ async def test_endpoint_add_moneybox__one__status_200(
         "name": "Test Box Endpoint Add 1",
         "id": moneybox["id"],
         "balance": 0,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 1,
     }
 
@@ -204,7 +204,7 @@ async def test_endpoint_add_moneybox__one__status_200(
     assert equal_dict(
         dict_1=moneybox,
         dict_2=expected_moneybox_data,
-        exclude_keys=["created_at", "modified_at", "id"],
+        exclude_keys=["createdAt", "modifiedAt", "id"],
     )
 
 
@@ -215,8 +215,8 @@ async def test_endpoint_add_moneybox__two__status_200(
 ) -> None:
     moneybox_data_1 = {
         "name": "Test Box Endpoint Add 1",
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
     }
     response_1 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
@@ -227,8 +227,8 @@ async def test_endpoint_add_moneybox__two__status_200(
         "name": "Test Box Endpoint Add 1",
         "id": moneybox_1["id"],
         "balance": 0,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 1,
     }
 
@@ -236,13 +236,13 @@ async def test_endpoint_add_moneybox__two__status_200(
     assert equal_dict(
         dict_1=moneybox_1,
         dict_2=expected_moneybox_data_1,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
     moneybox_data_2 = {
         "name": "Test Box Endpoint Add 2",
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
     }
     response_2 = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
@@ -254,8 +254,8 @@ async def test_endpoint_add_moneybox__two__status_200(
         "name": "Test Box Endpoint Add 2",
         "id": moneybox_2["id"],
         "balance": 0,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 2,
     }
 
@@ -263,7 +263,7 @@ async def test_endpoint_add_moneybox__two__status_200(
     assert equal_dict(
         dict_1=moneybox_2,
         dict_2=expected_moneybox_data_2,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
 

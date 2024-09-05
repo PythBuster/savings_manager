@@ -7,10 +7,13 @@ from typing import Annotated, Any, Sequence
 
 import tabulate
 from dictalchemy import asdict
+from pydantic.alias_generators import to_camel
 from starlette.requests import Request
 
 from src.custom_types import AppEnvVariables
 
+def to_camel_cleaned_suffix(field_name: str) -> str:
+    return to_camel(field_name.removesuffix("_"))
 
 async def check_existence_of_moneybox_by_id(
     request: Request,
