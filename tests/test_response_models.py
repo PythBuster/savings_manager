@@ -199,7 +199,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
         },
         {
             "id": 8,
-            "name": " Box 1", # leading whitespace
+            "name": " Box 1",  # leading whitespace
             "balance": 500,
             "savings_amount": 200,
             "savings_target": 1500,
@@ -362,7 +362,7 @@ def test_moneyboxes_response_invalid(data: dict[str, Any]) -> None:
 def test_transaction_log_response_valid(data: dict[str, Any]) -> None:
     """Test valid TransactionLogResponse creation."""
     response = TransactionLogResponse(**data)
-    assert response.id == data["id"]
+    assert response.id_ == data["id"]
     assert response.amount == data["amount"]
     assert response.balance == data["balance"]
 
@@ -458,7 +458,7 @@ def test_transaction_logs_response_valid(data: dict[str, Any]) -> None:
     response = TransactionLogsResponse(**data)
     assert len(response.transaction_logs) == len(data["transaction_logs"])
     for i, log in enumerate(response.transaction_logs):
-        assert log.id == data["transaction_logs"][i]["id"]
+        assert log.id_ == data["transaction_logs"][i]["id"]
 
 
 # PriorityResponse Tests
@@ -597,7 +597,7 @@ def test_prioritylist_response_invalid(data: dict[str, Any]) -> None:
 def test_app_settings_response_valid(data: dict[str, Any]) -> None:
     """Test valid AppSettingsResponse creation."""
     response = AppSettingsResponse(**data)
-    assert response.id == data["id"]
+    assert response.id_ == data["id"]
 
     if isinstance(data["created_at"], str):
         assert response.created_at == datetime.fromisoformat(data["created_at"])
@@ -639,7 +639,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": "pythbuster@gmail.com",
         },
         {
-            "id": 5,
+            "id": 6,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
@@ -649,7 +649,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": "pythbuster@gmail.com",
         },
         {
-            "id": 5,
+            "id": 7,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
@@ -659,7 +659,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": "1",  # Invalid email address
         },
         {
-            "id": 6,
+            "id": 8,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
@@ -669,7 +669,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": None,
         },
         {
-            "id": 7,
+            "id": 9,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
@@ -679,7 +679,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": None,
         },
         {
-            "id": 8,
+            "id": 10,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": datetime(2024, 8, 10, 11, 45, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
@@ -689,7 +689,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": "",  # Empty email address (Invalid)
         },
         {
-            "id": 9,
+            "id": 11,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": "dsf",
             "is_automated_saving_active": True,
@@ -699,7 +699,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": None,
         },
         {
-            "id": 10,
+            "id": 12,
             "created_at": "dsf",
             "modified_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
@@ -709,7 +709,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": None,
         },
         {
-            "id": 11,
+            "id": 13,
             "created_at": {},
             "modified_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "is_automated_saving_active": True,
@@ -719,7 +719,7 @@ def test_app_settings_response_valid(data: dict[str, Any]) -> None:
             "user_email_address": None,
         },
         {
-            "id": 13,
+            "id": 14,
             "created_at": datetime(2024, 8, 9, 10, 15, 0, tzinfo=timezone.utc),
             "modified_at": {},
             "is_automated_saving_active": True,

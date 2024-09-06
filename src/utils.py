@@ -12,8 +12,18 @@ from starlette.requests import Request
 
 from src.custom_types import AppEnvVariables
 
+
 def to_camel_cleaned_suffix(field_name: str) -> str:
+    """Remove suffix in field name and convert to camel case.
+
+    :param field_name: The field name.
+    :type field_name: :class:`str`
+    :return: Converted field name.
+    :rtype: :class:`str`
+    """
+
     return to_camel(field_name.removesuffix("_"))
+
 
 async def check_existence_of_moneybox_by_id(
     request: Request,

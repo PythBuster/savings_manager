@@ -8,7 +8,7 @@ from src.db.db_manager import DBManager
 from src.utils import get_app_data
 
 
-class ReportSender(ABC):  # pylint: disable=too-few-methods
+class ReportSender(ABC):  # pylint: disable=too-few-public-methods
     """The abstract base class for all message sender."""
 
     def __init__(

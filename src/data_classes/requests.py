@@ -2,7 +2,17 @@
 
 from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictInt, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    StrictBool,
+    StrictInt,
+    StringConstraints,
+    field_validator,
+    model_validator,
+)
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 from src.utils import to_camel_cleaned_suffix
@@ -12,18 +22,29 @@ class MoneyboxCreateRequest(BaseModel):
     """The pydantic moneybox create request model."""
 
     name: Annotated[
-        str, Field(min_length=1, description="The name of the moneybox. Has to be unique.")
+        str,
+        Field(
+            min_length=1,
+            description="The name of the moneybox. Has to be unique.",
+        ),
     ]
     """The name of the moneybox. Has to be unique."""
 
     savings_amount: Annotated[
-        StrictInt, Field(default=0, ge=0, description="The current savings amount of the moneybox.")
+        StrictInt,
+        Field(
+            serialization_alias="savings_amount",
+            default=0,
+            ge=0,
+            description="The current savings amount of the moneybox.",
+        ),
     ]
     """The current savings amount of the moneybox."""
 
     savings_target: Annotated[
         StrictInt | None,
         Field(
+            serialization_alias="savings_target",
             default=0,
             ge=0,
             description=(
@@ -52,6 +73,16 @@ class MoneyboxCreateRequest(BaseModel):
     )
     """The config of the model."""
 
+    @field_validator("name")
+    @classmethod
+    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+        """Check for leading and trailing whitespaces in value."""
+
+        if value != value.strip():
+            raise ValueError("Leading and trailing spaces in name are not allowed.")
+
+        return value
+
 
 class MoneyboxUpdateRequest(BaseModel):
     """The pydantic moneybox update request model."""
@@ -66,13 +97,19 @@ class MoneyboxUpdateRequest(BaseModel):
 
     savings_amount: Annotated[
         StrictInt,
-        Field(default=None, ge=0, description="The current savings amount of the moneybox."),
+        Field(
+            serialization_alias="savings_amount",
+            default=None,
+            ge=0,
+            description="The current savings amount of the moneybox.",
+        ),
     ]
     """The current savings amount of the moneybox."""
 
     savings_target: Annotated[
         StrictInt | None,
         Field(
+            serialization_alias="savings_target",
             default=None,
             ge=0,
             description=(
@@ -107,18 +144,31 @@ class MoneyboxUpdateRequest(BaseModel):
     )
     """The config of the model."""
 
+    @field_validator("name")
+    @classmethod
+    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+        """Check for leading and trailing whitespaces in value."""
+
+        if value != value.strip():
+            raise ValueError("Leading and trailing spaces in name are not allowed.")
+
+        return value
+
 
 class DepositTransactionRequest(BaseModel):
     """The deposit transaction request model"""
 
     amount: Annotated[
-        int,
+        StrictInt,
         Field(ge=1, description="The amount to add, value has to be at least 1."),
     ]
     """The amount to add, value has to be at least 1."""
 
     description: Annotated[
         str,
+        StringConstraints(  # type: ignore
+            strip_whitespace=True,
+        ),
         Field(default="", description="The description of the withdraw transaction."),
     ]
     """The description of the withdraw transaction."""
@@ -126,6 +176,8 @@ class DepositTransactionRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
@@ -142,13 +194,16 @@ class WithdrawTransactionRequest(BaseModel):
     """The withdrawal transaction request model"""
 
     amount: Annotated[
-        int,
+        StrictInt,
         Field(ge=1, description="The amount to sub, value has to be at least 1."),
     ]
     """The amount to sub, value has to be at least 1."""
 
     description: Annotated[
         str,
+        StringConstraints(  # type: ignore
+            strip_whitespace=True,
+        ),
         Field(default="", description="The description of the withdraw transaction."),
     ]
     """The description of the withdraw transaction."""
@@ -156,6 +211,8 @@ class WithdrawTransactionRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
@@ -172,19 +229,28 @@ class TransferTransactionRequest(BaseModel):
     """The transfer transaction request model"""
 
     to_moneybox_id: Annotated[
-        int,
-        Field(description="The id of the moneybox to transfer balance to."),
+        StrictInt,
+        Field(
+            serialization_alias="to_moneybox_id",
+            description="The id of the moneybox to transfer balance to.",
+        ),
     ]
     """The id of the moneybox to transfer balance to."""
 
     amount: Annotated[
-        int,
-        Field(ge=1, description="The amount to transfer, value has to be at least 1."),
+        StrictInt,
+        Field(
+            ge=1,
+            description="The amount to transfer, value has to be at least 1.",
+        ),
     ]
     """The amount to transfer, value has to be at least 1."""
 
     description: Annotated[
         str,
+        StringConstraints(  # type: ignore
+            strip_whitespace=True,
+        ),
         Field(default="", description="The description of the withdraw transaction."),
     ]
     """The description of the withdraw transaction."""
@@ -192,11 +258,13 @@ class TransferTransactionRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "amount": 50,
-                    "to_moneybox_id": 3,
+                    "toMoneyboxId": 3,
                     "description": "Delete Moneybox.",
                 }
             ]
@@ -208,7 +276,13 @@ class TransferTransactionRequest(BaseModel):
 class PriorityRequest(BaseModel):
     """The priority request model."""
 
-    moneybox_id: Annotated[StrictInt, Field(description="The id of the moneybox.")]
+    moneybox_id: Annotated[
+        StrictInt,
+        Field(
+            serialization_alias="moneybox_id",
+            description="The id of the moneybox.",
+        ),
+    ]
     """The id of the moneybox."""
 
     priority: Annotated[
@@ -223,7 +297,13 @@ class PriorityRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
-        json_schema_extra={"examples": [{"moneybox_id": 4, "priority": 1}]},
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {"moneyboxId": 4, "priority": 1},
+            ],
+        },
     )
     """The config of the model."""
 
@@ -240,16 +320,24 @@ class PrioritylistRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "prioritylist": [
                         {
-                            "moneybox_id": 1,
+                            "moneyboxId": 1,
                             "priority": 0,
                         },
-                        {"moneybox_id": 2, "priority": 2},
-                        {"moneybox_id": 4, "priority": 1},
+                        {
+                            "moneyboxId": 2,
+                            "priority": 2,
+                        },
+                        {
+                            "moneyboxId": 4,
+                            "priority": 1,
+                        },
                     ],
                 },
             ],
@@ -262,8 +350,9 @@ class AppSettingsRequest(BaseModel):
     """The app settings request model."""
 
     send_reports_via_email: Annotated[
-        bool,
+        StrictBool,
         Field(
+            serialization_alias="send_reports_via_email",
             default=None,
             description="Tells if receiving reports via report_sender is desired.",
         ),
@@ -273,6 +362,7 @@ class AppSettingsRequest(BaseModel):
     user_email_address: Annotated[
         EmailStr | None,
         Field(
+            serialization_alias="user_email_address",
             default=None,
             description="Users report_sender address. Will used for receiving reports.",
         ),
@@ -280,8 +370,9 @@ class AppSettingsRequest(BaseModel):
     """Users report_sender address. Will used for receiving reports."""
 
     is_automated_saving_active: Annotated[
-        bool,
+        StrictBool,
         Field(
+            serialization_alias="is_automated_saving_active",
             default=None,
             description="Tells if automated saving is active.",
         ),
@@ -291,6 +382,7 @@ class AppSettingsRequest(BaseModel):
     savings_amount: Annotated[
         StrictInt,
         Field(
+            serialization_alias="savings_amount",
             default=None,
             ge=0,
             description=(
@@ -305,6 +397,7 @@ class AppSettingsRequest(BaseModel):
     overflow_moneybox_automated_savings_mode: Annotated[
         OverflowMoneyboxAutomatedSavingsModeType,
         Field(
+            serialization_alias="overflow_moneybox_automated_savings_mode",
             default=None,
             description="The mode for automated savings.",
         ),
@@ -314,14 +407,16 @@ class AppSettingsRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
-                    "send_reports_via_email": True,
-                    "user_email_address": "pythbuster@gmail.com",
-                    "is_automated_saving_active": True,
-                    "savings_amount": 60000,
-                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+                    "sendReportsViaEmail": True,
+                    "userEmailAddress": "pythbuster@gmail.com",
+                    "isAutomatedSavingActive": True,
+                    "savingsAmount": 60000,
+                    "overflowMoneyboxAutomatedSavingsMode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
                 },
             ],
         },
@@ -330,14 +425,14 @@ class AppSettingsRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def lower_case_enum_strings(cls, data: dict[str, Any]) -> dict[str, Any]:
-        """Lower case enum strings."""
+    def convert_strings_to_enum(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Lower case enum strings and concerts to enum."""
 
-        if "overflow_moneybox_automated_savings_mode" in data and isinstance(
-            data["overflow_moneybox_automated_savings_mode"], str
+        if "overflowMoneyboxAutomatedSavingsMode" in data and isinstance(
+            data["overflowMoneyboxAutomatedSavingsMode"], str
         ):
-            data["overflow_moneybox_automated_savings_mode"] = data[
-                "overflow_moneybox_automated_savings_mode"
-            ].lower()
+            data["overflowMoneyboxAutomatedSavingsMode"] = OverflowMoneyboxAutomatedSavingsModeType(
+                data["overflowMoneyboxAutomatedSavingsMode"].lower()
+            )
 
         return data

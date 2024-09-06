@@ -19,20 +19,22 @@ async def test_get_app_settings_status_200(
     )
 
     expected_data = {
-        "created_at": "2024-08-11T13:57:17.941840+00:00",
-        "modified_at": "2024-08-11T15:03:17.312860+00:00",
-        "send_reports_via_email": False,
-        "user_email_address": None,
-        "is_automated_saving_active": True,
-        "savings_amount": 0,
-        "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+        "createdAt": "2024-08-11T13:57:17.941840+00:00",
+        "modifiedAt": "2024-08-11T15:03:17.312860+00:00",
+        "sendReportsViaEmail": False,
+        "userEmailAddress": None,
+        "isAutomatedSavingActive": True,
+        "savingsAmount": 0,
+        "overflowMoneyboxAutomatedSavingsMode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
     }
 
     app_settings = response.json()
 
     assert response.status_code == status.HTTP_200_OK
     assert equal_dict(
-        dict_1=app_settings, dict_2=expected_data, exclude_keys=["created_at", "modified_at", "id"]
+        dict_1=app_settings,
+        dict_2=expected_data,
+        exclude_keys=["createdAt", "modifiedAt", "id"],
     )
 
 
@@ -40,7 +42,7 @@ async def test_get_app_settings_status_200(
 async def test_update_app_settings_invalid_data(client: AsyncClient) -> None:
     """Test the update_app_settings endpoint with invalid data."""
     update_data = {
-        "savings_amount": -1000,  # Invalid savings_amount
+        "savingsAmount": -1000,  # Invalid savings_amount
     }
 
     response = await client.patch(

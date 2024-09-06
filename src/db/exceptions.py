@@ -118,8 +118,8 @@ class TransferEqualMoneyboxError(UpdateInstanceError):
             message="Can't transfer within the same moneybox",
             details={
                 "amount": amount,
-                "from_moneybox_id": from_moneybox_id,
-                "to_moneybox_id": to_moneybox_id,
+                "fromMoneyboxId": from_moneybox_id,
+                "toMoneyboxId": to_moneybox_id,
             },
         )
 

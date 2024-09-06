@@ -19,7 +19,6 @@ from src.routes.responses.app_settings import (
 app_settings_router = APIRouter(
     prefix=f"/{EndpointRouteType.APP_SETTINGS}",
     tags=[EndpointRouteType.APP_SETTINGS],
-
 )
 """The moneybox router."""
 

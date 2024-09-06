@@ -4,7 +4,6 @@ from httpx import AsyncClient
 from starlette import status
 
 from src.custom_types import EndpointRouteType
-from src.data_classes.requests import PrioritylistRequest
 from src.db.db_manager import DBManager
 from src.utils import equal_dict
 
@@ -31,7 +30,9 @@ async def test_get_prioritylist(
 
     for i, expected_priority in enumerate(expected_prioritylist):
         assert equal_dict(
-            dict_1=response_prioritylist[i], dict_2=expected_priority, exclude_keys=["moneybox_id"]
+            dict_1=response_prioritylist[i],
+            dict_2=expected_priority,
+            exclude_keys=["moneyboxId"],
         )
 
 
@@ -55,23 +56,24 @@ async def test_update_prioritylist(  # pylint:disable=too-many-locals
         name="Test Box 2",
     )
 
-    update_prioritylist = [
-        {"moneybox_id": first_moneybox_id, "priority": 2},
-        {"moneybox_id": second_moneybox_id, "priority": 1},
-    ]
+    update_prioritylist_data = {
+        "prioritylist": [
+            {"moneyboxId": first_moneybox_id, "priority": 2},
+            {"moneyboxId": second_moneybox_id, "priority": 1},
+        ]
+    }
 
     # Attempting to update with valid priorities
-    update_data = PrioritylistRequest(prioritylist=update_prioritylist)
     response = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}",
-        json=update_data.model_dump(),
+        json=update_prioritylist_data,
     )
     assert response.status_code == status.HTTP_200_OK
     response_prioritylist = response.json()["prioritylist"]
 
     expected_priority = [
-        {"moneybox_id": first_moneybox_id, "priority": 2, "name": "Test Box 1"},
-        {"moneybox_id": second_moneybox_id, "priority": 1, "name": "Test Box 2"},
+        {"moneyboxId": first_moneybox_id, "priority": 2, "name": "Test Box 1"},
+        {"moneyboxId": second_moneybox_id, "priority": 1, "name": "Test Box 2"},
     ]
     expected_priority.sort(key=lambda x: x["priority"])  # type: ignore
 
@@ -83,8 +85,8 @@ async def test_update_prioritylist(  # pylint:disable=too-many-locals
 
     # Attempting to update with priority=0, which should be rejected
     invalid_update_prioritylist = [
-        {"moneybox_id": first_moneybox_id, "priority": 0},
-        {"moneybox_id": second_moneybox_id, "priority": 1},
+        {"moneyboxId": first_moneybox_id, "priority": 0},
+        {"moneyboxId": second_moneybox_id, "priority": 1},
     ]
     response_invalid = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}",
@@ -93,13 +95,14 @@ async def test_update_prioritylist(  # pylint:disable=too-many-locals
     assert response_invalid.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     # Attempting to update the overflow moneybox with moneybox_id=1
-    overflow_update_prioritylist = [
-        {"moneybox_id": 1, "priority": 1},  # Assuming 1 is the overflow moneybox
-        {"moneybox_id": second_moneybox_id, "priority": 2},
-    ]
-    update_data_overflow = PrioritylistRequest(prioritylist=overflow_update_prioritylist)
+    overflow_update_prioritylist_data = {
+        "prioritylist": [
+            {"moneyboxId": 1, "priority": 1},  # Assuming 1 is the overflow moneybox
+            {"moneyboxId": second_moneybox_id, "priority": 2},
+        ]
+    }
     response_overflow = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}",
-        json=update_data_overflow.model_dump(),
+        json=overflow_update_prioritylist_data,
     )
     assert response_overflow.status_code == status.HTTP_405_METHOD_NOT_ALLOWED

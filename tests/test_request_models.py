@@ -4,6 +4,7 @@ from typing import Any
 
 import pytest
 from pydantic import ValidationError
+from pydantic.alias_generators import to_snake
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 from src.data_classes.requests import (
@@ -16,7 +17,7 @@ from src.data_classes.requests import (
     TransferTransactionRequest,
     WithdrawTransactionRequest,
 )
-from src.utils import equal_dict
+from src.utils import equal_dict, to_camel_cleaned_suffix
 
 
 # MoneyboxCreateRequest Tests
@@ -70,10 +71,8 @@ def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
     """Test valid MoneyboxUpdateRequest creation."""
     response = MoneyboxUpdateRequest(**data)
 
-    assert equal_dict(
-        dict_1=data,
-        dict_2=response.model_dump(by_alias=True, exclude_unset=True),
-    )
+    for key in data.keys():
+        assert getattr(response, to_snake(key)) == data[key]
 
 
 @pytest.mark.parametrize(
@@ -158,14 +157,14 @@ def test_withdraw_transaction_request_invalid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"to_moneybox_id": 3, "amount": 50, "description": "Delete Moneybox."},
-        {"to_moneybox_id": 5, "amount": 100, "description": ""},
+        {"toMoneyboxId": 3, "amount": 50, "description": "Delete Moneybox."},
+        {"toMoneyboxId": 5, "amount": 100, "description": ""},
     ],
 )
 def test_transfer_transaction_request_valid(data: dict[str, Any]) -> None:
     """Test valid TransferTransactionRequest creation."""
     response = TransferTransactionRequest(**data)
-    assert response.to_moneybox_id == data["to_moneybox_id"]
+    assert response.to_moneybox_id == data["toMoneyboxId"]
     assert response.amount == data["amount"]
     assert response.description == data["description"]
 
@@ -173,7 +172,7 @@ def test_transfer_transaction_request_valid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"to_moneybox_id": 3, "amount": 0, "description": "Delete Moneybox."},  # Invalid amount
+        {"toMoneyboxId": 3, "amount": 0, "description": "Delete Moneybox."},  # Invalid amount
     ],
 )
 def test_transfer_transaction_request_invalid(data: dict[str, Any]) -> None:
@@ -186,22 +185,22 @@ def test_transfer_transaction_request_invalid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"moneybox_id": 4, "priority": 1},
-        {"moneybox_id": 2, "priority": 2},
+        {"moneyboxId": 4, "priority": 1},
+        {"moneyboxId": 2, "priority": 2},
     ],
 )
 def test_priority_request_valid(data: dict[str, Any]) -> None:
     """Test valid PriorityRequest creation."""
     response = PriorityRequest(**data)
-    assert response.moneybox_id == data["moneybox_id"]
+    assert response.moneybox_id == data["moneyboxId"]
     assert response.priority == data["priority"]
 
 
 @pytest.mark.parametrize(
     "data",
     [
-        {"moneybox_id": 4, "priority": -2},  # Invalid priority (negative)
-        {"moneybox_id": 4, "priority": 0},  # Invalid priority (zero)
+        {"moneyboxId": 4, "priority": -2},  # Invalid priority (negative)
+        {"moneyboxId": 4, "priority": 0},  # Invalid priority (zero)
     ],
 )
 def test_priority_request_invalid(data: dict[str, Any]) -> None:
@@ -216,14 +215,14 @@ def test_priority_request_invalid(data: dict[str, Any]) -> None:
     [
         {
             "prioritylist": [
-                {"moneybox_id": 2, "priority": 2},
-                {"moneybox_id": 4, "priority": 1},
+                {"moneyboxId": 2, "priority": 2},
+                {"moneyboxId": 4, "priority": 1},
             ]
         },
         {
             "prioritylist": [
-                {"moneybox_id": 10, "priority": 1},
-                {"moneybox_id": 11, "priority": 3},
+                {"moneyboxId": 10, "priority": 1},
+                {"moneyboxId": 11, "priority": 3},
             ]
         },
     ],
@@ -233,7 +232,7 @@ def test_prioritylist_request_valid(data: dict[str, Any]) -> None:
     response = PrioritylistRequest(**data)
     assert len(response.prioritylist) == len(data["prioritylist"])
     for i, item in enumerate(response.prioritylist):
-        assert item.moneybox_id == data["prioritylist"][i]["moneybox_id"]
+        assert item.moneybox_id == data["prioritylist"][i]["moneyboxId"]
         assert item.priority == data["prioritylist"][i]["priority"]
 
 
@@ -242,26 +241,26 @@ def test_prioritylist_request_valid(data: dict[str, Any]) -> None:
     [
         {
             "prioritylist": [
-                {"moneybox_id": "one", "priority": 1},  # Invalid type for moneybox_id
-                {"moneybox_id": 2, "priority": 2},
+                {"moneyboxId": "one", "priority": 1},  # Invalid type for moneybox_id
+                {"moneyboxId": 2, "priority": 2},
             ]
         },
         {
             "prioritylist": [
-                {"moneybox_id": 1, "priority": -1},  # Invalid priority, negative number
-                {"moneybox_id": 2, "priority": 2},
+                {"moneyboxId": 1, "priority": -1},  # Invalid priority, negative number
+                {"moneyboxId": 2, "priority": 2},
             ]
         },
         {
             "prioritylist": [
-                {"moneybox_id": 1, "priority": 0},  # Invalid priority, zero number
-                {"moneybox_id": 2, "priority": 2},
+                {"moneyboxId": 1, "priority": 0},  # Invalid priority, zero number
+                {"moneyboxId": 2, "priority": 2},
             ]
         },
         {
             "prioritylist": [
                 {"priority": 1},  # Missing moneybox_id
-                {"moneybox_id": 2, "priority": 2},
+                {"moneyboxId": 2, "priority": 2},
             ]
         },
         {
@@ -280,30 +279,30 @@ def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
     "data",
     [
         {
-            "is_automated_saving_active": True,
-            "savings_amount": 1000,
+            "isAutomatedSavingActive": True,
+            "savingsAmount": 1000,
         },
         {
-            "is_automated_saving_active": False,
-            "savings_amount": 500,
+            "isAutomatedSavingActive": False,
+            "savingsAmount": 500,
         },
         {
-            "is_automated_saving_active": True,
-            "savings_amount": 0,
+            "isAutomatedSavingActive": True,
+            "savingsAmount": 0,
         },
         {
-            "is_automated_saving_active": False,
+            "isAutomatedSavingActive": False,
         },
         {
-            "savings_amount": 1230,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+            "savingsAmount": 1230,
+            "overflowMoneyboxAutomatedSavingsMode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
         },
         {
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,  # noqa: ignore  # pylint: disable=line-too-long
+            "overflowMoneyboxAutomatedSavingsMode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,  # noqa: ignore  # pylint: disable=line-too-long
         },
         {
-            "overflow_moneybox_automated_savings_mode": "collect",
-        },
+            "overflowMoneyboxAutomatedSavingsMode": "collect",
+        },  # strings converts to enum
     ],
 )
 def test_app_settings_request_valid(data: dict[str, Any]) -> None:
@@ -311,6 +310,8 @@ def test_app_settings_request_valid(data: dict[str, Any]) -> None:
     response = AppSettingsRequest(**data)
     set_attributes = response.model_dump(exclude_unset=True)
 
+    # convert snake_case keys to camelCase
+    set_attributes = {to_camel_cleaned_suffix(key): value for key, value in set_attributes.items()}
     assert equal_dict(dict_1=set_attributes, dict_2=data)
 
 
@@ -318,15 +319,15 @@ def test_app_settings_request_valid(data: dict[str, Any]) -> None:
     "data",
     [
         {
-            "is_automated_saving_active": "sagsfg",  # Invalid boolean
-            "savings_amount": 1000,
+            "isAutomatedSavingActive": "sagsfg",  # Invalid boolean
+            "savingsAmount": 1000,
         },
         {
-            "is_automated_saving_active": True,
-            "savings_amount": -500,  # Negative savings_amount
+            "isAutomatedSavingActive": True,
+            "savingsAmount": -500,  # Negative savings_amount
         },
         {
-            "overflow_moneybox_automated_savings_mode": "unknown",  # unknown mode
+            "overflowMoneyboxAutomatedSavingsMode": "unknown",  # unknown mode
         },
     ],
 )

@@ -20,6 +20,7 @@ email_sender_router = APIRouter(
 @email_sender_router.patch(
     "/send-testemail",
     responses=SEND_TESTEMAIL_RESPONSES,
+    status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
 async def send_testemail(request: Request) -> Response:
     """Endpoint for sending a test email."""

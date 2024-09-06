@@ -88,7 +88,7 @@ app = FastAPI(
     version=app_data["version"],
     contact={
         "name": author_name[1:-1],
-        "report_sender": author_mail[2:-2],
+        "email": author_mail[2:-2],
     },
     openapi_tags=tags_metadata,
     # swagger_ui_parameters={"defaultModelsExpandDepth": -1},

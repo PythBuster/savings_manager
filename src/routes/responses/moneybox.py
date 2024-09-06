@@ -28,7 +28,7 @@ GET_MONEYBOX_RESPONSES = {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
                     details={
-                        "moneybox_id": 1,
+                        "moneyboxId": 1,
                     },
                 ),
             }
@@ -115,7 +115,7 @@ UPDATE_MONEYBOX_RESPONSES = {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
                     details={
-                        "moneybox_id": 1,
+                        "moneyboxId": 1,
                     },
                 ),
             }
@@ -180,7 +180,7 @@ DELETE_MONEYBOX_RESPONSES = {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
                     details={
-                        "moneybox_id": 1,
+                        "moneyboxId": 1,
                     },
                 ),
             }
@@ -230,7 +230,7 @@ DEPOSIT_MONEYBOX_RESPONSES = {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
                     details={
-                        "moneybox_id": 1,
+                        "moneyboxId": 1,
                     },
                 ),
             }
@@ -282,7 +282,7 @@ TRANSFER_MONEYBOX_RESPONSES = {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
                     details={
-                        "moneybox_id": 1,
+                        "moneyboxId": 1,
                     },
                 ),
             }
@@ -335,7 +335,7 @@ MONEYBOX_TRANSACTION_LOGS_RESPONSES = {
                 "example": HTTPErrorResponse(
                     message="Moneybox not found.",
                     details={
-                        "moneybox_id": 1,
+                        "moneyboxId": 1,
                     },
                 ),
             }

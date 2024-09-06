@@ -27,9 +27,7 @@ GET_APP_SETTINGS_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="App settings not found.",
-                    details={
-                        "app_settings_id": 1,
-                    },
+                    details=None,
                 ),
             }
         },
@@ -88,9 +86,7 @@ UPDATE_APP_SETTINGS_RESPONSES = {
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="App settings not found.",
-                    details={
-                        "app_settings_id": 1,
-                    },
+                    details=None,
                 ),
             }
         },

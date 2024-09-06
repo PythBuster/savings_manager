@@ -1,6 +1,5 @@
 """The database test data initializer."""
 
-import time
 from functools import partial
 
 from sqlalchemy import insert
@@ -88,9 +87,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         """Call data generator function depending on test case name map."""
 
         await self.TEST_CASES_DATA[self.test_case]()  # type: ignore
-
-        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
-        time.sleep(1)
 
     async def truncate_tables(self, exclude_table_names: list[str] | None = None) -> None:
         """Truncate tables."""
@@ -190,7 +186,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             added_moneyboxes.append(moneybox)
 
         # sleep to get higher modified_at datetime (simulate time passing before modifying data)
-        time.sleep(1)
+        # time.sleep(1)
 
         # add some amount to second moneybox
         await self.db_manager.add_amount(
@@ -385,9 +381,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             moneybox_data=moneybox_data,
         )
 
-        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
-        time.sleep(1)
-
         # add some amount to moneybox 1
         deposit_transaction_data = {
             "amount": 100,
@@ -448,9 +441,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             )
             moneyboxes.append(moneybox)
 
-        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
-        time.sleep(1)
-
         # add some amount to second moneybox
         await self.db_manager.add_amount(
             moneybox_id=moneyboxes[1]["id"],
@@ -489,9 +479,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
             moneyboxes.append(moneybox)
-
-        # sleep to get higher modified_at datetime (simulate time passing before modifying data)
-        time.sleep(1)
 
         # add some amount to moneybox with id 2
         await self.db_manager.add_amount(

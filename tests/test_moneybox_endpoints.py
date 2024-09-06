@@ -872,7 +872,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204(
 
     transfer_data = {
         "amount": 500,
-        "to_moneybox_id": third_moneybox_id,
+        "toMoneyboxId": third_moneybox_id,
         "description": "Transfer money.",
     }
     response = await client.post(
@@ -898,7 +898,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204__mi
 
     transfer_data = {
         "amount": 500,
-        "to_moneybox_id": third_moneybox_id,
+        "toMoneyboxId": third_moneybox_id,
     }
     response = await client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
@@ -921,7 +921,7 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third__status_422__m
     )
 
     transfer_data = {
-        "to_moneybox_id": third_moneybox_id,
+        "toMoneyboxId": third_moneybox_id,
         "description": "Transfer money.",
     }
     response = await client.post(
@@ -956,7 +956,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__mi
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "missing" == content["detail"][0]["type"]
-    assert "to_moneybox_id" in content["detail"][0]["loc"]
+    assert "toMoneyboxId" in content["detail"][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -980,7 +980,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__st
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "missing" == content["detail"][0]["type"]
-    assert "to_moneybox_id" in content["detail"][0]["loc"]
+    assert "toMoneyboxId" in content["detail"][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -1001,7 +1001,7 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third_status_422__ne
 
     transfer_data = {
         "amount": -500,
-        "to_moneybox_id": third_moneybox_id,
+        "toMoneyboxId": third_moneybox_id,
         "description": "Transfer money.",
     }
     response = await client.post(
@@ -1033,7 +1033,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__ze
 
     transfer_data = {
         "amount": 0,
-        "to_moneybox_id": third_moneybox_id,
+        "toMoneyboxId": third_moneybox_id,
         "description": "Transfer money.",
     }
     response = await client.post(
@@ -1064,7 +1064,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to
 
     transfer_data = {
         "amount": 500,
-        "to_moneybox_id": third_moneybox_id,
+        "toMoneyboxId": third_moneybox_id,
         "description": "Transfer money.",
     }
 
@@ -1097,58 +1097,58 @@ async def test_endpoint_get_transactions_log_moneybox_second__status_200(  # noq
     expected_logs = [
         {
             "id": 2,
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": 6000,
             "balance": 6000,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": second_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": second_moneybox_id,
         },
         {
             "id": 3,
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": -500,
             "balance": 5500,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": second_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": second_moneybox_id,
         },
         {
             "id": 4,
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": -600,
             "balance": 4900,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": second_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": second_moneybox_id,
         },
         {
             "id": 5,
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": 5000,
             "balance": 9900,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": second_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": second_moneybox_id,
         },
         {
             "id": 18,
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": -900,
             "balance": 9000,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": second_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": second_moneybox_id,
         },
     ]
 
@@ -1158,8 +1158,8 @@ async def test_endpoint_get_transactions_log_moneybox_second__status_200(  # noq
     for i, expected_log in enumerate(expected_logs):
         assert equal_dict(
             dict_1=expected_log,  # type: ignore
-            dict_2=content["transaction_logs"][i],
-            exclude_keys=["modified_at", "created_at", "id"],
+            dict_2=content["transactionLogs"][i],
+            exclude_keys=["modifiedAt", "createdAt", "id"],
         )
 
 
@@ -1192,64 +1192,64 @@ async def test_endpoint_get_transactions_log_moneybox_third__status_200(  # noqa
 
     expected_logs = [
         {
-            "counterparty_moneybox_name": "Moneybox 1",
+            "counterpartyMoneyboxName": "Moneybox 1",
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": 3000,
             "balance": 3000,
-            "counterparty_moneybox_id": first_moneybox_id,
-            "moneybox_id": third_moneybox_id,
+            "counterpartyMoneyboxId": first_moneybox_id,
+            "moneyboxId": third_moneybox_id,
         },
         {
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": 10000,
             "balance": 13000,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": third_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": third_moneybox_id,
         },
         {
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": -900,
             "balance": 12100,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": third_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": third_moneybox_id,
         },
         {
-            "counterparty_moneybox_name": "Moneybox 4",
+            "counterpartyMoneyboxName": "Moneybox 4",
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": -5000,
             "balance": 7100,
-            "counterparty_moneybox_id": fourth_moneybox_id,
-            "moneybox_id": third_moneybox_id,
+            "counterpartyMoneyboxId": fourth_moneybox_id,
+            "moneyboxId": third_moneybox_id,
         },
         {
-            "counterparty_moneybox_name": None,
+            "counterpartyMoneyboxName": None,
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": -900,
             "balance": 6200,
-            "counterparty_moneybox_id": None,
-            "moneybox_id": third_moneybox_id,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": third_moneybox_id,
         },
         {
-            "counterparty_moneybox_name": "Moneybox 4",
+            "counterpartyMoneyboxName": "Moneybox 4",
             "description": "",
-            "transaction_type": "direct",
-            "transaction_trigger": "manually",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
             "amount": 8000,
             "balance": 14200,
-            "counterparty_moneybox_id": fourth_moneybox_id,
-            "moneybox_id": third_moneybox_id,
+            "counterpartyMoneyboxId": fourth_moneybox_id,
+            "moneyboxId": third_moneybox_id,
         },
     ]
 
@@ -1259,8 +1259,8 @@ async def test_endpoint_get_transactions_log_moneybox_third__status_200(  # noqa
     for i, expected_log in enumerate(expected_logs):
         assert equal_dict(
             dict_1=expected_log,  # type: ignore
-            dict_2=content["transaction_logs"][i],
-            exclude_keys=["modified_at", "created_at", "id"],
+            dict_2=content["transactionLogs"][i],
+            exclude_keys=["modifiedAt", "createdAt", "id"],
         )
 
 

@@ -9,12 +9,13 @@ from pydantic import (
     ConfigDict,
     EmailStr,
     Field,
+    StrictBool,
     StrictInt,
+    StringConstraints,
     computed_field,
     field_validator,
-    model_validator, StringConstraints,
+    model_validator,
 )
-from pydantic.alias_generators import to_camel
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
@@ -33,7 +34,7 @@ class HTTPErrorResponse(BaseModel):
             min_length=1,
             strip_whitespace=True,
         ),
-        Field(description="The error message.")  # additional field metadata
+        Field(description="The error message."),  # additional field metadata
     ]
     """The error message."""
 
@@ -52,7 +53,7 @@ class HTTPErrorResponse(BaseModel):
                         "message": "Connect call failed ('127.0.0.1', 5432)",
                     },
                 },
-            ]
+            ],
         },
     )
     """The config of the model."""
@@ -61,14 +62,16 @@ class HTTPErrorResponse(BaseModel):
 class MoneyboxResponse(BaseModel):
     """The pydantic moneybox response model"""
 
-    id_: Annotated[StrictInt,Field(description="The id of the moneybox.")]
+    id_: Annotated[StrictInt, Field(description="The id of the moneybox.")]
     """The id of the moneybox."""
 
-    name: Annotated[str, Field(
+    name: Annotated[
+        str,
+        Field(
             alias="name",
             min_length=1,
             description="The name of the moneybox. Has to be unique.",
-        )
+        ),
     ]
     """The name of the moneybox. Has to be unique."""
 
@@ -81,7 +84,7 @@ class MoneyboxResponse(BaseModel):
             validation_alias="savings_amount",
             ge=0,
             description="The current savings amount of the moneybox.",
-        )
+        ),
     ]
     """The current savings amount of the moneybox."""
 
@@ -116,7 +119,7 @@ class MoneyboxResponse(BaseModel):
         Field(
             validation_alias="created_at",
             description="The creation date of the moneybox.",
-        )
+        ),
     ]
     """The creation date of the moneybox."""
 
@@ -125,8 +128,7 @@ class MoneyboxResponse(BaseModel):
         Field(
             validation_alias="modified_at",
             description="The modification date of the moneybox.",
-        )
-
+        ),
     ]
     """The modification date of the moneybox."""
 
@@ -196,6 +198,8 @@ class MoneyboxResponse(BaseModel):
     @field_validator("name")
     @classmethod
     def check_for_leading_trailing_spaces(cls, value: str) -> str:
+        """Check for leading and trailing whitespaces in value."""
+
         if value != value.strip():
             raise ValueError("Leading and trailing spaces in name are not allowed.")
 
@@ -213,6 +217,7 @@ class MoneyboxesResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
         json_schema_extra={
             "examples": [
                 {
@@ -222,21 +227,21 @@ class MoneyboxesResponse(BaseModel):
                             "id": 1,
                             "name": "672c0145-c910-4ce8-8202-d6ce9ba405a4",
                             "balance": 0,
-                            "savings_amount": 0,
-                            "savings_target": None,
+                            "savingsAmount": 0,
+                            "savingsTarget": None,
                             "priority": 0,
-                            "created_at": "2024-08-13 02:50:41.837275 +00:00",
-                            "modified_at": None,
+                            "createdAt": "2024-08-13 02:50:41.837275 +00:00",
+                            "modifiedAt": None,
                         },
                         {
                             "id": 2,
                             "name": "Holiday",
                             "balance": 1050,
-                            "savings_amount": 50,
-                            "savings_target": 50000,
+                            "savingsAmount": 50,
+                            "savingsTarget": 50000,
                             "priority": 1,
-                            "created_at": "2024-08-16 02:50:41.837275 +00:00",
-                            "modified_at": "2024-08-17 04:41:45.126672 +00:00",
+                            "createdAt": "2024-08-16 02:50:41.837275 +00:00",
+                            "modifiedAt": "2024-08-17 04:41:45.126672 +00:00",
                         },
                     ],
                 }
@@ -256,28 +261,48 @@ class MoneyboxesResponse(BaseModel):
 class TransactionLogResponse(BaseModel):
     """The transaction log response model."""
 
-    id: Annotated[StrictInt, Field(
-        description="The ID of the transaction.",
-    )]
+    id_: Annotated[
+        StrictInt,
+        Field(
+            description="The ID of the transaction.",
+        ),
+    ]
     """The ID of the transaction."""
 
     counterparty_moneybox_name: Annotated[
-        str | None, Field(min_length=1, description="The name of the counterparty moneybox.")
+        str | None,
+        Field(
+            validation_alias="counterparty_moneybox_name",
+            min_length=1,
+            description="The name of the counterparty moneybox.",
+        ),
     ]
     """The name of the counterparty moneybox."""
 
-    description: Annotated[str, Field(description="The description of the transaction action.")]
+    description: Annotated[
+        str,
+        StringConstraints(  # type: ignore
+            strip_whitespace=True,
+        ),
+        Field(description="The description of the transaction action."),
+    ]
     """The description of the transaction action."""
 
     transaction_type: Annotated[
         TransactionType,
-        Field(description="The type of the transaction. Possible values: direct or distribution."),
+        Field(
+            validation_alias="transaction_type",
+            description=(
+                "The type of the transaction. Possible values: " "direct or distribution."
+            ),
+        ),
     ]
     """The type of the transaction. Possible values: direct or distribution."""
 
     transaction_trigger: Annotated[
         TransactionTrigger,
         Field(
+            validation_alias="transaction_trigger",
             description=(
                 "The transaction trigger type, possible values: manually, automatically. "
                 "Says, if balance was deposit or withdrawn manually or automatically."
@@ -311,6 +336,7 @@ class TransactionLogResponse(BaseModel):
     counterparty_moneybox_id: Annotated[
         StrictInt | None,
         Field(
+            validation_alias="counterparty_moneybox_id",
             description=(
                 "Transaction is a transfer between moneybox_id and "
                 "counterparty_moneybox_id, if set."
@@ -320,29 +346,39 @@ class TransactionLogResponse(BaseModel):
     """Transaction is a transfer between moneybox_id and
     counterparty_moneybox_id, if set."""
 
-    moneybox_id: Annotated[StrictInt, Field(description="The foreign key to moneybox.")]
+    moneybox_id: Annotated[
+        StrictInt,
+        Field(validation_alias="moneybox_id", description="The foreign key to moneybox."),
+    ]
     """The foreign key to moneybox."""
 
-    created_at: Annotated[datetime, Field(description="The creation date of the transaction log.")]
+    created_at: Annotated[
+        AwareDatetime,
+        Field(
+            validation_alias="created_at",
+            description="The creation date of the transaction log.",
+        ),
+    ]
     """The creation date of the transaction log."""
 
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
-        populate_by_name=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "id": 1,
-                    "moneybox_id": 1,
+                    "moneyboxId": 1,
                     "description": "Transfer Money.",
-                    "transaction_type": TransactionType.DIRECT,
-                    "transaction_trigger": TransactionTrigger.MANUALLY,
+                    "transactionType": TransactionType.DIRECT,
+                    "transactionTrigger": TransactionTrigger.MANUALLY,
                     "amount": 50,
                     "balance": 50,
-                    "counterparty_moneybox_id": 3,
-                    "counterparty_moneybox_name": "Moneybox 3",
-                    "created_at": "2024-08-11 13:57:17.941840 +00:00",
+                    "counterpartyMoneyboxId": 3,
+                    "counterpartyMoneyboxName": "Moneybox 3",
+                    "createdAt": "2024-08-11 13:57:17.941840 +00:00",
                 }
             ]
         },
@@ -438,34 +474,55 @@ class TransactionLogResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def lowercase_enum_strings(cls, data: dict[Any, Any]) -> dict[Any, Any]:
-        """Lowercase transaction type and transaction trigger strings."""
+    def cast_strings_to_enums(cls, data: dict[Any, Any]) -> dict[Any, Any]:
+        """Lowercase and cast strings to transaction type and transaction trigger."""
 
         if "transaction_type" in data and isinstance(data["transaction_type"], str):
-            data["transaction_type"] = data["transaction_type"].lower()
+            data["transaction_type"] = TransactionType(data["transaction_type"].lower())
 
         if "transaction_trigger" in data and isinstance(data["transaction_trigger"], str):
-            data["transaction_trigger"] = data["transaction_trigger"].lower()
+            data["transaction_trigger"] = TransactionTrigger(data["transaction_trigger"].lower())
 
         return data
+
+    @field_validator("counterparty_moneybox_name")
+    @classmethod
+    def check_for_leading_trailing_spaces(cls, value: str | None) -> str | None:
+        """Check for leading and trailing whitespaces in value."""
+
+        if value is None:
+            return value
+
+        if value != value.strip():
+            raise ValueError(
+                "Leading and trailing spaces in counterparty_moneybox_name " "are not allowed."
+            )
+
+        return value
 
 
 class TransactionLogsResponse(BaseModel):
     """The transaction logs response model."""
 
     transaction_logs: Annotated[
-        list[TransactionLogResponse], Field(description="The list of transaction logs.")
+        list[TransactionLogResponse],
+        Field(
+            validation_alias="transaction_logs",
+            description="The list of transaction logs.",
+        ),
     ]
     """The list of transaction logs."""
 
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "total": 1,
-                    "transaction_logs": [
+                    "transactionLogs": [
                         TransactionLogResponse.model_config["json_schema_extra"]["examples"][0],
                     ],
                 }
@@ -485,7 +542,13 @@ class TransactionLogsResponse(BaseModel):
 class PriorityResponse(BaseModel):
     """The priority response model."""
 
-    moneybox_id: Annotated[StrictInt, Field(description="The id of the moneybox.")]
+    moneybox_id: Annotated[
+        StrictInt,
+        Field(
+            validation_alias="moneybox_id",
+            description="The id of the moneybox.",
+        ),
+    ]
     """The id of the moneybox."""
 
     name: Annotated[str, Field(min_length=1, description="The name of the moneybox.")]
@@ -497,9 +560,29 @@ class PriorityResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
-        json_schema_extra={"examples": [{"moneybox_id": 4, "name": "Holiday", "priority": 1}]},
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "moneyboxId": 4,
+                    "name": "Holiday",
+                    "priority": 1,
+                },
+            ],
+        },
     )
     """The config of the model."""
+
+    @field_validator("name")
+    @classmethod
+    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+        """Check for leading and trailing whitespaces in value."""
+
+        if value != value.strip():
+            raise ValueError("Leading and trailing spaces in name are not allowed.")
+
+        return value
 
 
 class PrioritylistResponse(BaseModel):
@@ -514,18 +597,24 @@ class PrioritylistResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "total": 3,
                     "prioritylist": [
                         {
-                            "moneybox_id": 1,
+                            "moneyboxId": 1,
                             "name": "672c0145-c910-4ce8-8202-d6ce9ba405a4",
                             "priority": 0,
                         },
-                        {"moneybox_id": 2, "name": "Reserves", "priority": 2},
-                        {"moneybox_id": 4, "name": "Holiday", "priority": 1},
+                        {"moneyboxId": 2, "name": "Reserves", "priority": 2},
+                        {
+                            "moneyboxId": 4,
+                            "name": "Holiday",
+                            "priority": 1,
+                        },
                     ],
                 },
             ],
@@ -544,37 +633,63 @@ class PrioritylistResponse(BaseModel):
 class AppSettingsResponse(BaseModel):
     """The app settings response model."""
 
-    id: Annotated[StrictInt, Field(description="The ID of the app settings.")]
+    id_: Annotated[
+        StrictInt,
+        Field(
+            description="The ID of the app settings.",
+        ),
+    ]
     """The ID of the app settings."""
 
-    created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
+    created_at: Annotated[
+        AwareDatetime,
+        Field(
+            validation_alias="created_at",
+            description="The creation date of the moneybox.",
+        ),
+    ]
     """The creation date of the app settings."""
 
     modified_at: Annotated[
-        AwareDatetime | None, Field(description="The modification date of the moneybox.")
+        AwareDatetime | None,
+        Field(
+            validation_alias="modified_at",
+            description="The modification date of the moneybox.",
+        ),
     ]
     """The modification date of the app settings."""
 
     send_reports_via_email: Annotated[
-        bool, Field(description="Tells if receiving reports via report_sender is desired.")
+        StrictBool,
+        Field(
+            validation_alias="send_reports_via_email",
+            description="Tells if receiving reports via report_sender is desired.",
+        ),
     ]
     """Tells if receiving reports via report_sender is desired."""
 
     user_email_address: Annotated[
         EmailStr | None,
-        Field(description="Users report_sender address. Will used for receiving reports."),
+        Field(
+            validation_alias="user_email_address",
+            description=("Users report_sender address. Will used for receiving reports."),
+        ),
     ]
     """Users report_sender address. Will used for receiving reports."""
 
     is_automated_saving_active: Annotated[
-        bool,
-        Field(description="Tells if automated saving is active."),
+        StrictBool,
+        Field(
+            validation_alias="is_automated_saving_active",
+            description="Tells if automated saving is active.",
+        ),
     ]
     """Tells if automated saving is active."""
 
     savings_amount: Annotated[
         StrictInt,
         Field(
+            validation_alias="savings_amount",
             ge=0,
             description=(
                 "The savings amount for the automated saving which will be distributed "
@@ -588,6 +703,7 @@ class AppSettingsResponse(BaseModel):
     overflow_moneybox_automated_savings_mode: Annotated[
         OverflowMoneyboxAutomatedSavingsModeType,
         Field(
+            validation_alias="overflow_moneybox_automated_savings_mode",
             description="The mode for automated savings.",
         ),
     ]
@@ -596,17 +712,19 @@ class AppSettingsResponse(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "id": 1,
-                    "created_at": "2024-08-11 13:57:17.941840 +00:00",
-                    "modified_at": "2024-08-11 15:03:17.312860 +00:00",
-                    "send_reports_via_email": False,
-                    "user_email_address": "pythbuster@gmail.com",
-                    "is_automated_saving_active": True,
-                    "savings_amount": 60000,
-                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
+                    "createdAt": "2024-08-11 13:57:17.941840 +00:00",
+                    "modifiedAt": "2024-08-11 15:03:17.312860 +00:00",
+                    "sendReportsViaEmail": False,
+                    "userEmailAddress": "pythbuster@gmail.com",
+                    "isAutomatedSavingActive": True,
+                    "savingsAmount": 60000,
+                    "overflowMoneyboxAutomatedSavingsMode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,  # noqa: ignore  # pylint: disable=line-too-long
                 },
             ],
         },

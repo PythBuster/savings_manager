@@ -41,7 +41,7 @@ UPDATE_PRIORITYLIST_RESPONSES = {
                 "example": HTTPErrorResponse(
                     message="Updating overflow moneybox is not allowed/possible!",
                     details={
-                        "moneybox_id": 1,
+                        "moneyboxId": 1,
                     },
                 ),
             }

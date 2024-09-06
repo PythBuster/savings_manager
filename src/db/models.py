@@ -212,10 +212,7 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
         CheckConstraint(
             "is_active = true OR priority IS NULL", name="ck_moneyboxes_priority_if_inactive"
         ),
-        CheckConstraint(
-            "name = trim(name)",
-            name="name_no_leading_trailing_whitespace"
-        ),
+        CheckConstraint("name = trim(name)", name="name_no_leading_trailing_whitespace"),
     )
 
 
@@ -312,10 +309,7 @@ class MoneyboxNameHistory(SqlBase):  # pylint: disable=too-few-public-methods
     """The new name of the moneybox."""
 
     __table_args__ = (
-        CheckConstraint(
-            "name = trim(name)",
-            name="name_no_leading_trailing_whitespace"
-        ),
+        CheckConstraint("name = trim(name)", name="name_no_leading_trailing_whitespace"),
     )
 
 

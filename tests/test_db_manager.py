@@ -558,7 +558,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     to_moneybox_data = await db_manager.get_moneybox(moneybox_id=first_moneybox_id)
 
     transfer_transaction_1 = TransferTransactionRequest(
-        to_moneybox_id=to_moneybox_data["id"],
+        toMoneyboxId=to_moneybox_data["id"],
         amount=50,
     )
 
@@ -633,7 +633,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         await db_manager.transfer_amount(
             from_moneybox_id=42,
             transfer_transaction_data=TransferTransactionRequest(
-                to_moneybox_id=to_moneybox_data["id"],
+                toMoneyboxId=to_moneybox_data["id"],
                 amount=10,
             ).model_dump(),
             transaction_type=TransactionType.DIRECT,
@@ -644,7 +644,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
             transfer_transaction_data=TransferTransactionRequest(
-                to_moneybox_id=41,
+                toMoneyboxId=41,
                 amount=10,
             ).model_dump(),
             transaction_type=TransactionType.DIRECT,
@@ -655,7 +655,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         await db_manager.transfer_amount(
             from_moneybox_id=from_moneybox_data["id"],
             transfer_transaction_data=TransferTransactionRequest(
-                to_moneybox_id=to_moneybox_data["id"],
+                toMoneyboxId=to_moneybox_data["id"],
                 amount=1000,
             ).model_dump(),
             transaction_type=TransactionType.DIRECT,
@@ -683,8 +683,8 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
     assert ex_info.value.message == "Can't transfer within the same moneybox"
     assert ex_info.value.details == {
         "amount": 123,
-        "from_moneybox_id": first_moneybox_id,
-        "to_moneybox_id": first_moneybox_id,
+        "fromMoneyboxId": first_moneybox_id,
+        "toMoneyboxId": first_moneybox_id,
     }
 
 
@@ -712,7 +712,7 @@ async def test_get_transactions_logs_with_counterparty_to_deleted_moneybox(
     )
 
     transfer_transaction = TransferTransactionRequest(
-        to_moneybox_id=result_moneybox_data_5["id"],
+        toMoneyboxId=result_moneybox_data_5["id"],
         amount=20,
     )
 
