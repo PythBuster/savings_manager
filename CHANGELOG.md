@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.8.1 (2024-09-07)
+### Changed:
+- fix: check name against None before stripping/trimming string (update moneybox data)
+
 ## 2.8.0 (2024-09-06)
 ### Changed:
 - adapt json schemas (pydantic models): respect JSON naming convention and return/accept camel-cased keys in JSON data
