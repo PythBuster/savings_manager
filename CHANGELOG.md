@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.8.0 (2024-09-06)
+### Changed:
+- adapt json schemas (pydantic models): respect JSON naming convention and return/accept camel-cased keys in JSON data
+- make pydantic models strict: accept strict types and use validators for names (disallow leading/trailing whitespaces)
+
 ## 2.7.0 (2024-09-04)
 ### Changed:
 - adapt /prioritylist endpoints by adding "total" in response data
