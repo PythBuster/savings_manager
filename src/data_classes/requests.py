@@ -146,8 +146,11 @@ class MoneyboxUpdateRequest(BaseModel):
 
     @field_validator("name")
     @classmethod
-    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+    def check_for_leading_trailing_spaces(cls, value: str | None) -> str | None:
         """Check for leading and trailing whitespaces in value."""
+
+        if value is None:
+            return value
 
         if value != value.strip():
             raise ValueError("Leading and trailing spaces in name are not allowed.")
