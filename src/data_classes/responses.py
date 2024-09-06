@@ -61,11 +61,14 @@ class HTTPErrorResponse(BaseModel):
 class MoneyboxResponse(BaseModel):
     """The pydantic moneybox response model"""
 
-    id_: Annotated[StrictInt, Field(description="The id of the moneybox.")]
+    id_: Annotated[StrictInt,Field(description="The id of the moneybox.")]
     """The id of the moneybox."""
 
-    name: Annotated[
-        str, Field(min_length=1, description="The name of the moneybox. Has to be unique.")
+    name: Annotated[str, Field(
+            alias="name",
+            min_length=1,
+            description="The name of the moneybox. Has to be unique.",
+        )
     ]
     """The name of the moneybox. Has to be unique."""
 
@@ -73,13 +76,19 @@ class MoneyboxResponse(BaseModel):
     """The balance of the moneybox in CENTS."""
 
     savings_amount: Annotated[
-        StrictInt, Field(ge=0, description="The current savings amount of the moneybox.")
+        StrictInt,
+        Field(
+            validation_alias="savings_amount",
+            ge=0,
+            description="The current savings amount of the moneybox.",
+        )
     ]
     """The current savings amount of the moneybox."""
 
     savings_target: Annotated[
         StrictInt | None,
         Field(
+            validation_alias="savings_target",
             ge=0,
             description=(
                 "The current savings target. Is relevant for the automated "
@@ -102,12 +111,19 @@ class MoneyboxResponse(BaseModel):
     """The current priority of the moneybox. There is only one moneybox with
     a priority of Null (will be the marker for the overflow moneybox)."""
 
-    created_at: Annotated[AwareDatetime, Field(description="The creation date of the moneybox.")]
+    created_at: Annotated[
+        AwareDatetime,
+        Field(
+            validation_alias="created_at",
+            description="The creation date of the moneybox.",
+        )
+    ]
     """The creation date of the moneybox."""
 
     modified_at: Annotated[
         AwareDatetime | None,
         Field(
+            validation_alias="modified_at",
             description="The modification date of the moneybox.",
         )
 
@@ -119,7 +135,6 @@ class MoneyboxResponse(BaseModel):
         frozen=True,
         strict=True,
         alias_generator=to_camel_cleaned_suffix,
-        populate_by_name=True,
         json_schema_extra={
             "examples": [
                 {

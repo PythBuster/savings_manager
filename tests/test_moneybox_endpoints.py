@@ -293,8 +293,8 @@ async def test_endpoint_update_overflow_moneybox(
 
     moneybox_data_1 = {
         "name": "Updated Name Test Box 1",
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 1,
     }
 
@@ -340,8 +340,8 @@ async def test_endpoint_update_moneybox__invalid_priority_0(
 
     moneybox_data = {
         "name": "Updated Name Test Box 4",
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 0,
     }
     response = await client.patch(
@@ -370,16 +370,16 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
 
     moneybox_data_4 = {
         "name": "Updated Name Test Box 4",
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 3,
     }
     expected_moneybox_data_4 = {
         "name": "Updated Name Test Box 4",
         "id": last_moneybox_id,
         "balance": 0,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 3,
     }
 
@@ -392,7 +392,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
     assert equal_dict(
         dict_1=moneybox_4,
         dict_2=expected_moneybox_data_4,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
     # no change should be happened for moneyboxes id=2 and id=3
@@ -404,8 +404,8 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "name": "Test Box 1",
         "id": second_moneybox_id,
         "balance": 0,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 1,
     }
 
@@ -413,7 +413,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
     assert equal_dict(
         dict_1=moneybox_2,
         dict_2=expected_moneybox_data_2,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
     response_3 = await client.get(
@@ -424,8 +424,8 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "name": "Test Box 2",
         "id": third_moneybox_id,
         "balance": 0,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 2,
     }
 
@@ -433,7 +433,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
     assert equal_dict(
         dict_1=moneybox_3,
         dict_2=expected_moneybox_data_3,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
 
@@ -451,7 +451,7 @@ async def test_endpoint_first_moneybox__modified_at_checks(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
     )
     content_1 = response_1.json()
-    assert content_1["modified_at"] is None
+    assert content_1["modifiedAt"] is None
 
     moneybox_data_2 = {
         "name": "Updated Name Test Box 1",
@@ -462,7 +462,7 @@ async def test_endpoint_first_moneybox__modified_at_checks(
     )
     content_2 = response_2.json()
 
-    assert content_2["modified_at"] is not None
+    assert content_2["modifiedAt"] is not None
 
     # sleep to get higher modified_at datetime (simulate time passing before modifying data)
     await asyncio.sleep(1)
@@ -473,8 +473,8 @@ async def test_endpoint_first_moneybox__modified_at_checks(
         json=moneybox_data_3,
     )
     content_3 = response_3.json()
-    assert datetime.fromisoformat(content_3["modified_at"]) > datetime.fromisoformat(
-        content_2["modified_at"]
+    assert datetime.fromisoformat(content_3["modifiedAt"]) > datetime.fromisoformat(
+        content_2["modifiedAt"]
     )
 
 
@@ -571,8 +571,8 @@ async def test_endpoint_deposit_first_moneybox__status_200(
         "name": "Test Box 1",
         "id": first_moneybox_id,
         "balance": 100,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 1,
     }
 
@@ -580,7 +580,7 @@ async def test_endpoint_deposit_first_moneybox__status_200(
     assert equal_dict(
         dict_1=expected_data,
         dict_2=moneybox,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
 
@@ -715,8 +715,8 @@ async def test_endpoint_withdraw_first_moneybox__status_200(
         "name": "Test Box 1",
         "id": first_moneybox_id,
         "balance": 1,
-        "savings_amount": 0,
-        "savings_target": None,
+        "savingsAmount": 0,
+        "savingsTarget": None,
         "priority": 1,
     }
 
@@ -724,7 +724,7 @@ async def test_endpoint_withdraw_first_moneybox__status_200(
     assert equal_dict(
         dict_1=expected_data,
         dict_2=moneybox,
-        exclude_keys=["created_at", "modified_at"],
+        exclude_keys=["createdAt", "modifiedAt"],
     )
 
 

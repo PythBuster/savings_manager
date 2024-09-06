@@ -90,7 +90,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "priority": 2,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": None,
-        },  # None modified_at
+        },  # None modifiedAt
         {
             "id": 5,
             "name": "Vacation",
@@ -106,7 +106,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
 def test_moneybox_response_valid(data: dict[str, Any]) -> None:
     """Test valid MoneyboxResponse creation."""
     response = MoneyboxResponse(**data)
-    assert response.id == data["id"]
+    assert response.id_ == data["id"]
     assert response.name == data["name"]
     assert response.balance == data["balance"]
     assert response.savings_amount == data["savings_amount"]
@@ -141,18 +141,18 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "id": 2,
             "name": "Holiday",
             "balance": 1000,
-            "savings_amount": 500,
-            "savings_target": 2000,
+            "savingsAmount": 500,
+            "savingsTarget": 2000,
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
-        },  # modified_at before created_at,
+        },  # modified_at before createdAt,
         {
             "id": 3,
             "name": "Holiday",
             "balance": 1000,
-            "savings_amount": 500,
-            "savings_target": 2000,
+            "savingsAmount": 500,
+            "savingsTarget": 2000,
             "priority": 1,
             "created_at": "2024-08-11 13:57:17.941840+00:00",
             "modified_at": "not-a-datetime",
@@ -161,18 +161,18 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "id": 4,
             "name": "Emergency Fund",
             "balance": 200,
-            "savings_amount": 100,
-            "savings_target": None,
+            "savingsAmount": 100,
+            "savingsTarget": None,
             "priority": 2,
             "created_at": "not-a-datetime",
             "modified_at": None,
-        },  # Invalid created_at format
+        },  # Invalid modified_at format
         {
             "id": 5,
             "name": "Vacation",
             "balance": 500,
-            "savings_amount": 200,
-            "savings_target": 1500,
+            "savingsAmount": 200,
+            "savingsTarget": 1500,
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
@@ -181,8 +181,8 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "id": 6,
             "name": "Vacation",
             "balance": 500,
-            "savings_amount": 200,
-            "savings_target": 1500,
+            "savingsAmount": 200,
+            "savingsTarget": 1500,
             "priority": 1,
             "created_at": {},  # incorrect type
             "modified_at": datetime.now(tz=timezone.utc),
@@ -191,8 +191,8 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "id": 7,
             "name": "Vacation",
             "balance": 500,
-            "savings_amount": 200,
-            "savings_target": 1500,
+            "savingsAmount": 200,
+            "savingsTarget": 1500,
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": {},  # incorrect type
@@ -284,7 +284,7 @@ def test_moneyboxes_response_valid(data: dict[str, Any]) -> None:
     response = MoneyboxesResponse(**data)
     assert len(response.moneyboxes) == len(data["moneyboxes"])
     for i, box in enumerate(response.moneyboxes):
-        assert box.id == data["moneyboxes"][i]["id"]
+        assert box.id_ == data["moneyboxes"][i]["id"]
         assert box.name == data["moneyboxes"][i]["name"]
     assert response.total == len(data["moneyboxes"])  # Validate the computed `total` property
 

@@ -5,6 +5,7 @@ from typing import Annotated, Any
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StrictInt, model_validator
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
+from src.utils import to_camel_cleaned_suffix
 
 
 class MoneyboxCreateRequest(BaseModel):
@@ -36,12 +37,15 @@ class MoneyboxCreateRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "name": "Holiday",
-                    "savings_amount": 0,
-                    "savings_target": 50000,
+                    "savingsAmount": 0,
+                    "savingsTarget": 50000,
+                    "priority": 3,
                 }
             ]
         },
@@ -88,12 +92,14 @@ class MoneyboxUpdateRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
         json_schema_extra={
             "examples": [
                 {
                     "name": "Holiday",
-                    "savings_amount": 0,
-                    "savings_target": 50000,
+                    "savingsAmount": 0,
+                    "savingsTarget": 50000,
                     "priority": 1,
                 }
             ]

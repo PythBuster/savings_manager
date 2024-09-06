@@ -23,31 +23,31 @@ from src.utils import equal_dict
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "Holiday", "savings_amount": 100, "savings_target": 50000},
-        {"name": "Emergency Fund", "savings_amount": 0, "savings_target": None},
+        {"name": "Holiday", "savingsAmount": 100, "savingsTarget": 50000},
+        {"name": "Emergency Fund", "savingsAmount": 0, "savingsTarget": None},
     ],
 )
 def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
     """Test valid MoneyboxCreateRequest creation."""
     response = MoneyboxCreateRequest(**data)
     assert response.name == data["name"]
-    assert response.savings_amount == data["savings_amount"]
-    assert response.savings_target == data["savings_target"]
+    assert response.savings_amount == data["savingsAmount"]
+    assert response.savings_target == data["savingsTarget"]
 
 
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "", "savings_amount": 100, "savings_target": 50000, "priority": 1},  # Invalid name
+        {"name": "", "savingsAmount": 100, "savingsTarget": 50000, "priority": 1},  # Invalid name
         {
             "name": "Holiday",
-            "savings_amount": -10,
-            "savings_target": 50000,
+            "savingsAmount": -10,
+            "savingsTarget": 50000,
         },  # Negative savings_amount
         {
             "name": "Holiday",
-            "savings_amount": 100,
-            "savings_target": -1,
+            "savingsAmount": 100,
+            "savingsTarget": -1,
         },  # Negative savings_target
     ],
 )
@@ -61,31 +61,34 @@ def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "Holiday", "savings_amount": 200, "savings_target": 60000},
-        {"savings_amount": 150, "savings_target": None},
-        {"name": "Savings", "savings_target": None},
+        {"name": "Holiday", "savingsAmount": 200, "savingsTarget": 60000},
+        {"savingsAmount": 150, "savingsTarget": None},
+        {"name": "Savings", "savingsTarget": None},
     ],
 )
 def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
     """Test valid MoneyboxUpdateRequest creation."""
     response = MoneyboxUpdateRequest(**data)
 
-    assert equal_dict(dict_1=data, dict_2=response.model_dump(exclude_unset=True))
+    assert equal_dict(
+        dict_1=data,
+        dict_2=response.model_dump(by_alias=True, exclude_unset=True),
+    )
 
 
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "", "savings_amount": 200, "savings_target": 60000, "priority": 1},  # Invalid name
+        {"name": "", "savingsAmount": 200, "savingsTarget": 60000, "priority": 1},  # Invalid name
         {
             "name": "Holiday",
-            "savings_amount": -20,
-            "savings_target": 60000,
+            "savingsAmount": -20,
+            "savingsTarget": 60000,
         },  # Negative savings_amount
         {
             "name": "Holiday",
-            "savings_amount": 200,
-            "savings_target": -5,
+            "savingsAmount": 200,
+            "savingsTarget": -5,
         },  # Negative savings_target
     ],
 )
