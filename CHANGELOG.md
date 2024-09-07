@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.11.0 (2024-09-07)
+### Changed:
+- unify pydantic models
+- unify usage of app states in endpoints
+
 ## 2.10.0 (2024-09-07)
 ### Changed:
 - update poetry dependencies
