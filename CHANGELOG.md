@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.10.0 (2024-09-07)
+### Changed:
+- update poetry dependencies
+
 ## 2.9.0 (2024-09-07)
 ### Changed:
 - performance: add httptools as dependency to boost up uvicorns http parsing
