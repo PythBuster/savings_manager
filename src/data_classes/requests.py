@@ -7,8 +7,6 @@ from pydantic import (
     ConfigDict,
     EmailStr,
     Field,
-    StrictBool,
-    StrictInt,
     StringConstraints,
     field_validator,
     model_validator,
@@ -31,7 +29,7 @@ class MoneyboxCreateRequest(BaseModel):
     """The name of the moneybox. Has to be unique."""
 
     savings_amount: Annotated[
-        StrictInt,
+        int,
         Field(
             serialization_alias="savings_amount",
             default=0,
@@ -42,7 +40,7 @@ class MoneyboxCreateRequest(BaseModel):
     """The current savings amount of the moneybox."""
 
     savings_target: Annotated[
-        StrictInt | None,
+        int | None,
         Field(
             serialization_alias="savings_target",
             default=0,
@@ -75,7 +73,7 @@ class MoneyboxCreateRequest(BaseModel):
 
     @field_validator("name")
     @classmethod
-    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+    def validate_name_for_leading_trailing_spaces(cls, value: str) -> str:
         """Check for leading and trailing whitespaces in value."""
 
         if value != value.strip():
@@ -96,7 +94,7 @@ class MoneyboxUpdateRequest(BaseModel):
     """The name of the moneybox. Has to be unique."""
 
     savings_amount: Annotated[
-        StrictInt,
+        int,
         Field(
             serialization_alias="savings_amount",
             default=None,
@@ -107,7 +105,7 @@ class MoneyboxUpdateRequest(BaseModel):
     """The current savings amount of the moneybox."""
 
     savings_target: Annotated[
-        StrictInt | None,
+        int | None,
         Field(
             serialization_alias="savings_target",
             default=None,
@@ -121,7 +119,7 @@ class MoneyboxUpdateRequest(BaseModel):
     """"The current savings target. Is relevant for the automated distributed saving progress."""
 
     priority: Annotated[
-        StrictInt | None,
+        int | None,
         Field(default=None, ge=1, description="The current priority of the moneybox."),
     ]
     """The current priority of the moneybox."""
@@ -146,7 +144,7 @@ class MoneyboxUpdateRequest(BaseModel):
 
     @field_validator("name")
     @classmethod
-    def check_for_leading_trailing_spaces(cls, value: str | None) -> str | None:
+    def validate_name_for_leading_trailing_spaces(cls, value: str | None) -> str | None:
         """Check for leading and trailing whitespaces in value."""
 
         if value is None:
@@ -162,7 +160,7 @@ class DepositTransactionRequest(BaseModel):
     """The deposit transaction request model"""
 
     amount: Annotated[
-        StrictInt,
+        int,
         Field(ge=1, description="The amount to add, value has to be at least 1."),
     ]
     """The amount to add, value has to be at least 1."""
@@ -197,7 +195,7 @@ class WithdrawTransactionRequest(BaseModel):
     """The withdrawal transaction request model"""
 
     amount: Annotated[
-        StrictInt,
+        int,
         Field(ge=1, description="The amount to sub, value has to be at least 1."),
     ]
     """The amount to sub, value has to be at least 1."""
@@ -232,7 +230,7 @@ class TransferTransactionRequest(BaseModel):
     """The transfer transaction request model"""
 
     to_moneybox_id: Annotated[
-        StrictInt,
+        int,
         Field(
             serialization_alias="to_moneybox_id",
             description="The id of the moneybox to transfer balance to.",
@@ -241,7 +239,7 @@ class TransferTransactionRequest(BaseModel):
     """The id of the moneybox to transfer balance to."""
 
     amount: Annotated[
-        StrictInt,
+        int,
         Field(
             ge=1,
             description="The amount to transfer, value has to be at least 1.",
@@ -280,7 +278,7 @@ class PriorityRequest(BaseModel):
     """The priority request model."""
 
     moneybox_id: Annotated[
-        StrictInt,
+        int,
         Field(
             serialization_alias="moneybox_id",
             description="The id of the moneybox.",
@@ -289,7 +287,7 @@ class PriorityRequest(BaseModel):
     """The id of the moneybox."""
 
     priority: Annotated[
-        StrictInt,
+        int,
         Field(
             ge=1,
             description="The priority of the moneybox.",
@@ -353,7 +351,7 @@ class AppSettingsRequest(BaseModel):
     """The app settings request model."""
 
     send_reports_via_email: Annotated[
-        StrictBool,
+        bool,
         Field(
             serialization_alias="send_reports_via_email",
             default=None,
@@ -373,7 +371,7 @@ class AppSettingsRequest(BaseModel):
     """Users report_sender address. Will used for receiving reports."""
 
     is_automated_saving_active: Annotated[
-        StrictBool,
+        bool,
         Field(
             serialization_alias="is_automated_saving_active",
             default=None,
@@ -383,7 +381,7 @@ class AppSettingsRequest(BaseModel):
     """Tells if automated saving is active."""
 
     savings_amount: Annotated[
-        StrictInt,
+        int,
         Field(
             serialization_alias="savings_amount",
             default=None,
@@ -428,7 +426,7 @@ class AppSettingsRequest(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def convert_strings_to_enum(cls, data: dict[str, Any]) -> dict[str, Any]:
+    def transform_enum_strings_to_enum_type(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Lower case enum strings and concerts to enum."""
 
         if "overflowMoneyboxAutomatedSavingsMode" in data and isinstance(

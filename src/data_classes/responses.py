@@ -9,8 +9,6 @@ from pydantic import (
     ConfigDict,
     EmailStr,
     Field,
-    StrictBool,
-    StrictInt,
     StringConstraints,
     computed_field,
     field_validator,
@@ -62,7 +60,7 @@ class HTTPErrorResponse(BaseModel):
 class MoneyboxResponse(BaseModel):
     """The pydantic moneybox response model"""
 
-    id_: Annotated[StrictInt, Field(description="The id of the moneybox.")]
+    id_: Annotated[int, Field(description="The id of the moneybox.")]
     """The id of the moneybox."""
 
     name: Annotated[
@@ -75,11 +73,11 @@ class MoneyboxResponse(BaseModel):
     ]
     """The name of the moneybox. Has to be unique."""
 
-    balance: Annotated[StrictInt, Field(ge=0, description="The balance of the moneybox in CENTS.")]
+    balance: Annotated[int, Field(ge=0, description="The balance of the moneybox in CENTS.")]
     """The balance of the moneybox in CENTS."""
 
     savings_amount: Annotated[
-        StrictInt,
+        int,
         Field(
             validation_alias="savings_amount",
             ge=0,
@@ -89,7 +87,7 @@ class MoneyboxResponse(BaseModel):
     """The current savings amount of the moneybox."""
 
     savings_target: Annotated[
-        StrictInt | None,
+        int | None,
         Field(
             validation_alias="savings_target",
             ge=0,
@@ -102,7 +100,7 @@ class MoneyboxResponse(BaseModel):
     """"The current savings target. Is relevant for the automated distributed saving progress."""
 
     priority: Annotated[
-        StrictInt | None,
+        int | None,
         Field(
             ge=0,
             description=(
@@ -156,8 +154,9 @@ class MoneyboxResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def convert_to_strict_datetimes(cls, data: dict[Any, Any]) -> dict[Any, Any]:
-        """Check if 'modified_at' and 'created_at' is type datetime."""
+    def transform_string_datetimes_to_datetimes(cls, data: dict[Any, Any]) -> dict[Any, Any]:
+        """Try to transform 'modified_at' and 'created_at' datetime strings
+        to datetimes if possible and necessary."""
 
         if data["modified_at"] is not None:
             if isinstance(data["modified_at"], str):
@@ -184,7 +183,7 @@ class MoneyboxResponse(BaseModel):
         return data
 
     @model_validator(mode="after")
-    def validate_date_order(self) -> Self:
+    def validate_created_at_and_modified_at_date_order(self) -> Self:
         """Check if 'modified_at' date is after 'created_at'."""
 
         # create_at datetime has to be smaller than modified_at datetime!
@@ -197,7 +196,7 @@ class MoneyboxResponse(BaseModel):
 
     @field_validator("name")
     @classmethod
-    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+    def validate_name_for_leading_trailing_spaces(cls, value: str) -> str:
         """Check for leading and trailing whitespaces in value."""
 
         if value != value.strip():
@@ -262,7 +261,7 @@ class TransactionLogResponse(BaseModel):
     """The transaction log response model."""
 
     id_: Annotated[
-        StrictInt,
+        int,
         Field(
             description="The ID of the transaction.",
         ),
@@ -313,7 +312,7 @@ class TransactionLogResponse(BaseModel):
     Says, if balance was deposit or withdrawn manually or automatically."""
 
     amount: Annotated[
-        StrictInt,
+        int,
         Field(
             description=(
                 "The current amount of the transaction. "
@@ -325,7 +324,7 @@ class TransactionLogResponse(BaseModel):
     Can be negative, negative = withdraw, positive = deposit."""
 
     balance: Annotated[
-        StrictInt,
+        int,
         Field(
             ge=0,
             description="The new balance of the moneybox after the transaction.",
@@ -334,7 +333,7 @@ class TransactionLogResponse(BaseModel):
     """The new balance of the moneybox after the transaction."""
 
     counterparty_moneybox_id: Annotated[
-        StrictInt | None,
+        int | None,
         Field(
             validation_alias="counterparty_moneybox_id",
             description=(
@@ -347,7 +346,7 @@ class TransactionLogResponse(BaseModel):
     counterparty_moneybox_id, if set."""
 
     moneybox_id: Annotated[
-        StrictInt,
+        int,
         Field(validation_alias="moneybox_id", description="The foreign key to moneybox."),
     ]
     """The foreign key to moneybox."""
@@ -387,7 +386,7 @@ class TransactionLogResponse(BaseModel):
 
     @field_validator("amount")
     @classmethod
-    def check_amount(cls, value: int) -> int:
+    def validate_amount_not_zero(cls, value: int) -> int:
         """Check if amount is != 0. Transactions with amount of 0 doesn't make sense."""
 
         if value == 0:
@@ -397,8 +396,12 @@ class TransactionLogResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def convert_to_strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
-        """Check if 'created_at' is type datetime."""
+    def transform_create_at_string_datetime_to_datetime(
+            cls,
+            data: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Try to transform 'created_at' string datetime to datetime,
+         if possible and necessary."""
 
         if isinstance(data["created_at"], str):
             try:
@@ -413,7 +416,9 @@ class TransactionLogResponse(BaseModel):
         return data
 
     @model_validator(mode="after")
-    def check_transaction_trigger_and_type_combination(self) -> Self:
+    def validate_transaction_type_and_transaction_trigger_accepted_combinations(
+            self
+    ) -> Self:
         """Check for combinations:
         - TransactionType.DIRECT + TransactionTrigger.AUTOMATICALLY
         - TransactionType.DISTRIBUTION + TransactionTrigger.DIRECT
@@ -441,7 +446,9 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def check_counterparty_moneybox(self) -> Self:
+    def validate_counterparty_moneybox_name_and_counterparty_moneybox_id_both_set(
+            self
+    ) -> Self:
         """If counterparty_moneybox_name is set, counterparty_moneybox_id need to be set too."""
 
         if (self.counterparty_moneybox_name is None) != (self.counterparty_moneybox_id is None):
@@ -450,7 +457,7 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def check_moneybox_id(self) -> Self:
+    def validate_moneybox_id_not_same_as_counterparty_moneybox_id(self) -> Self:
         """moneybox_id must not be the same as counterparty_moneybox_id"""
 
         if self.moneybox_id == self.counterparty_moneybox_id:
@@ -459,7 +466,7 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def check_new_balance(self) -> Self:
+    def validate_balance_against_amount(self) -> Self:
         """Check balance
         - if amount is positive, balance must be at least greater than or equal to amount.
 
@@ -474,7 +481,7 @@ class TransactionLogResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def cast_strings_to_enums(cls, data: dict[Any, Any]) -> dict[Any, Any]:
+    def transform_enum_strings_to_enum_values(cls, data: dict[Any, Any]) -> dict[Any, Any]:
         """Lowercase and cast strings to transaction type and transaction trigger."""
 
         if "transaction_type" in data and isinstance(data["transaction_type"], str):
@@ -487,7 +494,7 @@ class TransactionLogResponse(BaseModel):
 
     @field_validator("counterparty_moneybox_name")
     @classmethod
-    def check_for_leading_trailing_spaces(cls, value: str | None) -> str | None:
+    def validate_name_for_leading_trailing_spaces(cls, value: str | None) -> str | None:
         """Check for leading and trailing whitespaces in value."""
 
         if value is None:
@@ -543,7 +550,7 @@ class PriorityResponse(BaseModel):
     """The priority response model."""
 
     moneybox_id: Annotated[
-        StrictInt,
+        int,
         Field(
             validation_alias="moneybox_id",
             description="The id of the moneybox.",
@@ -554,7 +561,7 @@ class PriorityResponse(BaseModel):
     name: Annotated[str, Field(min_length=1, description="The name of the moneybox.")]
     """The name of the moneybox."""
 
-    priority: Annotated[StrictInt, Field(ge=1, description="The priority of the moneybox.")]
+    priority: Annotated[int, Field(ge=1, description="The priority of the moneybox.")]
     """The priority of the moneybox."""
 
     model_config = ConfigDict(
@@ -576,7 +583,7 @@ class PriorityResponse(BaseModel):
 
     @field_validator("name")
     @classmethod
-    def check_for_leading_trailing_spaces(cls, value: str) -> str:
+    def validate_name_for_leading_trailing_spaces(cls, value: str) -> str:
         """Check for leading and trailing whitespaces in value."""
 
         if value != value.strip():
@@ -634,7 +641,7 @@ class AppSettingsResponse(BaseModel):
     """The app settings response model."""
 
     id_: Annotated[
-        StrictInt,
+        int,
         Field(
             description="The ID of the app settings.",
         ),
@@ -660,7 +667,7 @@ class AppSettingsResponse(BaseModel):
     """The modification date of the app settings."""
 
     send_reports_via_email: Annotated[
-        StrictBool,
+        bool,
         Field(
             validation_alias="send_reports_via_email",
             description="Tells if receiving reports via report_sender is desired.",
@@ -678,7 +685,7 @@ class AppSettingsResponse(BaseModel):
     """Users report_sender address. Will used for receiving reports."""
 
     is_automated_saving_active: Annotated[
-        StrictBool,
+        bool,
         Field(
             validation_alias="is_automated_saving_active",
             description="Tells if automated saving is active.",
@@ -687,7 +694,7 @@ class AppSettingsResponse(BaseModel):
     """Tells if automated saving is active."""
 
     savings_amount: Annotated[
-        StrictInt,
+        int,
         Field(
             validation_alias="savings_amount",
             ge=0,
@@ -733,7 +740,7 @@ class AppSettingsResponse(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def convert_to_strict_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
+    def validate_create_at_and_modified_datetimes(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Check if 'modified_at' and 'created_at' is type datetime."""
 
         if data["modified_at"] is not None:
@@ -760,7 +767,7 @@ class AppSettingsResponse(BaseModel):
         return data
 
     @model_validator(mode="after")
-    def check_if_email_is_set(self) -> Self:
+    def validate_user_email_address_if_set(self) -> Self:
         """Check if email exists, when send_reports_via_email is set to true,
         if not, raise ValueError."""
 
