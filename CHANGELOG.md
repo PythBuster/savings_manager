@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.9.0 (2024-09-07)
+### Changed:
+- performance: add httptools as dependency to boost up uvicorns http parsing
+
 ## 2.8.1 (2024-09-07)
 ### Changed:
 - fix: check name against None before stripping/trimming string (update moneybox data)
