@@ -1,6 +1,6 @@
 """The moneybox routes."""
 
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Body
 from starlette.requests import Request
@@ -33,7 +33,7 @@ async def get_app_settings(
 ) -> AppSettingsResponse:
     """Endpoint for getting app settings."""
 
-    db_manager: DBManager = request.app.state.db_manager
+    db_manager = cast(DBManager, request.app.state.db_manager)
     # use protected method for now
     app_settings_data = await db_manager._get_app_settings()  # pylint: disable=protected-access
     return app_settings_data.asdict()  # type: ignore
@@ -52,8 +52,8 @@ async def update_app_settings(
 ) -> AppSettingsResponse:
     """Endpoint for updating app settings."""
 
-    db_manager: DBManager = request.app.state.db_manager
-    email_sender: EmailSender = request.app.state.email_sender
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    email_sender = cast(EmailSender, request.app.state.email_sender)
 
     if app_settings_request.send_reports_via_email and not email_sender.smtp_settings.smtp_ready:
         raise MissingSMTPSettingsError()

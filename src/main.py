@@ -66,14 +66,34 @@ author_name, author_mail = app_data["authors"][0].split()
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
 
-    print(f"Initialize fastAPI app (id={id(fastapi_app)}) ...", flush=True)
-    initialize_app(fastapi_app=fastapi_app)
+    print("Set custom openapi schema ...", flush=True)
+    set_custom_openapi_schema(fastapi_app=fastapi_app)
 
     print(f"Register routers (id={id(fastapi_app)}) ...", flush=True)
     register_router(fastapi_app=fastapi_app)
 
+    print("Initialize app states ...", flush=True)
+    # create db_manager, email_sender and background task runner
+    app_env_variables = AppEnvVariables(_env_file=WORKING_DIR / "envs" / ".env")
+
+    db_manager = DBManager(
+        db_settings=app_env_variables,  # type: ignore
+    )
+    email_sender = EmailSender(
+        db_manager=db_manager,
+        smtp_settings=app_env_variables,
+    )
+    background_tasks_runner = BackgroundTaskRunner(  # type: ignore
+        db_manager=db_manager,
+        email_sender=email_sender,
+    )
+
     print("Start background tasks.")
-    await fastapi_app.state.background_tasks_runner.run()  # type: ignore
+    await background_tasks_runner.run()  # type: ignore
+
+    fastapi_app.state.db_manager = db_manager
+    fastapi_app.state.email_sender = email_sender
+    fastapi_app.state.background_tasks_runner = background_tasks_runner
 
     yield
 
@@ -143,33 +163,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-def initialize_app(fastapi_app: FastAPI) -> None:
-    """Initialise the FastAPI app.
-
-    :param fastapi_app: The fast api app.
-    :rtype fastapi_app: FastAPI
-    """
-
-    app_env_variables = AppEnvVariables(_env_file=WORKING_DIR / "envs" / ".env")
-
-    db_manager = DBManager(
-        db_settings=app_env_variables,  # type: ignore
-    )
-    email_sender = EmailSender(
-        db_manager=db_manager,
-        smtp_settings=app_env_variables,
-    )
-
-    fastapi_app.state.db_manager = db_manager  # type: ignore
-    fastapi_app.state.email_sender = email_sender  # type: ignore
-    fastapi_app.state.background_tasks_runner = BackgroundTaskRunner(  # type: ignore
-        db_manager=db_manager,
-        email_sender=email_sender,
-    )
-
-    set_custom_openapi_schema(fastapi_app=fastapi_app)
 
 
 def set_custom_openapi_schema(fastapi_app: FastAPI) -> None:

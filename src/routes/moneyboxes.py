@@ -1,10 +1,13 @@
 """The moneyboxes routes."""
 
+from typing import cast
+
 from fastapi import APIRouter
 from starlette.requests import Request
 
 from src.custom_types import EndpointRouteType
 from src.data_classes.responses import MoneyboxesResponse
+from src.db.db_manager import DBManager
 from src.routes.responses.moneyboxes import GET_MONEYBOXES_RESPONSES
 
 moneyboxes_router = APIRouter(
@@ -24,7 +27,8 @@ async def get_moneyboxes(
 ) -> MoneyboxesResponse:
     """Endpoint for getting moneyboxes."""
 
-    moneyboxes_data = await request.app.state.db_manager.get_moneyboxes()
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    moneyboxes_data = await db_manager.get_moneyboxes()
 
     response_moneyboxes_data = {
         "moneyboxes": moneyboxes_data,

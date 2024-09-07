@@ -1,6 +1,6 @@
 """The prioritylist routes."""
 
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Body
 from starlette import status
@@ -33,7 +33,7 @@ async def get_prioritylist(
 ) -> PrioritylistResponse | Response:
     """Endpoint for getting prioritylist. Note: Returns a list SORTED by priority (asc)."""
 
-    db_manager: DBManager = request.app.state.db_manager
+    db_manager = cast(DBManager, request.app.state.db_manager)
     priority_list = await db_manager.get_prioritylist()
 
     if priority_list:
@@ -57,7 +57,7 @@ async def update_prioritylist(
     """Endpoint for updating priority list. Note: Returns the updated list
     SORTED by priority (asc)."""
 
-    db_manager: DBManager = request.app.state.db_manager
+    db_manager = cast(DBManager, request.app.state.db_manager)
     updated_priority_list = await db_manager.update_prioritylist(
         priorities=prioritylist.model_dump()["prioritylist"],
     )

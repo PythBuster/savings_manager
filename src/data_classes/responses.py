@@ -495,7 +495,7 @@ class TransactionLogResponse(BaseModel):
 
         if value != value.strip():
             raise ValueError(
-                "Leading and trailing spaces in counterparty_moneybox_name " "are not allowed."
+                "Leading and trailing spaces in counterparty_moneybox_name are not allowed."
             )
 
         return value

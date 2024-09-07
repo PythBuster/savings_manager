@@ -1,5 +1,7 @@
 """The email sender routes."""
 
+from typing import cast
+
 from fastapi import APIRouter
 from starlette import status
 from starlette.requests import Request
@@ -25,8 +27,8 @@ email_sender_router = APIRouter(
 async def send_testemail(request: Request) -> Response:
     """Endpoint for sending a test email."""
 
-    email_sender: EmailSender = request.app.state.email_sender
-    db_manager: DBManager = request.app.state.db_manager
+    email_sender = cast(EmailSender, request.app.state.email_sender)
+    db_manager = cast(DBManager, request.app.state.db_manager)
 
     app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
     succeeded = await email_sender.send_testemail(to=app_settings.user_email_address)

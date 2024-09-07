@@ -3,14 +3,12 @@
 import asyncio
 import subprocess
 import time
-from contextlib import asynccontextmanager
 from functools import partial
 from pathlib import Path
 from typing import AsyncGenerator
 
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
-from fastapi import FastAPI
 from httpx import AsyncClient
 
 from src.constants import WORKING_DIR
@@ -31,13 +29,6 @@ app_env_variables = AppEnvVariables(
     _env_file=dotenv_path,
 )
 """The database settings."""
-
-
-@asynccontextmanager
-async def noop_lifespan(_: FastAPI):  # type: ignore
-    """No-op context manager for lifespan"""
-
-    yield
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -274,12 +265,13 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
     :rtype: AsyncGenerator
     """
 
-    app.router.lifespan_context = noop_lifespan  # type: ignore
-    app.state.db_manager = db_manager  # type: ignore
-    app.state.email_sender = email_sender  # type: ignore
     set_custom_openapi_schema(fastapi_app=app)
-
     register_router(fastapi_app=app)
+
+    # Load fixtures
+    print("Mock states ...", flush=True)
+    app.state.db_manager = db_manager
+    app.state.email_sender = email_sender
 
     async with AsyncClient(app=app, base_url="http://127.0.0.1:8999") as client:
         yield client

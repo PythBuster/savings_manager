@@ -1,6 +1,6 @@
 """The moneybox routes."""
 
-from typing import Annotated
+from typing import Annotated, cast
 
 from fastapi import APIRouter, Body, Depends, Path
 from starlette import status
@@ -16,6 +16,7 @@ from src.data_classes.requests import (
     WithdrawTransactionRequest,
 )
 from src.data_classes.responses import MoneyboxResponse, TransactionLogsResponse
+from src.db.db_manager import DBManager
 from src.routes.responses.moneybox import (
     CREATE_MONEYBOX_RESPONSES,
     DELETE_MONEYBOX_RESPONSES,
@@ -48,7 +49,8 @@ async def get_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint for getting moneybox by moneybox_id."""
 
-    moneybox_data = await request.app.state.db_manager.get_moneybox(moneybox_id=moneybox_id)
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data = await db_manager.get_moneybox(moneybox_id=moneybox_id)
     return moneybox_data  # type: ignore
 
 
@@ -65,7 +67,8 @@ async def add_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint for adding moneybox."""
 
-    moneybox_data = await request.app.state.db_manager.add_moneybox(
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data = await db_manager.add_moneybox(
         moneybox_data=moneybox_create_request.model_dump()
     )
     return moneybox_data  # type: ignore
@@ -85,7 +88,8 @@ async def update_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint for updating moneybox by moneybox_id."""
 
-    moneybox_data = await request.app.state.db_manager.update_moneybox(
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data = await db_manager.update_moneybox(
         moneybox_id=moneybox_id,
         moneybox_data=moneybox_update_request.model_dump(exclude_unset=True),
     )
@@ -103,7 +107,8 @@ async def delete_moneybox(
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id."""
 
-    await request.app.state.db_manager.delete_moneybox(
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    await db_manager.delete_moneybox(
         moneybox_id=moneybox_id,
     )
 
@@ -131,7 +136,8 @@ async def deposit_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint to add amount to moneybox by moneybox_id."""
 
-    moneybox_data = await request.app.state.db_manager.add_amount(
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data = await db_manager.add_amount(
         moneybox_id=moneybox_id,
         deposit_transaction_data=deposit_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,
@@ -163,7 +169,8 @@ async def withdraw_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint to sub balance from moneybox by moneybox_id."""
 
-    moneybox_data = await request.app.state.db_manager.sub_amount(
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data = await db_manager.sub_amount(
         moneybox_id=moneybox_id,
         withdraw_transaction_data=withdraw_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,
@@ -196,7 +203,8 @@ async def transfer_balance(
 ) -> Response:
     """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`."""
 
-    await request.app.state.db_manager.transfer_amount(
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    await db_manager.transfer_amount(
         from_moneybox_id=moneybox_id,
         transfer_transaction_data=transfer_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,
@@ -219,14 +227,12 @@ async def get_moneybox_transaction_logs(
 ) -> TransactionLogsResponse | Response:
     """Endpoint for getting moneybox transaction logs."""
 
-    transaction_logs_data = await request.app.state.db_manager.get_transaction_logs(
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    transaction_logs_data = await db_manager.get_transaction_logs(
         moneybox_id=moneybox_id,
     )
 
     if transaction_logs_data:
-        transaction_logs_data = {
-            "transaction_logs": transaction_logs_data,
-        }
-        return transaction_logs_data  # type: ignore
+        return {"transaction_logs": transaction_logs_data} # type: ignore
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
