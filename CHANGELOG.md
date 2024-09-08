@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.12.0 (2024-09-08)
+### Changed:
+- mount vueJS static dir to app root "/" and deploy vueJS UI 
+    note: (without static files inside, need manual export of static files from vueJS to this directory)
+
 ## 2.11.0 (2024-09-07)
 ### Changed:
 - unify pydantic models
