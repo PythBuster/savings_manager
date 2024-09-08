@@ -8,6 +8,7 @@ COPY src /savings_manager/src
 COPY envs /savings_manager/envs
 COPY scripts /savings_manager/scripts
 COPY docs/sphinx /savings_manager/docs/sphinx
+COPY static /savings_manager/static
 COPY alembic /savings_manager/alembic
 COPY alembic.ini /savings_manager/alembic.ini
 COPY poetry.lock /savings_manager/poetry.lock

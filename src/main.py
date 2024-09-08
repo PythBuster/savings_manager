@@ -13,12 +13,12 @@ from fastapi.exceptions import RequestValidationError
 from requests import Response
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import FileResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src import exception_handler
 from src.app_logger import app_logger
-from src.constants import SPHINX_DIRECTORY, WORKING_DIR
+from src.constants import SPHINX_DIRECTORY, WEB_UI_DIRECTORY, WORKING_DIR
 from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.db.db_manager import DBManager
 from src.report_sender.email_sender.sender import EmailSender
@@ -184,13 +184,6 @@ def register_router(fastapi_app: FastAPI) -> None:
     :rtype fastapi_app: FastAPI
     """
 
-    # mounts
-    fastapi_app.mount(
-        path="/sphinx",
-        app=StaticFiles(directory=SPHINX_DIRECTORY, html=True),
-        name="sphinx",
-    )
-
     # router registrations
     fastapi_app.include_router(
         moneybox_router,
@@ -212,6 +205,28 @@ def register_router(fastapi_app: FastAPI) -> None:
         email_sender_router,
         prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
+
+    # Mount the sphinx documentation
+    fastapi_app.mount(
+        path="/sphinx",
+        app=StaticFiles(directory=SPHINX_DIRECTORY, html=True),
+        name="sphinx",
+    )
+
+    # Mount the web UI
+    fastapi_app.mount(
+        path="/",
+        app=StaticFiles(directory=WEB_UI_DIRECTORY, html=True),
+        name="static",
+    )
+
+
+# Serve the Vue.js index.html as the root
+@app.get("/")
+async def read_index() -> FileResponse:
+    """The vueJS web ui root."""
+
+    return FileResponse("static/index.html")
 
 
 def main() -> None:

@@ -4,7 +4,7 @@
 # Export of Savings History as CSV / Excel
 
 
-# App localisation (currency/labels etc.) -> i18n-Plugins?
+# ~~App localisation (currency/labels etc.) -> i18n-Plugins?~~ - DONE
 
 
 # Auth / Login / PIN

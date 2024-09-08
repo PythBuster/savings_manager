@@ -397,11 +397,11 @@ class TransactionLogResponse(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def transform_create_at_string_datetime_to_datetime(
-            cls,
-            data: dict[str, Any],
+        cls,
+        data: dict[str, Any],
     ) -> dict[str, Any]:
         """Try to transform 'created_at' string datetime to datetime,
-         if possible and necessary."""
+        if possible and necessary."""
 
         if isinstance(data["created_at"], str):
             try:
@@ -416,9 +416,7 @@ class TransactionLogResponse(BaseModel):
         return data
 
     @model_validator(mode="after")
-    def validate_transaction_type_and_transaction_trigger_accepted_combinations(
-            self
-    ) -> Self:
+    def validate_transaction_type_and_transaction_trigger_accepted_combinations(self) -> Self:
         """Check for combinations:
         - TransactionType.DIRECT + TransactionTrigger.AUTOMATICALLY
         - TransactionType.DISTRIBUTION + TransactionTrigger.DIRECT
@@ -446,9 +444,7 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_counterparty_moneybox_name_and_counterparty_moneybox_id_both_set(
-            self
-    ) -> Self:
+    def validate_counterparty_moneybox_name_and_counterparty_moneybox_id_both_set(self) -> Self:
         """If counterparty_moneybox_name is set, counterparty_moneybox_id need to be set too."""
 
         if (self.counterparty_moneybox_name is None) != (self.counterparty_moneybox_id is None):

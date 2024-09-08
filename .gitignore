@@ -4,6 +4,8 @@
 *.sqlite3
 .env.prod
 .env.dev
+/static/*
+
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template

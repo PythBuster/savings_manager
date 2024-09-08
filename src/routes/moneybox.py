@@ -233,6 +233,6 @@ async def get_moneybox_transaction_logs(
     )
 
     if transaction_logs_data:
-        return {"transaction_logs": transaction_logs_data} # type: ignore
+        return {"transaction_logs": transaction_logs_data}  # type: ignore
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
