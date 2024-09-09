@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.15.0 (2024-09-09)
+### Feature:
+- added /app/metadata endpoint
+
 ## 2.14.0 (2024-09-09)
 ### Changed:
 - simplified/unified endpoint response codes

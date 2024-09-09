@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Savings Manager"
-version = "2.14.0"
+version = "2.15.0"
 description = "Savings Manager is an intuitive app for managing your savings using virtual moneyboxes. Allocate budgets, automate savings, and set priorities to reach goals faster. The app adjusts automatically when you withdraw, ensuring your plan stays on track. Easily transfer funds between moneyboxes or make manual deposits, giving you full control over your savings journey."
 authors = ["'PythBuster' <'pythbuster@gmail.com'>"]
 readme = "README.md"
@@ -24,6 +24,8 @@ jinja2 = "^3.1.4"
 aiosmtplib = "^3.0.2"
 tabulate = "^0.9.0"
 slowapi = "^0.1.9"
+pydantic-extra-types = "^2.9.0"
+semver = "^3.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -100,6 +102,7 @@ load-plugins=[
 
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
 [tool.pylint-per-file-ignores]
+"test_app_endpoints.py"="missing-function-docstring"
 "test_email_sender_endpoints.py"="missing-function-docstring"
 "test_task_runner.py"="missing-function-docstring"
 "test_db_core.py"="missing-function-docstring"
@@ -128,6 +131,12 @@ omit = [
     # omit this single files
     "src/main.py",
     ]
+
+[tool.vulture]
+ignore_decorators = ["@model_validator", "@pytest.fixture"]
+paths = ["tests", "src", "docs/vulture_whitelist.def"]
+sort_by_size = true
+make_whitelist = false
 
 
 [build-system]

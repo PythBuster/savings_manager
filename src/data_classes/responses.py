@@ -14,6 +14,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from pydantic_extra_types.semantic_version import SemanticVersion
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
@@ -631,6 +632,51 @@ class PrioritylistResponse(BaseModel):
         """The len of prioritylist."""
 
         return len(self.prioritylist)
+
+
+class AppInfoResponse(BaseModel):
+    """The application info response model."""
+
+    app_name: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="The name of the application.",
+        ),
+    ]
+    """The name of the application."""
+
+    app_version: Annotated[
+        SemanticVersion,
+        Field(description="The version of the application."),
+    ]
+    """The version of the application."""
+
+    app_description: Annotated[
+        str,
+        Field(
+            min_length=1,
+            description="The description of the application.",
+        ),
+    ]
+    """The description of the application."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "appName": "Savings Manager",
+                    "appVersion": "2.13.0",
+                    "appDescription": "The Savings Manager ....",
+                },
+            ],
+        },
+    )
+    """The config of the model."""
 
 
 class AppSettingsResponse(BaseModel):
