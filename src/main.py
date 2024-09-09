@@ -23,6 +23,7 @@ from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
+from src.routes.app import app_router
 from src.routes.app_settings import app_settings_router
 from src.routes.email_sender import email_sender_router
 from src.routes.moneybox import moneybox_router
@@ -52,6 +53,10 @@ tags_metadata = [
     {
         "name": "email",
         "description": "All email endpoints.",
+    },
+    {
+        "name": "app",
+        "description": "All general app endpoints.",
     },
 ]
 """Metadata about the endpoints."""
@@ -190,6 +195,10 @@ def register_router(fastapi_app: FastAPI) -> None:
     )
     fastapi_app.include_router(
         email_sender_router,
+        prefix=f"/{EndpointRouteType.APP_ROOT}",
+    )
+    fastapi_app.include_router(
+        app_router,
         prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
 

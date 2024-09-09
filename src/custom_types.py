@@ -10,6 +10,9 @@ from pydantic_settings import BaseSettings
 class EndpointRouteType(StrEnum):
     """The endpoint names."""
 
+    APP = "app"  # /app
+    """App endpoint path name"""
+
     APP_ROOT = "api"  # /api
     """Root endpoint path name."""
 
