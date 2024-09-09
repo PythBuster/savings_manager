@@ -1,12 +1,10 @@
 # Savings Manager
 
-The "Savings Manager" helps you manage your savings. With the use of virtual accounts, budgets can be allocated for various goals, and this process is entirely automated.
+Savings Manager is an intuitive app designed to help you efficiently manage your savings. With virtual moneyboxes, you can allocate budgets for various financial goals, automate your savings strategy, and easily transfer funds between moneyboxes.
 
-By setting a fixed monthly savings amount, you can determine the maximum amount that can be saved across the system each month. Desired savings amounts for each moneybox and upper savings limits allow the monthly savings to be automatically distributed across the moneyboxes at the beginning of each month. By setting fixed priorities, you can achieve a savings strategy that helps you reach certain savings goals faster than others.
+Set a fixed monthly savings amount to determine how much can be saved across all moneyboxes each month. The app automatically distributes this amount based on your preset priorities, ensuring that more important goals are reached faster. Additionally, if you withdraw from a moneybox, the system intelligently adjusts to prioritize refilling it, keeping your savings plan on track.
 
-A key feature is that if you withdraw a certain amount from a moneybox, the priority list of moneyboxes will automatically adjust to ensure that the emptied moneybox is quickly refilled.
-
-This makes saving easy, allowing you to watch as each moneybox is gradually replenished. Of course, amounts can be transferred between the moneyboxes, and manual deposits into the moneyboxes are always possible!
+Savings Manager simplifies the process, allowing you to watch as your moneyboxes gradually fill up. You can also transfer funds between moneyboxes or make manual deposits at any time, giving you full control over your financial journey.
 
 ## Deployment / Contribution
 
@@ -210,7 +208,7 @@ Navigate to `savings_manager/scripts` and run:
 
 (in windows, run the .bat file)
 
-The savings manager into the docker will run on port 64000 and you will reach the servcie at: http://localhost:64000
+The savings manager into the docker will run on port 8001 and you will reach the service at: http://localhost:8001
 
 API documentation: http://localhost:64000/docs
 Code documentation: http://localhost:64000/sphinx
