@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.13.1 (2024-09-09)
+### Changed:
+- fix: added missing poetry dependency
+- updated poetry dependencies
+
 ## 2.13.0 (2024-09-09)
 ### Changed:
 - added slowapi dependency and limited send-testemail endpoint to 1 request per minute
