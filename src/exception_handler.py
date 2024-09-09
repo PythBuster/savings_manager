@@ -2,7 +2,10 @@
 
 import sqlalchemy
 from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from slowapi.errors import RateLimitExceeded
 from starlette import status
+from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from src.app_logger import app_logger
@@ -15,9 +18,14 @@ from src.db.exceptions import (
 from src.routes.exceptions import MissingSMTPSettingsError
 
 
-async def response_exception(exception: Exception) -> JSONResponse:
+async def response_exception(  # pylint: disable=too-many-return-statements
+    _: Request,
+    exception: Exception,
+) -> JSONResponse:
     """Maps `exception` to a :class:`JSONResponse` and returns it.
 
+    :param _: The current request instance, not used.
+    :type _: :class:`Starlette.request.Request`
     :param exception: The caught exception.
     :type exception: :class:`Exception`
     :return: The exception as a json response.
@@ -28,7 +36,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
 
     if isinstance(exception, InconsistentDatabaseError):
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,
@@ -41,7 +49,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
         _, arg_2 = exception.args
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message="No database connection.",  # type: ignore
@@ -52,7 +60,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
 
     if issubclass(exception.__class__, RecordNotFoundError):
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,  # type: ignore
@@ -63,7 +71,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
 
     if issubclass(exception.__class__, CrudDatabaseError):
         return JSONResponse(
-            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,  # type: ignore
@@ -79,7 +87,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
         detail = "".join(detail)
 
         return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=message.replace("\nDETAIL", "").strip(),  # type: ignore
@@ -96,7 +104,7 @@ async def response_exception(exception: Exception) -> JSONResponse:
         error_message = exception.args[0]
 
         return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=error_message,
@@ -104,6 +112,40 @@ async def response_exception(exception: Exception) -> JSONResponse:
             ),
         )
 
-    # fastapi will catch any unhandled exception and will
-    # map it to a 500 Internal Server Error response
-    raise exception
+    if isinstance(exception, RequestValidationError):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message="Invalid request data",
+                    details={
+                        "args": exception.args,
+                        "body": exception.body,
+                    },
+                )
+            ),
+        )
+
+    if isinstance(exception, RateLimitExceeded):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message="Rate limit exceeded",
+                    details={"limit": exception.detail},
+                )
+            ),
+        )
+
+    # all other unmapped exceptions
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=jsonable_encoder(
+            HTTPErrorResponse(
+                message="Unknown Error",
+                details={
+                    "exception": exception.__class__.__name__,
+                },
+            )
+        ),
+    )

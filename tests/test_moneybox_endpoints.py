@@ -142,7 +142,7 @@ async def test_endpoint_get_moneybox_status_404_non_existing(
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/10",
     )
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -279,7 +279,7 @@ async def test_endpoint_add_moneybox__one__status_422__balance_postdata(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -303,7 +303,7 @@ async def test_endpoint_update_overflow_moneybox(
         json=moneybox_data_1,
     )
     content = response_1.json()
-    assert response_1.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert response_1.status_code == status.HTTP_400_BAD_REQUEST
     assert content["message"] == "Updating overflow moneybox is not allowed/possible!"
 
 
@@ -319,7 +319,7 @@ async def test_endpoint_delete_overflow_moneybox__status_405(
     response = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}"
     )
-    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json() == {
         "details": {
             "id": moneybox_id,
@@ -349,12 +349,12 @@ async def test_endpoint_update_moneybox__invalid_priority_0(
         json=moneybox_data,
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     content = response.json()
-    assert content["detail"][0]["msg"] == "Input should be greater than or equal to 1"
-    assert content["detail"][0]["loc"][1] == "priority"
-    assert content["detail"][0]["input"] == 0
+    assert content["details"]["args"][0][0]["msg"] == "Input should be greater than or equal to 1"
+    assert content["details"]["args"][0][0]["loc"][1] == "priority"
+    assert content["details"]["args"][0][0]["input"] == 0
 
 
 @pytest.mark.dependency
@@ -496,7 +496,7 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
         json=moneybox_data_1,
     )
 
-    assert response_1.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response_1.status_code == status.HTTP_400_BAD_REQUEST
 
     # unknown extra field not allowed in update data
     moneybox_data_2 = {"name": "Updated Test Box 1", "unknwon_field": "xyz"}
@@ -506,7 +506,7 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
         json=moneybox_data_2,
     )
 
-    assert response_2.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response_2.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -541,7 +541,7 @@ async def test_endpoint_delete_second_moneybox__status_204(
     response = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}"
     )
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -605,7 +605,7 @@ async def test_endpoint_deposit_first_moneybox__status_422__fail_extra_field(
         json=deposit_data,
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -629,9 +629,9 @@ async def test_endpoint_deposit_first_moneybox__status_422__missing_required_amo
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "missing" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "missing" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -656,9 +656,9 @@ async def test_endpoint_deposit_first_moneybox__status_422__negative_amount(
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "greater_than_equal" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -683,9 +683,9 @@ async def test_endpoint_deposit_first_moneybox__status_422__zero_amount(
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "greater_than_equal" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -750,7 +750,7 @@ async def test_endpoint_withdraw_first_moneybox__status_422__fail_extra_field(
         json=withdraw_data,
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -774,9 +774,9 @@ async def test_endpoint_withdraw_first_moneybox__status_422__missing_required_am
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "missing" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "missing" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -801,9 +801,9 @@ async def test_endpoint_withdraw_first_moneybox__status_422__negative_amount(
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "greater_than_equal" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -828,9 +828,9 @@ async def test_endpoint_withdraw_first_moneybox__status_422__zero_amount(
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "greater_than_equal" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 async def test_endpoint_withdraw_first_moneybox__status_405__balance_negative(
@@ -854,7 +854,7 @@ async def test_endpoint_withdraw_first_moneybox__status_405__balance_negative(
         json=withdraw_data,
     )
 
-    assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -930,9 +930,9 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third__status_422__m
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "missing" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "missing" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -954,9 +954,9 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__mi
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "missing" == content["detail"][0]["type"]
-    assert "toMoneyboxId" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "missing" == content["details"]["args"][0][0]["type"]
+    assert "toMoneyboxId" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -978,9 +978,9 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__st
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "missing" == content["detail"][0]["type"]
-    assert "toMoneyboxId" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "missing" == content["details"]["args"][0][0]["type"]
+    assert "toMoneyboxId" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -1010,9 +1010,9 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third_status_422__ne
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "greater_than_equal" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -1042,9 +1042,9 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__ze
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "greater_than_equal" == content["detail"][0]["type"]
-    assert "amount" in content["detail"][0]["loc"]
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
+    assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
 @pytest.mark.dependency
@@ -1074,7 +1074,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to
         json=transfer_data,
     )
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -1302,7 +1302,7 @@ async def test_endpoint_get_transactions_log_moneybox_fourth__status_404__delete
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{fourth_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.dependency
@@ -1325,4 +1325,4 @@ async def test_endpoint_get_transactions_log_moneybox_sixth__status_404__not_exi
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{sith_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
 
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

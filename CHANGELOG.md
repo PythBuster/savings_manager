@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.14.0 (2024-09-09)
+### Changed:
+- simplified/unified endpoint response codes
+- adapt request/exception handler
+- adapt custom openapi handler (fastapi)
+
 ## 2.13.1 (2024-09-09)
 ### Changed:
 - fix: added missing poetry dependency

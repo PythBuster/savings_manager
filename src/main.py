@@ -8,10 +8,8 @@ from typing import AsyncGenerator, Callable
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from requests import Response
-from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
@@ -19,10 +17,10 @@ from starlette.responses import FileResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src import exception_handler
-from src.app_logger import app_logger
 from src.constants import SPHINX_DIRECTORY, WEB_UI_DIRECTORY, WORKING_DIR
 from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.db.db_manager import DBManager
+from src.exception_handler import response_exception
 from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
 from src.routes.app_settings import app_settings_router
@@ -30,7 +28,7 @@ from src.routes.email_sender import email_sender_router
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
-from src.routes.responses.custom_openapi_schema import custom_422_openapi_schema
+from src.routes.responses.custom_openapi_schema import custom_400_500_openapi_schema
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data
 
@@ -120,28 +118,10 @@ app = FastAPI(
 """Reference to the fastapi app."""
 
 
-# Custom handler for RequestValidationError
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request,  # pylint: disable=unused-argument
-    exc: RequestValidationError,
-) -> JSONResponse:
-    """Custom request validation handler.
-
-    Logs exception before responding."""
-
-    app_logger.exception(exc)
-    return JSONResponse(
-        status_code=422,
-        content=jsonable_encoder({"detail": exc.errors()}),
-    )
-
-
 # exception handler
-async def catch_exceptions_middleware(
-    request: Request, call_next: Callable
-) -> Response | JSONResponse:
-    """Custom exception handler as middleware.
+async def handle_requests(request: Request, call_next: Callable) -> Response | JSONResponse:
+    """Custom request handler as middleware, which will handle
+    exceptions individually, which could arise.
 
     :param request: The current request.
     :param call_next: Callback to handle the request (route).
@@ -152,13 +132,15 @@ async def catch_exceptions_middleware(
     try:
         return await call_next(request)
     except Exception as ex:  # pylint:disable=broad-exception-caught
-        return await exception_handler.response_exception(exception=ex)
+        return await exception_handler.response_exception(request, exception=ex)
 
 
-# register/override middlewares
+# register/override middlewares, exceptions handlers
 print("Register/override middlewares, exceptions handlers ...", flush=True)
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.middleware("http")(catch_exceptions_middleware)
+app.add_exception_handler(RateLimitExceeded, response_exception)
+app.add_exception_handler(RequestValidationError, response_exception)
+app.middleware("http")(handle_requests)
+
 
 _origins = ["*"]
 app.add_middleware(
@@ -179,7 +161,7 @@ def set_custom_openapi_schema(fastapi_app: FastAPI) -> None:
     """
 
     fastapi_app.openapi_original = fastapi_app.openapi
-    fastapi_app.openapi = lambda: custom_422_openapi_schema(fastapi_app)
+    fastapi_app.openapi = lambda: custom_400_500_openapi_schema(fastapi_app)
 
 
 def register_router(fastapi_app: FastAPI) -> None:
@@ -227,8 +209,8 @@ def register_router(fastapi_app: FastAPI) -> None:
 
 
 # Serve the Vue.js index.html as the root
-@app.get("/")
-async def read_index() -> FileResponse:
+@app.get("/", include_in_schema=False)
+async def vuejs_index() -> FileResponse:
     """The vueJS web ui root."""
 
     return FileResponse("static/index.html")
