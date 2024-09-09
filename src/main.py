@@ -11,6 +11,8 @@ from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from requests import Response
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import FileResponse, JSONResponse
@@ -21,6 +23,7 @@ from src.app_logger import app_logger
 from src.constants import SPHINX_DIRECTORY, WEB_UI_DIRECTORY, WORKING_DIR
 from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.db.db_manager import DBManager
+from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
 from src.routes.app_settings import app_settings_router
 from src.routes.email_sender import email_sender_router
@@ -94,6 +97,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     fastapi_app.state.db_manager = db_manager
     fastapi_app.state.email_sender = email_sender
     fastapi_app.state.background_tasks_runner = background_tasks_runner
+    fastapi_app.state.limiter = limiter
 
     yield
 
@@ -152,7 +156,8 @@ async def catch_exceptions_middleware(
 
 
 # register/override middlewares
-print("Register/override middlewares ...", flush=True)
+print("Register/override middlewares, exceptions handlers ...", flush=True)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.middleware("http")(catch_exceptions_middleware)
 
 _origins = ["*"]

@@ -9,6 +9,7 @@ from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
+from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
 from src.routes.responses.email_sender import SEND_TESTEMAIL_RESPONSES
 
@@ -24,8 +25,9 @@ email_sender_router = APIRouter(
     responses=SEND_TESTEMAIL_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
+@limiter.limit("1/minute")
 async def send_testemail(request: Request) -> Response:
-    """Endpoint for sending a test email."""
+    """Endpoint for sending a test email. Limited to 1 request per minute."""
 
     email_sender = cast(EmailSender, request.app.state.email_sender)
     db_manager = cast(DBManager, request.app.state.db_manager)

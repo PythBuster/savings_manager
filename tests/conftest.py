@@ -15,6 +15,7 @@ from src.constants import WORKING_DIR
 from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
+from src.limiter import limiter
 from src.main import app, register_router, set_custom_openapi_schema
 from src.report_sender.email_sender.sender import EmailSender
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
@@ -272,6 +273,7 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
     print("Mock states ...", flush=True)
     app.state.db_manager = db_manager
     app.state.email_sender = email_sender
+    app.state.limiter = limiter
 
     async with AsyncClient(app=app, base_url="http://127.0.0.1:8999") as client:
         yield client

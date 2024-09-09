@@ -23,6 +23,7 @@ uvicorn = {extras = ["standard"], version = "^0.30.6"}
 jinja2 = "^3.1.4"
 aiosmtplib = "^3.0.2"
 tabulate = "^0.9.0"
+slowapi = "^0.1.9"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -100,6 +101,7 @@ load-plugins=[
 
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
 [tool.pylint-per-file-ignores]
+"test_email_sender_endpoints.py"="missing-function-docstring"
 "test_task_runner.py"="missing-function-docstring"
 "test_db_core.py"="missing-function-docstring"
 "test_db_manager.py"="missing-function-docstring"

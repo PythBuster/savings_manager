@@ -24,6 +24,14 @@ SEND_TESTEMAIL_RESPONSES = {
     status.HTTP_409_CONFLICT: {
         "description": "Conflict",
     },
+    status.HTTP_429_TOO_MANY_REQUESTS: {
+        "description": "Error: Too Many Requests",
+        "content": {
+            "application/json": {
+                "example": {"error": "Rate limit exceeded: 1 per 1 minute"},
+            }
+        },
+    },
     status.HTTP_500_INTERNAL_SERVER_ERROR: {
         "description": "Internal Server Error",
     },
