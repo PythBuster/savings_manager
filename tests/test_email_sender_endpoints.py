@@ -16,10 +16,10 @@ async def test_send_testemail_success(
         response = await client.patch(
             f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.EMAIL_SENDER}/send-testemail",
         )
-        assert response.status_code == status.HTTP_409_CONFLICT
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
         send_testemail_mock.return_value = True
         response = await client.patch(
             f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.EMAIL_SENDER}/send-testemail",
         )
-        assert response.status_code == status.HTTP_429_TOO_MANY_REQUESTS
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

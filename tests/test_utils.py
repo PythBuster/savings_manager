@@ -64,15 +64,12 @@ def test_get_app_data() -> None:
     assert app_name == expected_app_name
 
     description = app_data["description"]
-    assert (
-        description
-        == (
-            "Savings Manager is an intuitive app for managing your savings using "
-            "virtual moneyboxes. Allocate budgets, automate savings, and set priorities "
-            "to reach goals faster. The app adjusts automatically when you withdraw, "
-            "ensuring your plan stays on track. Easily transfer funds between moneyboxes "
-            "or make manual deposits, giving you full control over your savings journey."
-        )
+    assert description == (
+        "Savings Manager is an intuitive app for managing your savings using "
+        "virtual moneyboxes. Allocate budgets, automate savings, and set priorities "
+        "to reach goals faster. The app adjusts automatically when you withdraw, "
+        "ensuring your plan stays on track. Easily transfer funds between moneyboxes "
+        "or make manual deposits, giving you full control over your savings journey."
     )
 
     authors = app_data["authors"]

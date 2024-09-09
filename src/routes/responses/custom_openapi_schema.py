@@ -5,7 +5,7 @@ from typing import Any
 from fastapi import FastAPI
 
 
-def custom_422_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
+def custom_400_500_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
     if fastapi_app.openapi_schema:
         return fastapi_app.openapi_schema
 
@@ -14,37 +14,52 @@ def custom_422_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
 
     for path in original_openapi["paths"]:
         for method in original_openapi["paths"][path]:
+            # remove default 422 status codes
             if "422" in original_openapi["paths"][path][method]["responses"]:
-                original_openapi["paths"][path][method]["responses"]["422"] = {
-                    "description": "Unprocessable Content",
-                    "content": {
-                        "application/json": {
-                            "examples": {
-                                "example_1": {
-                                    "summary": "Data Serialization/Validation Error",
-                                    "value": {
-                                        "detail": [
-                                            {
-                                                "type": "string_type",
-                                                "loc": ["body", "name"],
-                                                "msg": "Input should be a valid string",
-                                                "input": 123,
-                                                "url": "https://errors.pydantic.dev/2.6/v/string_type",  # noqa: E501  # pylint: disable=line-too-long
-                                            }
-                                        ]
-                                    },
+                del original_openapi["paths"][path][method]["responses"]["422"]
+
+            original_openapi["paths"][path][method]["responses"]["400"] = {
+                "description": "Bad Request",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "summary": "Bad Request",
+                            "value": {
+                                "error": "Validation Error",
+                                "details": {
+                                    "detail": [
+                                        {
+                                            "type": "string_type",
+                                            "loc": ["body", "name"],
+                                            "msg": "Input should be a valid string",
+                                            "input": 123,
+                                            "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                                            # noqa: E501  # pylint: disable=line-too-long
+                                        }
+                                    ]
                                 },
-                                "example_2": {
-                                    "summary": "Inconsistent Database",
-                                    "value": {
-                                        "message": "Inconsistent Database! ...",
-                                        "details": {"key": "value"},
-                                    },
+                            },
+                        },
+                    }
+                },
+            }
+
+            original_openapi["paths"][path][method]["responses"]["500"] = {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "summary": "Internal Server Error",
+                            "value": {
+                                "error": "No Database Connection",
+                                "details": {
+                                    "ip": "127.0.0.1",
                                 },
-                            }
-                        }
-                    },
-                }
+                            },
+                        },
+                    }
+                },
+            }
 
     # override openapi schema with new one
     fastapi_app.openapi_schema = original_openapi
