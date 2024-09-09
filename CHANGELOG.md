@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.13.0 (2024-09-09)
+### Changed:
+- added slowapi dependency and limited send-testemail endpoint to 1 request per minute
+
 ## 2.12.0 (2024-09-08)
 ### Changed:
 - mount vueJS static dir to app root "/" and deploy vueJS UI 
