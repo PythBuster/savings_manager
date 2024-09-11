@@ -9,10 +9,19 @@ Subpackages
 
    src.data_classes
    src.db
+   src.report_sender
    src.routes
 
 Submodules
 ----------
+
+src.app\_logger module
+----------------------
+
+.. automodule:: src.app_logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 src.constants module
 --------------------
@@ -38,10 +47,26 @@ src.exception\_handler module
    :undoc-members:
    :show-inheritance:
 
+src.limiter module
+------------------
+
+.. automodule:: src.limiter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 src.main module
 ---------------
 
 .. automodule:: src.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.task\_runner module
+-----------------------
+
+.. automodule:: src.task_runner
    :members:
    :undoc-members:
    :show-inheritance:

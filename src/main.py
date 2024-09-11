@@ -8,7 +8,7 @@ from typing import AsyncGenerator, Callable
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, HTTPException
 from requests import Response
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
@@ -137,20 +137,24 @@ async def handle_requests(request: Request, call_next: Callable) -> Response | J
     try:
         return await call_next(request)
     except Exception as ex:  # pylint:disable=broad-exception-caught
-        return await exception_handler.response_exception(request, exception=ex)
+        return await response_exception(request, exception=ex)
 
 
 # register/override middlewares, exceptions handlers
 print("Register/override middlewares, exceptions handlers ...", flush=True)
+
+# override registered exception handler of
+# - RateLimitExceeded
+# - RequestValidationError
 app.add_exception_handler(RateLimitExceeded, response_exception)
 app.add_exception_handler(RequestValidationError, response_exception)
+
+# handle requests and all other exceptions
 app.middleware("http")(handle_requests)
 
-
-_origins = ["*"]
 app.add_middleware(
     CORSMiddleware,  # type: ignore
-    allow_origins=_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -202,13 +206,6 @@ def register_router(fastapi_app: FastAPI) -> None:
         prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
 
-    # Mount the sphinx documentation
-    fastapi_app.mount(
-        path="/sphinx",
-        app=StaticFiles(directory=SPHINX_DIRECTORY, html=True),
-        name="sphinx",
-    )
-
     # Mount the web UI
     fastapi_app.mount(
         path="/",
@@ -225,7 +222,7 @@ async def vuejs_index() -> FileResponse:
     return FileResponse("static/index.html")
 
 
-def main() -> None:
+if __name__ == "__main__":
     """Entry point of the app."""
 
     # load live env
@@ -243,7 +240,3 @@ def main() -> None:
         access_log=os.environ["ENVIRONMENT"] != "prod",  # disable access log for prod
     )
     print("Stop uvicorn server.", flush=True)
-
-
-if __name__ == "__main__":
-    main()

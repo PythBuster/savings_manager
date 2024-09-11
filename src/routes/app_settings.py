@@ -31,7 +31,11 @@ app_settings_router = APIRouter(
 async def get_app_settings(
     request: Request,
 ) -> AppSettingsResponse:
-    """Endpoint for getting app settings."""
+    """Endpoint for getting app settings
+    \f
+    :param request: ...
+    :return: ...
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     # use protected method for now

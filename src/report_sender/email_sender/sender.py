@@ -23,6 +23,14 @@ class EmailSender(ReportSender):
         db_manager: DBManager,
         smtp_settings: AppEnvVariables,
     ):
+        """Initialize the EmailSender.
+
+        :param db_manager: The fastAPI state db_manager instance.
+        :type db_manager: :class:`DBManager`
+        :param smtp_settings: The smtp settings instance.
+        :type smtp_settings: :class:`AppEnvVariables`
+        """
+
         self.smtp_settings = smtp_settings
 
         sender_template_path = SENDER_DIR_PATH / "email_sender" / "templates"

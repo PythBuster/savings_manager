@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.16.0 (2024-09-11)
+### Feature:
+- update sphinx documentation and mount/route sphinx documentation in inside vueJS statics
+
 ## 2.15.0 (2024-09-09)
 ### Feature:
 - added /app/metadata endpoint
