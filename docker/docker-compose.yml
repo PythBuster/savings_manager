@@ -13,8 +13,8 @@ services:
       - savings_manager_network
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
-      interval: 10s
-      retries: 5
+      interval: 5s
+      retries: 3
       start_period: 30s
       timeout: 10s
 
@@ -26,6 +26,12 @@ services:
       - POSTGRES_PASSWORD=test_postgres
       - POSTGRES_USER=test_postgres
       - POSTGRES_DB=savings_manager
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
 
   app:
     container_name: savings_manager
