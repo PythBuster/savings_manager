@@ -7,9 +7,21 @@ Welcome to Savings Manager's documentation!
 ===========================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
+   app_logger
+   constants
+   custom_types
+   data_classes
+   db
+   exception_handler
+   limiter
+   modules
+   report_sender
+   routes
+   task_runner
+   utils
 
 
 Indices and tables

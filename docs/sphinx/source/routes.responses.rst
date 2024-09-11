@@ -4,6 +4,14 @@ routes.responses package
 Submodules
 ----------
 
+routes.responses.app module
+---------------------------
+
+.. automodule:: routes.responses.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 routes.responses.app\_settings module
 -------------------------------------
 

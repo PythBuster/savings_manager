@@ -1,7 +1,7 @@
-utils module
-============
+limiter module
+==============
 
-.. automodule:: utils
+.. automodule:: limiter
    :members:
    :undoc-members:
    :show-inheritance:

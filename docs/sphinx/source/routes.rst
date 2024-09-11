@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+routes.app module
+-----------------
+
+.. automodule:: routes.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 routes.app\_settings module
 ---------------------------
 
