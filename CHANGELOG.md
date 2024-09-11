@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.17.0 (2024-09-11)
+### Feature:
+- adapt docker compose file by using healthstates for postgres_database and test database services
+- expose savings manager (docker service: app) on port 64000
+- update README.md
+
 ## 2.16.0 (2024-09-11)
 ### Feature:
 - update sphinx documentation and mount/route sphinx documentation in inside vueJS statics

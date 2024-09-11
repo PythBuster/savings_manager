@@ -13,8 +13,8 @@ Savings Manager simplifies the process, allowing you to watch as your moneyboxes
 2. Run: `docker compose up -d` to start the PostgreSQL database and the Savings Manager app.  
    The app will be accessible at: `localhost:8000`
 
-   - SwaggerUI: `localhost:8000/docs`
-   - Sphinx: `localhost:8000/sphinx`
+   - SwaggerUI: `localhost:64000/docs`
+   - Sphinx: `localhost:64000/sphinx`
 
 To get the latest version of the repository, simply pull it and rebuild the Docker container:  
 `docker compose up --build`
@@ -189,10 +189,10 @@ you should be able to start the app from root directory of the project by using 
 
 
 This will start a service on:
-`http://localhost:8001`
+`http://localhost:64000`
 
 To see the API documentation or use the API via SwaggerUI, visit:
-`http://localhost:8001/docs`
+`http://localhost:64000/docs`
 
 
 ## Run savings manager as docker:

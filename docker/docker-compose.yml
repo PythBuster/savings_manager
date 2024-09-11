@@ -11,6 +11,12 @@ services:
       - POSTGRES_DB=savings_manager
     networks:
       - savings_manager_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
 
   test_postgres_database:
     image: postgres:16
@@ -20,6 +26,12 @@ services:
       - POSTGRES_PASSWORD=test_postgres
       - POSTGRES_USER=test_postgres
       - POSTGRES_DB=savings_manager
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
 
   app:
     container_name: savings_manager
@@ -28,11 +40,12 @@ services:
       dockerfile: docker/deploy-savings-manager.Dockerfile
     depends_on:
       postgres_database:
-        condition: service_started
+        condition: service_healthy
+        # health check of postgres would be nice :D
     links:
       - postgres_database
     ports:
-      - "8001:8001"
+      - "64000:8001"
     environment:
       - DB_DRIVER=postgresql+asyncpg
       - DB_NAME=savings_manager

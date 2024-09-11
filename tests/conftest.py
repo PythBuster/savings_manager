@@ -312,15 +312,13 @@ async def mocked_db_manager() -> DBManager:  # type: ignore
     """
 
     print("Start docker with test database...", flush=True)
+    # will wait for docker by --wait health state
     subprocess.call(
         [
             "sh",
             f"{WORKING_DIR.parent / 'scripts' / 'up_test_database.sh'}",
         ]
     )
-    wait_for_docker = 5
-    print(f"Wait for DB up for {wait_for_docker} seconds...", flush=True)
-    time.sleep(wait_for_docker)
 
     db_manager = DBManager(
         db_settings=app_env_variables,
