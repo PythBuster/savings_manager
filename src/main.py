@@ -1,61 +1,28 @@
 """The start module of the savings manager app."""
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Callable
+from typing import AsyncGenerator
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-from requests import Response
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.responses import FileResponse, JSONResponse
-from starlette.staticfiles import StaticFiles
 
-from src.constants import WEB_UI_DIRECTORY, WORKING_DIR
-from src.custom_types import AppEnvVariables, EndpointRouteType, Environment
+from src.constants import WORKING_DIR
+from src.custom_types import AppEnvVariables, Environment
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
+from src.fastapi_metadata import tags_metadata
+from src.fastapi_utils import (
+    handle_requests,
+    register_router,
+    set_custom_openapi_schema,
+)
 from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
-from src.routes.app import app_router
-from src.routes.app_settings import app_settings_router
-from src.routes.email_sender import email_sender_router
-from src.routes.moneybox import moneybox_router
-from src.routes.moneyboxes import moneyboxes_router
-from src.routes.prioritylist import prioritylist_router
-from src.routes.responses.custom_openapi_schema import custom_400_500_openapi_schema
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data
-
-tags_metadata = [
-    {
-        "name": "moneybox",
-        "description": "All moneybox endpoints.",
-    },
-    {
-        "name": "moneyboxes",
-        "description": "All moneyboxes endpoints.",
-    },
-    {
-        "name": "prioritylist",
-        "description": "All prioritylist endpoints.",
-    },
-    {
-        "name": "settings",
-        "description": "All settings endpoints.",
-    },
-    {
-        "name": "email",
-        "description": "All email endpoints.",
-    },
-    {
-        "name": "app",
-        "description": "All general app endpoints.",
-    },
-]
-"""Metadata about the endpoints."""
 
 app_data = get_app_data()
 """Reference to the app data."""
@@ -124,23 +91,6 @@ app = FastAPI(
 """Reference to the fastapi app."""
 
 
-# exception handler
-async def handle_requests(request: Request, call_next: Callable) -> Response | JSONResponse:
-    """Custom request handler as middleware, which will handle
-    exceptions individually, which could arise.
-
-    :param request: The current request.
-    :param call_next: Callback to handle the request (route).
-    :return: The route response or a mapped exception.
-    :rtype: :class:`Response` | :class:`JSONResponse`
-    """
-
-    try:
-        return await call_next(request)
-    except Exception as ex:  # pylint:disable=broad-exception-caught
-        return await response_exception(request, exception=ex)
-
-
 # register/override middlewares, exceptions handlers
 print("Register/override middlewares, exceptions handlers ...", flush=True)
 
@@ -161,74 +111,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-def set_custom_openapi_schema(fastapi_app: FastAPI) -> None:
-    """Define the custom OpenAPI schema
-        save original fastapi_app.openapi to call it later in mocked one.
-
-    :param fastapi_app: The fast api app.
-    :type fastapi_app: FastAPI
-    """
-
-    fastapi_app.openapi_original = fastapi_app.openapi
-    fastapi_app.openapi = lambda: custom_400_500_openapi_schema(fastapi_app)
-
-
-def register_router(fastapi_app: FastAPI) -> None:
-    """Register routes to the FastAPI app.
-
-    :param fastapi_app: The fast api app.
-    :rtype fastapi_app: FastAPI
-    """
-
-    # router registrations
-    fastapi_app.include_router(
-        moneybox_router,
-        prefix=f"/{EndpointRouteType.APP_ROOT}",
-    )
-    fastapi_app.include_router(
-        moneyboxes_router,
-        prefix=f"/{EndpointRouteType.APP_ROOT}",
-    )
-    fastapi_app.include_router(
-        prioritylist_router,
-        prefix=f"/{EndpointRouteType.APP_ROOT}",
-    )
-    fastapi_app.include_router(
-        app_settings_router,
-        prefix=f"/{EndpointRouteType.APP_ROOT}",
-    )
-    fastapi_app.include_router(
-        email_sender_router,
-        prefix=f"/{EndpointRouteType.APP_ROOT}",
-    )
-    fastapi_app.include_router(
-        app_router,
-        prefix=f"/{EndpointRouteType.APP_ROOT}",
-    )
-
-    # Mount the web UI
-    fastapi_app.mount(
-        path="/",
-        app=StaticFiles(directory=WEB_UI_DIRECTORY, html=True),
-        name="static",
-    )
-
-
-# Serve the Vue.js index.html as the root
-@app.get("/", include_in_schema=False)
-async def vuejs_index() -> FileResponse:
-    """The vueJS web ui root."""
-
-    return FileResponse("static/index.html")
-
-
 if __name__ == "__main__":
-
-    # dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
-    # load_dotenv(dotenv_path=dotenv_path)
-    # print(f"Loaded {dotenv_path}")
-
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
         "src.main:app",
