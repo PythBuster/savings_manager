@@ -7,7 +7,7 @@ from datetime import datetime
 from src.custom_types import ActionType
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
-from src.decorators import each
+from src.decorators import every
 from src.report_sender.email_sender.sender import EmailSender
 
 
@@ -52,7 +52,7 @@ class BackgroundTaskRunner:
             self.background_tasks.add(task)
             task.add_done_callback(self.background_tasks.discard)
 
-    @each.hour(1)
+    @every.hour(1)
     async def task_automated_savings(self) -> None:
         """This is the task for automated savings.
         Checks if distribution day is reached and does the task.
