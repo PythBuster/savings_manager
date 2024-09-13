@@ -31,7 +31,14 @@ prioritylist_router = APIRouter(
 async def get_prioritylist(
     request: Request,
 ) -> PrioritylistResponse | Response:
-    """Endpoint for getting prioritylist. Note: Returns a list SORTED by priority (asc)."""
+    """Endpoint for getting prioritylist. Note: Returns a list SORTED by priority (asc).
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :return: The prioritylist if not empty, else a response object including status
+        code 204.
+    :rtype: :class:`PrioritylistResponse` | :class:`Response`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     priority_list = await db_manager.get_prioritylist()
@@ -55,7 +62,15 @@ async def update_prioritylist(
     ],
 ) -> PrioritylistResponse:
     """Endpoint for updating priority list. Note: Returns the updated list
-    SORTED by priority (asc)."""
+    SORTED by priority (asc).
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param prioritylist: The new priority list:
+    :type prioritylist: :class:`Prioritylist`
+    :return: The updated priority list.
+    :rtype: :class:`PrioritylistResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     updated_priority_list = await db_manager.update_prioritylist(

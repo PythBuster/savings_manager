@@ -19,8 +19,12 @@ app_router = APIRouter(
     response_model=AppInfoResponse,
     responses=GET_APP_INFO_RESPONSES,
 )
-async def get_app_infos() -> AppSettingsResponse:
-    """Endpoint for getting app infos."""
+async def get_app_infos() -> AppInfoResponse:
+    """Endpoint for getting app infos like appVersion, appName etc.
+    \f
+    :return: The app info data.
+    :rtype: :class:`AppInfoResponse`
+    """
 
     app_info_data = get_app_data()
 

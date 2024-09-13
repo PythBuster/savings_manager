@@ -27,7 +27,13 @@ email_sender_router = APIRouter(
 )
 @limiter.limit("1/minute")
 async def send_testemail(request: Request) -> Response:
-    """Endpoint for sending a test email. Limited to 1 request per minute."""
+    """Endpoint for sending a test email. Limited to 1 request per minute.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :return: The response object with the status code included.
+    :rtype: :class:`Response`
+    """
 
     email_sender = cast(EmailSender, request.app.state.email_sender)
     db_manager = cast(DBManager, request.app.state.db_manager)

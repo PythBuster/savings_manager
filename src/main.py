@@ -17,7 +17,7 @@ from starlette.responses import FileResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from src.constants import WEB_UI_DIRECTORY, WORKING_DIR
-from src.custom_types import AppEnvVariables, EndpointRouteType
+from src.custom_types import AppEnvVariables, EndpointRouteType, Environment
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.limiter import limiter
@@ -66,6 +66,8 @@ app_data = get_app_data()
 author_name, author_mail = app_data["authors"][0].split()
 """Reference to the author's name and report_sender address.'"""
 
+app_env_variables = AppEnvVariables(_env_file=WORKING_DIR.parent / "envs" / ".env")
+"""The loaded env settings."""
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
@@ -79,10 +81,11 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
 
     print("Initialize app states ...", flush=True)
     # create db_manager, email_sender and background task runner
-    app_env_variables = AppEnvVariables(_env_file=WORKING_DIR / "envs" / ".env")
-
     db_manager = DBManager(
-        db_settings=app_env_variables,  # type: ignore
+        db_settings=app_env_variables,
+        engine_args={
+            "echo": app_env_variables.environment is Environment.DEV,
+        }
     )
     email_sender = EmailSender(
         db_manager=db_manager,
@@ -117,6 +120,7 @@ app = FastAPI(
         "email": author_mail[2:-2],
     },
     openapi_tags=tags_metadata,
+    debug=app_env_variables.environment is Environment.DEV,
     # swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
 """Reference to the fastapi app."""
@@ -222,10 +226,10 @@ async def vuejs_index() -> FileResponse:
 
 
 if __name__ == "__main__":
-    # load live env
-    dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
-    load_dotenv(dotenv_path=dotenv_path)
-    print(f"Loaded {dotenv_path}")
+
+    #dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+    #load_dotenv(dotenv_path=dotenv_path)
+    #print(f"Loaded {dotenv_path}")
 
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
@@ -234,6 +238,8 @@ if __name__ == "__main__":
         port=8001,
         loop="uvloop",
         workers=1,
-        access_log=os.environ["ENVIRONMENT"] != "prod",  # disable access log for prod
+        reload=app_env_variables.environment is Environment.DEV,
+        access_log=app_env_variables.environment is not Environment.PROD,
+        # disable access log for prod
     )
     print("Stop uvicorn server.", flush=True)

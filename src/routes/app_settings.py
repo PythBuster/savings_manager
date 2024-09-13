@@ -31,10 +31,11 @@ app_settings_router = APIRouter(
 async def get_app_settings(
     request: Request,
 ) -> AppSettingsResponse:
-    """Endpoint for getting app settings
+    """Endpoint for getting app settings.
     \f
-    :param request: ...
-    :return: ...
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :return: The app settings data.
     """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
@@ -54,7 +55,18 @@ async def update_app_settings(
         AppSettingsRequest, Body(title="Update Data", description="The updating app settings data.")
     ],
 ) -> AppSettingsResponse:
-    """Endpoint for updating app settings."""
+    """Endpoint for updating app settings.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param app_settings_request: The update data of the app settings.
+    :type app_settings_request: :class:`AppSettingsRequest`
+    :return: The updated app settings data.
+    :rtype: :class:`AppSettingsResponse`
+
+    :raises MissingSMTPSettingsError: If the SMTP settings in the app's environment
+        variables are missing.
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     email_sender = cast(EmailSender, request.app.state.email_sender)

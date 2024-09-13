@@ -25,7 +25,12 @@ moneyboxes_router = APIRouter(
 async def get_moneyboxes(
     request: Request,
 ) -> MoneyboxesResponse:
-    """Endpoint for getting moneyboxes."""
+    """Endpoint for getting moneyboxes.
+    \f
+    :param request: The current request object.
+    :return: The list of moneyboxes.
+    :rtype: :class:`MoneyboxesResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     moneyboxes_data = await db_manager.get_moneyboxes()
