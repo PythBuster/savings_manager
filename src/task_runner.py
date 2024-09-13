@@ -7,6 +7,7 @@ from datetime import datetime
 from src.custom_types import ActionType
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
+from src.decorators import each
 from src.report_sender.email_sender.sender import EmailSender
 
 
@@ -51,59 +52,53 @@ class BackgroundTaskRunner:
             self.background_tasks.add(task)
             task.add_done_callback(self.background_tasks.discard)
 
+    @each.hour(1)
     async def task_automated_savings(self) -> None:
-        """This is the endless task for automated savings.
-        Sleeps (self.sleep_time), checks if distribution day is reached and does the task.
+        """This is the task for automated savings.
+        Checks if distribution day is reached and does the task.
 
         - do task on each 1st of month
         """
 
-        # Get the name of the current method
         current_method_name = inspect.currentframe().f_code.co_name.upper()  # type: ignore
+        today = datetime.today()
+        already_done = False
 
-        await self.print_task(task_name=current_method_name, message="Start task ...")
+        if today.day == 1 and today.hour >= 12:
+            automated_action_logs = await self.db_manager.get_automated_savings_logs(
+                action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+            )
 
-        while True:
-            today = datetime.today()
-            already_done = False
+            if automated_action_logs:
+                automated_action_logs_dates = [
+                    automated_action_log["action_at"].date()
+                    for automated_action_log in automated_action_logs
+                ]
 
-            if today.day == 1 and today.hour >= 12:
-                automated_action_logs = await self.db_manager.get_automated_savings_logs(
-                    action_type=ActionType.APPLIED_AUTOMATED_SAVING,
-                )
+                if today.date() in automated_action_logs_dates:
+                    already_done = True
 
-                if automated_action_logs:
-                    automated_action_logs_dates = [
-                        automated_action_log["action_at"].date()
-                        for automated_action_log in automated_action_logs
-                    ]
+            if not already_done:
+                result = await self.db_manager.automated_savings()
 
-                    if today.date() in automated_action_logs_dates:
-                        already_done = True
+                if result:
+                    await self.print_task(
+                        task_name=current_method_name, message="Automated savings run."
+                    )
 
-                if not already_done:
-                    result = await self.db_manager.automated_savings()
+                    app_settings: AppSettings = (
+                        await self.db_manager._get_app_settings()  # type: ignore  # noqa: ignore  # pylint:disable=protected-access, line-too-long
+                    )
 
-                    if result:
-                        await self.print_task(
-                            task_name=current_method_name, message="Automated savings run."
+                    if app_settings.send_reports_via_email:
+                        await self.email_sender.send_email_automated_savings_done_successfully(
+                            to=app_settings.user_email_address,
                         )
-
-                        app_settings: AppSettings = (
-                            await self.db_manager._get_app_settings()  # type: ignore  # noqa: ignore  # pylint:disable=protected-access, line-too-long
-                        )
-
-                        if app_settings.send_reports_via_email:
-                            await self.email_sender.send_email_automated_savings_done_successfully(
-                                to=app_settings.user_email_address,
-                            )
-                    else:
-                        await self.print_task(
-                            task_name=current_method_name,
-                            message="Nothing to do. Automated savings is deactivated.",
-                        )
-
-            await asyncio.sleep(self.sleep_time)
+                else:
+                    await self.print_task(
+                        task_name=current_method_name,
+                        message="Nothing to do. Automated savings is deactivated.",
+                    )
 
     async def print_task(self, task_name: str, message: str) -> None:
         """The background task runner is responsible for printing out the task information."""
