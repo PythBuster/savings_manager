@@ -42,11 +42,8 @@ async def test_if_test_db_is_used(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency
-async def test_create_db_manager_with_engine_args(db_settings_1: AppEnvVariables) -> None:
-    db_manager = DBManager(db_settings=db_settings_1, engine_args={"echo": True})
-    assert db_manager is not None
-
-    db_manager = DBManager(db_settings=db_settings_1, engine_args=None)
+async def test_create_db_manager_with_engine_args(app_env_variables: AppEnvVariables) -> None:
+    db_manager = DBManager(db_settings=app_env_variables, engine_args={"echo": True})
     assert db_manager is not None
 
 

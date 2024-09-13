@@ -2,6 +2,17 @@
 
 ## x.y.z (unreleased)
 
+## 2.19.1 (2024-09-13)
+### Fixes:
+- added cached function to get the env settings
+- fix: conftest.py and load .env.test
+- fix: tests
+
+## 2.19.0 (2024-09-13)
+### Changes:
+- implement decorator for BackgroundTaskRunner to be able to decorate task function by
+  setting specific sleeping time
+
 ## 2.18.0 (2024-09-13)
 ### Changes:
 - fix: AppEnvVariables wrongly loaded settings from ENVIRONMENT instead of .env file
