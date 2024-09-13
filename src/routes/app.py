@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 
 from src.custom_types import EndpointRouteType
-from src.data_classes.responses import AppInfoResponse, AppSettingsResponse
+from src.data_classes.responses import AppInfoResponse
 from src.routes.responses.app import GET_APP_INFO_RESPONSES
 from src.utils import get_app_data
 

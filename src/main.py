@@ -1,12 +1,9 @@
 """The start module of the savings manager app."""
 
-import os
 from contextlib import asynccontextmanager
-from pathlib import Path
 from typing import AsyncGenerator, Callable
 
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from requests import Response
@@ -69,6 +66,7 @@ author_name, author_mail = app_data["authors"][0].split()
 app_env_variables = AppEnvVariables(_env_file=WORKING_DIR.parent / "envs" / ".env")
 """The loaded env settings."""
 
+
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
@@ -85,7 +83,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
         db_settings=app_env_variables,
         engine_args={
             "echo": app_env_variables.environment is Environment.DEV,
-        }
+        },
     )
     email_sender = EmailSender(
         db_manager=db_manager,
@@ -227,9 +225,9 @@ async def vuejs_index() -> FileResponse:
 
 if __name__ == "__main__":
 
-    #dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
-    #load_dotenv(dotenv_path=dotenv_path)
-    #print(f"Loaded {dotenv_path}")
+    # dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
+    # load_dotenv(dotenv_path=dotenv_path)
+    # print(f"Loaded {dotenv_path}")
 
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
