@@ -23,6 +23,14 @@ class BackgroundTaskRunner:
     """
 
     def __init__(self, db_manager: DBManager, email_sender: EmailSender) -> None:
+        """Initialize the BackgroundTaskRunner instance.
+
+        :param db_manager: The DBManager instance.
+        :type db_manager: :class:`DBManager`
+        :param email_sender: The EmailSender instance.
+        :type email_sender: :class:`EmailSender`
+        """
+
         self.db_manager = db_manager
         self.email_sender = email_sender
         self.sleep_time = 60 * 60  # each hour

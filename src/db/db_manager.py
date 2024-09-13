@@ -56,6 +56,14 @@ class DBManager:
     def __init__(
         self, db_settings: AppEnvVariables, engine_args: dict[str, Any] | None = None
     ) -> None:
+        """Initializer for the DBManager instance.
+
+        :param db_settings: The database settings.
+        :type db_settings: :class:`AppEnvVariables`
+        :param engine_args: The asynch engine args.
+        :type engine_args: :class:`dict[str, Any] | None`
+        """
+
         if engine_args is None:
             engine_args = {"echo": False}
 
