@@ -6,7 +6,7 @@ from typing import Callable
 
 
 # decorator class
-class each:
+class every:
     """Task function decorator for functions used in BackgroundTaskRunner"""
 
     @staticmethod
