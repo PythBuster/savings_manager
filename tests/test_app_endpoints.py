@@ -1,3 +1,5 @@
+"""All app endpoints test are located here."""
+
 from httpx import AsyncClient
 
 from src.custom_types import EndpointRouteType

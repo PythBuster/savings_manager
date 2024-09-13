@@ -4,7 +4,6 @@ import asyncio
 import subprocess
 import time
 from functools import partial
-from pathlib import Path
 from typing import AsyncGenerator
 
 import pytest_asyncio
@@ -23,13 +22,17 @@ from tests.utils.db_test_data_initializer import DBTestDataInitializer
 pytest_plugins = ("pytest_asyncio",)
 """The pytest plugins which should be used to run tests."""
 
-dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
-"""The test env file path."""
 
-app_env_variables = AppEnvVariables(
-    _env_file=dotenv_path,
-)
-"""The database settings."""
+@pytest_asyncio.fixture(scope="session", name="app_env_variables")
+def get_app_env_variables() -> AppEnvVariables:
+    """Test env settings"""
+
+    test_env_path = WORKING_DIR.parent / "envs" / ".env.test"
+    app_env_variables_ = AppEnvVariables(
+        _env_file=test_env_path,
+    )
+
+    yield app_env_variables_
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -236,23 +239,16 @@ async def load_test_data(request: FixtureRequest, db_manager: DBManager) -> None
     await test_data_initializer_.run()
 
 
-@pytest_asyncio.fixture(scope="session", name="smtp_settings")
-async def mocked_smtp_settings(db_settings_1: AppEnvVariables) -> AsyncGenerator:
-    """SMTP settings fixture"""
-
-    yield db_settings_1
-
-
 @pytest_asyncio.fixture(scope="session", name="email_sender")
 async def mocked_email_sender(
     db_manager: DBManager,
-    smtp_settings: AppEnvVariables,
+    app_env_variables: AppEnvVariables,
 ) -> AsyncGenerator:
     """The email sender fixture."""
 
     email_sender = EmailSender(
         db_manager=db_manager,
-        smtp_settings=smtp_settings,
+        smtp_settings=app_env_variables,
     )
     # email_sender._send_message = lambda *args, **kwargs: None
     yield email_sender
@@ -279,32 +275,8 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
         yield client
 
 
-@pytest_asyncio.fixture(scope="session", name="db_settings_1")
-async def example_1_db_settings() -> AsyncGenerator:
-    """A fixture to create example db_settings data.
-
-    :return: db_settings example 1.
-    :rtype: AsyncGenerator
-    """
-
-    yield AppEnvVariables(
-        environment="test",
-        db_driver="postgresql+asyncpg",
-        db_name="test_db",
-        db_host="mylocalhost",
-        db_port=1234,
-        db_user="postgres",
-        db_password="<PASSWORD>",
-        smtp_server="mylocalsmtp",
-        smtp_method="TLS",
-        smtp_port=1225,
-        smtp_user_name="smtp user",
-        smtp_password="<PASSWORD>",
-    )
-
-
 @pytest_asyncio.fixture(scope="session", name="db_manager")
-async def mocked_db_manager() -> DBManager:  # type: ignore
+async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  # type: ignore
     """A fixture to create the db_manager.
 
     :return: The DBManager connected to the test database.

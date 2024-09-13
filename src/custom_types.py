@@ -1,7 +1,7 @@
 """All custom types are located here."""
 
 from enum import StrEnum
-from typing import Any, Self
+from typing import Self
 
 from pydantic import ConfigDict, SecretStr, model_validator
 from pydantic_settings import BaseSettings
@@ -102,33 +102,32 @@ class AppEnvVariables(BaseSettings):
             )
         )
 
-    @model_validator(mode="before")
-    @classmethod
-    def smtp_data_empty_to_none(cls, data: dict[str, Any]) -> dict[str, Any]:
+    @model_validator(mode="after")
+    def transform_smtp_data_to_none(self) -> Self:
         """Convert emtpy string to None in smtp data."""
 
-        if data["smtp_server"] == "":
-            data["smtp_server"] = None
+        if self.smtp_server == "":
+            self.smtp_server = None
 
-        if data["smtp_method"] == "":
-            data["smtp_method"] = None
+        if self.smtp_method == "":
+            self.smtp_method = None
 
-        if data["smtp_port"] == "":
-            data["smtp_port"] = None
+        if self.smtp_port == "":
+            self.smtp_port = None
 
-        if data["smtp_user_name"] == "":
-            data["smtp_user_name"] = None
+        if self.smtp_user_name == "":
+            self.smtp_user_name = None
 
-        if data["smtp_password"] == "":
-            data["smtp_password"] = None
+        if self.smtp_password == "":
+            self.smtp_password = None
 
-        return data
+        return self
 
     @model_validator(mode="after")
-    def lowercase_smtp_method(self) -> Self:
+    def transform_smtp_method_to_lower(self) -> Self:
         """Lowercase the smtp method."""
 
-        if self.smtp_method is not None:
+        if isinstance(self.smtp_method, str):
             self.smtp_method = self.smtp_method.lower()
 
         return self

@@ -9,8 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
 
-from src.constants import WORKING_DIR
-from src.custom_types import AppEnvVariables, Environment
+from src.custom_types import Environment
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
@@ -22,7 +21,7 @@ from src.fastapi_utils import (
 from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner
-from src.utils import get_app_data
+from src.utils import get_app_data, get_app_env_variables
 
 app_data = get_app_data()
 """Reference to the app data."""
@@ -30,13 +29,12 @@ app_data = get_app_data()
 author_name, author_mail = app_data["authors"][0].split()
 """Reference to the author's name and report_sender address.'"""
 
-app_env_variables = AppEnvVariables(_env_file=WORKING_DIR.parent / "envs" / ".env")
-"""The loaded env settings."""
-
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
+
+    app_env_variables = get_app_env_variables()
 
     print("Set custom openapi schema ...", flush=True)
     set_custom_openapi_schema(fastapi_app=fastapi_app)
@@ -85,7 +83,6 @@ app = FastAPI(
         "email": author_mail[2:-2],
     },
     openapi_tags=tags_metadata,
-    debug=app_env_variables.environment is Environment.DEV,
     # swagger_ui_parameters={"defaultModelsExpandDepth": -1},
 )
 """Reference to the fastapi app."""
@@ -112,6 +109,8 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
+    app_env_variables = get_app_env_variables()
+
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
         "src.main:app",
