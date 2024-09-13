@@ -15,11 +15,11 @@ async def test_app_metadata_valid(client: AsyncClient) -> None:
 
     description = app_data["appDescription"]
     assert description == (
-    "Savings Manager is an intuitive app for managing your savings using "
-    "virtual moneyboxes. Allocate budgets, automate savings, and set priorities "
-    "to reach goals faster. The app adjusts automatically when you withdraw, "
-    "ensuring your plan stays on track. Easily transfer funds between moneyboxes "
-    "or make manual deposits, giving you full control over your savings journey."
+        "Savings Manager is an intuitive app for managing your savings using "
+        "virtual moneyboxes. Allocate budgets, automate savings, and set priorities "
+        "to reach goals faster. The app adjusts automatically when you withdraw, "
+        "ensuring your plan stays on track. Easily transfer funds between moneyboxes "
+        "or make manual deposits, giving you full control over your savings journey."
     )
 
     ver_parts = str(app_data["appVersion"]).split(".")

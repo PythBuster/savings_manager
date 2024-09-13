@@ -3,7 +3,6 @@
 from abc import ABC
 
 from jinja2 import Environment
-from prompt_toolkit.filters import emacs_insert_mode
 
 from src.db.db_manager import DBManager
 from src.utils import get_app_data
