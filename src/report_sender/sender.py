@@ -16,6 +16,14 @@ class ReportSender(ABC):  # pylint: disable=too-few-public-methods
         db_manager: DBManager,
         jinja_env: Environment,
     ):
+        """Initialize the ReportSender instance.
+
+        :param db_manager: The database manager instance.
+        :type db_manager: :class:`DBManager`
+        :param jinja_env: The jinja env instance.
+        :type jinja_env: :class:`Jinja2`
+        """
+
         self.db_manager = db_manager
         self.jinja_env = jinja_env
 

@@ -23,7 +23,7 @@ class EmailSender(ReportSender):
         db_manager: DBManager,
         smtp_settings: AppEnvVariables,
     ):
-        """Initialize the EmailSender.
+        """Initialize the EmailSender instance.
 
         :param db_manager: The fastAPI state db_manager instance.
         :type db_manager: :class:`DBManager`
@@ -50,7 +50,8 @@ class EmailSender(ReportSender):
         :param to: The email address to send the test email to.
         :type to: :class:`str`
         :return: True, if send was successfully, otherwise returns False.
-        :rtype: :class:`bool`"""
+        :rtype: :class:`bool`
+        """
 
         try:
             today_dt_str = datetime.now(tz=timezone.utc).isoformat(sep=" ", timespec="seconds")

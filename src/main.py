@@ -8,7 +8,7 @@ from typing import AsyncGenerator, Callable
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.exceptions import RequestValidationError
 from requests import Response
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
@@ -16,8 +16,7 @@ from starlette.requests import Request
 from starlette.responses import FileResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
-from src import exception_handler
-from src.constants import SPHINX_DIRECTORY, WEB_UI_DIRECTORY, WORKING_DIR
+from src.constants import WEB_UI_DIRECTORY, WORKING_DIR
 from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
@@ -223,8 +222,6 @@ async def vuejs_index() -> FileResponse:
 
 
 if __name__ == "__main__":
-    """Entry point of the app."""
-
     # load live env
     dotenv_path = Path(__file__).resolve().parent.parent / "envs" / ".env"
     load_dotenv(dotenv_path=dotenv_path)
