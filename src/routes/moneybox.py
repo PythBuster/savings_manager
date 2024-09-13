@@ -47,7 +47,15 @@ async def get_moneybox(
         int, Path(title="Moneybox ID", description="Moneybox ID to be retrieved.")
     ],
 ) -> MoneyboxResponse:
-    """Endpoint for getting moneybox by moneybox_id."""
+    """Endpoint for getting moneybox by moneybox_id.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_id: The moneybox ID to be retrieved.
+    :type moneybox_id: :class:`int`
+    :return: The requested moneybox data.
+    :rtype: :class:`MoneyboxResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     moneybox_data = await db_manager.get_moneybox(moneybox_id=moneybox_id)
@@ -65,7 +73,15 @@ async def add_moneybox(
         MoneyboxCreateRequest, Body(title="Post Data", description="The new moneybox data.")
     ],
 ) -> MoneyboxResponse:
-    """Endpoint for adding moneybox."""
+    """Endpoint for adding moneybox.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_create_request: The new moneybox data.
+    :type moneybox_create_request: :class:`MoneyboxCreateRequest`
+    :return: The created moneybox data.
+    :rtype: :class:`MoneyboxResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     moneybox_data = await db_manager.add_moneybox(
@@ -86,7 +102,17 @@ async def update_moneybox(
         MoneyboxUpdateRequest, Body(title="Update Data", description="The updating moneybox data.")
     ],
 ) -> MoneyboxResponse:
-    """Endpoint for updating moneybox by moneybox_id."""
+    """Endpoint for updating moneybox by moneybox_id.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_id: The moneybox ID to be updated.
+    :type moneybox_id: :class:`int`
+    :param moneybox_update_request: The new moneybox data.
+    :type moneybox_update_request: :class:`MoneyboxUpdateRequest`
+    :return: The updated moneybox data.
+    :rtype: :class:`MoneyboxResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     moneybox_data = await db_manager.update_moneybox(
@@ -105,7 +131,14 @@ async def delete_moneybox(
     request: Request,
     moneybox_id: Annotated[int, Depends(check_existence_of_moneybox_by_id)],
 ) -> Response:
-    """Endpoint for deleting moneybox by moneybox_id."""
+    """Endpoint for deleting moneybox by moneybox_id.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_id: The moneybox ID to be deleted.
+    :type moneybox_id: :class:`int`
+    :return: The response object with the status code included.
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     await db_manager.delete_moneybox(
@@ -134,7 +167,17 @@ async def deposit_moneybox(
         ),
     ],
 ) -> MoneyboxResponse:
-    """Endpoint to add amount to moneybox by moneybox_id."""
+    """Endpoint to add amount to moneybox by moneybox_id.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_id: The moneybox ID to be deposited.
+    :type moneybox_id: :class:`int`
+    :param deposit_transaction: The data of the deposit.
+    :type deposit_transaction: :class:`DepositTransactionRequest`
+    :return: The updated moneybox data.
+    :rtype: :class:`MoneyboxResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     moneybox_data = await db_manager.add_amount(
@@ -167,7 +210,17 @@ async def withdraw_moneybox(
         ),
     ],
 ) -> MoneyboxResponse:
-    """Endpoint to sub balance from moneybox by moneybox_id."""
+    """Endpoint to sub balance from moneybox by moneybox_id.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_id: The moneybox ID to be withdrawn.
+    :type moneybox_id: :class:`int`
+    :param withdraw_transaction: The data of the withdrawal.
+    :type withdraw_transaction: :class:`WithdrawTransactionRequest`
+    :return: The updated moneybox data.
+    :rtype: :class:`MoneyboxResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     moneybox_data = await db_manager.sub_amount(
@@ -201,7 +254,16 @@ async def transfer_balance(
         ),
     ],
 ) -> Response:
-    """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`."""
+    """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_id: The moneybox ID where the balance shall be transferred from.
+    :param transfer_transaction: The data of the transfer, including the moneybox id
+        where the balance shall be transferred to.
+    :return: The response object with the status code included.
+    :rtype: :class:`Response`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     await db_manager.transfer_amount(
@@ -225,7 +287,16 @@ async def get_moneybox_transaction_logs(
         Depends(check_existence_of_moneybox_by_id),
     ],
 ) -> TransactionLogsResponse | Response:
-    """Endpoint for getting moneybox transaction logs."""
+    """Endpoint for getting moneybox transaction logs.
+    \f
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param moneybox_id: The moneybox ID where the transaction logs shall
+        be retrieved.
+    :type moneybox_id: :class:`int`
+    :return: The requested moneybox transaction logs.
+    :rtype: :class:`TransactionLogsResponse`
+    """
 
     db_manager = cast(DBManager, request.app.state.db_manager)
     transaction_logs_data = await db_manager.get_transaction_logs(
