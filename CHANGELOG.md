@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.18.0 (2024-09-13)
+### Changes:
+- fix: AppEnvVariables wrongly loaded settings from ENVIRONMENT instead of .env file
+- updated docstring for endpoints and class __init__ functions
+
 ## 2.17.0 (2024-09-11)
 ### Feature:
 - adapt docker compose file by using healthstates for postgres_database and test database services
