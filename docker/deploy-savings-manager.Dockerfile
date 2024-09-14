@@ -21,5 +21,5 @@ ENV PYTHONPATH="${PYTHONPATH}:/src"
 
 RUN poetry install --without dev
 
-ENTRYPOINT ["sh", "scripts/entrypoint.sh"]
+ENTRYPOINT ["sh", "scripts/entrypoint_savings_manager.sh"]
 CMD ["poetry", "run", "python", "-m", "src.main"]

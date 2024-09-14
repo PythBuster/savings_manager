@@ -15,5 +15,12 @@
       <jdbc-url>jdbc:postgresql://localhost:8765/savings_manager</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="DEV savings_manager@localhost [2]" uuid="2dd34191-8cbb-461e-9e19-6ee548891986">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://172.18.0.2:5432/savings_manager</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
