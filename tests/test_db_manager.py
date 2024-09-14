@@ -402,6 +402,18 @@ async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
+    # expected exception tests
+    with pytest.raises(NonPositiveAmountError):
+        await db_manager.add_amount(
+            moneybox_id=first_moneybox_id,
+            deposit_transaction_data={
+                "amount": 0,
+                "description": "Bonus.",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
 
 @pytest.mark.dependency(depends=["test_add_amount_to_first_moneybox"])
 async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
@@ -683,6 +695,18 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
         "fromMoneyboxId": first_moneybox_id,
         "toMoneyboxId": first_moneybox_id,
     }
+
+    with pytest.raises(NonPositiveAmountError) as ex_info:
+        await db_manager.transfer_amount(
+            from_moneybox_id=first_moneybox_id,
+            transfer_transaction_data={
+                "to_moneybox_id": second_moneybox_id,
+                "amount": 0,
+                "description": "Bonus.",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
 
 
 @pytest.mark.dependency(depends=["test_transfer_amount"])
