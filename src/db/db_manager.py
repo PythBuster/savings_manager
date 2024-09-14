@@ -414,7 +414,15 @@ class DBManager:
 
         :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
                     was not found in database.
+                 :class:NonPositiveAmountError`: if amount of deposit
+                    is <= 0.
         """
+
+        if deposit_transaction_data["amount"] == 0:
+            raise NonPositiveAmountError(
+                moneybox_id=moneybox_id,
+                amount=deposit_transaction_data["amount"],
+            )
 
         # Determine the session to use
         if session is None:
@@ -598,6 +606,12 @@ class DBManager:
                 :class:`TransferEqualMoneyboxError`:
             if transfer shall happen within the same moneybox.
         """
+
+        if transfer_transaction_data["amount"] <= 0:
+            raise NonPositiveAmountError(
+                moneybox_id=from_moneybox_id,
+                amount=transfer_transaction_data["amount"],
+            )
 
         to_moneybox_id = transfer_transaction_data["to_moneybox_id"]
         amount = transfer_transaction_data["amount"]
@@ -1443,30 +1457,33 @@ class DBManager:
                     updated_moneyboxes.append(moneybox)
                     continue
 
-            updated_moneybox = await self.add_amount(
-                session=session,
-                moneybox_id=moneybox["id"],
-                deposit_transaction_data={
-                    "amount": amount_to_distribute,
-                    "description": "Automated savings.",
-                },
-                transaction_type=TransactionType.DISTRIBUTION,
-                transaction_trigger=TransactionTrigger.AUTOMATICALLY,
-            )
-            updated_moneyboxes.append(updated_moneybox)
-
-            old_moneybox_balance = moneybox["balance"]
-
-            if updated_moneybox["balance"] != old_moneybox_balance + amount_to_distribute:
-                raise AutomatedSavingsError(
-                    record_id=moneybox["id"],
-                    details={
-                        "amount_to_distribute": amount_to_distribute,
-                        "moneybox": jsonable_encoder(moneybox),
+            if amount_to_distribute > 0 :
+                updated_moneybox = await self.add_amount(
+                    session=session,
+                    moneybox_id=moneybox["id"],
+                    deposit_transaction_data={
+                        "amount": amount_to_distribute,
+                        "description": "Automated savings.",
                     },
+                    transaction_type=TransactionType.DISTRIBUTION,
+                    transaction_trigger=TransactionTrigger.AUTOMATICALLY,
                 )
+                updated_moneyboxes.append(updated_moneybox)
+                old_moneybox_balance = moneybox["balance"]
 
-            distribute_amount -= amount_to_distribute
+                if updated_moneybox["balance"] != old_moneybox_balance + amount_to_distribute:
+                    raise AutomatedSavingsError(
+                        record_id=moneybox["id"],
+                        details={
+                            "amount_to_distribute": amount_to_distribute,
+                            "moneybox": jsonable_encoder(moneybox),
+                        },
+                    )
+
+                distribute_amount -= amount_to_distribute#
+            else:
+                updated_moneyboxes.append(moneybox)
+                continue
 
         # add the rest of app_savings_amount to overflow_moneybox if there is a rest
         rest_amount: int = distribute_amount

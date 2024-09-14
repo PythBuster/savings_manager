@@ -304,6 +304,10 @@ async def get_moneybox_transaction_logs(
     )
 
     if transaction_logs_data:
+        try:
+            model = TransactionLogsResponse.model_validate({"transaction_logs": transaction_logs_data})
+        except Exception as e:
+            pass
         return {"transaction_logs": transaction_logs_data}  # type: ignore
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
