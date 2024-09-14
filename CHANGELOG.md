@@ -10,6 +10,10 @@
 ### Feature:
 - automated database backup implemented for savings manager running as docker
 
+## 2.20.0 (2024-09-14)
+### Feature:
+- automated database backup implemented for savings manager running as docker
+
 ## 2.19.1 (2024-09-13)
 ### Fixes:
 - added cached function to get the env settings
