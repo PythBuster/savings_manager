@@ -2,7 +2,7 @@
 
 import sqlalchemy
 from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from slowapi.errors import RateLimitExceeded
 from starlette import status
 from starlette.requests import Request
@@ -118,6 +118,20 @@ async def response_exception(  # pylint: disable=too-many-return-statements
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message="Invalid request data",
+                    details={
+                        "args": exception.args,
+                        "body": exception.body,
+                    },
+                )
+            ),
+        )
+
+    if isinstance(exception, ResponseValidationError):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message="Invalid response data",
                     details={
                         "args": exception.args,
                         "body": exception.body,
