@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.20.2 (2024-09-13)
+### Fixes:
+- fix: adapt argument of pg_dump and add --data-only for database backup
+- fix: add missing database backup scripts (docker only)
+
 ## 2.20.1 (2024-09-13)
 ### Fixes:
 - fix: avoid adding/subbing/transferring amounts of 0 in automated savings algorithm
