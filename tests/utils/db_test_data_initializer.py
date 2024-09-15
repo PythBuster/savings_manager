@@ -78,6 +78,10 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_task_automated_savings_dont_schedule": self.dataset_test_task_automated_savings_dont_schedule,
             "test_task_automated_savings_no_email_send": self.dataset_test_task_automated_savings_no_email_send,
             "test_task_automated_savings_no_savings_active": self.dataset_test_task_automated_savings_no_savings_active,
+            "test_reset_database_keep_app_settings": self.dataset_test_reset_database_keep_app_settings,
+            "test_reset_database_delete_app_settings": self.dataset_test_reset_database_delete_app_settings,
+            "test_reset_app_keep_app_settings": self.dataset_test_reset_app_keep_app_settings,
+            "test_reset_app_delete_app_settings": self.dataset_test_reset_app_delete_app_settings,
         }
         """Map test case name witch related test data generation function"""
 
@@ -682,7 +686,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         # create app settings
         app_settings_data = {
             "send_reports_via_email": True,
-            "user_email_address": "egal",
+            "user_email_address": "pythbuster@gmail.com",
             "is_automated_saving_active": True,
             "savings_amount": 150,
             "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
@@ -718,7 +722,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         # create app settings
         app_settings_data = {
             "send_reports_via_email": True,
-            "user_email_address": "egal",
+            "user_email_address": "pythbuster@gmail.com",
             "is_automated_saving_active": True,
             "savings_amount": 150,
             "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
@@ -754,7 +758,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         # create app settings
         app_settings_data = {
             "send_reports_via_email": False,
-            "user_email_address": "egal",
+            "user_email_address": "pythbuster@gmail.com",
             "is_automated_saving_active": True,
             "savings_amount": 150,
             "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
@@ -790,7 +794,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         # create app settings
         app_settings_data = {
             "send_reports_via_email": False,
-            "user_email_address": "egal",
+            "user_email_address": "pythbuster@gmail.com",
             "is_automated_saving_active": False,
             "savings_amount": 150,
             "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
@@ -809,6 +813,140 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
             {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
             {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_reset_database_keep_app_settings(self) -> None:
+        """The data generation function for test_case:
+        `test_reset_database_keep_app_settings`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_session.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_reset_database_delete_app_settings(self) -> None:
+        """The data generation function for test_case:
+        `test_reset_database_delete_app_settings`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_session.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
+            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
+            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
+            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
+            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_reset_app_keep_app_settings(self) -> None:
+        """The data generation function for test_case:
+        `test_reset_database_keep_app_settings`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_session.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_reset_app_delete_app_settings(self) -> None:
+        """The data generation function for test_case:
+        `test_reset_app_delete_app_settings`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_session.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:

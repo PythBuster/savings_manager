@@ -64,7 +64,6 @@ class MoneyboxCreateRequest(BaseModel):
                     "name": "Holiday",
                     "savingsAmount": 0,
                     "savingsTarget": 50000,
-                    "priority": 3,
                 }
             ]
         },
@@ -437,3 +436,28 @@ class AppSettingsRequest(BaseModel):
             )
 
         return data
+
+
+class ResetDataRequest(BaseModel):
+    keep_app_settings: Annotated[
+        bool,
+        Field(
+            description="Indicates if app settings shall be also deleted."
+        )
+    ]
+    """Indicates if app settings shall be also deleted."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "keepApp_Settings": True,
+                },
+            ],
+        },
+    )
+    """The config of the model."""

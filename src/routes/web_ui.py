@@ -5,7 +5,7 @@ from starlette.responses import FileResponse
 
 web_ui_router = APIRouter(
     prefix="",
-    include_in_schema=True,
+    include_in_schema=False,
 )
 """The web ui router."""
 

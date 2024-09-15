@@ -1,9 +1,11 @@
 # pylint: disable=too-many-lines
 
 """All database definitions are located here."""
+import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
+from alembic.config import CommandLine
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -1566,3 +1568,37 @@ class DBManager:
             )
 
         return automated_savings_logs.asdict()  # type: ignore
+
+    async def reset_database(self, keep_app_settings: bool):
+        if keep_app_settings:
+            # TODO use private function for now, because there is
+            #   only one app settings
+            backup_app_settings = await self._get_app_settings()
+
+        cmd_line = CommandLine()
+        await asyncio.to_thread(
+            CommandLine.main,
+            cmd_line,
+            ["downgrade", "base"]
+        )
+
+        # After migration, invalidate cache or reset connection pool
+        await self.async_engine.dispose(close=False)
+        await asyncio.sleep(1)
+
+        await asyncio.to_thread(
+            CommandLine.main,
+            cmd_line,
+            ["upgrade", "head"]
+        )
+
+        # After migration, invalidate cache or reset connection pool
+        await self.async_engine.dispose(close=False)
+        await asyncio.sleep(1)
+
+        if keep_app_settings:
+            # TODO: adapt update_app_settings by adding settings_id
+            #   if there is a multi user mode later
+            await self.update_app_settings(
+                app_settings_data=backup_app_settings.asdict(),
+            )

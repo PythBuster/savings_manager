@@ -7,4 +7,11 @@ GET_APP_INFO_RESPONSES = {
         "description": "OK",
     },
 }
-"""Further responses for endpoint GET: /app/info."""
+"""Further responses for endpoint GET: /app/info"""
+
+POST_APP_RESET_RESPONSES = {
+    status.HTTP_204_NO_CONTENT: {
+        "description": "No Content",
+    },
+}
+"""Further responses for endpoint POST: /app/reset"""
