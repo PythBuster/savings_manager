@@ -52,7 +52,8 @@ async def get_app_settings(
 async def update_app_settings(
     request: Request,
     app_settings_request: Annotated[
-        AppSettingsRequest, Body(title="Update Data", description="The updating app settings data.")
+        AppSettingsRequest,
+        Body(title="Update Data", description="The updating app settings data."),
     ],
 ) -> AppSettingsResponse:
     """Endpoint for updating app settings.

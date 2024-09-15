@@ -207,10 +207,12 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
         CheckConstraint("savings_amount >= 0", name="ck_moneyboxes_savings_amount_nonnegative"),
         CheckConstraint("char_length(trim(name)) > 0", name="ck_moneyboxes_name_nonempty"),
         CheckConstraint(
-            "NOT (is_active = false AND balance != 0)", name="ck_moneyboxes_is_active_balance"
+            "NOT (is_active = false AND balance != 0)",
+            name="ck_moneyboxes_is_active_balance",
         ),
         CheckConstraint(
-            "is_active = true OR priority IS NULL", name="ck_moneyboxes_priority_if_inactive"
+            "is_active = true OR priority IS NULL",
+            name="ck_moneyboxes_priority_if_inactive",
         ),
         CheckConstraint("name = trim(name)", name="name_no_leading_trailing_whitespace"),
     )
@@ -327,7 +329,8 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
     """Tells if receiving reports via report_sender is desired."""
 
     user_email_address: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
-        nullable=True, comment="Users email address. Will used for receiving reports."
+        nullable=True,
+        comment="Users email address. Will used for receiving reports.",
     )
     """Users report_sender address. Will used for receiving reports."""
 

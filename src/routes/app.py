@@ -1,4 +1,5 @@
 """The general/basic root routes."""
+
 from typing import cast
 
 from fastapi import APIRouter
@@ -47,8 +48,8 @@ async def get_app_infos() -> AppInfoResponse:
     status_code=status.HTTP_200_OK,
 )
 async def reset_app(
-        request: Request,
-        reset_data: ResetDataRequest,
+    request: Request,
+    reset_data: ResetDataRequest,
 ) -> Response:
     """Endpoint for resetting app data.
     keepAppSettings=True is POST data protects the app setting from a reset.

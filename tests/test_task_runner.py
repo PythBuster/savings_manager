@@ -33,7 +33,8 @@ async def test_task_automated_savings_schedule(
 
     with (
         patch(
-            f"{email_sender_path}.{sender_class_name}._send_message", side_effect=mock_send_message
+            f"{email_sender_path}.{sender_class_name}._send_message",
+            side_effect=mock_send_message,
         ) as mock_send,
         patch(f"{module_path}.datetime") as mock_datetime,
     ):

@@ -39,7 +39,12 @@ def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "", "savingsAmount": 100, "savingsTarget": 50000, "priority": 1},  # Invalid name
+        {
+            "name": "",
+            "savingsAmount": 100,
+            "savingsTarget": 50000,
+            "priority": 1,
+        },  # Invalid name
         {
             "name": "Holiday",
             "savingsAmount": -10,
@@ -78,7 +83,12 @@ def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "", "savingsAmount": 200, "savingsTarget": 60000, "priority": 1},  # Invalid name
+        {
+            "name": "",
+            "savingsAmount": 200,
+            "savingsTarget": 60000,
+            "priority": 1,
+        },  # Invalid name
         {
             "name": "Holiday",
             "savingsAmount": -20,
@@ -172,7 +182,11 @@ def test_transfer_transaction_request_valid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"toMoneyboxId": 3, "amount": 0, "description": "Delete Moneybox."},  # Invalid amount
+        {
+            "toMoneyboxId": 3,
+            "amount": 0,
+            "description": "Delete Moneybox.",
+        },  # Invalid amount
     ],
 )
 def test_transfer_transaction_request_invalid(data: dict[str, Any]) -> None:

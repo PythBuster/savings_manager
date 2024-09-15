@@ -1,13 +1,14 @@
 """All app endpoints test are located here."""
+
 from unittest.mock import patch
 
-import pytest
-from alembic.config import CommandLine
 from httpx import AsyncClient
 from starlette import status
 
+from alembic.config import CommandLine
 from src.custom_types import EndpointRouteType
 from src.utils import equal_dict
+
 
 async def test_app_metadata_valid(client: AsyncClient) -> None:
     response = await client.get(
@@ -35,19 +36,19 @@ async def test_app_metadata_valid(client: AsyncClient) -> None:
 
 
 async def test_reset_app_keep_app_settings(
-        load_test_data: None,
-        client: AsyncClient,
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
 ) -> None:
     # Stelle sicher, dass das Mock-Objekt keine rekursive Schleife verursacht
     original_main = CommandLine.main
 
-    with patch.object(CommandLine, 'main') as mock_main:
-        def patched_main(cmd_line, args):
+    with patch.object(CommandLine, "main") as mock_main:
+
+        def patched_main(cmd_line, args) -> None:  # type: ignore
             args = ["-x", "testing"] + args
-            return original_main(cmd_line, args)
+            original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
-        mock_main.return_value = None  # Stellt sicher, dass der Mock keine Fehler auslöst
 
         response = await client.get(
             f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
@@ -87,18 +88,18 @@ async def test_reset_app_keep_app_settings(
 
 
 async def test_reset_app_delete_app_settings(
-        load_test_data: None,
-        client: AsyncClient,
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
 ) -> None:
     original_main = CommandLine.main
 
-    with patch.object(CommandLine, 'main') as mock_main:
-        def patched_main(cmd_line, args):
+    with patch.object(CommandLine, "main") as mock_main:
+
+        def patched_main(cmd_line, args) -> None:  # type: ignore
             args = ["-x", "testing"] + args
-            return original_main(cmd_line, args)
+            original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
-        mock_main.return_value = None  # Stellt sicher, dass der Mock keine Fehler auslöst
 
         response = await client.get(
             f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",

@@ -5,12 +5,12 @@ import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
-from alembic.config import CommandLine
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import joinedload
 
+from alembic.config import CommandLine
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -1459,7 +1459,7 @@ class DBManager:
                     updated_moneyboxes.append(moneybox)
                     continue
 
-            if amount_to_distribute > 0 :
+            if amount_to_distribute > 0:
                 updated_moneybox = await self.add_amount(
                     session=session,
                     moneybox_id=moneybox["id"],
@@ -1482,7 +1482,7 @@ class DBManager:
                         },
                     )
 
-                distribute_amount -= amount_to_distribute#
+                distribute_amount -= amount_to_distribute  #
             else:
                 updated_moneyboxes.append(moneybox)
                 continue
@@ -1569,28 +1569,27 @@ class DBManager:
 
         return automated_savings_logs.asdict()  # type: ignore
 
-    async def reset_database(self, keep_app_settings: bool):
+    async def reset_database(self, keep_app_settings: bool) -> None:
+        """Reset database data by using alembic upgrade and downgrade logic.
+
+        :param keep_app_settings: Indicates if app settings shall be also
+            deleted.
+        :type keep_app_settings: :class:`bool`
+        """
+
         if keep_app_settings:
             # TODO use private function for now, because there is
             #   only one app settings
             backup_app_settings = await self._get_app_settings()
 
         cmd_line = CommandLine()
-        await asyncio.to_thread(
-            CommandLine.main,
-            cmd_line,
-            ["downgrade", "base"]
-        )
+        await asyncio.to_thread(CommandLine.main, cmd_line, ["downgrade", "base"])
 
         # After migration, invalidate cache or reset connection pool
         await self.async_engine.dispose(close=False)
         await asyncio.sleep(1)
 
-        await asyncio.to_thread(
-            CommandLine.main,
-            cmd_line,
-            ["upgrade", "head"]
-        )
+        await asyncio.to_thread(CommandLine.main, cmd_line, ["upgrade", "head"])
 
         # After migration, invalidate cache or reset connection pool
         await self.async_engine.dispose(close=False)

@@ -13,7 +13,8 @@ from src.utils import equal_dict
 
 
 @pytest.mark.dependency(
-    depends=["tests/test_db_manager.py::test_update_app_settings_valid"], scope="session"
+    depends=["tests/test_db_manager.py::test_update_app_settings_valid"],
+    scope="session",
 )
 async def test_endpoint_get_moneyboxes__status_200__total_6(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -187,7 +188,8 @@ async def test_endpoint_add_moneybox__one__status_200(
         "savingsTarget": None,
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
+        json=moneybox_data,
     )
     moneybox = response.json()
 
@@ -219,7 +221,8 @@ async def test_endpoint_add_moneybox__two__status_200(
         "savingsTarget": None,
     }
     response_1 = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data_1
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
+        json=moneybox_data_1,
     )
     moneybox_1 = response_1.json()
 
@@ -276,7 +279,8 @@ async def test_endpoint_add_moneybox__one__status_422__balance_postdata(
     moneybox_data = {"name": "Test Box Endpoint Add 1", "balance": 200}
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}", json=moneybox_data
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}",
+        json=moneybox_data,
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST

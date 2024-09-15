@@ -47,7 +47,10 @@ class CrudDatabaseError(ABC, Exception):
     """Base CrudDatabaseError Exception Class"""
 
     def __init__(
-        self, record_id: int | None, message: str, details: dict[Hashable, Any] | None = None
+        self,
+        record_id: int | None,
+        message: str,
+        details: dict[Hashable, Any] | None = None,
     ) -> None:
         """Initializer for the CrudDatabaseError instance.
 
@@ -97,7 +100,10 @@ class CreateInstanceError(CrudDatabaseError):
     """Base CreateInstanceError Exception Class"""
 
     def __init__(
-        self, record_id: int | None, message: str, details: dict[Hashable, Any] | None = None
+        self,
+        record_id: int | None,
+        message: str,
+        details: dict[Hashable, Any] | None = None,
     ) -> None:
         """Initializer for the CreateInstanceError instance.
 
@@ -116,7 +122,10 @@ class DeleteInstanceError(CrudDatabaseError):
     """Base DeleteInstanceError Exception Class"""
 
     def __init__(
-        self, record_id: int | None, message: str, details: dict[Hashable, Any] | None = None
+        self,
+        record_id: int | None,
+        message: str,
+        details: dict[Hashable, Any] | None = None,
     ) -> None:
         """Initializer for the DeleteInstanceError instance.
 

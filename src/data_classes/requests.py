@@ -87,7 +87,9 @@ class MoneyboxUpdateRequest(BaseModel):
     name: Annotated[
         str,
         Field(
-            default=None, min_length=1, description="The name of the moneybox. Has to be unique."
+            default=None,
+            min_length=1,
+            description="The name of the moneybox. Has to be unique.",
         ),
     ]
     """The name of the moneybox. Has to be unique."""
@@ -439,11 +441,10 @@ class AppSettingsRequest(BaseModel):
 
 
 class ResetDataRequest(BaseModel):
+    """The reset app request model."""
+
     keep_app_settings: Annotated[
-        bool,
-        Field(
-            description="Indicates if app settings shall be also deleted."
-        )
+        bool, Field(description="Indicates if app settings shall be also deleted.")
     ]
     """Indicates if app settings shall be also deleted."""
 

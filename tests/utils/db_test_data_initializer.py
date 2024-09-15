@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 """The database test data initializer."""
 
 from functools import partial
@@ -126,11 +128,36 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         )
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 0, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 0, "savings_target": None, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": None, "priority": 5},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 5,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -154,7 +181,12 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create moneybox with id 1
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -178,8 +210,18 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
         ]
 
         added_moneyboxes = []
@@ -217,7 +259,12 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -225,7 +272,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_endpoint_update_moneybox__last_moneybox__namechange(self) -> None:
+    async def dataset_test_endpoint_update_moneybox__last_moneybox__namechange(
+        self,
+    ) -> None:
         """The data generation function for test_case:
         `test_endpoint_update_moneybox__last_moneybox__namechange`.
         """
@@ -239,9 +288,24 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 3 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 0, "savings_target": None, "priority": 3},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 3,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -270,9 +334,24 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 3 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 0, "savings_target": None, "priority": 3},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 3,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -296,8 +375,18 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -336,8 +425,18 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -356,7 +455,12 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -409,7 +513,12 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 1 moneybox
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -433,9 +542,24 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 3 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 0, "savings_target": None, "priority": 3},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 3,
+            },
         ]
 
         moneyboxes = []
@@ -472,9 +596,24 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 3 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 0, "savings_target": None, "priority": 3},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 3,
+            },
         ]
 
         moneyboxes = []
@@ -506,8 +645,18 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -526,8 +675,18 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -546,8 +705,18 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         # create 2 moneyboxes
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 0, "savings_target": None, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 0, "savings_target": None, "priority": 2},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 2,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -578,12 +747,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -591,7 +790,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_automated_savings_overflow_moneybox_mode_add_to_amount(self) -> None:
+    async def dataset_test_automated_savings_overflow_moneybox_mode_add_to_amount(
+        self,
+    ) -> None:
         """The data generation function for test_case:
         `test_automated_savings_overflow_moneybox_mode_add_to_amount`.
         """
@@ -627,12 +828,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         )
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -640,7 +871,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_automated_savings_overflow_moneybox_mode_fill_up(self) -> None:
+    async def dataset_test_automated_savings_overflow_moneybox_mode_fill_up(
+        self,
+    ) -> None:
         """The data generation function for test_case:
         `dataset_test_automated_savings_overflow_moneybox_mode_fill_up`.
         """
@@ -663,12 +896,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -699,12 +962,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -735,12 +1028,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -771,12 +1094,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -807,12 +1160,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -843,7 +1226,12 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -874,12 +1262,42 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 10, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 15, "savings_target": None, "priority": 3},
-            {"name": "Test Box 4", "savings_amount": 20, "savings_target": 50, "priority": 4},
-            {"name": "Test Box 5", "savings_amount": 0, "savings_target": 0, "priority": 5},
-            {"name": "Test Box 6", "savings_amount": 25, "savings_target": 0, "priority": 6},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -910,7 +1328,12 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await session.execute(stmt)
 
         moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 5, "savings_target": 5, "priority": 1},
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
         ]
 
         for moneybox_data in moneyboxes_data:

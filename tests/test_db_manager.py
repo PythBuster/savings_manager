@@ -1,15 +1,15 @@
 # pylint: disable=too-many-lines
 
 """All db_manager tests are located here."""
-import os
+
 from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
-from alembic.config import CommandLine
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
+from alembic.config import CommandLine
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -44,7 +44,9 @@ async def test_if_test_db_is_used(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency
-async def test_create_db_manager_with_engine_args(app_env_variables: AppEnvVariables) -> None:
+async def test_create_db_manager_with_engine_args(
+    app_env_variables: AppEnvVariables,
+) -> None:
     db_manager = DBManager(db_settings=app_env_variables, engine_args={"echo": True})
     assert db_manager is not None
 
@@ -116,16 +118,24 @@ async def test_get_prioritylist(
     expected_priorities.sort(key=lambda x: x["priority"])  # type: ignore
 
     assert equal_dict(
-        dict_1=expected_priorities[0], dict_2=priorities[0], exclude_keys=["moneybox_id"]
+        dict_1=expected_priorities[0],
+        dict_2=priorities[0],
+        exclude_keys=["moneybox_id"],
     )
     assert equal_dict(
-        dict_1=expected_priorities[1], dict_2=priorities[1], exclude_keys=["moneybox_id"]
+        dict_1=expected_priorities[1],
+        dict_2=priorities[1],
+        exclude_keys=["moneybox_id"],
     )
     assert equal_dict(
-        dict_1=expected_priorities[2], dict_2=priorities[2], exclude_keys=["moneybox_id"]
+        dict_1=expected_priorities[2],
+        dict_2=priorities[2],
+        exclude_keys=["moneybox_id"],
     )
     assert equal_dict(
-        dict_1=expected_priorities[3], dict_2=priorities[3], exclude_keys=["moneybox_id"]
+        dict_1=expected_priorities[3],
+        dict_2=priorities[3],
+        exclude_keys=["moneybox_id"],
     )
 
 
@@ -865,7 +875,9 @@ async def test_get_app_settings_invalid(
 
 
 @pytest.mark.dependency(depends=["test_get_app_settings_invalid"])
-async def test_add_automated_savings_log_valid_without_session(db_manager: DBManager) -> None:
+async def test_add_automated_savings_log_valid_without_session(
+    db_manager: DBManager,
+) -> None:
     action_at = datetime.now(tz=timezone.utc)
     automated_savings_log_data_collection = [
         {
@@ -895,7 +907,9 @@ async def test_add_automated_savings_log_valid_without_session(db_manager: DBMan
 
 
 @pytest.mark.dependency(depends=["test_add_automated_savings_log_valid_without_session"])
-async def test_add_automated_savings_log_valid_with_session(db_manager: DBManager) -> None:
+async def test_add_automated_savings_log_valid_with_session(
+    db_manager: DBManager,
+) -> None:
     action_at = datetime.now(tz=timezone.utc)
     automated_savings_log_data_collection = [
         {
@@ -1097,30 +1111,33 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
 
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
-async def test_reset_database_keep_app_settings(load_test_data: None, db_manager: DBManager) -> None:
-    # Stelle sicher, dass das Mock-Objekt keine rekursive Schleife verursacht
+async def test_reset_database_keep_app_settings(
+    load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
+) -> None:
     original_main = CommandLine.main
 
-    with patch.object(CommandLine, 'main') as mock_main:
-        def patched_main(cmd_line, args):
+    with patch.object(CommandLine, "main") as mock_main:
+
+        def patched_main(cmd_line, args):  # type: ignore
             args = ["-x", "testing"] + args
-            return original_main(cmd_line, args)
+            original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
-        mock_main.return_value = None  # Stellt sicher, dass der Mock keine Fehler auslöst
 
-        old_app_settings_data = await db_manager._get_app_settings()
+        old_app_settings_data = (
+            await db_manager._get_app_settings()  # pylint: disable=protected-access
+        )
         old_moneyboxes = await db_manager.get_moneyboxes()
 
         await db_manager.reset_database(keep_app_settings=True)
 
-        app_settings_data = await db_manager._get_app_settings()
+        app_settings_data = await db_manager._get_app_settings()  # pylint: disable=protected-access
         moneyboxes = await db_manager.get_moneyboxes()
 
         assert equal_dict(
             dict_1=old_app_settings_data.asdict(),
             dict_2=app_settings_data.asdict(),
-            exclude_keys=["created_at", "modified_at"]
+            exclude_keys=["created_at", "modified_at"],
         )
 
         assert len(old_moneyboxes) != len(moneyboxes)
@@ -1128,34 +1145,36 @@ async def test_reset_database_keep_app_settings(load_test_data: None, db_manager
 
         mock_main.assert_called()
 
+
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
 async def test_reset_database_delete_app_settings(
-        load_test_data: None,  # pylint: disable=unused-argument
-        db_manager: DBManager,
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
-    # Stelle sicher, dass das Mock-Objekt keine rekursive Schleife verursacht
     original_main = CommandLine.main
 
-    with patch.object(CommandLine, 'main') as mock_main:
-        def patched_main(cmd_line, args):
+    with patch.object(CommandLine, "main") as mock_main:
+
+        def patched_main(cmd_line, args) -> None:  # type: ignore
             args = ["-x", "testing"] + args
-            return original_main(cmd_line, args)
+            original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
-        mock_main.return_value = None  # Stellt sicher, dass der Mock keine Fehler auslöst
 
-        old_app_settings_data = await db_manager._get_app_settings()
+        old_app_settings_data = (
+            await db_manager._get_app_settings()  # pylint: disable=protected-access
+        )
         old_moneyboxes = await db_manager.get_moneyboxes()
 
         await db_manager.reset_database(keep_app_settings=False)
 
-        app_settings_data = await db_manager._get_app_settings()
+        app_settings_data = await db_manager._get_app_settings()  # pylint: disable=protected-access
         moneyboxes = await db_manager.get_moneyboxes()
 
         assert not equal_dict(
             dict_1=old_app_settings_data.asdict(),
             dict_2=app_settings_data.asdict(),
-            exclude_keys=["created_at", "modified_at"]
+            exclude_keys=["created_at", "modified_at"],
         )
 
         assert len(old_moneyboxes) != len(moneyboxes)

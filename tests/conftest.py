@@ -24,7 +24,7 @@ pytest_plugins = ("pytest_asyncio",)
 
 
 @pytest_asyncio.fixture(scope="session", name="app_env_variables")
-def get_app_env_variables() -> AppEnvVariables:
+def get_app_env_variables() -> AppEnvVariables:  # type: ignore
     """Test env settings"""
 
     test_env_path = WORKING_DIR.parent / "envs" / ".env.test"

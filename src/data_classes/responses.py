@@ -210,7 +210,8 @@ class MoneyboxesResponse(BaseModel):
     """The moneyboxes response model."""
 
     moneyboxes: Annotated[
-        list[MoneyboxResponse], Field(min_length=1, description="The list of moneyboxes.")
+        list[MoneyboxResponse],
+        Field(min_length=1, description="The list of moneyboxes."),
     ]
     """The list of moneyboxes."""
 
@@ -417,7 +418,9 @@ class TransactionLogResponse(BaseModel):
         return data
 
     @model_validator(mode="after")
-    def validate_transaction_type_and_transaction_trigger_accepted_combinations(self) -> Self:
+    def validate_transaction_type_and_transaction_trigger_accepted_combinations(
+        self,
+    ) -> Self:
         """Check for combinations:
         - TransactionType.DIRECT + TransactionTrigger.AUTOMATICALLY
         - TransactionType.DISTRIBUTION + TransactionTrigger.DIRECT
@@ -445,7 +448,9 @@ class TransactionLogResponse(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_counterparty_moneybox_name_and_counterparty_moneybox_id_both_set(self) -> Self:
+    def validate_counterparty_moneybox_name_and_counterparty_moneybox_id_both_set(
+        self,
+    ) -> Self:
         """If counterparty_moneybox_name is set, counterparty_moneybox_id need to be set too."""
 
         if (self.counterparty_moneybox_name is None) != (self.counterparty_moneybox_id is None):

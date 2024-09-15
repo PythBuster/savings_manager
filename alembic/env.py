@@ -34,7 +34,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-is_testing = context.get_x_argument(as_dictionary=True).get('testing')
+is_testing = context.get_x_argument(as_dictionary=True).get("testing")
 
 if is_testing is None:
     env_file = Path(__file__).resolve().parent.parent / "envs" / ".env"
@@ -46,7 +46,11 @@ print(f"Loaded {env_file}", flush=True)
 
 database_url = get_database_url(db_settings=app_env_variables)
 config.set_main_option("sqlalchemy.url", database_url)
-print(f"{app_env_variables.db_driver=}, {app_env_variables.db_host=}, {app_env_variables.db_port=}", flush=True)
+print(
+    f"{app_env_variables.db_driver=}, {app_env_variables.db_host=}, {app_env_variables.db_port=}",
+    flush=True,
+)
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

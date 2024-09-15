@@ -70,7 +70,8 @@ async def get_moneybox(
 async def add_moneybox(
     request: Request,
     moneybox_create_request: Annotated[
-        MoneyboxCreateRequest, Body(title="Post Data", description="The new moneybox data.")
+        MoneyboxCreateRequest,
+        Body(title="Post Data", description="The new moneybox data."),
     ],
 ) -> MoneyboxResponse:
     """Endpoint for adding moneybox.
@@ -99,7 +100,8 @@ async def update_moneybox(
     request: Request,
     moneybox_id: Annotated[int, Depends(check_existence_of_moneybox_by_id)],
     moneybox_update_request: Annotated[
-        MoneyboxUpdateRequest, Body(title="Update Data", description="The updating moneybox data.")
+        MoneyboxUpdateRequest,
+        Body(title="Update Data", description="The updating moneybox data."),
     ],
 ) -> MoneyboxResponse:
     """Endpoint for updating moneybox by moneybox_id.
@@ -304,10 +306,6 @@ async def get_moneybox_transaction_logs(
     )
 
     if transaction_logs_data:
-        try:
-            model = TransactionLogsResponse.model_validate({"transaction_logs": transaction_logs_data})
-        except Exception as e:
-            pass
         return {"transaction_logs": transaction_logs_data}  # type: ignore
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

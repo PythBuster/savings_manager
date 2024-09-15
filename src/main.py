@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 import uvicorn
-from alembic.config import CommandLine
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
@@ -35,7 +34,7 @@ author_name, author_mail = app_data["authors"][0].split()
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
 
-    app_env_variables = get_app_env_variables()
+    app_env_variables = get_app_env_variables()  # pylint: disable=redefined-outer-name
 
     print("Set custom openapi schema ...", flush=True)
     set_custom_openapi_schema(fastapi_app=fastapi_app)

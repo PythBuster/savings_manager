@@ -76,7 +76,7 @@ class AppEnvVariables(BaseSettings):
     smtp_method: str | None = None
     """The smtp method, supported: STARTTLS and TLS."""
 
-    smtp_port: int | None = None
+    smtp_port: int | str | None = None
     """The port name of the smtp server."""
 
     smtp_user_name: str | None = None
@@ -106,19 +106,22 @@ class AppEnvVariables(BaseSettings):
     def transform_smtp_data_to_none(self) -> Self:
         """Convert emtpy string to None in smtp data."""
 
-        if self.smtp_server == "":
+        if self.smtp_server is not None and self.smtp_server == "":
             self.smtp_server = None
 
-        if self.smtp_method == "":
+        if self.smtp_method is not None and self.smtp_method == "":
             self.smtp_method = None
 
-        if self.smtp_port == "":
-            self.smtp_port = None
+        if self.smtp_port is not None:
+            if self.smtp_port == "":
+                self.smtp_port = None
+            else:
+                self.smtp_port = int(self.smtp_port)
 
-        if self.smtp_user_name == "":
+        if self.smtp_user_name is not None and self.smtp_user_name == "":
             self.smtp_user_name = None
 
-        if self.smtp_password == "":
+        if self.smtp_password is not None and self.smtp_password == "":
             self.smtp_password = None
 
         return self

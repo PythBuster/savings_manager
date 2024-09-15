@@ -6,11 +6,20 @@ from typing import Callable
 
 
 # decorator class
-class every:
+class every:  # pylint: disable=invalid-name
     """Task function decorator for functions used in BackgroundTaskRunner"""
 
     @staticmethod
     def hour(interval: int) -> Callable:
+        """The hour decorator function.
+
+        :param interval: The interval time in seconds,
+            will calculate in hours.
+        :type interval: :class:`int`
+        :return: The decorated function.
+        :rtype: :class:`Callable`
+        """
+
         def decorator(func: Callable) -> Callable:
             func_name = func.__name__.upper()  # Capture the name of the decorated function
 
@@ -31,6 +40,15 @@ class every:
 
     @staticmethod
     def minute(interval: int) -> Callable:
+        """The minute decorator function.
+
+        :param interval: The interval time in seconds,
+            will calculate in minutes.
+        :type interval: :class:`int`
+        :return: The decorated function.
+        :rtype: :class:`Callable`
+        """
+
         def decorator(func: Callable) -> Callable:
             func_name = func.__name__.upper()  # Capture the name of the decorated function
 
@@ -51,6 +69,14 @@ class every:
 
     @staticmethod
     def second(interval: int) -> Callable:
+        """The second decorator function.
+
+        :param interval: The interval time in seconds.
+        :type interval: :class:`int`
+        :return: The decorated function.
+        :rtype: :class:`Callable`
+        """
+
         def decorator(func: Callable) -> Callable:
             func_name = func.__name__.upper()  # Capture the name of the decorated function
 

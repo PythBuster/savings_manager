@@ -15,7 +15,9 @@ from src.custom_types import AppEnvVariables
 
 
 @cache
-def get_app_env_variables():
+def get_app_env_variables() -> AppEnvVariables:
+    """Helper function to get env settings."""
+
     return AppEnvVariables(_env_file=WORKING_DIR.parent / "envs" / ".env")
 
 
