@@ -1,10 +1,12 @@
 # pylint: disable=too-many-lines
 
 """All db_manager tests are located here."""
-
+import os
 from datetime import datetime, timezone
+from unittest.mock import patch
 
 import pytest
+from alembic.config import CommandLine
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
@@ -1092,3 +1094,71 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
     )
     assert last_transaction_log["description"] == expected_description
     # <<<
+
+
+@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
+async def test_reset_database_keep_app_settings(load_test_data: None, db_manager: DBManager) -> None:
+    # Stelle sicher, dass das Mock-Objekt keine rekursive Schleife verursacht
+    original_main = CommandLine.main
+
+    with patch.object(CommandLine, 'main') as mock_main:
+        def patched_main(cmd_line, args):
+            args = ["-x", "testing"] + args
+            return original_main(cmd_line, args)
+
+        mock_main.side_effect = patched_main
+        mock_main.return_value = None  # Stellt sicher, dass der Mock keine Fehler auslöst
+
+        old_app_settings_data = await db_manager._get_app_settings()
+        old_moneyboxes = await db_manager.get_moneyboxes()
+
+        await db_manager.reset_database(keep_app_settings=True)
+
+        app_settings_data = await db_manager._get_app_settings()
+        moneyboxes = await db_manager.get_moneyboxes()
+
+        assert equal_dict(
+            dict_1=old_app_settings_data.asdict(),
+            dict_2=app_settings_data.asdict(),
+            exclude_keys=["created_at", "modified_at"]
+        )
+
+        assert len(old_moneyboxes) != len(moneyboxes)
+        assert len(moneyboxes) == 1
+
+        mock_main.assert_called()
+
+@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
+async def test_reset_database_delete_app_settings(
+        load_test_data: None,  # pylint: disable=unused-argument
+        db_manager: DBManager,
+) -> None:
+    # Stelle sicher, dass das Mock-Objekt keine rekursive Schleife verursacht
+    original_main = CommandLine.main
+
+    with patch.object(CommandLine, 'main') as mock_main:
+        def patched_main(cmd_line, args):
+            args = ["-x", "testing"] + args
+            return original_main(cmd_line, args)
+
+        mock_main.side_effect = patched_main
+        mock_main.return_value = None  # Stellt sicher, dass der Mock keine Fehler auslöst
+
+        old_app_settings_data = await db_manager._get_app_settings()
+        old_moneyboxes = await db_manager.get_moneyboxes()
+
+        await db_manager.reset_database(keep_app_settings=False)
+
+        app_settings_data = await db_manager._get_app_settings()
+        moneyboxes = await db_manager.get_moneyboxes()
+
+        assert not equal_dict(
+            dict_1=old_app_settings_data.asdict(),
+            dict_2=app_settings_data.asdict(),
+            exclude_keys=["created_at", "modified_at"]
+        )
+
+        assert len(old_moneyboxes) != len(moneyboxes)
+        assert len(moneyboxes) == 1
+
+        mock_main.assert_called()
