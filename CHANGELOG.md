@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.21.0 (2024-09-15)
+### Feature:
+- implemented resetting app data functionality
+
 ## 2.20.2 (2024-09-13)
 ### Fixes:
 - fix: adapt argument of pg_dump and add --data-only for database backup
