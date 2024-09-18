@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.22.1 (2024-09-18)
+### Fixes:
+- install missing dependency in CI/CD workflow yml (github action)
+
 ## 2.22.0 (2024-09-18)
 ### Feature:
 - implemented exporting functionality (export sql dump)
