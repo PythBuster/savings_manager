@@ -1,7 +1,9 @@
 """All app endpoints test are located here."""
-
+import io
+from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from httpx import AsyncClient
 from starlette import status
 
@@ -136,3 +138,20 @@ async def test_reset_app_delete_app_settings(
             dict_2=app_settings,
             exclude_keys=["createdAt", "modifiedAt"],
         )
+
+@pytest.mark.order(after="tests/test_db_manager.py::test_export_sql_dump")
+async def test_app_export_valid(client: AsyncClient) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/export",
+    )
+
+    assert response.status_code == 200
+
+    dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
+
+    with open(dump_file_path, "rb") as file:
+        sql_dump_bytes = io.BytesIO(file.read())
+
+    assert hash(response.content) == hash(sql_dump_bytes.getvalue())
+    assert 'filename="export_data_savings_manager_' in response.headers["Content-Disposition"]
+    assert response.headers["content-type"] == "application/octet-stream"

@@ -10,7 +10,7 @@ import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 from httpx import AsyncClient
 
-from src.constants import WORKING_DIR
+from src.constants import WORKING_DIR_PATH
 from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
@@ -27,7 +27,7 @@ pytest_plugins = ("pytest_asyncio",)
 def get_app_env_variables() -> AppEnvVariables:  # type: ignore
     """Test env settings"""
 
-    test_env_path = WORKING_DIR.parent / "envs" / ".env.test"
+    test_env_path = WORKING_DIR_PATH.parent / "envs" / ".env.test"
     app_env_variables_ = AppEnvVariables(
         _env_file=test_env_path,
     )
@@ -288,7 +288,7 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
     subprocess.call(
         [
             "sh",
-            f"{WORKING_DIR.parent / 'scripts' / 'up_test_database.sh'}",
+            f"{WORKING_DIR_PATH.parent / 'scripts' / 'up_test_database.sh'}",
         ]
     )
 
@@ -340,6 +340,6 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
     subprocess.call(
         [
             "sh",
-            f"{WORKING_DIR.parent / 'scripts' / 'down_test_database.sh'}",
+            f"{WORKING_DIR_PATH.parent / 'scripts' / 'down_test_database.sh'}",
         ]
     )

@@ -84,6 +84,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_reset_database_delete_app_settings": self.dataset_test_reset_database_delete_app_settings,
             "test_reset_app_keep_app_settings": self.dataset_test_reset_app_keep_app_settings,
             "test_reset_app_delete_app_settings": self.dataset_test_reset_app_delete_app_settings,
+            "test_export_sql_dump": self.dataset_test_export_sql_dump,
         }
         """Map test case name witch related test data generation function"""
 
@@ -1369,6 +1370,39 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "savings_amount": 5,
                 "savings_target": 5,
                 "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_export_sql_dump(self) -> None:
+        """The data generation function for test_case:
+        `test_export_sql_dump`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_session.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
             },
         ]
 
