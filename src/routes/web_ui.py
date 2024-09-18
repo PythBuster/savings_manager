@@ -15,6 +15,7 @@ web_ui_router = APIRouter(
 async def index() -> FileResponse:
     """The web root.
     \f
+
     :return: The html file.
     :rtype: :class:`FileResponse`
     """

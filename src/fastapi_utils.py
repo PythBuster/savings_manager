@@ -1,5 +1,5 @@
 """The FastAPI helper functions for initializing etc.,..."""
-
+import os
 from typing import Callable
 
 from fastapi import FastAPI
@@ -7,8 +7,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.staticfiles import StaticFiles
 
-from src.constants import WEB_UI_DIRECTORY
-from src.custom_types import EndpointRouteType
+from src.constants import WEB_UI_DIR_PATH, PGPASS_FILE_PATH
+from src.custom_types import EndpointRouteType, AppEnvVariables
 from src.exception_handler import response_exception
 from src.routes.app import app_router
 from src.routes.app_settings import app_settings_router
@@ -89,6 +89,27 @@ def register_router(fastapi_app: FastAPI) -> None:
     # Mount the web UI
     fastapi_app.mount(
         path="/",
-        app=StaticFiles(directory=WEB_UI_DIRECTORY, html=True),
+        app=StaticFiles(directory=WEB_UI_DIR_PATH, html=True),
         name="static",
     )
+
+def create_pgpass(app_env_variables: AppEnvVariables) -> None:
+    """Create a .pgpass file in PGPASS_FILE_PATH dir and export
+    file path to ENVIRONMENT `PGPASSFILE`. pg_dump and pg_restore
+    will need this file for connecting the database.
+
+    :param app_env_variables: The env settings.
+    :type app_env_variables: :class:`AppEnvVariables`
+    """
+
+    port = app_env_variables.db_port
+    db = app_env_variables.db_name
+    user = app_env_variables.db_user
+    pw = app_env_variables.db_password.get_secret_value()
+    host = app_env_variables.db_host
+
+    pass_data = f"{host}:{port}:{db}:{user}:{pw}"
+    PGPASS_FILE_PATH.write_text(pass_data, encoding="utf-8")
+    PGPASS_FILE_PATH.chmod(0o600)
+
+    os.environ["PGPASSFILE"] = str(PGPASS_FILE_PATH)

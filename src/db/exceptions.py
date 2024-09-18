@@ -335,3 +335,32 @@ class AutomatedSavingsError(CrudDatabaseError):
             message = "Failed automated distribution."
 
         super().__init__(record_id=record_id, message=message, details=details)
+
+
+class MissingDependencyError(Exception):
+    """Custom MissingDependencyError Exception"""
+
+    def __init__(self, message: str) -> None:
+        """Initializer for the MissingDependencyError exception.
+
+        :param message: The message of the error.
+        :type message: :class:`str`
+        """
+
+        super().__init__(message)
+
+
+class ProcessCommunicationError(Exception):
+    """Custom ProcessCommunicationError Exception.
+
+    Error class for errors in communication with extern processes
+        like: pg_dumb, pg_restore, etc."""
+
+    def __init__(self, message: str) -> None:
+        """Initializer for the ProcessCommunicationError exception.
+
+        :param message: The message of the error.
+        :type message: :class:`str`
+        """
+
+        super().__init__(message)

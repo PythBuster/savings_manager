@@ -1,17 +1,17 @@
 """The general/basic root routes."""
-
+from time import time
 from typing import cast
 
 from fastapi import APIRouter
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import Response, StreamingResponse
 
 from src.custom_types import EndpointRouteType
 from src.data_classes.requests import ResetDataRequest
 from src.data_classes.responses import AppInfoResponse
 from src.db.db_manager import DBManager
-from src.routes.responses.app import GET_APP_INFO_RESPONSES, POST_APP_RESET_RESPONSES
+from src.routes.responses.app import GET_APP_INFO_RESPONSES, POST_APP_RESET_RESPONSES, POST_APP_EXPORT_RESPONSES
 from src.utils import get_app_data
 
 app_router = APIRouter(
@@ -29,6 +29,7 @@ app_router = APIRouter(
 async def get_app_infos() -> AppInfoResponse:
     """Endpoint for getting app infos like appVersion, appName etc.
     \f
+
     :return: The app info data.
     :rtype: :class:`AppInfoResponse`
     """
@@ -69,3 +70,33 @@ async def reset_app(
     )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app_router.get(
+    "/export",
+    responses=POST_APP_EXPORT_RESPONSES,
+)
+async def download_sql_dump(
+        request: Request,
+) -> StreamingResponse:
+    """Endpoint for exporting SQL dump.
+    \f
+
+    :param request: The current request.
+    :type request: :class:`Request`
+    :return: The sql dump as streaming response.
+    :rtype: :class:`StreamingResponse`
+    """
+
+    db_manager = cast(DBManager, request.app.state.db_manager)
+    sql_dump_bytes = await db_manager.export_sql_dump()
+
+    current_timestamp = int(time())
+    response = StreamingResponse(
+        sql_dump_bytes,
+        media_type="application/octet-stream",
+        headers = {
+            'Content-Disposition': f'attachment; filename="export_data_savings_manager_{current_timestamp}.sql"'
+        }
+    )
+    return response

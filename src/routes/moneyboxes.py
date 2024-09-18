@@ -27,6 +27,7 @@ async def get_moneyboxes(
 ) -> MoneyboxesResponse:
     """Endpoint for getting moneyboxes.
     \f
+
     :param request: The current request object.
     :return: The list of moneyboxes.
     :rtype: :class:`MoneyboxesResponse`

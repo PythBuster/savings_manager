@@ -2,14 +2,14 @@
 
 import logging
 
-from src.constants import WORKING_DIR
+from src.constants import WORKING_DIR_PATH
 
 # Create and configure the app logger
 app_logger = logging.getLogger("app")
 """The global app logger"""
 
 # Configure the logger
-handler = logging.FileHandler(WORKING_DIR.parent / "errors.log", mode="a")
+handler = logging.FileHandler(WORKING_DIR_PATH.parent / "errors.log", mode="a")
 """hander"""
 
 formatter = logging.Formatter("\r\n%(asctime)s: %(message)s", datefmt="%d.%m.%Y %H:%M:%S")

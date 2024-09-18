@@ -10,7 +10,7 @@ from dictalchemy import asdict
 from pydantic.alias_generators import to_camel
 from starlette.requests import Request
 
-from src.constants import WORKING_DIR
+from src.constants import WORKING_DIR_PATH
 from src.custom_types import AppEnvVariables
 
 
@@ -18,7 +18,7 @@ from src.custom_types import AppEnvVariables
 def get_app_env_variables() -> AppEnvVariables:
     """Helper function to get env settings."""
 
-    return AppEnvVariables(_env_file=WORKING_DIR.parent / "envs" / ".env")
+    return AppEnvVariables(_env_file=WORKING_DIR_PATH.parent / "envs" / ".env")
 
 
 def to_camel_cleaned_suffix(field_name: str) -> str:

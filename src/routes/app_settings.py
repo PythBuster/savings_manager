@@ -33,6 +33,7 @@ async def get_app_settings(
 ) -> AppSettingsResponse:
     """Endpoint for getting app settings.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :return: The app settings data.
@@ -58,6 +59,7 @@ async def update_app_settings(
 ) -> AppSettingsResponse:
     """Endpoint for updating app settings.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param app_settings_request: The update data of the app settings.

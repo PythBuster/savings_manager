@@ -2,7 +2,14 @@
 
 """All database definitions are located here."""
 import asyncio
+import io
+import os
+import subprocess
 from datetime import datetime, timezone
+from io import BytesIO
+from logging import exception
+from pathlib import Path
+from pyexpat.errors import messages
 from typing import Any
 
 from fastapi.encoders import jsonable_encoder
@@ -11,6 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import joinedload
 
 from alembic.config import CommandLine
+
+from src.constants import PGPASS_FILE_PATH
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -40,7 +49,7 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError,
+    UpdateInstanceError, MissingDependencyError, ProcessCommunicationError,
 )
 from src.db.models import (
     AppSettings,
@@ -1601,3 +1610,49 @@ class DBManager:
             await self.update_app_settings(
                 app_settings_data=backup_app_settings.asdict(),
             )
+
+    async def export_sql_dump(self) -> io.BytesIO:
+        """Export a sql dump by using pg_dump.
+
+        :return: The sql dump as bytes.
+        :rtype: :class:`io.BytesIO`
+
+        :raises: :class:`MissingDependencyError`: if pg_dump is not installed
+            or found.
+                 :class:`ProcessCommunicationError`: if pg_dump itself has
+            an error
+        """
+
+        command = [
+            "pg_dump",
+            "--data-only",
+            "-h",
+            self.db_settings.db_host,
+            "-p",
+            str(self.db_settings.db_port),
+            "-U",
+            self.db_settings.db_user,
+            "-d",
+            self.db_settings.db_name,
+        ]
+
+        try:
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+        except:
+            raise MissingDependencyError(
+                message="pg_dump not installed."
+            )
+
+        stdout, stderr = process.communicate()
+
+        if process.returncode != 0:
+            raise ProcessCommunicationError(
+                message=stderr.decode('utf-8'),
+            )
+
+        dump_stream = io.BytesIO(stdout)
+        return dump_stream

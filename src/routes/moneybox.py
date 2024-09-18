@@ -49,6 +49,7 @@ async def get_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint for getting moneybox by moneybox_id.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_id: The moneybox ID to be retrieved.
@@ -76,6 +77,7 @@ async def add_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint for adding moneybox.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_create_request: The new moneybox data.
@@ -106,6 +108,7 @@ async def update_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint for updating moneybox by moneybox_id.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_id: The moneybox ID to be updated.
@@ -135,6 +138,7 @@ async def delete_moneybox(
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_id: The moneybox ID to be deleted.
@@ -171,6 +175,7 @@ async def deposit_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint to add amount to moneybox by moneybox_id.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_id: The moneybox ID to be deposited.
@@ -214,6 +219,7 @@ async def withdraw_moneybox(
 ) -> MoneyboxResponse:
     """Endpoint to sub balance from moneybox by moneybox_id.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_id: The moneybox ID to be withdrawn.
@@ -258,6 +264,7 @@ async def transfer_balance(
 ) -> Response:
     """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_id: The moneybox ID where the balance shall be transferred from.
@@ -291,6 +298,7 @@ async def get_moneybox_transaction_logs(
 ) -> TransactionLogsResponse | Response:
     """Endpoint for getting moneybox transaction logs.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param moneybox_id: The moneybox ID where the transaction logs shall

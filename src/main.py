@@ -16,7 +16,7 @@ from src.fastapi_metadata import tags_metadata
 from src.fastapi_utils import (
     handle_requests,
     register_router,
-    set_custom_openapi_schema,
+    set_custom_openapi_schema, create_pgpass,
 )
 from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
@@ -35,6 +35,9 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
 
     app_env_variables = get_app_env_variables()  # pylint: disable=redefined-outer-name
+
+    print("Create .pgpass for sql import/export functionality ...", flush=True)
+    create_pgpass(app_env_variables=app_env_variables)
 
     print("Set custom openapi schema ...", flush=True)
     set_custom_openapi_schema(fastapi_app=fastapi_app)
@@ -59,8 +62,9 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
         email_sender=email_sender,
     )
 
-    print("Start background tasks.")
-    await background_tasks_runner.run()  # type: ignore
+    if app_env_variables.environment is Environment.PROD:
+        print("Start background tasks.")
+        await background_tasks_runner.run()  # type: ignore
 
     fastapi_app.state.db_manager = db_manager
     fastapi_app.state.email_sender = email_sender
@@ -116,7 +120,7 @@ if __name__ == "__main__":
         "src.main:app",
         host="0.0.0.0",
         port=8001,
-        loop="uvloop",
+        loop="auto",
         workers=1,
         reload=app_env_variables.environment is Environment.DEV,
         access_log=app_env_variables.environment is not Environment.PROD,

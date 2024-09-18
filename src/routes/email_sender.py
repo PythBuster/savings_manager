@@ -29,6 +29,7 @@ email_sender_router = APIRouter(
 async def send_testemail(request: Request) -> Response:
     """Endpoint for sending a test email. Limited to 1 request per minute.
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :return: The response object with the status code included.

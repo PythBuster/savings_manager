@@ -33,6 +33,7 @@ async def get_prioritylist(
 ) -> PrioritylistResponse | Response:
     """Endpoint for getting prioritylist. Note: Returns a list SORTED by priority (asc).
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :return: The prioritylist if not empty, else a response object including status
@@ -64,6 +65,7 @@ async def update_prioritylist(
     """Endpoint for updating priority list. Note: Returns the updated list
     SORTED by priority (asc).
     \f
+
     :param request: The current request object.
     :type request: :class:`Request`
     :param prioritylist: The new priority list:
