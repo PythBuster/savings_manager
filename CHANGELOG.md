@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.22.0 (2024-09-18)
+### Feature:
+- implemented exporting functionality (export sql dump)
+
 ## 2.21.0 (2024-09-15)
 ### Feature:
 - implemented resetting app data functionality
