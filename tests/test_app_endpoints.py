@@ -1,4 +1,5 @@
 """All app endpoints test are located here."""
+
 import io
 from pathlib import Path
 from unittest.mock import patch
@@ -138,6 +139,7 @@ async def test_reset_app_delete_app_settings(
             dict_2=app_settings,
             exclude_keys=["createdAt", "modifiedAt"],
         )
+
 
 @pytest.mark.order(after="tests/test_db_manager.py::test_export_sql_dump")
 async def test_app_export_valid(client: AsyncClient) -> None:

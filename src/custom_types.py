@@ -4,7 +4,7 @@ from enum import StrEnum
 from typing import Self
 
 from pydantic import ConfigDict, SecretStr, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
 class EndpointRouteType(StrEnum):

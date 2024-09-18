@@ -1,4 +1,5 @@
 """The FastAPI helper functions for initializing etc.,..."""
+
 import os
 from typing import Callable
 
@@ -7,8 +8,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.staticfiles import StaticFiles
 
-from src.constants import WEB_UI_DIR_PATH, PGPASS_FILE_PATH
-from src.custom_types import EndpointRouteType, AppEnvVariables
+from src.constants import PGPASS_FILE_PATH, WEB_UI_DIR_PATH
+from src.custom_types import AppEnvVariables, EndpointRouteType
 from src.exception_handler import response_exception
 from src.routes.app import app_router
 from src.routes.app_settings import app_settings_router
@@ -92,6 +93,7 @@ def register_router(fastapi_app: FastAPI) -> None:
         app=StaticFiles(directory=WEB_UI_DIR_PATH, html=True),
         name="static",
     )
+
 
 def create_pgpass(app_env_variables: AppEnvVariables) -> None:
     """Create a .pgpass file in PGPASS_FILE_PATH dir and export

@@ -102,6 +102,7 @@ load-plugins=[
 
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
 [tool.pylint-per-file-ignores]
+"tests/test_fastapi_utils.py"="missing-function-docstring"
 "test_app_endpoints.py"="missing-function-docstring"
 "test_email_sender_endpoints.py"="missing-function-docstring"
 "test_task_runner.py"="missing-function-docstring"

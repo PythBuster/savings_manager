@@ -3,13 +3,8 @@
 """All database definitions are located here."""
 import asyncio
 import io
-import os
 import subprocess
 from datetime import datetime, timezone
-from io import BytesIO
-from logging import exception
-from pathlib import Path
-from pyexpat.errors import messages
 from typing import Any
 
 from fastapi.encoders import jsonable_encoder
@@ -18,8 +13,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import joinedload
 
 from alembic.config import CommandLine
-
-from src.constants import PGPASS_FILE_PATH
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -42,14 +35,16 @@ from src.db.exceptions import (
     DeleteInstanceError,
     HasBalanceError,
     InconsistentDatabaseError,
+    MissingDependencyError,
     MoneyboxNotFoundByNameError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     OverflowMoneyboxCantBeDeletedError,
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
+    ProcessCommunicationError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError, MissingDependencyError, ProcessCommunicationError,
+    UpdateInstanceError,
 )
 from src.db.models import (
     AppSettings,
@@ -1642,16 +1637,14 @@ class DBManager:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
-        except:
-            raise MissingDependencyError(
-                message="pg_dump not installed."
-            )
+        except Exception as ex:  # noqa: E722
+            raise MissingDependencyError(message="pg_dump not installed.") from ex
 
         stdout, stderr = process.communicate()
 
         if process.returncode != 0:
             raise ProcessCommunicationError(
-                message=stderr.decode('utf-8'),
+                message=stderr.decode("utf-8"),
             )
 
         dump_stream = io.BytesIO(stdout)

@@ -14,9 +14,10 @@ from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
 from src.fastapi_utils import (
+    create_pgpass,
     handle_requests,
     register_router,
-    set_custom_openapi_schema, create_pgpass,
+    set_custom_openapi_schema,
 )
 from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender

@@ -1,4 +1,5 @@
 """The general/basic root routes."""
+
 from time import time
 from typing import cast
 
@@ -11,7 +12,11 @@ from src.custom_types import EndpointRouteType
 from src.data_classes.requests import ResetDataRequest
 from src.data_classes.responses import AppInfoResponse
 from src.db.db_manager import DBManager
-from src.routes.responses.app import GET_APP_INFO_RESPONSES, POST_APP_RESET_RESPONSES, POST_APP_EXPORT_RESPONSES
+from src.routes.responses.app import (
+    GET_APP_INFO_RESPONSES,
+    POST_APP_EXPORT_RESPONSES,
+    POST_APP_RESET_RESPONSES,
+)
 from src.utils import get_app_data
 
 app_router = APIRouter(
@@ -77,7 +82,7 @@ async def reset_app(
     responses=POST_APP_EXPORT_RESPONSES,
 )
 async def download_sql_dump(
-        request: Request,
+    request: Request,
 ) -> StreamingResponse:
     """Endpoint for exporting SQL dump.
     \f
@@ -95,8 +100,10 @@ async def download_sql_dump(
     response = StreamingResponse(
         sql_dump_bytes,
         media_type="application/octet-stream",
-        headers = {
-            'Content-Disposition': f'attachment; filename="export_data_savings_manager_{current_timestamp}.sql"'
-        }
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="export_data_savings_manager_{current_timestamp}.sql"'
+            )
+        },
     )
     return response

@@ -11,7 +11,6 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
 from alembic.config import CommandLine
-
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -34,7 +33,6 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
 )
-from src.fastapi_utils import create_pgpass
 from src.utils import equal_dict
 
 
@@ -1185,11 +1183,12 @@ async def test_reset_database_delete_app_settings(
 
         mock_main.assert_called()
 
+
 @pytest.mark.dependency(depends=["test_reset_database_delete_app_settings"])
 @pytest.mark.order(after="tests/test_fastapi_utils.py::test_create_pgpass")
 async def test_export_sql_dump(
-        load_test_data: None,  # pylint: disable=unused-argument
-        db_manager: DBManager,
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
     dump_stream = await db_manager.export_sql_dump()
 
