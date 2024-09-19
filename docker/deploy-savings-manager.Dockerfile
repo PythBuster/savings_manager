@@ -5,6 +5,7 @@ LABEL maintainer="PythBuster <pythbuster@gmail.com>"
 RUN apt-get update && apt-get install -y --no-install-recommends python3-poetry python3-dev
 
 COPY src /savings_manager/src
+COPY temp /savings_manager/temp
 COPY envs /savings_manager/envs
 COPY scripts /savings_manager/scripts
 COPY docs/sphinx /savings_manager/docs/sphinx
