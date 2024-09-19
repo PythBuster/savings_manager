@@ -1622,7 +1622,6 @@ class DBManager:
         command = [
             "pg_dump",
             "-Fc",
-            # "--data-only",
             "-h",
             self.db_settings.db_host,
             "-p",
@@ -1639,7 +1638,7 @@ class DBManager:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             ) as process:
-                stdout, stderr = process.communicate()
+                stdout, stderr = process.communicate(timeout=15)
 
                 if process.returncode != 0:
                     raise ProcessCommunicationError(
@@ -1707,7 +1706,7 @@ class DBManager:
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                 ) as process:
-                    _, stderr = process.communicate()
+                    _, stderr = process.communicate(timeout=15)
 
                     if process.returncode != 0:
                         raise ProcessCommunicationError(
