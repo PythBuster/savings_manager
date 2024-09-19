@@ -4,6 +4,7 @@
 import asyncio
 import io
 import subprocess
+import tempfile
 from datetime import datetime, timezone
 from typing import Any
 
@@ -1620,7 +1621,8 @@ class DBManager:
 
         command = [
             "pg_dump",
-            "--data-only",
+            "-Fc",
+            # "--data-only",
             "-h",
             self.db_settings.db_host,
             "-p",
@@ -1632,20 +1634,84 @@ class DBManager:
         ]
 
         try:
-            process = subprocess.Popen(
+            with subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-            )
+            ) as process:
+                stdout, stderr = process.communicate()
+
+                if process.returncode != 0:
+                    raise ProcessCommunicationError(
+                        message=stderr.decode("utf-8"),
+                    )
+
+                dump_stream = io.BytesIO(stdout)
+                return dump_stream
+
         except Exception as ex:  # noqa: E722
             raise MissingDependencyError(message="pg_dump not installed.") from ex
 
-        stdout, stderr = process.communicate()
 
-        if process.returncode != 0:
-            raise ProcessCommunicationError(
-                message=stderr.decode("utf-8"),
+    async def import_sql_dump(self, sql_dump: bytes) -> None:
+        """Export a sql dump by using pg_dump.
+
+        :return: The sql dump as bytes.
+        :rtype: :class:`io.BytesIO`
+
+        :raises: :class:`MissingDependencyError`: if pg_dump is not installed
+            or found.
+                 :class:`ProcessCommunicationError`: if pg_dump itself has
+            an error
+        """
+
+        # backup database
+        backup_database_dump_bytes = await self.export_sql_dump()
+        await self.reset_database(keep_app_settings=False)
+
+        try:
+            await self._import_sql_dump(sql_dump=sql_dump)
+        except:  # noqa: E722
+            # restore db on fail restoring users import
+            await self._import_sql_dump(
+                sql_dump=backup_database_dump_bytes.getvalue(),
             )
+            raise
 
-        dump_stream = io.BytesIO(stdout)
-        return dump_stream
+    async def _import_sql_dump(
+        self,
+        sql_dump: bytes,
+    ) -> None:
+        with tempfile.NamedTemporaryFile(delete=True) as tmp_file:
+            tmp_file.write(sql_dump)
+            tmp_file_path = tmp_file.name
+
+            command = [
+                "pg_restore",
+                "--clean",
+                "--if-exists",
+                "-h",
+                self.db_settings.db_host,
+                "-p",
+                str(self.db_settings.db_port),
+                "-U",
+                self.db_settings.db_user,
+                "-d",
+                self.db_settings.db_name,
+                tmp_file_path,
+            ]
+
+            try:
+                with subprocess.Popen(
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                ) as process:
+                    _, stderr = process.communicate()
+
+                    if process.returncode != 0:
+                        raise ProcessCommunicationError(
+                            message=stderr.decode("utf-8"),
+                        )
+            except Exception as ex:  # noqa: E722
+                raise MissingDependencyError(message="pg_restore not installed.") from ex

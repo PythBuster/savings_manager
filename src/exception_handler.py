@@ -13,6 +13,7 @@ from src.data_classes.responses import HTTPErrorResponse
 from src.db.exceptions import (
     CrudDatabaseError,
     InconsistentDatabaseError,
+    InvalidFileError,
     RecordNotFoundError,
 )
 from src.routes.exceptions import MissingSMTPSettingsError
@@ -147,6 +148,17 @@ async def response_exception(  # pylint: disable=too-many-return-statements
                 HTTPErrorResponse(
                     message="Rate limit exceeded",
                     details={"limit": exception.detail},
+                )
+            ),
+        )
+
+    if isinstance(exception, InvalidFileError):
+        message = exception.message
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=message,
                 )
             ),
         )

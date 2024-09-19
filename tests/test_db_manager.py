@@ -1196,4 +1196,4 @@ async def test_export_sql_dump(
     with dump_file_path.open("wb") as f:
         f.write(dump_stream.getvalue())
 
-    assert 3100 < len(dump_stream.getvalue()) < 3130
+    assert 31250 < len(dump_stream.getvalue()) < 31270

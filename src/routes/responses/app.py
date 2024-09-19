@@ -23,9 +23,17 @@ GET_APP_EXPORT_RESPONSES = {
 }
 """Further responses for endpoint GET: /app/info"""
 
-POST_APP_EXPORT_RESPONSES = {
+GET_APP_EXPORT_RESPONSES = {
     status.HTTP_200_OK: {
         "description": "OK",
     },
 }
 """Further responses for endpoint GET: /app/export"""
+
+
+POST_APP_IMPORT_RESPONSES = {
+    status.HTTP_204_NO_CONTENT: {
+        "description": "No Content",
+    },
+}
+"""Further responses for endpoint POST: /app/import"""

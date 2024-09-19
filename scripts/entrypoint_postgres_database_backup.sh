@@ -5,7 +5,7 @@ echo "postgres_database:5432:${POSTGRES_DB}:${POSTGRES_USER}:${POSTGRES_PASSWORD
     chmod 600 ~/.pgpass
 
 # Create a script that runs pg_dump
-echo "#!/bin/bash\n pg_dump --data-only -h postgres_database -p 5432 -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f ${BACKUP_DIR}/backup_\$(date +%Y-%m-%d_%H%M).sql" > /backup.sh && \
+echo "#!/bin/bash\n pg_dump -Fc -h postgres_database -p 5432 -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f ${BACKUP_DIR}/backup_\$(date +%Y-%m-%d_%H%M).sql" > /backup.sh && \
     chmod +x /backup.sh
 
 # Add cron job to crontab for root

@@ -347,6 +347,7 @@ class MissingDependencyError(Exception):
         :type message: :class:`str`
         """
 
+        self.message = message
         super().__init__(message)
 
 
@@ -363,4 +364,19 @@ class ProcessCommunicationError(Exception):
         :type message: :class:`str`
         """
 
+        self.message = message
+        super().__init__(message)
+
+
+class InvalidFileError(Exception):
+    """Custom InvalidFileError Exception."""
+
+    def __init__(self, message: str) -> None:
+        """Initializer for the InvalidFileError exception.
+
+        :param message: The message of the error.
+        :type message: :class:`str`
+        """
+
+        self.message = message
         super().__init__(message)
