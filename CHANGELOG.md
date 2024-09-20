@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.24.0 (2024-09-20)
+### Changes:
+- use python 3.12: better performance, better debug/error messages
+
 ## 2.23.0 (2024-09-20)
 ### Feature:
 - implemented import functionality (import sql dump)
