@@ -1,6 +1,6 @@
 """All app endpoints test are located here."""
+
 import asyncio
-import hashlib
 import io
 from pathlib import Path
 from unittest.mock import patch
@@ -159,7 +159,7 @@ async def test_app_export_valid(client: AsyncClient) -> None:
     assert len(response.content) == len(sql_dump_value)
 
     # Remove HEADER, because datetime is embedded within first ~50 bytes
-    # see: https://github.com/postgres/postgres/blob/d35e29387870fecfdb52ffd4c93c651f0c7c1b43/src/bin/pg_dump/pg_backup_archiver.c#L3953-L3980
+    # see: https://github.com/postgres/postgres/blob/d35e29387870fecfdb52ffd4c93c651f0c7c1b43/src/bin/pg_dump/pg_backup_archiver.c#L3953-L3980  # noqa: ignore  # pylint: disable=line-too-long
     hash1 = hash(response.content[50:])
     hash2 = hash(sql_dump_value[50:])
     assert hash1 == hash2
@@ -171,12 +171,11 @@ async def test_app_export_valid(client: AsyncClient) -> None:
 
 
 @pytest.mark.order(after="tests/test_db_manager.py::test_import_sql_dump")
-async def test_app_import_valid(
-        client: AsyncClient
-) -> None:
+async def test_app_import_valid(client: AsyncClient) -> None:
     original_main = CommandLine.main
 
     with patch.object(CommandLine, "main") as mock_main:
+
         def patched_main(cmd_line, args) -> None:  # type: ignore
             args = ["-x", "testing"] + args
             original_main(cmd_line, args)

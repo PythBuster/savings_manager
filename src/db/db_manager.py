@@ -1651,7 +1651,6 @@ class DBManager:
         except Exception as ex:  # noqa: E722
             raise MissingDependencyError(message="pg_dump not installed.") from ex
 
-
     async def import_sql_dump(self, sql_dump: bytes) -> None:
         """Export a sql dump by using pg_dump.
 

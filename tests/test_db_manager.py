@@ -1210,6 +1210,7 @@ async def test_import_sql_dump(
     original_main = CommandLine.main
 
     with patch.object(CommandLine, "main") as mock_main:
+
         def patched_main(cmd_line, args) -> None:  # type: ignore
             args = ["-x", "testing"] + args
             original_main(cmd_line, args)
@@ -1227,7 +1228,9 @@ async def test_import_sql_dump(
             "user_email_address": "pythbuster@gmail.com",
             "is_automated_saving_active": False,
             "savings_amount": 150,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "overflow_moneybox_automated_savings_mode": (
+                OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            ),
         }
         expected_moneyboxes = [
             {
@@ -1242,7 +1245,7 @@ async def test_import_sql_dump(
         assert moneyboxes[0]["name"] == expected_moneyboxes[0]["name"]
         assert moneyboxes[1]["name"] == expected_moneyboxes[1]["name"]
 
-        app_settings = await db_manager._get_app_settings()
+        app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
         assert equal_dict(
             dict_1=app_settings.asdict(),
             dict_2=expected_app_settings_data,
