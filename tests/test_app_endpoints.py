@@ -1,5 +1,6 @@
 """All app endpoints test are located here."""
-
+import asyncio
+import hashlib
 import io
 from pathlib import Path
 from unittest.mock import patch
@@ -147,13 +148,52 @@ async def test_app_export_valid(client: AsyncClient) -> None:
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/export",
     )
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
 
     dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
 
     with open(dump_file_path, "rb") as file:
         sql_dump_bytes = io.BytesIO(file.read())
 
-    assert hash(response.content) == hash(sql_dump_bytes.getvalue())
+    sql_dump_value = sql_dump_bytes.getvalue()
+    assert len(response.content) == len(sql_dump_value)
+
+    # Remove HEADER, because datetime is embedded within first ~50 bytes
+    # see: https://github.com/postgres/postgres/blob/d35e29387870fecfdb52ffd4c93c651f0c7c1b43/src/bin/pg_dump/pg_backup_archiver.c#L3953-L3980
+    hash1 = hash(response.content[50:])
+    hash2 = hash(sql_dump_value[50:])
+    assert hash1 == hash2
+
     assert 'filename="export_data_savings_manager_' in response.headers["Content-Disposition"]
     assert response.headers["content-type"] == "application/octet-stream"
+
+    await asyncio.sleep(1)
+
+
+@pytest.mark.order(after="tests/test_db_manager.py::test_import_sql_dump")
+async def test_app_import_valid(
+        client: AsyncClient
+) -> None:
+    original_main = CommandLine.main
+
+    with patch.object(CommandLine, "main") as mock_main:
+        def patched_main(cmd_line, args) -> None:  # type: ignore
+            args = ["-x", "testing"] + args
+            original_main(cmd_line, args)
+
+        mock_main.side_effect = patched_main
+
+        dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
+
+        with open(dump_file_path, "rb") as file:
+            sql_dump_bytes = io.BytesIO(file.read())
+
+        # Prepare the file as part of the request (mimicking an upload)
+        files = {"file": ("dump.sql", sql_dump_bytes, "application/sql")}
+
+        response = await client.post(
+            f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/import",
+            files=files,
+        )
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT

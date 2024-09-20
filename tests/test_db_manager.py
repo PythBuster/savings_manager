@@ -1,7 +1,7 @@
 # pylint: disable=too-many-lines
 
 """All db_manager tests are located here."""
-
+import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
@@ -1155,7 +1155,6 @@ async def test_reset_database_delete_app_settings(
     original_main = CommandLine.main
 
     with patch.object(CommandLine, "main") as mock_main:
-
         def patched_main(cmd_line, args) -> None:  # type: ignore
             args = ["-x", "testing"] + args
             original_main(cmd_line, args)
@@ -1193,7 +1192,59 @@ async def test_export_sql_dump(
     dump_stream = await db_manager.export_sql_dump()
 
     dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
-    with dump_file_path.open("wb") as f:
-        f.write(dump_stream.getvalue())
+    dump_value = dump_stream.getvalue()
 
-    assert 31250 < len(dump_stream.getvalue()) < 31270
+    with dump_file_path.open("wb") as f:
+        f.write(dump_value)
+
+    assert 31250 < len(dump_value) < 31270
+    await asyncio.sleep(1)
+
+
+@pytest.mark.dependency(depends=["test_export_sql_dump"])
+@pytest.mark.order(after="tests/test_app_endpoints.py::test_app_export_valid")
+async def test_import_sql_dump(
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
+) -> None:
+    original_main = CommandLine.main
+
+    with patch.object(CommandLine, "main") as mock_main:
+        def patched_main(cmd_line, args) -> None:  # type: ignore
+            args = ["-x", "testing"] + args
+            original_main(cmd_line, args)
+
+        mock_main.side_effect = patched_main
+
+        dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
+        with dump_file_path.open("rb") as f:
+            sql_dump = f.read()
+
+        await db_manager.import_sql_dump(sql_dump=sql_dump)
+
+        expected_app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+        }
+        expected_moneyboxes = [
+            {
+                "name": "Overflow Moneybox",
+            },
+            {
+                "name": "Test Box 1",
+            },
+        ]
+        moneyboxes = await db_manager.get_moneyboxes()
+        assert len(moneyboxes) == len(expected_moneyboxes)
+        assert moneyboxes[0]["name"] == expected_moneyboxes[0]["name"]
+        assert moneyboxes[1]["name"] == expected_moneyboxes[1]["name"]
+
+        app_settings = await db_manager._get_app_settings()
+        assert equal_dict(
+            dict_1=app_settings.asdict(),
+            dict_2=expected_app_settings_data,
+            exclude_keys=["created_at", "modified_at", "id"],
+        )
