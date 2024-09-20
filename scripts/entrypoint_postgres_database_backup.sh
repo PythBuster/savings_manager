@@ -9,13 +9,13 @@ echo "#!/bin/bash\n pg_dump -Fc -h postgres_database -p 5432 -U ${POSTGRES_USER}
     chmod +x /backup.sh
 
 # Add cron job to crontab for root
-#echo "0 */12 * * * root /bin/bash /backup.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/postgres_backup && \
-echo "* * * * * root /bin/bash /backup.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/postgres_backup && \
+echo "0 */12 * * * root /bin/bash /backup.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/postgres_backup && \
+#echo "* * * * * root /bin/bash /backup.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/postgres_backup && \
     chmod 0644 /etc/cron.d/postgres_backup
 
 # Add cron job to crontab for root
-#echo "* 12 * * 7 root /bin/bash /clean_up_postgres_database_backups.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/clean_postgres_backup && \
-echo "* * * * * root /bin/bash /clean_up_postgres_database_backups.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/clean_postgres_backup && \
+echo "* 12 * * 7 root /bin/bash /clean_up_postgres_database_backups.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/clean_postgres_backup && \
+#echo "* * * * * root /bin/bash /clean_up_postgres_database_backups.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/clean_postgres_backup && \
     chmod 0644 /etc/cron.d/clean_postgres_backup
 
 exec "$@"

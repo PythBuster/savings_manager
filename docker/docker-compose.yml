@@ -5,8 +5,8 @@ services:
       context: ../
       dockerfile: docker/deploy-postgres-database-backup.Dockerfile
     volumes:
-      - /mnt/nas/savings_manager/db_backups:/postgres_backup
-      #- /home/david/dev/test:/postgres_backup
+      #- /mnt/nas/savings_manager/db_backups:/postgres_backup
+      - /home/david/dev/test:/postgres_backup
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
