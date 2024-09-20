@@ -1229,7 +1229,7 @@ async def test_import_sql_dump(
             "is_automated_saving_active": False,
             "savings_amount": 150,
             "overflow_moneybox_automated_savings_mode": (
-                OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+                OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
             ),
         }
         expected_moneyboxes = [
@@ -1246,8 +1246,9 @@ async def test_import_sql_dump(
         assert moneyboxes[1]["name"] == expected_moneyboxes[1]["name"]
 
         app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
+        app_settings_data = app_settings.asdict()
         assert equal_dict(
-            dict_1=app_settings.asdict(),
+            dict_1=app_settings_data,
             dict_2=expected_app_settings_data,
             exclude_keys=["created_at", "modified_at", "id"],
         )
