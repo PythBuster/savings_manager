@@ -26,9 +26,9 @@ To get the latest version of the repository, simply pull it and rebuild the Dock
 [Poetry](https://python-poetry.org/) is used as the deployment and dependency manager.
 
 ##### Linux (Ubuntu 22.04):
-1. Install Python 3.11 on your OS and add Python 3.11 to PATH.
+1. Install Python 3.12 on your OS and add Python 3.12 to PATH.
 2. Install pipx: `sudo apt update && sudo apt install pipx`
-3. Install Poetry: `pipx install poetry --python 311`
+3. Install Poetry: `python3.12 -m pipx install poetry`
 4. Install project dependencies:  
    ```bash
    cd PROJECT_ROOT
