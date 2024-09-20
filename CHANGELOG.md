@@ -2,6 +2,14 @@
 
 ## x.y.z (unreleased)
 
+## 2.23.0 (2024-09-20)
+### Feature:
+- implemented import functionality (import sql dump)
+
+### Changes:
+- export custom format sql (pg_dump) instead of plain text
+- export full  (pg_dump) data instead of --data-only option
+
 ## 2.22.1 (2024-09-18)
 ### Fixes:
 - install missing dependency in CI/CD workflow yml (github action)
