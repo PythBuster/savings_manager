@@ -5,17 +5,13 @@ from typing import AsyncGenerator
 
 import uvicorn
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
-from slowapi.errors import RateLimitExceeded
-from starlette.middleware.cors import CORSMiddleware
 
 from src.custom_types import Environment
 from src.db.db_manager import DBManager
-from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
 from src.fastapi_utils import (
     create_pgpass,
-    handle_requests,
+    register_handler_and_middleware,
     register_router,
     set_custom_openapi_schema,
 )
@@ -23,12 +19,6 @@ from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data, get_app_env_variables
-
-app_data = get_app_data()
-"""Reference to the app data."""
-
-author_name, author_mail = app_data["authors"][0].split()
-"""Reference to the author's name and report_sender address.'"""
 
 
 @asynccontextmanager
@@ -77,6 +67,12 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     # deconstruct app here
 
 
+app_data = get_app_data()
+"""Reference to the app data."""
+
+author_name, author_mail = app_data["authors"][0].split()
+"""Reference to the author's name and report_sender address.'"""
+
 # Initialize the fastAPI app
 app = FastAPI(
     lifespan=lifespan,
@@ -93,27 +89,9 @@ app = FastAPI(
 """Reference to the fastapi app."""
 
 
-# register/override middlewares, exceptions handlers
-print("Register/override middlewares, exceptions handlers ...", flush=True)
-
-# override registered exception handler of
-# - RateLimitExceeded
-# - RequestValidationError
-app.add_exception_handler(RateLimitExceeded, response_exception)
-app.add_exception_handler(RequestValidationError, response_exception)
-
-# handle requests and all other exceptions
-app.middleware("http")(handle_requests)
-
-app.add_middleware(
-    CORSMiddleware,  # type: ignore
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 if __name__ == "__main__":
+    register_handler_and_middleware(fastapi_app=app)
+
     app_env_variables = get_app_env_variables()
 
     print("Start uvicorn server ...", flush=True)

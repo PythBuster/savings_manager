@@ -14,6 +14,7 @@ from src.constants import WORKING_DIR_PATH
 from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
+from src.fastapi_utils import register_handler_and_middleware
 from src.limiter import limiter
 from src.main import app, register_router, set_custom_openapi_schema
 from src.report_sender.email_sender.sender import EmailSender
@@ -262,6 +263,7 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
     :rtype: AsyncGenerator
     """
 
+    register_handler_and_middleware(fastapi_app=app)
     set_custom_openapi_schema(fastapi_app=app)
     register_router(fastapi_app=app)
 

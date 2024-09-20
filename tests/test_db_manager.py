@@ -1155,6 +1155,7 @@ async def test_reset_database_delete_app_settings(
     original_main = CommandLine.main
 
     with patch.object(CommandLine, "main") as mock_main:
+
         def patched_main(cmd_line, args) -> None:  # type: ignore
             args = ["-x", "testing"] + args
             original_main(cmd_line, args)
