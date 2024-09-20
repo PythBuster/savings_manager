@@ -5,15 +5,18 @@ from typing import AsyncGenerator
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from slowapi.errors import RateLimitExceeded
+from starlette.middleware.cors import CORSMiddleware
 
 from src.custom_types import Environment
 from src.db.db_manager import DBManager
+from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
 from src.fastapi_utils import (
     create_pgpass,
-    register_handler_and_middleware,
     register_router,
-    set_custom_openapi_schema,
+    set_custom_openapi_schema, handle_requests,
 )
 from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
@@ -64,6 +67,8 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
 
     yield
 
+    await background_tasks_runner.stop_tasks()
+
     # deconstruct app here
 
 
@@ -88,16 +93,33 @@ app = FastAPI(
 )
 """Reference to the fastapi app."""
 
+# register/override middlewares, exceptions handlers
+print("Register/override middlewares, exceptions handlers ...", flush=True)
+
+app.add_middleware(
+    CORSMiddleware,  # type: ignore
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+# override registered exception handler of
+# - RateLimitExceeded
+# - RequestValidationError
+app.add_exception_handler(RateLimitExceeded, response_exception)
+app.add_exception_handler(RequestValidationError, response_exception)
+
+# handle requests and all other exceptions
+app.middleware("http")(handle_requests)
+
 
 if __name__ == "__main__":
-    register_handler_and_middleware(fastapi_app=app)
-
     app_env_variables = get_app_env_variables()
 
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
         "src.main:app",
-        host="0.0.0.0",
+       # host="0.0.0.0",
         port=8001,
         loop="auto",
         workers=1,

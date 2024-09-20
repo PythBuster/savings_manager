@@ -118,32 +118,3 @@ def create_pgpass(app_env_variables: AppEnvVariables) -> None:
     PGPASS_FILE_PATH.chmod(0o600)
 
     os.environ["PGPASSFILE"] = str(PGPASS_FILE_PATH)
-
-
-def register_handler_and_middleware(fastapi_app: FastAPI) -> None:
-    """Helper function for fastAPI app to register middlewares,
-    handlers, etc.
-
-    :param fastapi_app: The fast api app.
-    :type fastapi_app: :class:`FastAPI`
-    """
-
-    # register/override middlewares, exceptions handlers
-    print("Register/override middlewares, exceptions handlers ...", flush=True)
-
-    # override registered exception handler of
-    # - RateLimitExceeded
-    # - RequestValidationError
-    fastapi_app.add_exception_handler(RateLimitExceeded, response_exception)
-    fastapi_app.add_exception_handler(RequestValidationError, response_exception)
-
-    # handle requests and all other exceptions
-    fastapi_app.middleware("http")(handle_requests)
-
-    fastapi_app.add_middleware(
-        CORSMiddleware,  # type: ignore
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )

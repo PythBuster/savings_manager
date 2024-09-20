@@ -104,3 +104,12 @@ class BackgroundTaskRunner:
         """The background task runner is responsible for printing out the task information."""
 
         print(f"{datetime.now()} - {task_name.strip()}: {message.strip()}", flush=True)
+
+    async def stop_tasks(self):
+        for task in self.background_tasks:
+            task.cancel()
+
+        try:
+            await asyncio.wait_for(asyncio.gather(*self.background_tasks, return_exceptions=True), timeout=2)
+        except asyncio.TimeoutError:
+            print("Timeout reached while waiting for tasks to finish. Force stopping.")
