@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.24.2 (2024-09-23)
+### Fixes:
+- fixed pipeline by fixing unnecessary function imports in tests
+
 ## 2.24.1 (2024-09-20)
 ### Changes:
 - fix: register fastAPI middlewares and handlers before being used from uvicorn
