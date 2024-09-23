@@ -119,7 +119,7 @@ if __name__ == "__main__":
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
         "src.main:app",
-       # host="0.0.0.0",
+        host="0.0.0.0",
         port=8001,
         loop="auto",
         workers=1,

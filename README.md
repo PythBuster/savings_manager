@@ -9,6 +9,8 @@ Savings Manager simplifies the process, allowing you to watch as your moneyboxes
 ## Deployment / Contribution
 
 ### Docker
+**NOTE**: You need a `.env` with all environments in `/envs` dir (see section **Env**).
+
 1. Navigate to the Docker directory: `cd docker`
 2. Run: `docker compose up -d` to start the PostgreSQL database and the Savings Manager app.  
    The app will be accessible at: `localhost:8000`
@@ -39,6 +41,7 @@ To get the latest version of the repository, simply pull it and rebuild the Dock
 ##### Database
 A PostgreSQL database is required. To connect to the database, add a `.env` file in `/src/envs` with the following information:
 
+##### Env
 ```
 ENVIRONMENT=prod|dev|test
 
