@@ -396,26 +396,26 @@ class TransactionLogResponse(BaseModel):
 
         return value
 
-    @model_validator(mode="before")
+    @field_validator("created_at", mode="before")
     @classmethod
     def transform_create_at_string_datetime_to_datetime(
         cls,
-        data: dict[str, Any],
-    ) -> dict[str, Any]:
+        value: Any,
+    ) -> Any:
         """Try to transform 'created_at' string datetime to datetime,
         if possible and necessary."""
 
-        if isinstance(data["created_at"], str):
+        if isinstance(value, str):
             try:
-                data["created_at"] = datetime.fromisoformat(data["created_at"])
+                return datetime.fromisoformat(value)
             except (TypeError, ValueError) as ex:
                 raise ValueError(
                     "'created_at' must be of type datetime or datetime-string."
                 ) from ex
-        elif not isinstance(data["created_at"], datetime):
+        elif not isinstance(value, datetime):
             raise ValueError("'created_at' must be of type datetime or datetime-string.")
 
-        return data
+        return value
 
     @model_validator(mode="after")
     def validate_transaction_type_and_transaction_trigger_accepted_combinations(

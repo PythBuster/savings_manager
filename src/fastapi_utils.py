@@ -4,9 +4,6 @@ import os
 from typing import Callable
 
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
-from slowapi.errors import RateLimitExceeded
-from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.staticfiles import StaticFiles

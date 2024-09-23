@@ -9,7 +9,6 @@ from pydantic import (
     Field,
     StringConstraints,
     field_validator,
-    model_validator,
 )
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
@@ -425,19 +424,15 @@ class AppSettingsRequest(BaseModel):
     )
     """The config of the model."""
 
-    @model_validator(mode="before")
+    @field_validator("overflow_moneybox_automated_savings_mode", mode="before")
     @classmethod
-    def transform_enum_strings_to_enum_type(cls, data: dict[str, Any]) -> dict[str, Any]:
-        """Lower case enum strings and concerts to enum."""
+    def transform_str_overflow_moneybox_automated_savings_mode_to_enum_type(cls, value: Any) -> Any:
+        """Lower case enum string and convert to enum."""
 
-        if "overflowMoneyboxAutomatedSavingsMode" in data and isinstance(
-            data["overflowMoneyboxAutomatedSavingsMode"], str
-        ):
-            data["overflowMoneyboxAutomatedSavingsMode"] = OverflowMoneyboxAutomatedSavingsModeType(
-                data["overflowMoneyboxAutomatedSavingsMode"].lower()
-            )
+        if isinstance(value, str):
+            return OverflowMoneyboxAutomatedSavingsModeType(value.lower())
 
-        return data
+        return value
 
 
 class ResetDataRequest(BaseModel):

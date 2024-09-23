@@ -30,6 +30,7 @@ from src.utils import equal_dict, to_camel_cleaned_suffix
 )
 def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
     """Test valid MoneyboxCreateRequest creation."""
+
     response = MoneyboxCreateRequest(**data)
     assert response.name == data["name"]
     assert response.savings_amount == data["savingsAmount"]
@@ -59,6 +60,7 @@ def test_moneybox_create_request_valid(data: dict[str, Any]) -> None:
 )
 def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
     """Test MoneyboxCreateRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         MoneyboxCreateRequest(**data)
 
@@ -74,6 +76,7 @@ def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
 )
 def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
     """Test valid MoneyboxUpdateRequest creation."""
+
     response = MoneyboxUpdateRequest(**data)
 
     for key in data.keys():
@@ -103,6 +106,7 @@ def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
 )
 def test_moneybox_update_request_invalid(data: dict[str, Any]) -> None:
     """Test MoneyboxUpdateRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         MoneyboxUpdateRequest(**data)
 
@@ -117,6 +121,7 @@ def test_moneybox_update_request_invalid(data: dict[str, Any]) -> None:
 )
 def test_deposit_transaction_request_valid(data: dict[str, Any]) -> None:
     """Test valid DepositTransactionRequest creation."""
+
     response = DepositTransactionRequest(**data)
     assert response.amount == data["amount"]
     assert response.description == data["description"]
@@ -131,6 +136,7 @@ def test_deposit_transaction_request_valid(data: dict[str, Any]) -> None:
 )
 def test_deposit_transaction_request_invalid(data: dict[str, Any]) -> None:
     """Test DepositTransactionRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         DepositTransactionRequest(**data)
 
@@ -145,6 +151,7 @@ def test_deposit_transaction_request_invalid(data: dict[str, Any]) -> None:
 )
 def test_withdraw_transaction_request_valid(data: dict[str, Any]) -> None:
     """Test valid WithdrawTransactionRequest creation."""
+
     response = WithdrawTransactionRequest(**data)
     assert response.amount == data["amount"]
     assert response.description == data["description"]
@@ -159,6 +166,7 @@ def test_withdraw_transaction_request_valid(data: dict[str, Any]) -> None:
 )
 def test_withdraw_transaction_request_invalid(data: dict[str, Any]) -> None:
     """Test WithdrawTransactionRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         WithdrawTransactionRequest(**data)
 
@@ -173,6 +181,7 @@ def test_withdraw_transaction_request_invalid(data: dict[str, Any]) -> None:
 )
 def test_transfer_transaction_request_valid(data: dict[str, Any]) -> None:
     """Test valid TransferTransactionRequest creation."""
+
     response = TransferTransactionRequest(**data)
     assert response.to_moneybox_id == data["toMoneyboxId"]
     assert response.amount == data["amount"]
@@ -191,6 +200,7 @@ def test_transfer_transaction_request_valid(data: dict[str, Any]) -> None:
 )
 def test_transfer_transaction_request_invalid(data: dict[str, Any]) -> None:
     """Test TransferTransactionRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         TransferTransactionRequest(**data)
 
@@ -205,6 +215,7 @@ def test_transfer_transaction_request_invalid(data: dict[str, Any]) -> None:
 )
 def test_priority_request_valid(data: dict[str, Any]) -> None:
     """Test valid PriorityRequest creation."""
+
     response = PriorityRequest(**data)
     assert response.moneybox_id == data["moneyboxId"]
     assert response.priority == data["priority"]
@@ -219,6 +230,7 @@ def test_priority_request_valid(data: dict[str, Any]) -> None:
 )
 def test_priority_request_invalid(data: dict[str, Any]) -> None:
     """Test PriorityRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         PriorityRequest(**data)
 
@@ -243,6 +255,7 @@ def test_priority_request_invalid(data: dict[str, Any]) -> None:
 )
 def test_prioritylist_request_valid(data: dict[str, Any]) -> None:
     """Test valid PrioritylistRequest creation."""
+
     response = PrioritylistRequest(**data)
     assert len(response.prioritylist) == len(data["prioritylist"])
     for i, item in enumerate(response.prioritylist):
@@ -284,6 +297,7 @@ def test_prioritylist_request_valid(data: dict[str, Any]) -> None:
 )
 def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
     """Test PrioritylistRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         PrioritylistRequest(**data)
 
@@ -317,15 +331,26 @@ def test_prioritylist_request_invalid(data: dict[str, Any]) -> None:
         {
             "overflowMoneyboxAutomatedSavingsMode": "collect",
         },  # strings converts to enum
+        {
+            "overflowMoneyboxAutomatedSavingsMode": "COLLECT",
+        },  # UPPER strings converts to enum
     ],
 )
 def test_app_settings_request_valid(data: dict[str, Any]) -> None:
     """Test valid AppSettingsRequest creation."""
+
     response = AppSettingsRequest(**data)
     set_attributes = response.model_dump(exclude_unset=True)
 
+    def _lower_strings(value: Any) -> Any:
+        if isinstance(value, str):
+            return value.lower()
+
+        return value
+
     # convert snake_case keys to camelCase
     set_attributes = {to_camel_cleaned_suffix(key): value for key, value in set_attributes.items()}
+    data = {key: _lower_strings(value) for key, value in set_attributes.items()}
     assert equal_dict(dict_1=set_attributes, dict_2=data)
 
 
@@ -347,5 +372,6 @@ def test_app_settings_request_valid(data: dict[str, Any]) -> None:
 )
 def test_app_settings_request_invalid(data: dict[str, Any]) -> None:
     """Test AppSettingsRequest creation with invalid data."""
+
     with pytest.raises(ValidationError):
         AppSettingsRequest(**data)
