@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.25.0 (2024-09-23)
+### Changes:
+- refactor pydantic validators and use field_validators in some cases instead of model_validators
+
 ## 2.24.2 (2024-09-23)
 ### Fixes:
 - fixed pipeline by fixing unnecessary function imports in tests
