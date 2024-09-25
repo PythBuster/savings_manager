@@ -4,7 +4,17 @@ from typing import Any
 
 from asyncpg import InvalidTextRepresentationError
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import Sequence, and_, insert, select, update
+from sqlalchemy import (
+    Insert,
+    Result,
+    Select,
+    Sequence,
+    Update,
+    and_,
+    insert,
+    select,
+    update,
+)
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -16,7 +26,7 @@ async def create_instance(
     async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     data: dict[str, Any],
-) -> SqlBase:
+) -> SqlBase | None:
     """The core CREATE db function.
 
     :param async_session: The current async_session of the database or a session_maker,
@@ -27,18 +37,18 @@ async def create_instance(
     :param data: The ORM model data.
     :type data: :class:`dict[str, Any]`
     :return: The created db instance.
-    :rtype: :class:`SqlBase`
+    :rtype: :class:`SqlBase` | None
     """
 
-    stmt = insert(orm_model).values(data).returning(orm_model)
+    stmt: Insert = insert(orm_model).values(data).returning(orm_model)
 
     if isinstance(async_session, AsyncSession):
-        result = await async_session.execute(stmt)
+        result: Result = await async_session.execute(stmt)
     else:
         async with async_session.begin() as session:
             result = await session.execute(stmt)
 
-    instance = result.scalars().one()
+    instance: SqlBase | None = result.scalars().one()
     return instance
 
 
@@ -66,19 +76,19 @@ async def read_instance(
     """
 
     if only_active_instances:
-        stmt = select(orm_model).where(  # type: ignore
+        stmt: Select = select(orm_model).where(  # type: ignore
             and_(orm_model.id == record_id, orm_model.is_active.is_(True))  # type: ignore
         )
     else:
-        stmt = select(orm_model).where(orm_model.id == record_id)  # type: ignore
+        stmt: Select = select(orm_model).where(orm_model.id == record_id)  # type: ignore
 
     if isinstance(async_session, AsyncSession):
-        result = await async_session.execute(stmt)  # type: ignore
+        result: Result = await async_session.execute(stmt)  # type: ignore
     else:
         async with async_session.begin() as session:
-            result = await session.execute(stmt)  # type: ignore
+            result: Result = await session.execute(stmt)  # type: ignore
 
-    instance = result.scalars().one_or_none()
+    instance: SqlBase | None = result.scalars().one_or_none()
     return instance
 
 
@@ -103,19 +113,19 @@ async def read_instances(
     """
 
     if only_active_instances:
-        stmt = select(orm_model).where(  # type: ignore
+        stmt: Select = select(orm_model).where(  # type: ignore
             orm_model.is_active.is_(True)  # type: ignore
         )
     else:
-        stmt = select(orm_model)  # type: ignore
+        stmt: Select = select(orm_model)  # type: ignore
 
     if isinstance(async_session, AsyncSession):
-        result = await async_session.execute(stmt)  # type: ignore
+        result: Result = await async_session.execute(stmt)  # type: ignore
     else:
         async with async_session.begin() as session:
-            result = await session.execute(stmt)  # type: ignore
+            result: Result = await session.execute(stmt)  # type: ignore
 
-    instances = result.scalars().all()
+    instances: Sequence[SqlBase] = result.scalars().all()
     return instances
 
 
@@ -150,11 +160,13 @@ async def update_instance(
     if "is_active" in data:
         del data["is_active"]
 
-    stmt = update(orm_model).where(orm_model.id == record_id).values(data).returning(orm_model)
+    stmt: Update = (
+        update(orm_model).where(orm_model.id == record_id).values(data).returning(orm_model)
+    )
 
     try:
         if isinstance(async_session, AsyncSession):
-            result = await async_session.execute(stmt)
+            result: Result = await async_session.execute(stmt)
         else:
             async with async_session.begin() as session:
                 result = await session.execute(stmt)
@@ -168,8 +180,7 @@ async def update_instance(
             },
         ) from ex
 
-    instance = result.scalars().one_or_none()
-    return instance
+    return result.scalars().one_or_none()
 
 
 async def deactivate_instance(
@@ -192,14 +203,14 @@ async def deactivate_instance(
     :rtype: :class:`bool`
     """
 
-    active_moneybox = await read_instance(
+    active_moneybox: SqlBase | None = await read_instance(
         async_session=async_session,
         orm_model=orm_model,
         record_id=record_id,
     )
 
     if active_moneybox is not None:
-        stmt = (
+        stmt: Update = (
             update(orm_model)
             .where(orm_model.id == record_id)
             .values(is_active=False)
@@ -207,12 +218,12 @@ async def deactivate_instance(
         )
 
         if isinstance(async_session, AsyncSession):
-            result = await async_session.execute(stmt)
+            result: Result = await async_session.execute(stmt)
         else:
             async with async_session.begin() as session:
                 result = await session.execute(stmt)
 
-        updated_instance = result.scalars().one_or_none()
+        updated_instance: SqlBase = result.scalars().one_or_none()
 
         if updated_instance is not None:
             return True

@@ -11,11 +11,14 @@
             "id": "1bdf787dcc5f54b4",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
-                "mode": "source",
-                "source": false
+                "file": "Untitled.canvas",
+                "viewState": {
+                  "x": 0,
+                  "y": 0,
+                  "zoom": 0
+                }
               }
             }
           }
@@ -85,7 +88,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
+                "file": "Untitled.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +105,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
+                "file": "Untitled.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +128,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Feauture Requests/Ideas.md"
+                "file": "Untitled.canvas"
               }
             }
           }
@@ -148,39 +151,39 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
-    "Requirements/Requirement Analysis.md",
+    "Architecture/Database App v2.md",
+    "Untitled.canvas",
     "Architecture/Autom. Database Backup.md",
-    "Feauture Requests/Ideas.md",
-    "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
+    "ui/draft/SavingsManagerUI_v2.png",
+    "ui/draft/SavingsManagerUI_v1.png",
+    "ui/draft/FullTransactionLogs_v2.png",
+    "Requirements/Requirement Analysis.md",
     "Guidelines/Workflow.md",
+    "Architecture/Endpoints.md",
+    "Architecture/Database App v1.md",
+    "TransactionLog_Creation.png",
+    "distribution_logs_app_v2.png",
+    "Diagram 1.svg",
+    "Diagram 2.svg",
+    "ui/draft/App Version 1.md",
+    "ui/draft/App Version 2.md",
+    "ui/draft/App_v1_SavingsManagerUI.png",
+    "_changelog_template.md",
+    "ui/draft/FullTransactionLogs_v1.png",
+    "ui/draft/date-filter-animation-.gif",
+    "Feauture Requests/Ideas.md",
     "Guidelines/Code/Quality Assurence.md",
     "Guidelines/Code/Code Style.md",
-    "ui/draft/App_v2_SavingsManagerUI.png",
-    "Architecture/Database App v2.md",
-    "Architecture/Database App v1.md",
     "vulture_whitelist.def",
-    "Architecture/Endpoints.md",
     "vulture_whitelist.def~",
     "sphinx/source/task_runner.rst",
     "sphinx/source/report_sender.rst",
     "sphinx/source/report_sender.email_sender.templates.rst",
     "sphinx/source/report_sender.email_sender.rst",
     "sphinx/source/app_logger.rst",
-    "TransactionLog_Creation.png",
-    "_changelog_template.md",
-    "distribution_logs_app_v2.png",
-    "Diagram 1.svg",
-    "Diagram.svg",
-    "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
-    "ui/draft/App_v1_SavingsManagerUI.png",
-    "ui/draft/App Version 2.md",
-    "ui/draft/App Version 1.md",
-    "transaction_log/Final_Example_Transatcion_Log.png",
-    "transaction_log/draft_moneybox_log.png",
     "sphinx/source/conf.py.isorted",
     "Diagram 2.svg.xml",
     "Diagram 1.svg.xml",
-    "Untitled.canvas",
     "transaction_log/Untitled.md",
     "Guidelines/Code/Deployment.md",
     "Guidelines/Deployment/Unbenannt.md",

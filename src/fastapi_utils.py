@@ -4,6 +4,7 @@ import os
 from typing import Callable
 
 from fastapi import FastAPI
+from pydantic.types import SecretType
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.staticfiles import StaticFiles
@@ -22,7 +23,10 @@ from src.routes.web_ui import web_ui_router
 
 
 # exception handler
-async def handle_requests(request: Request, call_next: Callable) -> Response | JSONResponse:
+async def handle_requests(
+    request: Request,
+    call_next: Callable,
+) -> Response | JSONResponse:
     """Custom request handler as middleware, which will handle
     exceptions individually, which could arise.
 
@@ -104,13 +108,13 @@ def create_pgpass(app_env_variables: AppEnvVariables) -> None:
     :type app_env_variables: :class:`AppEnvVariables`
     """
 
-    port = app_env_variables.db_port
-    db = app_env_variables.db_name
-    user = app_env_variables.db_user
-    pw = app_env_variables.db_password.get_secret_value()
-    host = app_env_variables.db_host
+    port: int = app_env_variables.db_port
+    db: str = app_env_variables.db_name
+    user: str = app_env_variables.db_user
+    pw: SecretType = app_env_variables.db_password.get_secret_value()
+    host: str = app_env_variables.db_host
 
-    pass_data = f"{host}:{port}:{db}:{user}:{pw}"
+    pass_data: str = f"{host}:{port}:{db}:{user}:{pw}"
     PGPASS_FILE_PATH.write_text(pass_data, encoding="utf-8")
     PGPASS_FILE_PATH.chmod(0o600)
 

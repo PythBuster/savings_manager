@@ -9,11 +9,12 @@ from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
-from src.limiter import limiter
+from src.db.models import AppSettings
 from src.report_sender.email_sender.sender import EmailSender
 from src.routes.responses.email_sender import SEND_TESTEMAIL_RESPONSES
+from src.singleton import limiter
 
-email_sender_router = APIRouter(
+email_sender_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.EMAIL_SENDER}",
     tags=[EndpointRouteType.EMAIL_SENDER],
 )
@@ -36,11 +37,13 @@ async def send_testemail(request: Request) -> Response:
     :rtype: :class:`Response`
     """
 
-    email_sender = cast(EmailSender, request.app.state.email_sender)
-    db_manager = cast(DBManager, request.app.state.db_manager)
+    email_sender: EmailSender = cast(EmailSender, request.app.state.email_sender)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
 
-    app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
-    succeeded = await email_sender.send_testemail(to=app_settings.user_email_address)
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # pylint: disable=protected-access
+    )
+    succeeded: bool = await email_sender.send_testemail(to=app_settings.user_email_address)
 
     if succeeded:
         return Response(status_code=status.HTTP_204_NO_CONTENT)

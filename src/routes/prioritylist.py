@@ -16,7 +16,7 @@ from src.routes.responses.prioritylist import (
     UPDATE_PRIORITYLIST_RESPONSES,
 )
 
-prioritylist_router = APIRouter(
+prioritylist_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.PRIORITYLIST}",
     tags=[EndpointRouteType.PRIORITYLIST],
 )
@@ -41,8 +41,8 @@ async def get_prioritylist(
     :rtype: :class:`PrioritylistResponse` | :class:`Response`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    priority_list = await db_manager.get_prioritylist()
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    priority_list: list[dict[str, int | str]] = await db_manager.get_prioritylist()
 
     if priority_list:
         return {"prioritylist": priority_list}  # type: ignore
@@ -74,8 +74,8 @@ async def update_prioritylist(
     :rtype: :class:`PrioritylistResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    updated_priority_list = await db_manager.update_prioritylist(
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    updated_priority_list: list[dict[str, int | str]] = await db_manager.update_prioritylist(
         priorities=prioritylist.model_dump()["prioritylist"],
     )
 

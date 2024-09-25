@@ -14,9 +14,9 @@ from src.constants import WORKING_DIR_PATH
 from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
 from src.db.models import Base
-from src.limiter import limiter
 from src.main import app, register_router, set_custom_openapi_schema
 from src.report_sender.email_sender.sender import EmailSender
+from src.singleton import limiter
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
 
 pytest_plugins = ("pytest_asyncio",)
@@ -305,7 +305,7 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
         if exclude_table_names is None:
             exclude_table_names = []
 
-        async with self.async_session.begin() as session:
+        async with self.async_sessionmaker.begin() as session:
             for table in Base.metadata.sorted_tables:
                 if table.name not in exclude_table_names:
                     await session.execute(table.delete())

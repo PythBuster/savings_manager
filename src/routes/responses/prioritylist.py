@@ -1,8 +1,10 @@
 """Further prioritylist SwaggerUI response codes and examples are located here."""
 
+from typing import Any
+
 from starlette import status
 
-GET_PRIORITYLIST_RESPONSES = {
+GET_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
     },
@@ -12,7 +14,7 @@ GET_PRIORITYLIST_RESPONSES = {
 }
 """Further custom responses for endpoint GET: /prioritylist."""
 
-UPDATE_PRIORITYLIST_RESPONSES = {
+UPDATE_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
     },

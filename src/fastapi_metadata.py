@@ -1,6 +1,6 @@
 """The FastAPI tags metadata are defined here."""
 
-tags_metadata = [
+tags_metadata: list[dict[str, str]] = [
     {
         "name": "moneybox",
         "description": "All moneybox endpoints.",

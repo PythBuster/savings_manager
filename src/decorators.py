@@ -21,7 +21,7 @@ class every:  # pylint: disable=invalid-name
         """
 
         def decorator(func: Callable) -> Callable:
-            func_name = func.__name__.upper()  # Capture the name of the decorated function
+            func_name: str = func.__name__.upper()  # Capture the name of the decorated function
 
             @wraps(func)
             async def wrapper(obj, *args, **kwargs):  # type: ignore
@@ -50,7 +50,7 @@ class every:  # pylint: disable=invalid-name
         """
 
         def decorator(func: Callable) -> Callable:
-            func_name = func.__name__.upper()  # Capture the name of the decorated function
+            func_name: str = func.__name__.upper()  # Capture the name of the decorated function
 
             @wraps(func)
             async def wrapper(obj, *args, **kwargs):  # type: ignore
@@ -78,7 +78,7 @@ class every:  # pylint: disable=invalid-name
         """
 
         def decorator(func: Callable) -> Callable:
-            func_name = func.__name__.upper()  # Capture the name of the decorated function
+            func_name: str = func.__name__.upper()  # Capture the name of the decorated function
 
             @wraps(func)
             async def wrapper(obj, *args, **kwargs):  # type: ignore

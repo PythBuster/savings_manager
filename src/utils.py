@@ -60,6 +60,8 @@ def get_database_url(db_settings: AppEnvVariables) -> str:
     :type db_settings: :class:`AppEnvVariables`
     :return: A database connection string
     :rtype: :class:`str`
+
+    :raises ValueError: if db_driver in settings is not supported.
     """
 
     if "postgres" in db_settings.db_driver:
@@ -76,17 +78,17 @@ def get_app_data() -> dict[str, Any]:
     :rtype: :class:`dict[str, Any]`
     """
 
-    pyproject_file_path = Path(__file__).resolve().parent.parent / "pyproject.toml"
+    pyproject_file_path: Path = Path(__file__).resolve().parent.parent / "pyproject.toml"
 
     with pyproject_file_path.open(mode="rb") as pyproject_file:
-        pyproject_data = tomllib.load(pyproject_file)
+        pyproject_data: dict[str, Any] = tomllib.load(pyproject_file)
 
     return pyproject_data["tool"]["poetry"]
 
 
 def equal_dict(
-    dict_1: dict,
-    dict_2: dict,
+    dict_1: dict[str, Any],
+    dict_2: dict[str, Any],
     exclude_keys: list[str] | None = None,
 ) -> bool:
     """Compare two dictionaries by excluding keys specified in exclude_keys.
@@ -105,8 +107,8 @@ def equal_dict(
         exclude_keys = []
 
     # Create copies of the dictionaries to avoid modifying the originals
-    dict_1_filtered = {k: v for k, v in dict_1.items() if k not in exclude_keys}
-    dict_2_filtered = {k: v for k, v in dict_2.items() if k not in exclude_keys}
+    dict_1_filtered: dict[str, Any] = {k: v for k, v in dict_1.items() if k not in exclude_keys}
+    dict_2_filtered: dict[str, Any] = {k: v for k, v in dict_2.items() if k not in exclude_keys}
 
     return dict_1_filtered == dict_2_filtered
 
@@ -133,15 +135,15 @@ def as_dict(  # type: ignore  # pylint: disable=missing-function-docstring, too-
     )
 
 
-def tabulate_str(headers: Sequence, rows: Sequence, showindex: bool = False) -> str:
+def tabulate_str(headers: Sequence, rows: Sequence, show_index: bool = False) -> str:
     """Helper function to get a ascii table based on headers and rows.
 
     :param headers: The headers of the table.
     :type headers: :class:`Sequence`
     :param rows: The row data of the table.
     :type rows: :class:`Sequence`
-    :param showindex: Flag to show indexes in table.
-    :type showindex: :class:`bool`
+    :param show_index: Flag to show indexes in table.
+    :type show_index: :class:`bool`
     :return: The generated string table.
     :rtype: :class:`str`
     """
@@ -151,5 +153,5 @@ def tabulate_str(headers: Sequence, rows: Sequence, showindex: bool = False) -> 
         headers=headers,
         tabular_data=rows,
         tablefmt="plain",
-        showindex=showindex,
+        showindex=show_index,
     )

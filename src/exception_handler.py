@@ -82,10 +82,10 @@ async def response_exception(  # pylint: disable=too-many-return-statements
         )
 
     if isinstance(exception, sqlalchemy.exc.IntegrityError):
-        error_message = exception.args[0]
-        error_parts = error_message.split(":")
-        exception_type, message, *detail = error_parts
-        detail = "".join(detail)
+        error_message: str = exception.args[0]
+        error_parts: list[str] = error_message.split(":")
+        exception_type, message, *details = error_parts
+        detail: str = "".join(details)
 
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,

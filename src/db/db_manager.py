@@ -1,16 +1,21 @@
 # pylint: disable=too-many-lines
-
 """All database definitions are located here."""
+
 import asyncio
 import io
 import subprocess
 import tempfile
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import and_, desc, insert, select, update
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy import Result, Select, and_, desc, insert, select, update
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import joinedload
 
 from alembic.config import CommandLine
@@ -52,6 +57,7 @@ from src.db.models import (
     AutomatedSavingsLog,
     Moneybox,
     MoneyboxNameHistory,
+    SqlBase,
     Transaction,
 )
 from src.utils import get_database_url
@@ -74,13 +80,13 @@ class DBManager:
         if engine_args is None:
             engine_args = {"echo": False}
 
-        self.db_settings = db_settings
+        self.db_settings: AppEnvVariables = db_settings
 
-        self.async_engine = create_async_engine(
+        self.async_engine: AsyncEngine = create_async_engine(
             url=self.db_connection_string,
             **engine_args,
         )
-        self.async_session = async_sessionmaker(
+        self.async_sessionmaker: async_sessionmaker = async_sessionmaker(
             bind=self.async_engine,
             expire_on_commit=False,
         )
@@ -100,13 +106,12 @@ class DBManager:
     async def get_moneyboxes(self) -> list[dict[str, Any]]:
         """DB Function to get all moneyboxes.
 
-
         :return: The requested moneybox data.
         :rtype: :class:`list[dict[str, Any]]`
         """
 
-        moneyboxes = await read_instances(
-            async_session=self.async_session,
+        moneyboxes: Sequence[SqlBase] = await read_instances(
+            async_session=self.async_sessionmaker,
             orm_model=Moneybox,  # type: ignore
         )
 
@@ -131,8 +136,8 @@ class DBManager:
             was not found in database.
         """
 
-        moneybox = await read_instance(
-            async_session=self.async_session,
+        moneybox: SqlBase | None = await read_instance(
+            async_session=self.async_sessionmaker,
             orm_model=Moneybox,  # type: ignore
             record_id=moneybox_id,
             only_active_instances=only_active_instances,
@@ -157,17 +162,20 @@ class DBManager:
             database, missing moneybox with priority = 0.
         """
 
-        stmt = select(Moneybox).where(  # type: ignore
+        stmt: Select = select(Moneybox).where(  # type: ignore
             and_(
                 Moneybox.priority == 0,
                 Moneybox.is_active.is_(True),
             )
         )
 
-        async with self.async_session() as session:
-            result = await session.execute(stmt)  # type: ignore
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)  # type: ignore
 
-        moneybox = result.scalars().one_or_none()
+        moneybox: Moneybox | None = cast(
+            Moneybox,
+            result.scalars().one_or_none(),
+        )
 
         if moneybox is None:
             raise OverflowMoneyboxNotFoundError()
@@ -190,12 +198,15 @@ class DBManager:
             creating instance in database.
         """
 
-        async with self.async_session.begin() as session:
+        async with self.async_sessionmaker.begin() as session:
             moneybox_data["priority"] = 0
-            moneybox = await create_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                data=moneybox_data,
+            moneybox: Moneybox | None = cast(
+                Moneybox,
+                await create_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    data=moneybox_data,
+                ),
             )
 
             if moneybox is None:
@@ -220,16 +231,19 @@ class DBManager:
             creating instance in database.
         """
 
-        async with self.async_session.begin() as session:
-            priority_list = await self.get_prioritylist()
+        async with self.async_sessionmaker.begin() as session:
+            priority_list: list[dict[str, int | str]] = await self.get_prioritylist()
             moneybox_data["priority"] = (
                 1 if not priority_list else priority_list[-1]["priority"] + 1  # type: ignore
             )
 
-            moneybox = await create_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                data=moneybox_data,
+            moneybox: Moneybox | None = cast(
+                Moneybox,
+                await create_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    data=moneybox_data,
+                ),
             )
 
             if moneybox is None:
@@ -239,14 +253,17 @@ class DBManager:
                     details=moneybox_data,
                 )
 
-            moneybox_name_history_data = {
+            moneybox_name_history_data: dict[str, str | int] = {
                 "name": moneybox.name,  # type: ignore
                 "moneybox_id": moneybox.id,
             }
-            moneybox_name_history = await create_instance(
-                async_session=session,
-                orm_model=MoneyboxNameHistory,  # type: ignore
-                data=moneybox_name_history_data,
+            moneybox_name_history: MoneyboxNameHistory | None = cast(
+                MoneyboxNameHistory,
+                await create_instance(
+                    async_session=session,
+                    orm_model=MoneyboxNameHistory,  # type: ignore
+                    data=moneybox_name_history_data,
+                ),
             )
 
             if moneybox_name_history is None:
@@ -287,26 +304,32 @@ class DBManager:
         if moneybox_id == _overflow_moneybox.id:
             raise OverflowMoneyboxCantBeUpdatedError(moneybox_id=_overflow_moneybox.id)
 
-        async with self.async_session.begin() as session:
-            moneybox = await update_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                record_id=moneybox_id,
-                data=moneybox_data,
+        async with self.async_sessionmaker.begin() as session:
+            moneybox: Moneybox | None = cast(
+                Moneybox,
+                await update_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    record_id=moneybox_id,
+                    data=moneybox_data,
+                ),
             )
 
             if moneybox is None:
                 raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
             if "name" in moneybox_data:
-                moneybox_name_history_data = {
+                moneybox_name_history_data: dict[str, str | int] = {
                     "name": moneybox.name,  # type: ignore
                     "moneybox_id": moneybox.id,
                 }
-                moneybox_name_history = await create_instance(
-                    async_session=session,
-                    orm_model=MoneyboxNameHistory,  # type: ignore
-                    data=moneybox_name_history_data,
+                moneybox_name_history: MoneyboxNameHistory | None = cast(
+                    MoneyboxNameHistory,
+                    await create_instance(
+                        async_session=session,
+                        orm_model=MoneyboxNameHistory,  # type: ignore
+                        data=moneybox_name_history_data,
+                    ),
                 )
 
                 if moneybox_name_history is None:
@@ -336,7 +359,7 @@ class DBManager:
             wrong while deleting progress in db transaction.
         """
 
-        moneybox = await self.get_moneybox(moneybox_id=moneybox_id)
+        moneybox: dict[str, Any] = await self.get_moneybox(moneybox_id=moneybox_id)
         _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
 
         if moneybox["id"] == _overflow_moneybox.id:
@@ -345,12 +368,15 @@ class DBManager:
         if moneybox["balance"] > 0:
             raise HasBalanceError(moneybox_id=moneybox_id, balance=moneybox["balance"])
 
-        async with self.async_session.begin() as session:
-            updated_moneybox = await update_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                record_id=moneybox_id,
-                data={"priority": None},
+        async with self.async_sessionmaker.begin() as session:
+            updated_moneybox: Moneybox | None = cast(
+                Moneybox,
+                await update_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    record_id=moneybox_id,
+                    data={"priority": None},
+                ),
             )
 
             if not updated_moneybox:
@@ -373,7 +399,10 @@ class DBManager:
                     details={"deactivated": deactivated},
                 )
 
-            sorted_by_priority_prioritylist = await self.get_prioritylist()
+            sorted_by_priority_prioritylist: list[dict[str, int | str]] = (
+                await self.get_prioritylist()
+            )
+
             sorted_by_priority_prioritylist = [
                 priority_data
                 for priority_data in sorted_by_priority_prioritylist
@@ -433,11 +462,14 @@ class DBManager:
 
         # Determine the session to use
         if session is None:
-            async with self.async_session.begin() as session:
-                moneybox = await read_instance(
-                    async_session=session,
-                    orm_model=Moneybox,  # type: ignore
-                    record_id=moneybox_id,
+            async with self.async_sessionmaker.begin() as session:
+                moneybox: Moneybox | None = cast(
+                    Moneybox,
+                    await read_instance(
+                        async_session=session,
+                        orm_model=Moneybox,  # type: ignore
+                        record_id=moneybox_id,
+                    ),
                 )
 
                 if moneybox is None:
@@ -445,11 +477,14 @@ class DBManager:
 
                 moneybox.balance += deposit_transaction_data["amount"]  # type: ignore
 
-                updated_moneybox = await update_instance(
-                    async_session=session,
-                    orm_model=Moneybox,  # type: ignore
-                    record_id=moneybox_id,
-                    data=moneybox.asdict(),
+                updated_moneybox: Moneybox | None = cast(
+                    Moneybox,
+                    await update_instance(
+                        async_session=session,
+                        orm_model=Moneybox,  # type: ignore
+                        record_id=moneybox_id,
+                        data=moneybox.asdict(),
+                    ),
                 )
 
                 await self._add_transfer_log(
@@ -462,10 +497,13 @@ class DBManager:
                     session=session,
                 )
         else:
-            moneybox = await read_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                record_id=moneybox_id,
+            moneybox = cast(
+                Moneybox,
+                await read_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    record_id=moneybox_id,
+                ),
             )
 
             if moneybox is None:
@@ -473,11 +511,14 @@ class DBManager:
 
             moneybox.balance += deposit_transaction_data["amount"]  # type: ignore
 
-            updated_moneybox = await update_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                record_id=moneybox_id,
-                data=moneybox.asdict(),
+            updated_moneybox = cast(
+                Moneybox,
+                await update_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    record_id=moneybox_id,
+                    data=moneybox.asdict(),
+                ),
             )
 
             await self._add_transfer_log(
@@ -523,22 +564,28 @@ class DBManager:
             if result of withdraw is negative.
         """
 
-        amount = withdraw_transaction_data["amount"]
+        amount: int = withdraw_transaction_data["amount"]
 
         if amount <= 0:
             raise NonPositiveAmountError(moneybox_id=moneybox_id, amount=amount)
 
         if session is None:
-            moneybox = await read_instance(
-                async_session=self.async_session,
-                orm_model=Moneybox,  # type: ignore
-                record_id=moneybox_id,
+            moneybox: Moneybox | None = cast(
+                Moneybox,
+                await read_instance(
+                    async_session=self.async_sessionmaker,
+                    orm_model=Moneybox,  # type: ignore
+                    record_id=moneybox_id,
+                ),
             )
         else:
-            moneybox = await read_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                record_id=moneybox_id,
+            moneybox = cast(
+                Moneybox,
+                await read_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    record_id=moneybox_id,
+                ),
             )
 
         if moneybox is None:
@@ -550,12 +597,15 @@ class DBManager:
             raise BalanceResultIsNegativeError(moneybox_id=moneybox_id, amount=amount)
 
         if session is None:
-            async with self.async_session.begin() as session:
-                updated_moneybox = await update_instance(
-                    async_session=session,
-                    orm_model=Moneybox,  # type: ignore
-                    record_id=moneybox_id,
-                    data=moneybox.asdict(),
+            async with self.async_sessionmaker.begin() as session:
+                updated_moneybox: Moneybox | None = cast(
+                    Moneybox,
+                    await update_instance(
+                        async_session=session,
+                        orm_model=Moneybox,  # type: ignore
+                        record_id=moneybox_id,
+                        data=moneybox.asdict(),
+                    ),
                 )
 
                 await self._add_transfer_log(
@@ -568,11 +618,14 @@ class DBManager:
                     session=session,
                 )
         else:
-            updated_moneybox = await update_instance(
-                async_session=session,
-                orm_model=Moneybox,  # type: ignore
-                record_id=moneybox_id,
-                data=moneybox.asdict(),
+            updated_moneybox = cast(
+                Moneybox,
+                await update_instance(
+                    async_session=session,
+                    orm_model=Moneybox,  # type: ignore
+                    record_id=moneybox_id,
+                    data=moneybox.asdict(),
+                ),
             )
 
             await self._add_transfer_log(
@@ -620,8 +673,8 @@ class DBManager:
                 amount=transfer_transaction_data["amount"],
             )
 
-        to_moneybox_id = transfer_transaction_data["to_moneybox_id"]
-        amount = transfer_transaction_data["amount"]
+        to_moneybox_id: int = transfer_transaction_data["to_moneybox_id"]
+        amount: int = transfer_transaction_data["amount"]
 
         if from_moneybox_id == to_moneybox_id:
             raise TransferEqualMoneyboxError(
@@ -630,47 +683,64 @@ class DBManager:
                 amount=amount,
             )
 
-        from_moneybox = await read_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=from_moneybox_id,
+        from_moneybox: Moneybox | None = cast(
+            Moneybox,
+            await read_instance(
+                async_session=self.async_sessionmaker,
+                orm_model=Moneybox,  # type: ignore
+                record_id=from_moneybox_id,
+            ),
         )
 
         if from_moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=from_moneybox_id)
 
-        to_moneybox = await read_instance(
-            async_session=self.async_session,
-            orm_model=Moneybox,  # type: ignore
-            record_id=to_moneybox_id,
+        to_moneybox: Moneybox | None = cast(
+            Moneybox,
+            await read_instance(
+                async_session=self.async_sessionmaker,
+                orm_model=Moneybox,  # type: ignore
+                record_id=to_moneybox_id,
+            ),
         )
 
         if to_moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=to_moneybox_id)
 
-        async with self.async_session.begin() as session:
-            new_from_moneybox_data = {"balance": from_moneybox.balance - amount}  # type: ignore
+        async with self.async_sessionmaker.begin() as session:
+            new_from_moneybox_data: dict[str, int] = {
+                "balance": from_moneybox.balance - amount,
+            }
 
             if new_from_moneybox_data["balance"] < 0:
-                raise BalanceResultIsNegativeError(moneybox_id=from_moneybox_id, amount=amount)
+                raise BalanceResultIsNegativeError(
+                    moneybox_id=from_moneybox_id,
+                    amount=amount,
+                )
 
-            new_to_moneybox_data = {"balance": to_moneybox.balance + amount}  # type: ignore
+            new_to_moneybox_data: dict[str, int] = {"balance": to_moneybox.balance + amount}
 
-            result_1 = await session.execute(
+            result_1: Result = await session.execute(
                 update(Moneybox)
                 .where(Moneybox.id == from_moneybox_id)
                 .values(new_from_moneybox_data)
                 .returning(Moneybox)
             )
-            updated_from_moneybox = result_1.scalar_one()
+            updated_from_moneybox: Moneybox | None = cast(
+                Moneybox,
+                result_1.scalar_one(),
+            )
 
-            result_2 = await session.execute(
+            result_2: Result = await session.execute(
                 update(Moneybox)
                 .where(Moneybox.id == to_moneybox_id)
                 .values(new_to_moneybox_data)
                 .returning(Moneybox)
             )
-            updated_to_moneybox = result_2.scalar_one()
+            updated_to_moneybox: Moneybox | None = cast(
+                Moneybox,
+                result_2.scalar_one(),
+            )
 
             # log in `from_moneybox`instance (withdraw)
             await self._add_transfer_log(
@@ -756,7 +826,7 @@ class DBManager:
             was not found in database.
         """
 
-        stmt = (
+        stmt: Select = (
             select(Moneybox)  # type: ignore
             .options(joinedload(Moneybox.transactions_log))  # type: ignore
             .where(
@@ -767,15 +837,18 @@ class DBManager:
             )
         )
 
-        async with self.async_session() as session:
-            result = await session.execute(stmt)
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)
 
-        moneybox = result.unique().scalars().one_or_none()
+        moneybox: Moneybox | None = cast(
+            Moneybox,
+            result.unique().scalars().one_or_none(),
+        )
 
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-        _overflow_moneybox = await self._get_overflow_moneybox()
+        _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
 
         # TODO: save resolved names on a cache?
         #   map like:  id  -> datetimerange -> name
@@ -789,7 +862,7 @@ class DBManager:
             if counterparty_moneybox_id_ == _overflow_moneybox.id:
                 return _overflow_moneybox.name
 
-            counterparty_moneybox_name = await self._get_historical_moneybox_name(
+            counterparty_moneybox_name: str = await self._get_historical_moneybox_name(
                 moneybox_id=counterparty_moneybox_id_,
                 from_datetime=from_datetime,
             )
@@ -823,7 +896,7 @@ class DBManager:
             was not found in database.
         """
 
-        stmt = (
+        stmt: Select = (
             select(MoneyboxNameHistory)  # type: ignore
             .order_by(desc(MoneyboxNameHistory.created_at))  # type: ignore
             .limit(1)
@@ -841,10 +914,13 @@ class DBManager:
                 )
             )
 
-        async with self.async_session() as session:
-            result = await session.execute(stmt)  # type: ignore
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)  # type: ignore
 
-        moneybox_name_history = result.scalars().one_or_none()
+        moneybox_name_history: MoneyboxNameHistory | None = cast(
+            MoneyboxNameHistory,
+            result.scalars().one_or_none(),
+        )
 
         if moneybox_name_history is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
@@ -870,17 +946,20 @@ class DBManager:
             was not found in database.
         """
 
-        stmt = select(Moneybox).where(  # type: ignore
+        stmt: Select = select(Moneybox).where(  # type: ignore
             Moneybox.name == name,
         )
 
         if only_active_instances:
             stmt = stmt.where(Moneybox.is_active.is_(True))
 
-        async with self.async_session() as session:
-            result = await session.execute(stmt)  # type: ignore
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)  # type: ignore
 
-        moneybox = result.scalars().one_or_none()
+        moneybox: Moneybox | None = cast(
+            Moneybox,
+            result.scalars().one_or_none(),
+        )
 
         if moneybox is None:
             raise MoneyboxNotFoundByNameError(name=name)
@@ -894,20 +973,20 @@ class DBManager:
         :rtype: :class:`list[dict[str, int|str]]`
         """
 
-        stmt = (
-            select(Moneybox.id, Moneybox.priority, Moneybox.name)
-            .where(  # type: ignore
+        stmt: Select = (
+            select(Moneybox.id, Moneybox.priority, Moneybox.name)  # type: ignore
+            .where(
                 Moneybox.is_active.is_(True),
             )
-            .order_by(Moneybox.priority)
+            .order_by(Moneybox.priority)  # type: ignore
         )
 
-        async with self.async_session() as session:
-            result = await session.execute(stmt)  # type: ignore
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)
 
-        priorities = result.all()
+        priorities: list[tuple[int, int, str]] = result.all()  # type: ignore
 
-        priority_map = [
+        priority_map: list[dict[str, int | str]] = [
             {
                 "moneybox_id": moneybox_id,
                 "name": name,
@@ -939,12 +1018,13 @@ class DBManager:
             wrong while updating progress in db transaction.
         """
 
-        updating_data = [
+        updating_data: list[dict[str, int]] = [
             {"id": priority["moneybox_id"], "priority": priority["priority"]}
             for priority in priorities
         ]
+        len_priorities: int = len(priorities)
 
-        _overflow_moneybox = await self._get_overflow_moneybox()
+        _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
 
         if _overflow_moneybox.id in (d["id"] for d in updating_data):
             raise OverflowMoneyboxCantBeUpdatedError(
@@ -958,39 +1038,47 @@ class DBManager:
                 details={"prioritylist": priorities},  # type: ignore
             )
 
-        reset_data = [{"id": priority["moneybox_id"], "priority": None} for priority in priorities]
+        reset_data: list[dict[str, int | None]] = [
+            {
+                "id": priority["moneybox_id"],
+                "priority": None,
+            }
+            for priority in priorities
+        ]
 
         if session is None:
-            async with self.async_session.begin() as session:
+            async with self.async_sessionmaker.begin() as session:
                 # ORM Bulk UPDATE by Primary Key -> set priority to None
-                pre_updated_moneyboxes_result = await session.execute(
+                pre_updated_moneyboxes_result: Result = await session.execute(
                     update(Moneybox)
                     .where(Moneybox.id.in_([item["id"] for item in reset_data]))
                     .values(priority=None)
                     .returning(Moneybox.name, Moneybox.id, Moneybox.priority)
                 )
-                pre_updated_moneyboxes = pre_updated_moneyboxes_result.fetchall()
+                pre_updated_moneyboxes: list[tuple[Any, ...]] = (  # type: ignore
+                    pre_updated_moneyboxes_result.fetchall()
+                )
 
-                if len(pre_updated_moneyboxes) < len(priorities):
+                if len(pre_updated_moneyboxes) < len_priorities:
                     raise UpdateInstanceError(
                         record_id=None,
                         message="Updating priorities failed. Some moneybox_ids may not exist.",
                         details={"prioritylist": priorities},
                     )
 
-                updated_moneyboxes = []
+                updated_moneyboxes: list[Moneybox] = []  # type: ignore
 
                 for entry in updating_data:
-                    updated_moneybox = await session.execute(
+                    updated_moneyboxes_result: Result = await session.execute(
                         update(Moneybox)
                         .where(Moneybox.id == entry["id"])
                         .values(priority=entry["priority"])
                         .returning(Moneybox.id, Moneybox.priority, Moneybox.name)
                     )
 
-                    updated_moneyboxes.append(updated_moneybox.fetchone())
+                    updated_moneyboxes.append(updated_moneyboxes_result.fetchone())  # type: ignore
 
-                if len(updated_moneyboxes) < len(priorities):
+                if len(updated_moneyboxes) < len_priorities:
                     raise UpdateInstanceError(
                         record_id=None,
                         message="Updating priorities failed. Some moneybox_ids may not exist.",
@@ -1004,35 +1092,37 @@ class DBManager:
                 .values(priority=None)
                 .returning(Moneybox.name, Moneybox.id, Moneybox.priority)
             )
-            pre_updated_moneyboxes = pre_updated_moneyboxes_result.fetchall()
+            pre_updated_moneyboxes: list[Moneybox] = (  # type: ignore
+                pre_updated_moneyboxes_result.fetchall()
+            )
 
-            if len(pre_updated_moneyboxes) < len(priorities):
+            if len(pre_updated_moneyboxes) < len_priorities:
                 raise UpdateInstanceError(
                     record_id=None,
                     message="Updating priorities failed. Some moneybox_ids may not exist.",
                     details={"prioritylist": priorities},
                 )
 
-            updated_moneyboxes = []
+            updated_moneyboxes: list[Moneybox] = []  # type: ignore
 
             for entry in updating_data:
-                updated_moneybox = await session.execute(
+                updated_moneybox_result: Result = await session.execute(
                     update(Moneybox)
                     .where(Moneybox.id == entry["id"])
                     .values(priority=entry["priority"])
                     .returning(Moneybox.id, Moneybox.priority, Moneybox.name)
                 )
 
-                updated_moneyboxes.append(updated_moneybox.fetchone())
+                updated_moneyboxes.append(updated_moneybox_result.fetchone())  # type: ignore
 
-            if len(updated_moneyboxes) < len(priorities):
+            if len(updated_moneyboxes) < len_priorities:
                 raise UpdateInstanceError(
                     record_id=None,
                     message="Updating priorities failed. Some moneybox_ids may not exist.",
                     details={"prioritylist": priorities},
                 )
 
-        priority_map = [
+        priority_map: list[dict[str, int | str]] = [
             {
                 "moneybox_id": moneybox_id,
                 "name": name,
@@ -1041,8 +1131,7 @@ class DBManager:
             for moneybox_id, priority, name in updated_moneyboxes
         ]
 
-        priority_map.sort(key=lambda x: x["priority"])
-        return priority_map
+        return sorted(priority_map, key=lambda x: x["priority"])
 
     async def get_app_settings(
         self,
@@ -1059,10 +1148,13 @@ class DBManager:
             database, missing moneybox with priority = 0.
         """
 
-        app_settings = await read_instance(
-            async_session=self.async_session,
-            orm_model=AppSettings,  # type: ignore
-            record_id=app_settings_id,
+        app_settings: AppSettings | None = cast(
+            AppSettings,
+            await read_instance(
+                async_session=self.async_sessionmaker,
+                orm_model=AppSettings,  # type: ignore
+                record_id=app_settings_id,
+            ),
         )
 
         if app_settings is None:
@@ -1087,14 +1179,17 @@ class DBManager:
             transactions.
         """
 
-        app_settings = await self._get_app_settings()
+        app_settings: AppSettings = await self._get_app_settings()
 
-        async with self.async_session.begin() as session:
-            app_settings = await update_instance(
-                async_session=session,
-                orm_model=AppSettings,  # type: ignore
-                record_id=app_settings.id,
-                data=app_settings_data,
+        async with self.async_sessionmaker.begin() as session:
+            app_settings = cast(
+                AppSettings,
+                await update_instance(
+                    async_session=session,
+                    orm_model=AppSettings,  # type: ignore
+                    record_id=app_settings.id,
+                    data=app_settings_data,
+                ),
             )
 
             if app_settings is None:
@@ -1102,18 +1197,19 @@ class DBManager:
                 raise AppSettingsNotFoundError(app_settings_id=-1)
 
             if "is_automated_saving_active" in app_settings_data:
-                activate = app_settings.is_automated_saving_active  # type: ignore
-                action_type = (
+                activate: bool = app_settings.is_automated_saving_active  # type: ignore
+                action_type: ActionType = (
                     ActionType.ACTIVATED_AUTOMATED_SAVING
                     if activate
                     else ActionType.DEACTIVATED_AUTOMATED_SAVING
                 )
-                automated_savings_log_data = {
+                automated_savings_log_data: dict[str, Any] = {
                     "action": action_type,
                     "action_at": datetime.now(tz=timezone.utc),
                     "details": jsonable_encoder(app_settings.asdict()),
                 }
-                automated_savings_log = await self.add_automated_savings_logs(
+
+                automated_savings_log: dict[str, Any] = await self.add_automated_savings_logs(
                     session=session,
                     automated_savings_log_data=automated_savings_log_data,
                 )
@@ -1158,12 +1254,12 @@ class DBManager:
         :rtype: :class:`list[AppSettings]`
         """
 
-        stmt = select(AppSettings).where(AppSettings.is_active.is_(True))  # type: ignore
+        stmt: Select = select(AppSettings).where(AppSettings.is_active.is_(True))  # type: ignore
 
-        async with self.async_session() as session:
-            result = await session.execute(stmt)  # type: ignore
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)  # type: ignore
 
-        return list(result.scalars().all())
+        return result.scalars().all()  # type: ignore
 
     async def _get_app_settings(self) -> AppSettings:
         """Get app settings if automated savings.
@@ -1175,14 +1271,13 @@ class DBManager:
             are inconsistent.
         """
 
-        all_app_settings = await self._get_all_app_settings()
+        all_app_settings: list[AppSettings] = await self._get_all_app_settings()
 
         if not all_app_settings:
             raise InconsistentDatabaseError(message="No app settings found.")
 
         # get the single app setting
-        app_settings = all_app_settings[0]
-        return app_settings
+        return all_app_settings[0]
 
     async def _overflow_moneybox_add_amount(
         self,
@@ -1207,10 +1302,11 @@ class DBManager:
         :raises: :class:`AutomatedSavingsError`: when something went wrong while session
             transactions.
         """
+
         if add_amount <= 0:
             return overflow_moneybox
 
-        deposit_transaction_data = {
+        deposit_transaction_data: dict[str, int | str] = {
             "amount": add_amount,
             "description": (
                 "Automated Savings with Overflow Moneybox Mode: "
@@ -1219,7 +1315,7 @@ class DBManager:
         }
 
         try:
-            updated_overflow_moneybox = await self.add_amount(
+            updated_overflow_moneybox: dict[str, Any] = await self.add_amount(
                 session=session,
                 moneybox_id=overflow_moneybox["id"],
                 deposit_transaction_data=deposit_transaction_data,
@@ -1267,7 +1363,7 @@ class DBManager:
         if sub_amount <= 0:
             return overflow_moneybox
 
-        withdraw_transaction_data = {
+        withdraw_transaction_data: dict[str, int | str] = {
             "amount": sub_amount,
             "description": (
                 "Automated Savings with Overflow Moneybox Mode: "
@@ -1276,7 +1372,7 @@ class DBManager:
         }
 
         try:
-            updated_overflow_moneybox = await self.sub_amount(
+            updated_overflow_moneybox: dict[str, Any] = await self.sub_amount(
                 session=session,
                 moneybox_id=overflow_moneybox["id"],
                 withdraw_transaction_data=withdraw_transaction_data,
@@ -1311,20 +1407,26 @@ class DBManager:
             transactions.
         """
 
-        app_settings = await self._get_app_settings()
+        app_settings: AppSettings = await self._get_app_settings()
 
         if not app_settings.is_automated_saving_active:
             return False
 
-        moneyboxes = await self.get_moneyboxes()
-        sorted_moneyboxes = sorted(moneyboxes, key=lambda item: item["priority"])
-        distribution_amount = app_settings.savings_amount
+        moneyboxes: list[dict[str, Any]] = await self.get_moneyboxes()
+        sorted_moneyboxes: list[dict[str, Any]] = sorted(
+            moneyboxes,
+            key=lambda item: item["priority"],
+        )
+        distribution_amount: int = app_settings.savings_amount
 
-        async with self.async_session.begin() as session:
+        async with self.async_sessionmaker.begin() as session:
             # Mode 1: COLLECT
 
             # Mode 2: ADD_TO_AUTOMATED_SAVINGS_AMOUNT
-            action = app_settings.overflow_moneybox_automated_savings_mode
+            action: OverflowMoneyboxAutomatedSavingsModeType = (
+                app_settings.overflow_moneybox_automated_savings_mode
+            )
+
             if (
                 action is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT
                 and sorted_moneyboxes[0]["balance"] > 0
@@ -1341,12 +1443,14 @@ class DBManager:
                     sub_amount=from_overflow_moneybox_distributed_amount,
                 )
 
-            updated_moneyboxes = await self._distribute_automated_savings_amount(  # type: ignore  # noqa: ignore  # pylint:disable=line-too-long
-                session=session,
-                sorted_moneyboxes=sorted_moneyboxes,
-                respect_moneybox_savings_amount=True,
-                distribute_amount=distribution_amount,
-                app_settings=app_settings,
+            updated_moneyboxes: list[dict[str, Any]] = (
+                await self._distribute_automated_savings_amount(  # type: ignore  # noqa: ignore  # pylint:disable=line-too-long
+                    session=session,
+                    sorted_moneyboxes=sorted_moneyboxes,
+                    respect_moneybox_savings_amount=True,
+                    distribute_amount=distribution_amount,
+                    app_settings=app_settings,
+                )
             )
 
             # Mode 3: FILL_UP_LIMITED_MONEYBOXES
@@ -1356,7 +1460,7 @@ class DBManager:
                 and updated_moneyboxes[0]["balance"] > 0
             ):
                 # filter moneyboxes only with savings_target != None AND > 0
-                filtered_moneyboxes = [
+                filtered_moneyboxes: list[dict[str, Any]] = [
                     moneybox
                     for moneybox in updated_moneyboxes
                     if moneybox["priority"] == 0
@@ -1365,7 +1469,10 @@ class DBManager:
                 ]
 
                 # sort moneyboxes by priority
-                updated_moneyboxes = sorted(filtered_moneyboxes, key=lambda item: item["priority"])
+                updated_moneyboxes = sorted(
+                    filtered_moneyboxes,
+                    key=lambda item: item["priority"],
+                )
                 old_overflow_moneybox_balance: int = updated_moneyboxes[0]["balance"]
 
                 # remove balance from overflow moneybox
@@ -1385,7 +1492,7 @@ class DBManager:
                 )
 
             # log automated saving
-            automated_savings_log_data = {
+            automated_savings_log_data: dict[str, Any] = {
                 "action": ActionType.APPLIED_AUTOMATED_SAVING,
                 "action_at": datetime.now(tz=timezone.utc),
                 "details": jsonable_encoder(
@@ -1441,13 +1548,18 @@ class DBManager:
         if distribute_amount <= 0:
             return sorted_moneyboxes
 
-        updated_moneyboxes = [sorted_moneyboxes[0]]  # add initially the overflow moneybox
+        updated_moneyboxes: list[dict[str, Any]] = [
+            sorted_moneyboxes[0]
+        ]  # add initially the overflow moneybox
 
         for moneybox in sorted_moneyboxes[1:]:  # skip overflow moneybox (priority=0)
-            amount_to_distribute = distribute_amount
+            amount_to_distribute: int = distribute_amount
 
             if respect_moneybox_savings_amount:
-                amount_to_distribute = min(moneybox["savings_amount"], amount_to_distribute)
+                amount_to_distribute = min(
+                    moneybox["savings_amount"],
+                    amount_to_distribute,
+                )
 
                 if amount_to_distribute == 0:
                     # Nothing to distribute, skip this moneybox
@@ -1455,17 +1567,20 @@ class DBManager:
                     continue
 
             if moneybox["savings_target"] is not None:
-                missing_amount_until_target = moneybox["savings_target"] - moneybox["balance"]
+                missing_amount_until_target: int = moneybox["savings_target"] - moneybox["balance"]
 
                 if missing_amount_until_target > 0:
-                    amount_to_distribute = min(amount_to_distribute, missing_amount_until_target)
+                    amount_to_distribute = min(
+                        amount_to_distribute,
+                        missing_amount_until_target,
+                    )
                 else:
                     # Moneybox is full (reached amount target )
                     updated_moneyboxes.append(moneybox)
                     continue
 
             if amount_to_distribute > 0:
-                updated_moneybox = await self.add_amount(
+                updated_moneybox: dict[str, Any] = await self.add_amount(
                     session=session,
                     moneybox_id=moneybox["id"],
                     deposit_transaction_data={
@@ -1476,7 +1591,7 @@ class DBManager:
                     transaction_trigger=TransactionTrigger.AUTOMATICALLY,
                 )
                 updated_moneyboxes.append(updated_moneybox)
-                old_moneybox_balance = moneybox["balance"]
+                old_moneybox_balance: int = moneybox["balance"]
 
                 if updated_moneybox["balance"] != old_moneybox_balance + amount_to_distribute:
                     raise AutomatedSavingsError(
@@ -1487,7 +1602,7 @@ class DBManager:
                         },
                     )
 
-                distribute_amount -= amount_to_distribute  #
+                distribute_amount -= amount_to_distribute
             else:
                 updated_moneyboxes.append(moneybox)
                 continue
@@ -1514,7 +1629,7 @@ class DBManager:
         :rtype: :class:`list[dict[str, Any]]`
         """
 
-        stmt = (
+        stmt: Select = (
             select(AutomatedSavingsLog)  # type: ignore
             .where(
                 and_(
@@ -1525,10 +1640,11 @@ class DBManager:
             .order_by(AutomatedSavingsLog.action_at.desc())
         )
 
-        async with self.async_session() as session:
-            result = await session.execute(stmt)  # type: ignore
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)  # type: ignore
 
-        automated_savings_logs = result.scalars().all()
+        automated_savings_logs: list[AutomatedSavingsLog] = result.scalars().all()  # type: ignore
+
         return [
             get_automated_savings_log.asdict()
             for get_automated_savings_log in automated_savings_logs
@@ -1552,17 +1668,25 @@ class DBManager:
             creating database instance.
         """
 
+        automated_savings_logs: AutomatedSavingsLog | None = None
+
         if session is None:
-            automated_savings_logs = await create_instance(
-                async_session=self.async_session,
-                orm_model=AutomatedSavingsLog,  # type: ignore
-                data=automated_savings_log_data,
+            automated_savings_logs = cast(
+                AutomatedSavingsLog,
+                await create_instance(
+                    async_session=self.async_sessionmaker,
+                    orm_model=AutomatedSavingsLog,  # type: ignore
+                    data=automated_savings_log_data,
+                ),
             )
         else:
-            automated_savings_logs = await create_instance(
-                async_session=session,
-                orm_model=AutomatedSavingsLog,  # type: ignore
-                data=automated_savings_log_data,
+            automated_savings_logs = cast(
+                AutomatedSavingsLog,
+                await create_instance(
+                    async_session=session,
+                    orm_model=AutomatedSavingsLog,  # type: ignore
+                    data=automated_savings_log_data,
+                ),
             )
 
         if automated_savings_logs is None:
@@ -1585,27 +1709,33 @@ class DBManager:
         if keep_app_settings:
             # TODO use private function for now, because there is
             #   only one app settings
-            backup_app_settings = await self._get_app_settings()
+            backup_app_settings: AppSettings = await self._get_app_settings()
 
-        cmd_line = CommandLine()
-        await asyncio.to_thread(CommandLine.main, cmd_line, ["downgrade", "base"])
-
-        # After migration, invalidate cache or reset connection pool
-        await self.async_engine.dispose(close=False)
-        await asyncio.sleep(1)
-
-        await asyncio.to_thread(CommandLine.main, cmd_line, ["upgrade", "head"])
+        cmd_line: CommandLine = CommandLine()
+        await asyncio.to_thread(
+            CommandLine.main,
+            cmd_line,
+            ["downgrade", "base"],
+        )
 
         # After migration, invalidate cache or reset connection pool
         await self.async_engine.dispose(close=False)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
+
+        await asyncio.to_thread(
+            CommandLine.main,
+            cmd_line,
+            ["upgrade", "head"],
+        )
+
+        # After migration, invalidate cache or reset connection pool
+        await self.async_engine.dispose(close=False)
+        await asyncio.sleep(0.5)
 
         if keep_app_settings:
             # TODO: adapt update_app_settings by adding settings_id
             #   if there is a multi user mode later
-            await self.update_app_settings(
-                app_settings_data=backup_app_settings.asdict(),
-            )
+            await self.update_app_settings(app_settings_data=backup_app_settings.asdict())
 
     async def export_sql_dump(self) -> io.BytesIO:
         """Export a sql dump by using pg_dump.
@@ -1619,7 +1749,7 @@ class DBManager:
             an error
         """
 
-        command = [
+        command: list[str] = [
             "pg_dump",
             "-Fc",
             "-h",
@@ -1645,8 +1775,7 @@ class DBManager:
                         message=stderr.decode("utf-8"),
                     )
 
-                dump_stream = io.BytesIO(stdout)
-                return dump_stream
+                return io.BytesIO(stdout)
 
         except Exception as ex:  # noqa: E722
             raise MissingDependencyError(message="pg_dump not installed.") from ex
@@ -1664,7 +1793,7 @@ class DBManager:
         """
 
         # backup database
-        backup_database_dump_bytes = await self.export_sql_dump()
+        backup_database_dump_bytes: io.BytesIO = await self.export_sql_dump()
         await self.reset_database(keep_app_settings=False)
 
         try:
@@ -1684,7 +1813,7 @@ class DBManager:
             tmp_file.write(sql_dump)
             tmp_file_path = tmp_file.name
 
-            command = [
+            command: list[str] = [
                 "pg_restore",
                 "--clean",
                 "--if-exists",

@@ -1,6 +1,6 @@
 """The moneybox routes."""
 
-from typing import Annotated, cast
+from typing import Annotated, Any, cast
 
 from fastapi import APIRouter, Body
 from starlette.requests import Request
@@ -9,6 +9,7 @@ from src.custom_types import EndpointRouteType
 from src.data_classes.requests import AppSettingsRequest
 from src.data_classes.responses import AppSettingsResponse
 from src.db.db_manager import DBManager
+from src.db.models import AppSettings
 from src.report_sender.email_sender.sender import EmailSender
 from src.routes.exceptions import MissingSMTPSettingsError
 from src.routes.responses.app_settings import (
@@ -16,7 +17,7 @@ from src.routes.responses.app_settings import (
     UPDATE_APP_SETTINGS_RESPONSES,
 )
 
-app_settings_router = APIRouter(
+app_settings_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.APP_SETTINGS}",
     tags=[EndpointRouteType.APP_SETTINGS],
 )
@@ -39,9 +40,11 @@ async def get_app_settings(
     :return: The app settings data.
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     # use protected method for now
-    app_settings_data = await db_manager._get_app_settings()  # pylint: disable=protected-access
+    app_settings_data: AppSettings = (
+        await db_manager._get_app_settings()  # pylint: disable=protected-access
+    )
     return app_settings_data.asdict()  # type: ignore
 
 
@@ -71,13 +74,13 @@ async def update_app_settings(
         variables are missing.
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    email_sender = cast(EmailSender, request.app.state.email_sender)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    email_sender: EmailSender = cast(EmailSender, request.app.state.email_sender)
 
     if app_settings_request.send_reports_via_email and not email_sender.smtp_settings.smtp_ready:
         raise MissingSMTPSettingsError()
 
-    app_settings_data = await db_manager.update_app_settings(
+    app_settings_data: dict[str, Any] = await db_manager.update_app_settings(
         app_settings_data=app_settings_request.model_dump(exclude_unset=True),
     )
     return app_settings_data  # type: ignore

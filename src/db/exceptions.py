@@ -1,7 +1,6 @@
 """All database exceptions are located."""
 
 from abc import ABC
-from collections.abc import Hashable
 from typing import Any
 
 
@@ -17,8 +16,8 @@ class InconsistentDatabaseError(ABC, Exception):
         :type details: :class:`dict[str, Any]`
         """
 
-        self.message = f"Inconsistent Database! {message}"
-        self.details = details
+        self.message: str = f"Inconsistent Database! {message}"
+        self.details: dict[str, Any] | None = details
 
         super().__init__(message)
 
@@ -36,8 +35,8 @@ class RecordNotFoundError(ABC, Exception):
         """
 
         self.record_id = record_id
-        self.message = message
-        self.details = {
+        self.message: str = message
+        self.details: dict[str, Any] = {
             "id": record_id,
         }
         super().__init__(message)
@@ -50,7 +49,7 @@ class CrudDatabaseError(ABC, Exception):
         self,
         record_id: int | None,
         message: str,
-        details: dict[Hashable, Any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the CrudDatabaseError instance.
 
@@ -63,12 +62,12 @@ class CrudDatabaseError(ABC, Exception):
         """
 
         self.record_id = record_id
-        self.message = message
+        self.message: str = message
 
         if details is None:
             details = {}
 
-        self.details = details | {
+        self.details: dict[str, Any] = details | {
             "id": record_id,
         }
         super().__init__(message)
@@ -81,7 +80,7 @@ class UpdateInstanceError(CrudDatabaseError):
         self,
         record_id: int | None,
         message: str,
-        details: dict[Hashable, Any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the UpdateInstanceError instance.
 
@@ -103,7 +102,7 @@ class CreateInstanceError(CrudDatabaseError):
         self,
         record_id: int | None,
         message: str,
-        details: dict[Hashable, Any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the CreateInstanceError instance.
 
@@ -125,7 +124,7 @@ class DeleteInstanceError(CrudDatabaseError):
         self,
         record_id: int | None,
         message: str,
-        details: dict[Hashable, Any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the DeleteInstanceError instance.
 
@@ -150,7 +149,7 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         :type moneybox_id: :class:`int`
         """
 
-        message = f"Moneybox with id '{moneybox_id}' does not exist."
+        message: str = f"Moneybox with id '{moneybox_id}' does not exist."
         super().__init__(record_id=moneybox_id, message=message)
 
 
@@ -164,7 +163,7 @@ class AppSettingsNotFoundError(RecordNotFoundError):
         :type app_settings_id: :class:`int`
         """
 
-        message = f"App Settings with id '{app_settings_id}' does not exist."
+        message: str = f"App Settings with id '{app_settings_id}' does not exist."
         super().__init__(record_id=app_settings_id, message=message)
 
 
@@ -178,7 +177,7 @@ class MoneyboxNotFoundByNameError(RecordNotFoundError):
         :type name: :class:`str`
         """
 
-        message = f"Moneybox with name '{name}' does not exist."
+        message: str = f"Moneybox with name '{name}' does not exist."
         super().__init__(record_id=None, message=message)
 
 
@@ -194,8 +193,10 @@ class NonPositiveAmountError(UpdateInstanceError):
         :type amount: :class:`int`
         """
 
-        message = f"Can't add or sub amount less than 1 '{amount}' to Moneybox '{moneybox_id}'."
-        self.amount = amount
+        message: str = (
+            f"Can't add or sub amount less than 1 '{amount}' to Moneybox '{moneybox_id}'."
+        )
+        self.amount: int = amount
         super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
 
 
@@ -215,7 +216,7 @@ class TransferEqualMoneyboxError(UpdateInstanceError):
         :type amount: :class:`int`
         """
 
-        self.amount = amount
+        self.amount: int = amount
         super().__init__(
             record_id=None,
             message="Can't transfer within the same moneybox",
@@ -241,11 +242,11 @@ class BalanceResultIsNegativeError(UpdateInstanceError):
         :type amount: :class:`int`
         """
 
-        message = (
+        message: str = (
             f"Can't sub amount '{amount}' from Moneybox '{moneybox_id}'. "
             "Not enough balance to sub."
         )
-        self.amount = amount
+        self.amount: int = amount
         super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
 
 
@@ -261,11 +262,11 @@ class HasBalanceError(DeleteInstanceError):
         :type balance: :class:`int`
         """
 
-        message = (
+        message: str = (
             f"Deleting moneyboxes with balance > 0 is not allowed. "
             f"Moneybox '{moneybox_id}' has balance {balance}."
         )
-        self.balance = balance
+        self.balance: int = balance
         super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
 
 
@@ -279,7 +280,7 @@ class OverflowMoneyboxCantBeDeletedError(DeleteInstanceError):
         :type moneybox_id: :class:`int`
         """
 
-        message = "Deleting overflow moneybox is not allowed/possible!"
+        message: str = "Deleting overflow moneybox is not allowed/possible!"
         super().__init__(record_id=moneybox_id, message=message)
 
 
@@ -293,7 +294,7 @@ class OverflowMoneyboxCantBeUpdatedError(UpdateInstanceError):
         :type moneybox_id: :class:`int`
         """
 
-        message = "Updating overflow moneybox is not allowed/possible!"
+        message: str = "Updating overflow moneybox is not allowed/possible!"
         super().__init__(record_id=moneybox_id, message=message)
 
 
@@ -303,7 +304,7 @@ class OverflowMoneyboxNotFoundError(InconsistentDatabaseError):
     def __init__(self) -> None:
         """Initializer for the OverflowMoneyboxNotFoundError exception."""
 
-        message = (
+        message: str = (
             "No overflow moneybox found in database! There has to be one moneybox with "
             "priority = 0 as column value!"
         )
@@ -319,7 +320,7 @@ class AutomatedSavingsError(CrudDatabaseError):
         self,
         record_id: int | None,
         message: str | None = None,
-        details: dict[Hashable, Any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the AutomatedSavingsError exception.
 
@@ -328,7 +329,7 @@ class AutomatedSavingsError(CrudDatabaseError):
         :param message: The message of the error.
         :type message: :class:`str`
         :param details: Additional details of the error.
-        :type details: :class:`dict`
+        :type details: :class:`dict[str, Any]`
         """
 
         if message is None:
@@ -347,7 +348,7 @@ class MissingDependencyError(Exception):
         :type message: :class:`str`
         """
 
-        self.message = message
+        self.message: str = message
         super().__init__(message)
 
 
@@ -364,7 +365,7 @@ class ProcessCommunicationError(Exception):
         :type message: :class:`str`
         """
 
-        self.message = message
+        self.message: str = message
         super().__init__(message)
 
 
@@ -378,5 +379,5 @@ class InvalidFileError(Exception):
         :type message: :class:`str`
         """
 
-        self.message = message
+        self.message: str = message
         super().__init__(message)

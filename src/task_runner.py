@@ -2,7 +2,8 @@
 
 import asyncio
 import inspect
-from datetime import datetime
+from datetime import date, datetime
+from typing import Any, Callable
 
 from src.custom_types import ActionType
 from src.db.db_manager import DBManager
@@ -32,15 +33,15 @@ class BackgroundTaskRunner:
         :type email_sender: :class:`EmailSender`
         """
 
-        self.db_manager = db_manager
-        self.email_sender = email_sender
-        self.sleep_time = 60 * 60  # each hour
+        self.db_manager: DBManager = db_manager
+        self.email_sender: EmailSender = email_sender
+        self.sleep_time: int = 60 * 60  # each hour
         self.background_tasks: set[asyncio.Task] = set()
 
     async def run(self) -> None:
         """Collect all async methods of the class that start with 'task_'"""
 
-        task_methods = [
+        task_methods: list[Callable] = [
             getattr(self, method_name)
             for method_name in dir(self)
             if method_name.startswith("task_")
@@ -48,7 +49,7 @@ class BackgroundTaskRunner:
         ]
 
         for task_method in task_methods:
-            task = asyncio.create_task(task_method())
+            task: asyncio.Task = asyncio.create_task(task_method())
             self.background_tasks.add(task)
             task.add_done_callback(self.background_tasks.discard)
 
@@ -60,26 +61,28 @@ class BackgroundTaskRunner:
         - do task on each 1st of month
         """
 
-        current_method_name = inspect.currentframe().f_code.co_name.upper()  # type: ignore
-        today = datetime.today()
-        already_done = False
+        current_method_name: str = inspect.currentframe().f_code.co_name.upper()  # type: ignore
+        today_dt: datetime = datetime.today()
+        already_done: bool = False
 
-        if today.day == 1 and today.hour >= 12:
-            automated_action_logs = await self.db_manager.get_automated_savings_logs(
-                action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+        if today_dt.day == 1 and today_dt.hour >= 12:
+            automated_action_logs: list[dict[str, Any]] = (
+                await self.db_manager.get_automated_savings_logs(
+                    action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+                )
             )
 
             if automated_action_logs:
-                automated_action_logs_dates = [
+                automated_action_logs_dates: list[date] = [
                     automated_action_log["action_at"].date()
                     for automated_action_log in automated_action_logs
                 ]
 
-                if today.date() in automated_action_logs_dates:
+                if today_dt.date() in automated_action_logs_dates:
                     already_done = True
 
             if not already_done:
-                result = await self.db_manager.automated_savings()
+                result: bool = await self.db_manager.automated_savings()
 
                 if result:
                     await self.print_task(

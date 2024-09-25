@@ -1,6 +1,6 @@
 """The moneybox routes."""
 
-from typing import Annotated, cast
+from typing import Annotated, Any, cast
 
 from fastapi import APIRouter, Body, Depends, Path
 from starlette import status
@@ -29,7 +29,7 @@ from src.routes.responses.moneybox import (
 )
 from src.utils import check_existence_of_moneybox_by_id
 
-moneybox_router = APIRouter(
+moneybox_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOX}",
     tags=[EndpointRouteType.MONEYBOX],
 )
@@ -58,8 +58,8 @@ async def get_moneybox(
     :rtype: :class:`MoneyboxResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    moneybox_data = await db_manager.get_moneybox(moneybox_id=moneybox_id)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data: dict[str, Any] = await db_manager.get_moneybox(moneybox_id=moneybox_id)
     return moneybox_data  # type: ignore
 
 
@@ -86,8 +86,8 @@ async def add_moneybox(
     :rtype: :class:`MoneyboxResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    moneybox_data = await db_manager.add_moneybox(
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data: dict[str, Any] = await db_manager.add_moneybox(
         moneybox_data=moneybox_create_request.model_dump()
     )
     return moneybox_data  # type: ignore
@@ -119,8 +119,8 @@ async def update_moneybox(
     :rtype: :class:`MoneyboxResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    moneybox_data = await db_manager.update_moneybox(
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data: dict[str, Any] = await db_manager.update_moneybox(
         moneybox_id=moneybox_id,
         moneybox_data=moneybox_update_request.model_dump(exclude_unset=True),
     )
@@ -146,7 +146,7 @@ async def delete_moneybox(
     :return: The response object with the status code included.
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     await db_manager.delete_moneybox(
         moneybox_id=moneybox_id,
     )
@@ -186,8 +186,8 @@ async def deposit_moneybox(
     :rtype: :class:`MoneyboxResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    moneybox_data = await db_manager.add_amount(
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data: dict[str, Any] = await db_manager.add_amount(
         moneybox_id=moneybox_id,
         deposit_transaction_data=deposit_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,
@@ -230,8 +230,8 @@ async def withdraw_moneybox(
     :rtype: :class:`MoneyboxResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    moneybox_data = await db_manager.sub_amount(
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    moneybox_data: dict[str, Any] = await db_manager.sub_amount(
         moneybox_id=moneybox_id,
         withdraw_transaction_data=withdraw_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,
@@ -274,7 +274,7 @@ async def transfer_balance(
     :rtype: :class:`Response`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     await db_manager.transfer_amount(
         from_moneybox_id=moneybox_id,
         transfer_transaction_data=transfer_transaction.model_dump(),
@@ -308,8 +308,8 @@ async def get_moneybox_transaction_logs(
     :rtype: :class:`TransactionLogsResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    transaction_logs_data = await db_manager.get_transaction_logs(
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    transaction_logs_data: list[dict[str, Any]] = await db_manager.get_transaction_logs(
         moneybox_id=moneybox_id,
     )
 

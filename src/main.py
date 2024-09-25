@@ -1,7 +1,7 @@
 """The start module of the savings manager app."""
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
 import uvicorn
 from fastapi import FastAPI
@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
 
-from src.custom_types import Environment
+from src.custom_types import AppEnvVariables, Environment
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
@@ -19,7 +19,6 @@ from src.fastapi_utils import (
     register_router,
     set_custom_openapi_schema,
 )
-from src.limiter import limiter
 from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data, get_app_env_variables
@@ -29,7 +28,9 @@ from src.utils import get_app_data, get_app_env_variables
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
 
-    app_env_variables = get_app_env_variables()  # pylint: disable=redefined-outer-name
+    app_env_variables: AppEnvVariables = (  # pylint: disable=redefined-outer-name
+        get_app_env_variables()
+    )
 
     print("Create .pgpass for sql import/export functionality ...", flush=True)
     create_pgpass(app_env_variables=app_env_variables)
@@ -42,17 +43,17 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
 
     print("Initialize app states ...", flush=True)
     # create db_manager, email_sender and background task runner
-    db_manager = DBManager(
+    db_manager: DBManager = DBManager(
         db_settings=app_env_variables,
         engine_args={
             "echo": app_env_variables.environment is Environment.DEV,
         },
     )
-    email_sender = EmailSender(
+    email_sender: EmailSender = EmailSender(
         db_manager=db_manager,
         smtp_settings=app_env_variables,
     )
-    background_tasks_runner = BackgroundTaskRunner(  # type: ignore
+    background_tasks_runner: BackgroundTaskRunner = BackgroundTaskRunner(  # type: ignore
         db_manager=db_manager,
         email_sender=email_sender,
     )
@@ -64,7 +65,6 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     fastapi_app.state.db_manager = db_manager
     fastapi_app.state.email_sender = email_sender
     fastapi_app.state.background_tasks_runner = background_tasks_runner
-    fastapi_app.state.limiter = limiter
 
     yield
 
@@ -73,14 +73,14 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     # deconstruct app here
 
 
-app_data = get_app_data()
+app_data: dict[str, Any] = get_app_data()
 """Reference to the app data."""
 
 author_name, author_mail = app_data["authors"][0].split()
 """Reference to the author's name and report_sender address.'"""
 
 # Initialize the fastAPI app
-app = FastAPI(
+app: FastAPI = FastAPI(
     lifespan=lifespan,
     title=app_data["name"],
     description=app_data["description"],
@@ -115,7 +115,7 @@ app.middleware("http")(handle_requests)
 
 
 if __name__ == "__main__":
-    app_env_variables = get_app_env_variables()
+    app_env_variables: AppEnvVariables = get_app_env_variables()
 
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(

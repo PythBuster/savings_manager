@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 from starlette.responses import FileResponse
 
-web_ui_router = APIRouter(
+web_ui_router: APIRouter = APIRouter(
     prefix="",
     include_in_schema=False,
 )

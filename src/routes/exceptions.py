@@ -7,5 +7,5 @@ class MissingSMTPSettingsError(Exception):
     def __init__(self) -> None:
         """Initialize the MissingSMTPSettingsError instance."""
 
-        self.message = "SMTP settings incomplete. Can't send email."
+        self.message: str = "SMTP settings incomplete. Can't send email."
         super().__init__(self.message)

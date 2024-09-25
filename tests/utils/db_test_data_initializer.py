@@ -744,7 +744,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -812,7 +812,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -893,7 +893,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -959,7 +959,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1025,7 +1025,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1091,7 +1091,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1157,7 +1157,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1223,7 +1223,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1259,7 +1259,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1325,7 +1325,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1361,7 +1361,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1397,7 +1397,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 
@@ -1430,7 +1430,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "note": "",
         }
 
-        async with self.db_manager.async_session.begin() as session:
+        async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
 

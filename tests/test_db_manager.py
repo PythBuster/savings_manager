@@ -925,7 +925,7 @@ async def test_add_automated_savings_log_valid_with_session(
         },
     ]
 
-    async with db_manager.async_session.begin() as session:
+    async with db_manager.async_sessionmaker.begin() as session:
         for i, automated_savings_log_data in enumerate(automated_savings_log_data_collection):
             automated_savings_log = await db_manager.add_automated_savings_logs(
                 session=session,

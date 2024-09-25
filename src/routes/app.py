@@ -1,7 +1,8 @@
 """The general/basic root routes."""
 
+import io
 from datetime import datetime
-from typing import cast
+from typing import Any, cast
 
 from fastapi import APIRouter, File, UploadFile
 from starlette import status
@@ -21,7 +22,7 @@ from src.routes.responses.app import (
 )
 from src.utils import get_app_data
 
-app_router = APIRouter(
+app_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.APP}",
     tags=[EndpointRouteType.APP],
 )
@@ -41,7 +42,7 @@ async def get_app_infos() -> AppInfoResponse:
     :rtype: :class:`AppInfoResponse`
     """
 
-    app_info_data = get_app_data()
+    app_info_data: dict[str, Any] = get_app_data()
 
     return {  # type: ignore
         "appName": app_info_data["name"],
@@ -71,7 +72,7 @@ async def reset_app(
     :rtype: :class:`Response`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     await db_manager.reset_database(
         keep_app_settings=reset_data.keep_app_settings,
     )
@@ -95,11 +96,11 @@ async def export_sql_dump(
     :rtype: :class:`StreamingResponse`
     """
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
-    sql_dump_bytes = await db_manager.export_sql_dump()
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    sql_dump_bytes: io.BytesIO = await db_manager.export_sql_dump()
 
-    current_dt_string = datetime.now().strftime("%Y-%m-%d_%H%M")
-    response = StreamingResponse(
+    current_dt_string: str = datetime.now().strftime("%Y-%m-%d_%H%M")
+    response: StreamingResponse = StreamingResponse(
         sql_dump_bytes,
         media_type="application/octet-stream",
         headers={
@@ -134,9 +135,9 @@ async def import_sql_dump(
     if not file.filename.endswith(".sql"):
         raise InvalidFileError("SQL file required")
 
-    sql_dump = await file.read()
+    sql_dump: bytes = await file.read()
 
-    db_manager = cast(DBManager, request.app.state.db_manager)
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     await db_manager.import_sql_dump(sql_dump=sql_dump)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

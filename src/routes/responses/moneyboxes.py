@@ -1,8 +1,10 @@
 """Further moneyboxes SwaggerUI response codes and examples are located here."""
 
+from typing import Any
+
 from starlette import status
 
-GET_MONEYBOXES_RESPONSES = {
+GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
     },

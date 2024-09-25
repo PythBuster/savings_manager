@@ -1,6 +1,7 @@
 """The abstract class ReportSender is located here."""
 
 from abc import ABC
+from typing import Any
 
 from jinja2 import Environment
 
@@ -24,8 +25,8 @@ class ReportSender(ABC):  # pylint: disable=too-few-public-methods
         :type jinja_env: :class:`Jinja2`
         """
 
-        self.db_manager = db_manager
-        self.jinja_env = jinja_env
+        self.db_manager: DBManager = db_manager
+        self.jinja_env: Environment = jinja_env
 
-        app_data = get_app_data()
-        self.versioned_app_name = f"{app_data['name']} v{app_data['version']}"
+        app_data: dict[str, Any] = get_app_data()
+        self.versioned_app_name: str = f"{app_data['name']} v{app_data['version']}"
