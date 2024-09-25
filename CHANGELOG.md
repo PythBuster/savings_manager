@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.26.0 (2024-09-25)
+### Changes:
+- refactor code: annotate local and global variables
+
 ## 2.25.0 (2024-09-23)
 ### Changes:
 - refactor pydantic validators and use field_validators in some cases instead of model_validators
