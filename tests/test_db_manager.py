@@ -1354,7 +1354,7 @@ async def test_delete_user(
 
 
 @pytest.mark.dependency(depends=["test_delete_user"])
-async def get_user_by_credentials_fail(
+async def test_user_by_credentials_fail(
     db_manager: DBManager,
 ) -> None:
     user_data = {
