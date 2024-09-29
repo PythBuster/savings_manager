@@ -6,6 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from _pytest.cacheprovider import Cache
+from _pytest.fixtures import FixtureRequest
 from httpx import AsyncClient
 from starlette import status
 
@@ -197,8 +199,12 @@ async def test_app_import_valid(client: AsyncClient) -> None:
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+
 @pytest.mark.order(after="tests/test_db_manager.py::test_add_user")
-async def test_app_login(client: AsyncClient) -> None:
+async def test_app_login_success(
+        request: FixtureRequest,
+        client: AsyncClient,
+) -> None:
     login_post_data = {
         "userLogin": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
         "userPassword": "sicher-ist-nichts",
@@ -213,3 +219,26 @@ async def test_app_login(client: AsyncClient) -> None:
     user = response.json()
     assert user is not None
     assert user["userLogin"] == login_post_data["userLogin"]
+
+    request.config.cache.set('login_state', "hash:....")
+
+@pytest.mark.order(after="test_app_login_success")
+async def test_app_logout_success(
+        request: FixtureRequest,
+        client: AsyncClient,
+) -> None:
+    response = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/logout",
+    )
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    login_hash: str = request.config.cache.get('login_state', "")
+    assert login_hash == "hash:...."
+
+    # clear the request cache
+    Cache.clear_cache(
+        request.config.cache._cachedir
+    )
+
+
+

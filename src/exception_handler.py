@@ -187,7 +187,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
                 message="Unknown Error",
                 details={
                     "exception": exception.__class__.__name__,
-                    "message": exception.args[0],
+                    "args": exception.args,
                 },
             )
         ),

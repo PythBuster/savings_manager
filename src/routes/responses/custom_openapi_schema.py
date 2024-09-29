@@ -16,10 +16,10 @@ def custom_400_500_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
     app_root = EndpointRouteType.APP
 
     exclude_401_for_paths: set[str] = {
-       f"/{api_root}/{app_root}/login",
+        f"/{api_root}/{app_root}/login",
     }
     exclude_403_for_paths: set[str] = {
-       f"/{api_root}/{app_root}/login",
+        f"/{api_root}/{app_root}/login",
     }
 
     # call original openapi get the openapi schema

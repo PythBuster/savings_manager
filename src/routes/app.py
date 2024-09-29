@@ -6,9 +6,10 @@ from typing import Any, cast, Annotated
 
 from async_fastapi_jwt_auth import AuthJWT
 from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import Response, StreamingResponse, JSONResponse
+from starlette.responses import JSONResponse, Response, StreamingResponse
 
 from src.auth.jwt_auth import UserAuthJWTBearer
 from src.custom_types import EndpointRouteType
@@ -18,10 +19,12 @@ from src.db.db_manager import DBManager
 from src.db.exceptions import InvalidFileError
 from src.routes.exceptions import BadUsernameOrPasswordError
 from src.routes.responses.app import (
+    DELETE_APP_LOGOUT_RESPONSES,
     GET_APP_EXPORT_RESPONSES,
     GET_APP_INFO_RESPONSES,
     POST_APP_IMPORT_RESPONSES,
-    POST_APP_RESET_RESPONSES, POST_APP_LOGIN_RESPONSES, DELETE_APP_LOGOUT_RESPONSES,
+    POST_APP_LOGIN_RESPONSES,
+    POST_APP_RESET_RESPONSES,
 )
 from src.utils import get_app_data
 
@@ -190,7 +193,7 @@ async def login(
     # Set the JWT cookie in the response
     response: JSONResponse = JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=user_valid_response_data,
+        content=jsonable_encoder(user_valid_response_data),
     )
     await jwt_authorize.set_access_cookies(
         encoded_access_token=access_token,

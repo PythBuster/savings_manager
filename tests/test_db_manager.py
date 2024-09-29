@@ -1339,6 +1339,7 @@ async def test_update_user(
     )
     assert user is None
 
+
 @pytest.mark.dependency(depends=["test_update_user"])
 async def test_delete_user(
     db_manager: DBManager,

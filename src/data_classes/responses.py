@@ -827,8 +827,38 @@ class AppSettingsResponse(BaseModel):
 class LoginUserResponse(BaseModel):
     """The login user response model."""
 
+    id_: Annotated[
+        int,
+        Field(
+            description="The id of the user.",
+        )
+    ]
+    """The id of the moneybox."""
+
+    created_at: Annotated[
+        AwareDatetime,
+        Field(
+            validation_alias="created_at",
+            description="The creation date of the user.",
+        ),
+    ]
+    """The creation date of the user."""
+
+    modified_at: Annotated[
+        AwareDatetime | None,
+        Field(
+            validation_alias="modified_at",
+            description="The modification date of the user.",
+        ),
+    ]
+    """The modification date of the user."""
+
     user_login: Annotated[
-        str, Field(description="The user's login, which is email address in this case.")
+        str,
+        Field(
+            validation_alias="user_login",
+            description="The user's login, which is email address in this case.",
+        )
     ]
     """The user's login, which is email address in this case."""
 

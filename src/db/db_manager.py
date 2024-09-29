@@ -1771,22 +1771,23 @@ class DBManager:  # pylint: disable=too-many-public-methods
         ]
 
         try:
-            with subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            ) as process:
-                stdout, stderr = process.communicate(timeout=15)
-
-                if process.returncode != 0:
-                    raise ProcessCommunicationError(
-                        message=stderr.decode("utf-8"),
-                    )
-
-                return io.BytesIO(stdout)
-
+            process: subprocess.Popen = subprocess.Popen(
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+            )
         except Exception as ex:  # noqa: E722
             raise MissingDependencyError(message="pg_dump not installed.") from ex
+
+        with process:
+            stdout, stderr = process.communicate(timeout=15)
+
+            if process.returncode != 0:
+                raise ProcessCommunicationError(
+                    message=stderr.decode("utf-8"),
+                )
+
+            return io.BytesIO(stdout)
 
     async def import_sql_dump(self, sql_dump: bytes) -> None:
         """Export a sql dump by using pg_dump.
@@ -1837,19 +1838,21 @@ class DBManager:  # pylint: disable=too-many-public-methods
             ]
 
             try:
-                with subprocess.Popen(
-                    command,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                ) as process:
-                    _, stderr = process.communicate(timeout=15)
-
-                    if process.returncode != 0:
-                        raise ProcessCommunicationError(
-                            message=stderr.decode("utf-8"),
-                        )
+                process: subprocess.Popen = subprocess.Popen(
+                        command,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                )
             except Exception as ex:  # noqa: E722
                 raise MissingDependencyError(message="pg_restore not installed.") from ex
+
+            with process:
+                _, stderr = process.communicate(timeout=15)
+
+                if process.returncode != 0:
+                    raise ProcessCommunicationError(
+                        message=stderr.decode("utf-8"),
+                    )
 
     async def add_user(self, user_login: str, user_password: str) -> dict[str, Any]:
         """Create a user database entry and returns new entry.

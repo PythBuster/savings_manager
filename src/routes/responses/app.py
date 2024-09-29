@@ -23,12 +23,7 @@ POST_APP_RESET_RESPONSES: dict[status, dict[str, Any]] = {
 
 
 GET_APP_EXPORT_RESPONSES: dict[status, dict[str, Any]] = {
-    status.HTTP_200_OK: {
-        "description": "OK",
-        "content": {
-            "application/octet-stream": {}
-        }
-    }
+    status.HTTP_200_OK: {"description": "OK", "content": {"application/octet-stream": {}}}
 }
 """Further responses for endpoint GET: /app/export"""
 
