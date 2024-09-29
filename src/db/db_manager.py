@@ -6,6 +6,7 @@ import io
 import subprocess
 import tempfile
 from datetime import datetime, timezone
+from functools import cached_property
 from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
@@ -98,7 +99,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             expire_on_commit=False,
         )
 
-    @property
+    @cached_property
     def db_connection_string(self) -> str:
         """Property to create a database connection string based on db driver.
 
@@ -1899,11 +1900,13 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :rtype: :class:`dict`
         """
 
-        if "user_password" in user_data:
-            user_data["user_password_hash"] = await self.get_password_hash(
-                password=user_data["user_password"]
+        user_data_ = user_data.copy()
+
+        if "user_password" in user_data_:
+            user_data_["user_password_hash"] = await self.get_password_hash(
+                password=user_data_["user_password"]
             )
-            del user_data["user_password"]
+            del user_data_["user_password"]
 
         updated_user: User | None = cast(
             User,
@@ -1911,7 +1914,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 async_session=self.async_sessionmaker,
                 record_id=user_id,
                 orm_model=cast(SqlBase, User),
-                data=user_data,
+                data=user_data_,
             ),
         )
 
