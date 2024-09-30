@@ -9,8 +9,6 @@ async def test_create_instance(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
 ) -> None:
-    prioritylist = await db_manager.get_prioritylist()
-
     moneybox_data = {
         "id": 1,
         "name": "Test Box 1",

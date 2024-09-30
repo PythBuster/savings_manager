@@ -11,7 +11,7 @@ from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
 from passlib.context import CryptContext
-from sqlalchemy import Result, Select, and_, desc, insert, select, update
+from sqlalchemy import Result, Select, and_, desc, insert, select, update, exists, Exists
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -52,7 +52,7 @@ from src.db.exceptions import (
     OverflowMoneyboxNotFoundError,
     ProcessCommunicationError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError,
+    UpdateInstanceError, UserLoginAlreadyExistError,
 )
 from src.db.models import (
     AppSettings,
@@ -1868,6 +1868,21 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :raises CreateInstanceError: if creating database entry fails.
         """
 
+        exist_criteria: Exists = exists().where(
+            User.user_login == user_login
+        )
+        exists_stmt: Select = select(User).where(
+            User.is_active.is_(True)
+        ).where(exist_criteria)
+
+        async with self.async_sessionmaker() as session:
+            result: Result = await session.execute(exists_stmt)
+
+        user_exists = result.scalar_one_or_none() is not None
+
+        if user_exists:
+            raise UserLoginAlreadyExistError(user_login=user_login)
+
         user: User | None = cast(
             User,
             await create_instance(
@@ -1987,6 +2002,29 @@ class DBManager:  # pylint: disable=too-many-public-methods
             user_password,
             user.user_password_hash,
         ):
+            return None
+
+        return user.asdict()
+
+    async def get_user(
+        self,
+        user_id: int,
+    ) -> dict[str, Any] | None:
+        """Get user by user_id
+
+        :param user_id: The ID of the user.
+        :type user_id: :class:`int`
+        :return: The user data, if not found, returns None.
+        :rtype: :class:`dict[str, Any] | None`
+        """
+
+        user = await read_instance(
+            async_session=self.async_sessionmaker,
+            orm_model=cast(SqlBase, User),
+            record_id=user_id,
+        )
+
+        if user is None:
             return None
 
         return user.asdict()

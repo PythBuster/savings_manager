@@ -31,6 +31,9 @@ class EndpointRouteType(StrEnum):
     EMAIL_SENDER: str = "email"  # /email
     """Email endpoint path name."""
 
+    USER: str = "user"  # /user
+    """User endpoint path name."""
+
 
 class EnvironmentType(StrEnum):
     """App environment types/names."""

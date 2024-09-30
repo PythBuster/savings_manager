@@ -381,3 +381,27 @@ class InvalidFileError(Exception):
 
         self.message: str = message
         super().__init__(message)
+
+class UserLoginAlreadyExistError(CrudDatabaseError):
+    """Custom UserLoginAlreadyExistError Exception."""
+
+    def __init__(
+            self,
+            user_login: str,
+            details: dict[str, Any] | None = None,
+    ) -> None:
+        self.user_login: str = user_login
+        message: str = "User already exists."
+
+        if details is None:
+            details = {}
+
+        details |= {
+            "user_login": user_login,
+        }
+
+        super().__init__(
+            record_id=None,
+            message=message,
+            details=details,
+        )

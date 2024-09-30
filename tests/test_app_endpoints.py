@@ -200,7 +200,7 @@ async def test_app_import_valid(client: AsyncClient) -> None:
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.order(after="tests/test_db_manager.py::test_add_user")
+@pytest.mark.order(after="tests/test_db_manager.py::test_add_user_success")
 async def test_app_login_success(
         request: FixtureRequest,
         client: AsyncClient,

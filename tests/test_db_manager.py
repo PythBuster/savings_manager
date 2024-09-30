@@ -1,9 +1,11 @@
 # pylint: disable=too-many-lines
 
 """All db_manager tests are located here."""
+
 import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -11,6 +13,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
 from alembic.config import CommandLine
+
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -31,7 +34,7 @@ from src.db.exceptions import (
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError,
+    UpdateInstanceError, UserLoginAlreadyExistError,
 )
 from src.utils import equal_dict
 
@@ -1264,7 +1267,7 @@ async def test_get_users_empty(
 
 
 @pytest.mark.dependency(depends=["test_get_users_empty"])
-async def test_add_user(
+async def test_add_user_success(
     db_manager: DBManager,
 ) -> None:
     user_data = {
@@ -1286,9 +1289,54 @@ async def test_add_user(
     )
 
 
-@pytest.mark.dependency(depends=["test_add_user"])
-async def test_get_user_by_credentials_success(
+@pytest.mark.dependency(depends=["test_get_users_empty"])
+async def test_add_user_failed(
     db_manager: DBManager,
+) -> None:
+    # already existing user
+    user_data = {
+        "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "user_password": "sicher-ist-nichts",
+    }
+
+    with pytest.raises(UserLoginAlreadyExistError):
+        await db_manager.add_user(
+            user_login=user_data["user_login"],
+            user_password=user_data["user_password"],
+        )
+
+
+
+@pytest.mark.dependency(depends=["test_add_user_failed"])
+async def test_get_user(
+    db_manager: DBManager,
+) -> None:
+    user_data: dict[str, str] = {
+        "user_login": "hannelore2",
+        "user_password": "sicher-ist-nichts",
+    }
+    user: dict[str, Any] = await db_manager.add_user(
+        user_login=user_data["user_login"],
+        user_password=user_data["user_password"],
+    )
+
+    user_id: int = user["id"]
+    user: dict[str, Any] = await db_manager.get_user(
+        user_id=user_id,
+    )
+
+    expected_user_data: dict[str, Any] = {
+        "user_login": "hannelore2",
+    }
+    assert equal_dict(
+        dict_1=user,
+        dict_2=expected_user_data,
+        exclude_keys=["created_at", "modified_at", "id"],
+    )
+
+@pytest.mark.dependency(depends=["test_get_user"])
+async def test_get_user_by_credentials_success(
+        db_manager: DBManager,
 ) -> None:
     user_data = {
         "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
@@ -1352,14 +1400,15 @@ async def test_delete_user(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )
+    user_id = user["id"]
     assert user is not None
 
     await db_manager.delete_user(
-        user_id=user["id"],
+        user_id=user_id,
     )
 
-    users = await db_manager.get_users()
-    assert not users
+    user = await db_manager.get_user(user_id=user_id)
+    assert not user
 
 
 @pytest.mark.dependency(depends=["test_delete_user"])

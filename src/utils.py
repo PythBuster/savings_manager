@@ -59,26 +59,6 @@ def to_camel_cleaned_suffix(field_name: str) -> str:
     return to_camel(field_name.removesuffix("_"))
 
 
-async def check_existence_of_moneybox_by_id(
-    request: Request,
-    moneybox_id: Annotated[
-        int, Path(title="Moneybox ID", description="Moneybox ID to be processed.")  # type: ignore
-    ],
-) -> int:
-    """FastAPI dependency for checking existence of moneybox by id.
-
-    :param request: The fastapi request object.
-    :type request: Request
-    :param moneybox_id: The id of the moneybox to check.
-    :type moneybox_id: int
-    :return: The moneybox id.
-    :rtype: int
-    """
-
-    _ = await request.app.state.db_manager.get_moneybox(moneybox_id=moneybox_id)
-    return moneybox_id
-
-
 def get_database_url(db_settings: AppEnvVariables) -> str:
     """Create a database connection string based on db_settings.
 

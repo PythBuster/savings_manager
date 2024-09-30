@@ -27,7 +27,6 @@ from src.routes.responses.moneybox import (
     UPDATE_MONEYBOX_RESPONSES,
     WITHDRAW_MONEYBOX_RESPONSES,
 )
-from src.utils import check_existence_of_moneybox_by_id
 
 moneybox_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOX}",
@@ -100,7 +99,10 @@ async def add_moneybox(
 )
 async def update_moneybox(
     request: Request,
-    moneybox_id: Annotated[int, Depends(check_existence_of_moneybox_by_id)],
+    moneybox_id: Annotated[
+                 int,
+                 Path(title="Moneybox ID", description="Moneybox ID to be updated.")
+    ],
     moneybox_update_request: Annotated[
         MoneyboxUpdateRequest,
         Body(title="Update Data", description="The updating moneybox data."),
@@ -134,7 +136,10 @@ async def update_moneybox(
 )
 async def delete_moneybox(
     request: Request,
-    moneybox_id: Annotated[int, Depends(check_existence_of_moneybox_by_id)],
+    moneybox_id: Annotated[
+        int,
+        Path(title="Moneybox ID", description="Moneybox ID to be deleted."),
+        ]
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id.
     \f
@@ -163,7 +168,7 @@ async def deposit_moneybox(
     request: Request,
     moneybox_id: Annotated[
         int,
-        Depends(check_existence_of_moneybox_by_id),
+        Path(title="Moneybox ID", description="Moneybox ID to be deposited.")
     ],
     deposit_transaction: Annotated[
         DepositTransactionRequest,
@@ -205,7 +210,7 @@ async def withdraw_moneybox(
     request: Request,
     moneybox_id: Annotated[
         int,
-        Depends(check_existence_of_moneybox_by_id),
+        Path(title="Moneybox ID", description="Moneybox ID to be withdrawn.")
     ],
     withdraw_transaction: Annotated[
         WithdrawTransactionRequest,
@@ -250,7 +255,7 @@ async def transfer_balance(
     request: Request,
     moneybox_id: Annotated[
         int,
-        Depends(check_existence_of_moneybox_by_id),
+        Path(title="Moneybox ID", description="Moneybox ID to be transferred from.")
     ],
     transfer_transaction: Annotated[
         TransferTransactionRequest,
@@ -293,7 +298,10 @@ async def get_moneybox_transaction_logs(
     request: Request,
     moneybox_id: Annotated[
         int,
-        Depends(check_existence_of_moneybox_by_id),
+        Path(
+            title="Moneybox ID",
+            description="Moneybox ID of the transactions to be retrieved.",
+        ),
     ],
 ) -> TransactionLogsResponse | Response:
     """Endpoint for getting moneybox transaction logs.
