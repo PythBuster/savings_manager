@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any, cast
 
-from fastapi import APIRouter, Body, Depends, Path
+from fastapi import APIRouter, Body, Path
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
@@ -100,8 +100,7 @@ async def add_moneybox(
 async def update_moneybox(
     request: Request,
     moneybox_id: Annotated[
-                 int,
-                 Path(title="Moneybox ID", description="Moneybox ID to be updated.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be updated.")
     ],
     moneybox_update_request: Annotated[
         MoneyboxUpdateRequest,
@@ -139,7 +138,7 @@ async def delete_moneybox(
     moneybox_id: Annotated[
         int,
         Path(title="Moneybox ID", description="Moneybox ID to be deleted."),
-        ]
+    ],
 ) -> Response:
     """Endpoint for deleting moneybox by moneybox_id.
     \f
@@ -167,8 +166,7 @@ async def delete_moneybox(
 async def deposit_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int,
-        Path(title="Moneybox ID", description="Moneybox ID to be deposited.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be deposited.")
     ],
     deposit_transaction: Annotated[
         DepositTransactionRequest,
@@ -209,8 +207,7 @@ async def deposit_moneybox(
 async def withdraw_moneybox(
     request: Request,
     moneybox_id: Annotated[
-        int,
-        Path(title="Moneybox ID", description="Moneybox ID to be withdrawn.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be withdrawn.")
     ],
     withdraw_transaction: Annotated[
         WithdrawTransactionRequest,
@@ -254,8 +251,7 @@ async def withdraw_moneybox(
 async def transfer_balance(
     request: Request,
     moneybox_id: Annotated[
-        int,
-        Path(title="Moneybox ID", description="Moneybox ID to be transferred from.")
+        int, Path(title="Moneybox ID", description="Moneybox ID to be transferred from.")
     ],
     transfer_transaction: Annotated[
         TransferTransactionRequest,

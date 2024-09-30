@@ -13,7 +13,6 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
 from alembic.config import CommandLine
-
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
@@ -34,7 +33,8 @@ from src.db.exceptions import (
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError, UserLoginAlreadyExistError,
+    UpdateInstanceError,
+    UserLoginAlreadyExistError,
 )
 from src.utils import equal_dict
 
@@ -1306,7 +1306,6 @@ async def test_add_user_failed(
         )
 
 
-
 @pytest.mark.dependency(depends=["test_add_user_failed"])
 async def test_get_user(
     db_manager: DBManager,
@@ -1334,9 +1333,10 @@ async def test_get_user(
         exclude_keys=["created_at", "modified_at", "id"],
     )
 
+
 @pytest.mark.dependency(depends=["test_get_user"])
 async def test_get_user_by_credentials_success(
-        db_manager: DBManager,
+    db_manager: DBManager,
 ) -> None:
     user_data = {
         "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",

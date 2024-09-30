@@ -831,7 +831,7 @@ class LoginUserResponse(BaseModel):
         int,
         Field(
             description="The id of the user.",
-        )
+        ),
     ]
     """The id of the moneybox."""
 
@@ -858,7 +858,7 @@ class LoginUserResponse(BaseModel):
         Field(
             validation_alias="user_login",
             description="The user's login, which is email address in this case.",
-        )
+        ),
     ]
     """The user's login, which is email address in this case."""
 

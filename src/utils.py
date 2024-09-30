@@ -4,12 +4,11 @@ import os
 import tomllib
 from functools import cache
 from pathlib import Path
-from typing import Annotated, Any, Sequence
+from typing import Any, Sequence
 
 import tabulate
 from dictalchemy import asdict
 from pydantic.alias_generators import to_camel
-from starlette.requests import Request
 
 from src.constants import ENVIRONMENT_ENV_FILE_PATHS
 from src.custom_types import AppEnvVariables, EnvironmentType

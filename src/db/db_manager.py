@@ -11,7 +11,17 @@ from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
 from passlib.context import CryptContext
-from sqlalchemy import Result, Select, and_, desc, insert, select, update, exists, Exists
+from sqlalchemy import (
+    Exists,
+    Result,
+    Select,
+    and_,
+    desc,
+    exists,
+    insert,
+    select,
+    update,
+)
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -52,7 +62,8 @@ from src.db.exceptions import (
     OverflowMoneyboxNotFoundError,
     ProcessCommunicationError,
     TransferEqualMoneyboxError,
-    UpdateInstanceError, UserLoginAlreadyExistError,
+    UpdateInstanceError,
+    UserLoginAlreadyExistError,
 )
 from src.db.models import (
     AppSettings,
@@ -1772,9 +1783,9 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         try:
             process: subprocess.Popen = subprocess.Popen(
-                    command,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
             )
         except Exception as ex:  # noqa: E722
             raise MissingDependencyError(message="pg_dump not installed.") from ex
@@ -1839,9 +1850,9 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
             try:
                 process: subprocess.Popen = subprocess.Popen(
-                        command,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                 )
             except Exception as ex:  # noqa: E722
                 raise MissingDependencyError(message="pg_restore not installed.") from ex
@@ -1868,12 +1879,8 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :raises CreateInstanceError: if creating database entry fails.
         """
 
-        exist_criteria: Exists = exists().where(
-            User.user_login == user_login
-        )
-        exists_stmt: Select = select(User).where(
-            User.is_active.is_(True)
-        ).where(exist_criteria)
+        exist_criteria: Exists = exists().where(User.user_login == user_login)
+        exists_stmt: Select = select(User).where(User.is_active.is_(True)).where(exist_criteria)
 
         async with self.async_sessionmaker() as session:
             result: Result = await session.execute(exists_stmt)
