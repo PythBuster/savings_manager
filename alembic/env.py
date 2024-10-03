@@ -7,7 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from src.custom_types import AppEnvVariables
+from src.custom_types import AppEnvVariables, EnvironmentType
 from src.db.models import Base
 from src.utils import get_app_env_variables, get_database_url
 
@@ -35,10 +35,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-#is_testing = context.get_x_argument(as_dictionary=True).get("testing")
-
-#if is_testing is None:
-#    os.environ["ENVIRONMENT"] = "test"
 
 _, app_env_variables = get_app_env_variables()
 

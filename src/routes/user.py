@@ -6,7 +6,7 @@ from fastapi import APIRouter, Path
 from starlette.requests import Request
 
 from src.custom_types import EndpointRouteType
-from src.data_classes.responses import LoginUserResponse, PrioritylistResponse
+from src.data_classes.responses import LoginUserResponse
 from src.db.db_manager import DBManager
 
 
@@ -32,14 +32,15 @@ async def get_user(
         ),
     ],
 ) -> LoginUserResponse:
-    """Endpoint for getting prioritylist. Note: Returns a list SORTED by priority (asc).
+    """Endpoint for getting user by user_id.
     \f
 
     :param request: The current request object.
     :type request: :class:`Request`
-    :return: The prioritylist if not empty, else a response object including status
-        code 204.
-    :rtype: :class:`PrioritylistResponse` | :class:`Response`
+    :param user_id: The user ID to be retrieved.
+    :type user_id: :class:`int`
+    :return: The requested user data.
+    :rtype: :class:`LoginUserResponse`
     """
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
