@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.27.0 (2024-10-03)
+### Changes:
+- simplify env handling by using separate env file for general settings
+
 ## 2.26.0 (2024-09-25)
 ### Changes:
 - refactor code: annotate local and global variables
