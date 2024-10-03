@@ -153,6 +153,20 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         super().__init__(record_id=moneybox_id, message=message)
 
 
+class UserNotFoundError(RecordNotFoundError):
+    """Custom UserNotFoundError Exception"""
+
+    def __init__(self, user_id: int) -> None:
+        """Initializer for the UserNotFoundError exception.
+
+        :param user_id: The moneybox id.
+        :type user_id: :class:`int`
+        """
+
+        message: str = f"User with id '{user_id}' does not exist."
+        super().__init__(record_id=user_id, message=message)
+
+
 class AppSettingsNotFoundError(RecordNotFoundError):
     """Custom AppSettingsNotFoundError Exception"""
 

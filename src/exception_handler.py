@@ -17,7 +17,7 @@ from src.db.exceptions import (
     InvalidFileError,
     RecordNotFoundError,
 )
-from src.routes.exceptions import MissingSMTPSettingsError, BadUsernameOrPasswordError
+from src.routes.exceptions import BadUsernameOrPasswordError, MissingSMTPSettingsError
 
 
 async def response_exception(  # pylint: disable=too-many-return-statements, too-many-branches

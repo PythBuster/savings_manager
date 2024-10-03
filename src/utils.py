@@ -15,7 +15,7 @@ from src.custom_types import AppEnvVariables, EnvironmentType
 
 
 def get_app_env_variables(
-        environment: EnvironmentType | None = None,
+    environment: EnvironmentType | None = None,
 ) -> tuple[EnvironmentType, AppEnvVariables]:
     """Helper function to get env settings.
 

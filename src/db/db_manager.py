@@ -64,6 +64,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserLoginAlreadyExistError,
+    UserNotFoundError,
 )
 from src.db.models import (
     AppSettings,
@@ -1782,7 +1783,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         ]
 
         try:
-            process: subprocess.Popen = subprocess.Popen(
+            process: subprocess.Popen = subprocess.Popen(  # pylint: disable=consider-using-with
                 command,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -1849,7 +1850,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             ]
 
             try:
-                process: subprocess.Popen = subprocess.Popen(
+                process: subprocess.Popen = subprocess.Popen(  # pylint: disable=consider-using-with
                     command,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
@@ -2016,13 +2017,15 @@ class DBManager:  # pylint: disable=too-many-public-methods
     async def get_user(
         self,
         user_id: int,
-    ) -> dict[str, Any] | None:
+    ) -> dict[str, Any]:
         """Get user by user_id
 
         :param user_id: The ID of the user.
         :type user_id: :class:`int`
-        :return: The user data, if not found, returns None.
-        :rtype: :class:`dict[str, Any] | None`
+        :return: The user data.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises UserNotFountError: if user by id not found.
         """
 
         user = await read_instance(
@@ -2032,7 +2035,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         )
 
         if user is None:
-            return None
+            raise UserNotFoundError(user_id=user_id)
 
         return user.asdict()
 

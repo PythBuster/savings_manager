@@ -1,22 +1,15 @@
 """The JWT classes and functions are located here."""
-import os
+
 from asyncio import Lock
 from typing import Annotated
 
-from async_fastapi_jwt_auth.auth_jwt import AuthJWT, AuthJWTBearer
-from blib2to3.pgen2.parse import lam_sub
-from dotenv import load_dotenv
-from fastapi import FastAPI
+from async_fastapi_jwt_auth.auth_jwt import AuthJWT
 from fastapi.security import HTTPBearer as SecurityHTTPBearer
 from pydantic import BaseModel, Field
-from sqlalchemy import lambda_stmt
 from starlette.requests import Request
-
 from starlette.responses import Response
 
-from src.custom_types import AppEnvVariables
 from src.utils import get_app_env_variables
-from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
 
 
 class JWTSettings(BaseModel):
@@ -94,22 +87,6 @@ class UserAuthJWTBearer(SecurityHTTPBearer):
     _config_loaded: bool = False
     _lock: Lock = Lock()
 
-    def __init__(
-        self,
-        *,
-        bearerFormat: str|None = None,
-        scheme_name: str|None = None,
-        description: str|None = None,
-        auto_error: bool = True,
-    ):
-        super().__init__(
-            bearerFormat=bearerFormat,
-            scheme_name=scheme_name,
-            description=description,
-            auto_error=auto_error,
-        )
-
-
     async def __call__(
         self,
         req: Request = None,
@@ -130,7 +107,7 @@ class UserAuthJWTBearer(SecurityHTTPBearer):
         """Internal method to configure the AuthJWT with custom settings."""
 
         print("Load AuthJWT Configuration...", flush=True)
-        AuthJWT.load_config(lambda: UserAuthJWTBearer._get_jwt_config())  # type: ignore
+        AuthJWT.load_config(UserAuthJWTBearer._get_jwt_config)  # type: ignore
 
     @staticmethod
     def _get_jwt_config() -> JWTSettings:
@@ -139,6 +116,7 @@ class UserAuthJWTBearer(SecurityHTTPBearer):
         :return: JWT settings
         :rtype: :class:`JWTSettings`
         """
+
         _, app_env_variables = get_app_env_variables()
 
         # Use fallback if the value is not set

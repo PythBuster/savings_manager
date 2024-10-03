@@ -2,7 +2,7 @@
 
 import io
 from datetime import datetime
-from typing import Any, cast, Annotated
+from typing import Annotated, Any, cast
 
 from async_fastapi_jwt_auth import AuthJWT
 from fastapi import APIRouter, Depends, File, UploadFile
@@ -11,7 +11,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
-from src.auth.jwt_auth import UserAuthJWTBearer, auth_dep
+from src.auth.jwt_auth import auth_dep
 from src.custom_types import EndpointRouteType
 from src.data_classes.requests import LoginUserRequest, ResetDataRequest
 from src.data_classes.responses import AppInfoResponse, LoginUserResponse
@@ -198,7 +198,7 @@ async def login(
 
     await jwt_authorize.set_access_cookies(
         encoded_access_token=access_token,
-       response=response,
+        response=response,
     )
     return response
 
@@ -209,7 +209,7 @@ async def login(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def logout(
-        jwt_authorize: Annotated[AuthJWT, Depends(auth_dep)],
+    jwt_authorize: Annotated[AuthJWT, Depends(auth_dep)],
 ) -> Response:
     """Endpoint for logging in.
     \f

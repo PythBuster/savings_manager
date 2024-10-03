@@ -2,7 +2,6 @@
 
 """All db_manager tests are located here."""
 
-import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -35,6 +34,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserLoginAlreadyExistError,
+    UserNotFoundError,
 )
 from src.utils import equal_dict
 
@@ -1320,7 +1320,7 @@ async def test_get_user(
     )
 
     user_id: int = user["id"]
-    user: dict[str, Any] = await db_manager.get_user(
+    user = await db_manager.get_user(
         user_id=user_id,
     )
 
@@ -1338,11 +1338,11 @@ async def test_get_user(
 async def test_get_user_by_credentials_success(
     db_manager: DBManager,
 ) -> None:
-    user_data = {
+    user_data: dict[str, str] = {
         "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
         "user_password": "sicher-ist-nichts",
     }
-    user = await db_manager.get_user_by_credentials(
+    user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )
@@ -1353,20 +1353,20 @@ async def test_get_user_by_credentials_success(
 async def test_update_user(
     db_manager: DBManager,
 ) -> None:
-    old_password = "sicher-ist-nichts"
-    user_data = {
+    old_password: str = "sicher-ist-nichts"
+    user_data: dict[str, str] = {
         "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
         "user_password": old_password,
     }
-    user = await db_manager.get_user_by_credentials(
+    user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )
 
     assert user is not None
 
-    new_password = "sicher-ist-wirklich-wirklich-nichts"
-    new_user_data = {
+    new_password: str = "sicher-ist-wirklich-wirklich-nichts"
+    new_user_data: dict[str, str] = {
         "user_login": "hannelore@buxtehu.de",
         "user_password": new_password,
     }
@@ -1392,34 +1392,34 @@ async def test_update_user(
 async def test_delete_user(
     db_manager: DBManager,
 ) -> None:
-    user_data = {
+    user_data: dict[str, str] = {
         "user_login": "hannelore@buxtehu.de",
         "user_password": "sicher-ist-wirklich-wirklich-nichts",
     }
-    user = await db_manager.get_user_by_credentials(
+    user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )
-    user_id = user["id"]
     assert user is not None
 
+    user_id: int = user["id"]
     await db_manager.delete_user(
         user_id=user_id,
     )
 
-    user = await db_manager.get_user(user_id=user_id)
-    assert not user
+    with pytest.raises(UserNotFoundError):
+        await db_manager.get_user(user_id=user_id)
 
 
 @pytest.mark.dependency(depends=["test_delete_user"])
 async def test_user_by_credentials_fail(
     db_manager: DBManager,
 ) -> None:
-    user_data = {
+    user_data: dict[str, str] = {
         "user_login": "hannelore@buxtehu.de",
         "user_password": "sicher-ist-nichts",
     }
-    user = await db_manager.get_user_by_credentials(
+    user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )

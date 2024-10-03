@@ -9,7 +9,6 @@ from src.custom_types import EndpointRouteType
 from src.data_classes.responses import LoginUserResponse
 from src.db.db_manager import DBManager
 
-
 user_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.USER}",
     tags=[EndpointRouteType.USER],

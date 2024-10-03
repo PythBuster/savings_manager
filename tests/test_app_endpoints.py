@@ -6,8 +6,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from _pytest.cacheprovider import Cache
-from _pytest.fixtures import FixtureRequest
 from httpx import AsyncClient
 from starlette import status
 
@@ -195,13 +193,11 @@ async def test_app_import_valid(client: AsyncClient) -> None:
             f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/import",
             files=files,
         )
-
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.order(after="tests/test_db_manager.py::test_add_user_success")
 async def test_app_login_success(
-    request: FixtureRequest,
     client: AsyncClient,
 ) -> None:
     login_post_data = {
@@ -223,7 +219,6 @@ async def test_app_login_success(
     assert user is not None
     assert user["userLogin"] == login_post_data["userLogin"]
 
-    #request.config.cache.set("savings_manager", "hash:....")
 
 @pytest.mark.order(after="test_app_login_success")
 async def test_app_logout_success(
@@ -235,7 +230,7 @@ async def test_app_logout_success(
     assert response.status_code == status.HTTP_204_NO_CONTENT
     assert len(response.headers.raw) == 1
     assert response.headers.raw[-1][0] == b"set-cookie"
-    assert b"savings_manager=\"\"" in response.headers.raw[-1][1]
+    assert b'savings_manager=""' in response.headers.raw[-1][1]
 
 
 @pytest.mark.order(after="test_app_logout_success")
@@ -246,6 +241,7 @@ async def test_app_logout_fail(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/logout",
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
 
 @pytest.mark.order(after="test_app_logout_fail")
 async def test_app_login_fail(
