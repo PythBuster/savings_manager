@@ -1,6 +1,7 @@
 """All exception_handler logic are located here."""
 
 import sqlalchemy
+from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from slowapi.errors import RateLimitExceeded
@@ -34,6 +35,21 @@ async def response_exception(  # pylint: disable=too-many-return-statements
     """
 
     app_logger.exception(exception)
+
+    if isinstance(exception, AuthJWTException):
+        if "Signature has expired" in exception.message:
+            status_code = status.HTTP_401_UNAUTHORIZED
+        else:
+            status_code = status.HTTP_400_BAD_REQUEST
+
+        return JSONResponse(
+            status_code=status_code,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=exception.message,
+                )
+            ),
+        )
 
     if isinstance(exception, InconsistentDatabaseError):
         return JSONResponse(

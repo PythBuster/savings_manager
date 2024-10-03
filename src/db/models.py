@@ -386,14 +386,14 @@ class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
 
     __tablename__ = "automated_savings_logs"
 
-    action_at: Mapped[datetime] = mapped_column(  # pylint: disable=unsubscriptable-object)
+    action_at: Mapped[datetime] = mapped_column(  # pylint: disable=unsubscriptable-object
         DateTime(timezone=True),  # type: ignore
         nullable=False,
         comment="The utc datetime of the action.",
     )
     """The utc datetime of the action."""
 
-    action: Mapped[ActionType] = mapped_column(  # pylint: disable=unsubscriptable-object)
+    action: Mapped[ActionType] = mapped_column(  # pylint: disable=unsubscriptable-object
         nullable=False,
         comment="The action type within the automated savings and automated savings logs.",
     )

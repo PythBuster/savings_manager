@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
+from passlib.context import CryptContext
 from sqlalchemy import Result, Select, and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -63,7 +64,7 @@ from src.db.models import (
 from src.utils import get_database_url
 
 
-class DBManager:
+class DBManager:  # pylint: disable=too-many-public-methods
     """All db manager logic are located here."""
 
     def __init__(
@@ -76,6 +77,11 @@ class DBManager:
         :param engine_args: The asynch engine args.
         :type engine_args: :class:`dict[str, Any] | None`
         """
+
+        self.pwd_context: CryptContext = CryptContext(
+            schemes=["bcrypt"],
+            deprecated="auto",
+        )
 
         if engine_args is None:
             engine_args = {"echo": False}
@@ -112,7 +118,7 @@ class DBManager:
 
         moneyboxes: Sequence[SqlBase] = await read_instances(
             async_session=self.async_sessionmaker,
-            orm_model=Moneybox,  # type: ignore
+            orm_model=cast(SqlBase, Moneybox),
         )
 
         return [moneybox.asdict() for moneybox in moneyboxes]
@@ -138,7 +144,7 @@ class DBManager:
 
         moneybox: SqlBase | None = await read_instance(
             async_session=self.async_sessionmaker,
-            orm_model=Moneybox,  # type: ignore
+            orm_model=cast(SqlBase, Moneybox),
             record_id=moneybox_id,
             only_active_instances=only_active_instances,
         )
@@ -204,7 +210,7 @@ class DBManager:
                 Moneybox,
                 await create_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     data=moneybox_data,
                 ),
             )
@@ -241,7 +247,7 @@ class DBManager:
                 Moneybox,
                 await create_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     data=moneybox_data,
                 ),
             )
@@ -261,7 +267,7 @@ class DBManager:
                 MoneyboxNameHistory,
                 await create_instance(
                     async_session=session,
-                    orm_model=MoneyboxNameHistory,  # type: ignore
+                    orm_model=cast(SqlBase, MoneyboxNameHistory),
                     data=moneybox_name_history_data,
                 ),
             )
@@ -309,7 +315,7 @@ class DBManager:
                 Moneybox,
                 await update_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
                     data=moneybox_data,
                 ),
@@ -327,7 +333,7 @@ class DBManager:
                     MoneyboxNameHistory,
                     await create_instance(
                         async_session=session,
-                        orm_model=MoneyboxNameHistory,  # type: ignore
+                        orm_model=cast(SqlBase, MoneyboxNameHistory),
                         data=moneybox_name_history_data,
                     ),
                 )
@@ -373,7 +379,7 @@ class DBManager:
                 Moneybox,
                 await update_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
                     data={"priority": None},
                 ),
@@ -388,7 +394,7 @@ class DBManager:
 
             deactivated: bool = await deactivate_instance(
                 async_session=session,
-                orm_model=Moneybox,  # type: ignore
+                orm_model=cast(SqlBase, Moneybox),
                 record_id=moneybox_id,
             )
 
@@ -467,7 +473,7 @@ class DBManager:
                     Moneybox,
                     await read_instance(
                         async_session=session,
-                        orm_model=Moneybox,  # type: ignore
+                        orm_model=cast(SqlBase, Moneybox),
                         record_id=moneybox_id,
                     ),
                 )
@@ -481,7 +487,7 @@ class DBManager:
                     Moneybox,
                     await update_instance(
                         async_session=session,
-                        orm_model=Moneybox,  # type: ignore
+                        orm_model=cast(SqlBase, Moneybox),
                         record_id=moneybox_id,
                         data=moneybox.asdict(),
                     ),
@@ -501,7 +507,7 @@ class DBManager:
                 Moneybox,
                 await read_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
                 ),
             )
@@ -515,7 +521,7 @@ class DBManager:
                 Moneybox,
                 await update_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
                     data=moneybox.asdict(),
                 ),
@@ -574,7 +580,7 @@ class DBManager:
                 Moneybox,
                 await read_instance(
                     async_session=self.async_sessionmaker,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
                 ),
             )
@@ -583,7 +589,7 @@ class DBManager:
                 Moneybox,
                 await read_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
                 ),
             )
@@ -602,7 +608,7 @@ class DBManager:
                     Moneybox,
                     await update_instance(
                         async_session=session,
-                        orm_model=Moneybox,  # type: ignore
+                        orm_model=cast(SqlBase, Moneybox),
                         record_id=moneybox_id,
                         data=moneybox.asdict(),
                     ),
@@ -622,7 +628,7 @@ class DBManager:
                 Moneybox,
                 await update_instance(
                     async_session=session,
-                    orm_model=Moneybox,  # type: ignore
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
                     data=moneybox.asdict(),
                 ),
@@ -687,7 +693,7 @@ class DBManager:
             Moneybox,
             await read_instance(
                 async_session=self.async_sessionmaker,
-                orm_model=Moneybox,  # type: ignore
+                orm_model=cast(SqlBase, Moneybox),
                 record_id=from_moneybox_id,
             ),
         )
@@ -699,7 +705,7 @@ class DBManager:
             Moneybox,
             await read_instance(
                 async_session=self.async_sessionmaker,
-                orm_model=Moneybox,  # type: ignore
+                orm_model=cast(SqlBase, Moneybox),
                 record_id=to_moneybox_id,
             ),
         )
@@ -1152,7 +1158,7 @@ class DBManager:
             AppSettings,
             await read_instance(
                 async_session=self.async_sessionmaker,
-                orm_model=AppSettings,  # type: ignore
+                orm_model=cast(SqlBase, AppSettings),
                 record_id=app_settings_id,
             ),
         )
@@ -1186,7 +1192,7 @@ class DBManager:
                 AppSettings,
                 await update_instance(
                     async_session=session,
-                    orm_model=AppSettings,  # type: ignore
+                    orm_model=cast(SqlBase, AppSettings),
                     record_id=app_settings.id,
                     data=app_settings_data,
                 ),
@@ -1675,7 +1681,7 @@ class DBManager:
                 AutomatedSavingsLog,
                 await create_instance(
                     async_session=self.async_sessionmaker,
-                    orm_model=AutomatedSavingsLog,  # type: ignore
+                    orm_model=cast(SqlBase, AutomatedSavingsLog),
                     data=automated_savings_log_data,
                 ),
             )
@@ -1684,7 +1690,7 @@ class DBManager:
                 AutomatedSavingsLog,
                 await create_instance(
                     async_session=session,
-                    orm_model=AutomatedSavingsLog,  # type: ignore
+                    orm_model=cast(SqlBase, AutomatedSavingsLog),
                     data=automated_savings_log_data,
                 ),
             )
@@ -1842,3 +1848,161 @@ class DBManager:
                         )
             except Exception as ex:  # noqa: E722
                 raise MissingDependencyError(message="pg_restore not installed.") from ex
+
+    async def add_user(self, user_login: str, user_password: str) -> dict[str, Any]:
+        """Create a user database entry and returns new entry.
+
+        :param user_login: The user login.
+        :type user_login: :class:`str`
+        :param user_password: The password of the user. The password
+            will be hashed before persisting into database.
+        :type user_password: :class:`str`
+        :return: The new user database entry.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises CreateInstanceError: if creating database entry fails.
+        """
+
+        user: User | None = cast(
+            User,
+            create_instance(
+                async_session=self.async_sessionmaker,
+                orm_model=cast(SqlBase, User),
+                data={
+                    "user_login": user_login,
+                    "user_password_hash": self.get_password_hash(password=user_password),
+                },
+            ),
+        )
+
+        if user is None:
+            raise CreateInstanceError(
+                record_id=None,
+                message="User creation failed.",
+            )
+
+        return user.asdict()
+
+    async def update_user(
+        self,
+        user_id: int,
+        user_data: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Update a user database entry by ID and return updated entry.
+
+        :param user_id: The id of the user.
+        :type user_id: :class:`int`
+        :param user_data: The new user data.
+        :type user_data: :class:`dict`
+        :return: The updated user data.
+        :rtype: :class:`dict`
+        """
+
+        if "user_password" in user_data:
+            user_data["user_password_hash"] = await self.get_password_hash(
+                password=user_data["user_password"]
+            )
+            del user_data["user_password"]
+
+        updated_user: User | None = cast(
+            User,
+            await update_instance(
+                async_session=self.async_sessionmaker,
+                record_id=user_id,
+                orm_model=cast(SqlBase, User),
+                data=user_data,
+            ),
+        )
+
+        if updated_user is None:
+            raise UpdateInstanceError(
+                record_id=user_id,
+                message="User update failed.",
+            )
+
+        return updated_user.asdict()
+
+    async def delete_user(self, user_id: int) -> None:
+        """Delete a user database entry by given ID.
+
+        :param user_id: The user ID.
+        :type user_id: :class:`int`
+
+        :raises DeleteInstanceError: if deleting user fails.
+        """
+
+        deactivated: bool = await deactivate_instance(
+            async_session=self.async_sessionmaker,
+            orm_model=cast(SqlBase, User),
+            record_id=user_id,
+        )
+
+        if not deactivated:
+            raise DeleteInstanceError(
+                record_id=user_id,
+                message="Failed to delete (deactivate) user.",
+                details={"deactivated": deactivated},
+            )
+
+    async def get_user_by_credentials(
+        self,
+        user_login: str,
+        user_password: str,
+    ) -> dict[str, Any] | None:
+        """Get user by credentials. If user not found, rerun None, else
+        user data as dict will be returned.
+
+        :param user_login: The login of the user, which is an email address
+            in this case.
+        :type user_login: :class:`str`
+        :param user_password: The password of the user.
+        :type user_password: :class:`str`
+        :return: The user data, if not found, returns None.
+        :rtype: :class:`dict[str, Any] | None`
+        """
+
+        stmt: Select = select(User).where(  # type: ignore
+            and_(
+                User.user_login == user_login,
+                User.is_active.is_(True),
+            )
+        )
+
+        with self.async_sessionmaker() as session:
+            result: Result = await session.execute(stmt)
+
+        user: User | None = cast(
+            User,
+            result.one_or_none(),
+        )
+
+        if user is None or not self.verify_password(user_password, user.user_password_hash):
+            return None
+
+        return user.asdict()
+
+    async def verify_password(
+        self, plain_password: str | bytes, hashed_password: str | bytes
+    ) -> bool:
+        """Verify the plain_password matches the hashed password.
+
+        :param plain_password: The plain password.
+        :type plain_password: :class:`str` | :class:`bytes`
+        :param hashed_password: The hashed password.
+        :type hashed_password: :class:`str` | :class:`bytes`
+        :return: True, if the hashed password matches the plain_password.
+        :rtype: :class:`bool`
+        """
+
+        return self.pwd_context.verify(plain_password, hashed_password)
+
+    async def get_password_hash(self, password: str | bytes) -> str:
+        """Get hashed password.
+
+        :param password: The password.
+        :type password: :class:`str`
+        :return: The hashed password.
+        :rtype: :class:`str`
+        """
+
+        return self.pwd_context.hash(password)

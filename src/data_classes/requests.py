@@ -7,6 +7,7 @@ from pydantic import (
     ConfigDict,
     EmailStr,
     Field,
+    SecretStr,
     StringConstraints,
     field_validator,
 )
@@ -452,6 +453,34 @@ class ResetDataRequest(BaseModel):
             "examples": [
                 {
                     "keepApp_Settings": True,
+                },
+            ],
+        },
+    )
+    """The config of the model."""
+
+
+class LoginUserRequest(BaseModel):
+    """The login user request model."""
+
+    user_login: Annotated[
+        str, Field(description="The user's login, which is email address in this case.")
+    ]
+    """The user's login, which is email address in this case."""
+
+    user_password: Annotated[SecretStr, Field(description="The user's login password.")]
+    """The user's login password."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "userLogin": "JohnDoe@mail.com",
+                    "userPassword": "myPassword",
                 },
             ],
         },

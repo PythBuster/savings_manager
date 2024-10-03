@@ -4,16 +4,19 @@ import io
 from datetime import datetime
 from typing import Any, cast
 
-from fastapi import APIRouter, File, UploadFile
+from async_fastapi_jwt_auth import AuthJWT
+from fastapi import APIRouter, Depends, File, UploadFile
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response, StreamingResponse
 
+from src.auth.jwt_auth import auth_dep
 from src.custom_types import EndpointRouteType
-from src.data_classes.requests import ResetDataRequest
+from src.data_classes.requests import LoginUserRequest, ResetDataRequest
 from src.data_classes.responses import AppInfoResponse
 from src.db.db_manager import DBManager
 from src.db.exceptions import InvalidFileError
+from src.routes.exceptions import BadUsernameOrPasswordError
 from src.routes.responses.app import (
     GET_APP_EXPORT_RESPONSES,
     GET_APP_INFO_RESPONSES,
@@ -141,3 +144,62 @@ async def import_sql_dump(
     await db_manager.import_sql_dump(sql_dump=sql_dump)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app_router.post("/login")
+async def login(
+    request: Request,
+    user_request_data: LoginUserRequest,
+    jwt_authorize: AuthJWT = Depends(auth_dep),
+) -> Response:
+    """Endpoint for logging in.
+    \f
+
+    :param request: The current request.
+    :type request: :class:`Request`
+    :param user_request_data: The login user data.
+    :type user_request_data: :class:`LoginUserRequest`
+    :param jwt_authorize: The JWT authorizer dependency.
+    :type jwt_authorize: :class:`AuthJWT`
+    """
+
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
+        user_login=user_request_data.user_login,
+        user_password=user_request_data.user_password.get_secret_value(),
+    )
+
+    if user is None:
+        raise BadUsernameOrPasswordError(
+            user_name=user_request_data.user_name,
+        )
+
+    access_token: str = await jwt_authorize.create_access_token(
+        subject=str(user["id"]),
+        expires_time=7 * 24 * 60 * 60,  # 7 days
+    )
+
+    # Set the JWT cookie in the response
+    response: Response = Response(status_code=status.HTTP_204_NO_CONTENT)
+    await jwt_authorize.set_access_cookies(
+        encoded_access_token=access_token,
+        response=response,
+    )
+
+    return response
+
+
+@app_router.delete("/logout")
+async def logout(jwt_authorize: AuthJWT = Depends(auth_dep)) -> Response:
+    """Endpoint for logging in.
+    \f
+
+    :param jwt_authorize: The JWT authorizer dependency.
+    :type jwt_authorize: :class:`AuthJWT`
+    """
+
+    await jwt_authorize.jwt_required()
+
+    response: Response = Response(status_code=status.HTTP_204_NO_CONTENT)
+    await jwt_authorize.unset_jwt_cookies(response=response)
+    return response

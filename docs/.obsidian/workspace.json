@@ -11,14 +11,9 @@
             "id": "1bdf787dcc5f54b4",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "image",
               "state": {
-                "file": "Untitled.canvas",
-                "viewState": {
-                  "x": 0,
-                  "y": 0,
-                  "zoom": 0
-                }
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png"
               }
             }
           }
@@ -88,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Untitled.canvas",
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -105,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Untitled.canvas",
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -128,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Untitled.canvas"
+                "file": "ui/draft/App_v2_SavingsManagerUI__UPDATED.png"
               }
             }
           }
@@ -151,8 +146,9 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
-    "Architecture/Database App v2.md",
+    "Architecture/Database App v1.md",
     "Untitled.canvas",
+    "Architecture/Database App v2.md",
     "Architecture/Autom. Database Backup.md",
     "ui/draft/SavingsManagerUI_v2.png",
     "ui/draft/SavingsManagerUI_v1.png",
@@ -160,7 +156,6 @@
     "Requirements/Requirement Analysis.md",
     "Guidelines/Workflow.md",
     "Architecture/Endpoints.md",
-    "Architecture/Database App v1.md",
     "TransactionLog_Creation.png",
     "distribution_logs_app_v2.png",
     "Diagram 1.svg",

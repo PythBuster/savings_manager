@@ -50,6 +50,7 @@ class AppEnvVariables(BaseSettings):
     - general
     - database
     - smtp
+    - JWT
     """
 
     # DATABASE
@@ -86,6 +87,19 @@ class AppEnvVariables(BaseSettings):
 
     smtp_password: SecretStr | None = None
     """The user password."""
+
+    # AUTH JWT DATA
+    authjwt_secret_key: SecretStr
+    """The JWT secret key."""
+
+    authjwt_cookie_secure: bool
+    """Enable cookie secure."""
+
+    authjwt_cookie_csrf_protect: bool
+    """Enable CSRF protection."""
+
+    authjwt_cookie_samesite: str
+    """Same-site protection mode."""
 
     model_config = ConfigDict(extra="forbid")
     """Model config."""
