@@ -822,3 +822,27 @@ class AppSettingsResponse(BaseModel):
             raise ValueError("Can't activate receiving emails, user email address is not set!")
 
         return self
+
+
+class LoginUserResponse(BaseModel):
+    """The login user response model."""
+
+    user_login: Annotated[
+        str, Field(description="The user's login, which is email address in this case.")
+    ]
+    """The user's login, which is email address in this case."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "userLogin": "JohnDoe@mail.com",
+                },
+            ],
+        },
+    )
+    """The config of the model."""

@@ -196,3 +196,20 @@ async def test_app_import_valid(client: AsyncClient) -> None:
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
+
+@pytest.mark.order(after="tests/test_db_manager.py::test_add_user")
+async def test_app_login(client: AsyncClient) -> None:
+    login_post_data = {
+        "userLogin": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "userPassword": "sicher-ist-nichts",
+    }
+
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login",
+        json=login_post_data,
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    user = response.json()
+    assert user is not None
+    assert user["userLogin"] == login_post_data["userLogin"]

@@ -8,12 +8,12 @@ from async_fastapi_jwt_auth import AuthJWT
 from fastapi import APIRouter, Depends, File, UploadFile
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import Response, StreamingResponse
+from starlette.responses import Response, StreamingResponse, JSONResponse
 
 from src.auth.jwt_auth import UserAuthJWTBearer
 from src.custom_types import EndpointRouteType
 from src.data_classes.requests import LoginUserRequest, ResetDataRequest
-from src.data_classes.responses import AppInfoResponse
+from src.data_classes.responses import AppInfoResponse, LoginUserResponse
 from src.db.db_manager import DBManager
 from src.db.exceptions import InvalidFileError
 from src.routes.exceptions import BadUsernameOrPasswordError
@@ -21,7 +21,7 @@ from src.routes.responses.app import (
     GET_APP_EXPORT_RESPONSES,
     GET_APP_INFO_RESPONSES,
     POST_APP_IMPORT_RESPONSES,
-    POST_APP_RESET_RESPONSES,
+    POST_APP_RESET_RESPONSES, POST_APP_LOGIN_RESPONSES, DELETE_APP_LOGOUT_RESPONSES,
 )
 from src.utils import get_app_data
 
@@ -57,7 +57,7 @@ async def get_app_infos() -> AppInfoResponse:
 @app_router.post(
     "/reset",
     responses=POST_APP_RESET_RESPONSES,
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def reset_app(
     request: Request,
@@ -86,6 +86,7 @@ async def reset_app(
 @app_router.get(
     "/export",
     responses=GET_APP_EXPORT_RESPONSES,
+    response_class=StreamingResponse,
 )
 async def export_sql_dump(
     request: Request,
@@ -145,7 +146,11 @@ async def import_sql_dump(
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app_router.post("/login")
+
+@app_router.post(
+    "/login",
+    responses=POST_APP_LOGIN_RESPONSES,
+)
 async def login(
     request: Request,
     user_request_data: LoginUserRequest,
@@ -160,6 +165,8 @@ async def login(
     :type user_request_data: :class:`LoginUserRequest`
     :param jwt_authorize: The JWT authorizer dependency.
     :type jwt_authorize: :class:`AuthJWT`
+    :return: A json response included :class:`LoginUserResponse` data.
+    :rtype: :class:`JSONResponse`
     """
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
@@ -173,13 +180,18 @@ async def login(
             user_name=user_request_data.user_name,
         )
 
+    user_valid_response_data = LoginUserResponse(**user)
+
     access_token: str = await jwt_authorize.create_access_token(
         subject=str(user["id"]),
         expires_time=7 * 24 * 60 * 60,  # 7 days
     )
 
     # Set the JWT cookie in the response
-    response: Response = Response(status_code=status.HTTP_204_NO_CONTENT)
+    response: JSONResponse = JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=user_valid_response_data,
+    )
     await jwt_authorize.set_access_cookies(
         encoded_access_token=access_token,
         response=response,
@@ -188,7 +200,11 @@ async def login(
     return response
 
 
-@app_router.delete("/logout")
+@app_router.delete(
+    "/logout",
+    responses=DELETE_APP_LOGOUT_RESPONSES,
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def logout(
         jwt_authorize: Annotated[AuthJWT, Depends(UserAuthJWTBearer)],
 ) -> Response:

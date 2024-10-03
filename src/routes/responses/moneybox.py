@@ -4,9 +4,12 @@ from typing import Any
 
 from starlette import status
 
+from src.data_classes.responses import MoneyboxResponse, TransactionLogsResponse
+
 GET_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
+        "model": MoneyboxResponse,
     },
 }
 """Further custom responses for endpoint GET: /moneybox/{moneybox_id}."""
@@ -14,6 +17,7 @@ GET_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
 CREATE_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
+        "model": MoneyboxResponse,
     },
 }
 """Further custom responses for endpoint (create) POST: /moneybox."""
@@ -21,6 +25,7 @@ CREATE_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
 UPDATE_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
+        "model": MoneyboxResponse,
     },
 }
 """Further custom responses for endpoint (update) PATCH: /moneybox/{moneybox_id}."""
@@ -35,6 +40,7 @@ DELETE_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
 DEPOSIT_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
+        "model": MoneyboxResponse,
     },
 }
 """Further custom responses for endpoint (deposit) POST: /moneybox/{moneybox_id}/balance/add."""
@@ -42,6 +48,7 @@ DEPOSIT_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
 WITHDRAW_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
+        "model": MoneyboxResponse,
     },
 }
 """Further custom responses for endpoint (withdraw) POST: /moneybox/{moneybox_id}/balance/sub."""
@@ -58,6 +65,7 @@ POST: /moneybox/{moneybox_id}/balance/transfer."""
 MONEYBOX_TRANSACTION_LOGS_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
+        "model": TransactionLogsResponse,
     },
     status.HTTP_204_NO_CONTENT: {
         "description": "No Content",
