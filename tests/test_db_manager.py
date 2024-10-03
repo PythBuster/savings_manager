@@ -1252,3 +1252,111 @@ async def test_import_sql_dump(
             dict_2=expected_app_settings_data,
             exclude_keys=["created_at", "modified_at", "id"],
         )
+
+@pytest.mark.dependency
+async def test_get_users_empty(
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
+) -> None:
+    users = await db_manager.get_users()
+    assert len(users) == 0
+
+
+@pytest.mark.dependency(depends=["test_get_users_empty"])
+async def test_add_user(
+    db_manager: DBManager,
+) -> None:
+    user_data = {
+        "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "user_password": "sicher-ist-nichts",
+    }
+    user = await db_manager.add_user(
+        user_login=user_data["user_login"],
+        user_password=user_data["user_password"],
+    )
+
+    expected_user_data = {
+        "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+    }
+    assert equal_dict(
+        dict_1=expected_user_data,
+        dict_2=user,
+        exclude_keys=["created_at", "modified_at", "id"],
+    )
+
+
+@pytest.mark.dependency(depends=["test_add_user"])
+async def test_get_user_by_credentials_success(
+        db_manager: DBManager,
+):
+    user_data = {
+        "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "user_password": "sicher-ist-nichts",
+    }
+    user = await db_manager.get_user_by_credentials(
+        user_login=user_data["user_login"],
+        user_password=user_data["user_password"],
+    )
+    assert user != None
+
+
+@pytest.mark.dependency(depends=["test_get_user_by_credentials_success"])
+async def test_update_user(
+    db_manager: DBManager,
+) -> None:
+    user_data = {
+        "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "user_password": "sicher-ist-nichts",
+    }
+    user = await db_manager.get_user_by_credentials(
+        user_login=user_data["user_login"],
+        user_password=user_data["user_password"],
+    )
+
+    new_user_data = {
+        "user_login": "hannelore@buxtehu.de",
+    }
+    user = await db_manager.update_user(
+        user_id=user["id"],
+        user_data=new_user_data,
+    )
+
+    assert equal_dict(
+        dict_1=new_user_data,
+        dict_2=user,
+        exclude_keys=["created_at", "modified_at", "id"],
+    )
+
+@pytest.mark.dependency(depends=["test_update_user"])
+async def test_delete_user(
+    db_manager: DBManager,
+) -> None:
+    user_data = {
+        "user_login": "hannelore@buxtehu.de",
+        "user_password": "sicher-ist-nichts",
+    }
+    user = await db_manager.get_user_by_credentials(
+        user_login=user_data["user_login"],
+        user_password=user_data["user_password"],
+    )
+    await db_manager.delete_user(
+        user_id=user["id"],
+    )
+
+    users = await db_manager.get_users()
+    assert not users
+
+
+@pytest.mark.dependency(depends=["test_delete_user"])
+async def get_user_by_credentials_fail(
+        db_manager: DBManager,
+):
+    user_data = {
+        "user_login": "hannelore@buxtehu.de",
+        "user_password": "sicher-ist-nichts",
+    }
+    user = await db_manager.get_user_by_credentials(
+        user_login=user_data["user_login"],
+        user_password=user_data["user_password"],
+    )
+    assert user == None

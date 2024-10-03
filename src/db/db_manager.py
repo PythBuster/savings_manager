@@ -1866,12 +1866,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         user: User | None = cast(
             User,
-            create_instance(
+            await create_instance(
                 async_session=self.async_sessionmaker,
                 orm_model=cast(SqlBase, User),
                 data={
                     "user_login": user_login,
-                    "user_password_hash": self.get_password_hash(password=user_password),
+                    "user_password_hash": await self.get_password_hash(password=user_password),
                 },
             ),
         )
@@ -1969,18 +1969,40 @@ class DBManager:  # pylint: disable=too-many-public-methods
             )
         )
 
-        with self.async_sessionmaker() as session:
+        async with self.async_sessionmaker() as session:
             result: Result = await session.execute(stmt)
 
         user: User | None = cast(
             User,
-            result.one_or_none(),
+            result.scalars().one_or_none(),
         )
 
-        if user is None or not self.verify_password(user_password, user.user_password_hash):
+        if user is None or not await self.verify_password(
+                user_password,
+                user.user_password_hash,
+        ):
             return None
 
         return user.asdict()
+
+    async def get_users(
+        self,
+        only_active_instances: bool = True,
+    ) -> list[dict[str, Any]]:
+        """Get all user as a list.
+
+        :param only_active_instances: If True, only return active users.
+        :type only_active_instances: :class:`bool`
+        :return: The user data, if not found, returns None.
+        :rtype: :class:`dict[str, Any] | None`
+        """
+
+        users = await read_instances(
+            async_session=self.async_sessionmaker,
+            orm_model=cast(SqlBase, User),
+            only_active_instances=only_active_instances,
+        )
+        return [user.asdict() for user in users]
 
     async def verify_password(
         self, plain_password: str | bytes, hashed_password: str | bytes
@@ -2007,3 +2029,4 @@ class DBManager:  # pylint: disable=too-many-public-methods
         """
 
         return self.pwd_context.hash(password)
+

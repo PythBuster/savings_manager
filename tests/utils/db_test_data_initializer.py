@@ -86,6 +86,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_reset_app_delete_app_settings": self.dataset_test_reset_app_delete_app_settings,
             "test_export_sql_dump": self.dataset_test_export_sql_dump,
             "test_import_sql_dump": self.dataset_test_import_sql_dump,
+            "test_get_users_empty": self.truncate_tables,
         }
         """Map test case name witch related test data generation function"""
 
