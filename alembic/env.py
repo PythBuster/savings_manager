@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -8,7 +9,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 from src.custom_types import AppEnvVariables
 from src.db.models import Base
-from src.utils import get_database_url
+from src.utils import get_app_env_variables, get_database_url
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -34,15 +35,12 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-is_testing = context.get_x_argument(as_dictionary=True).get("testing")
+#is_testing = context.get_x_argument(as_dictionary=True).get("testing")
 
-if is_testing is None:
-    env_file = Path(__file__).resolve().parent.parent / "envs" / ".env"
-else:
-    env_file = Path(__file__).resolve().parent.parent / "envs" / ".env.test"
+#if is_testing is None:
+#    os.environ["ENVIRONMENT"] = "test"
 
-app_env_variables = AppEnvVariables(_env_file=env_file)
-print(f"Loaded {env_file}", flush=True)
+_, app_env_variables = get_app_env_variables()
 
 database_url = get_database_url(db_settings=app_env_variables)
 config.set_main_option("sqlalchemy.url", database_url)

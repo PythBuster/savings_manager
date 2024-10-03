@@ -9,7 +9,7 @@ Savings Manager simplifies the process, allowing you to watch as your moneyboxes
 ## Deployment / Contribution
 
 ### Docker
-**NOTE**: You need a `.env` with all environments in `/envs` dir (see section **Env**).
+**NOTE**: You need do add `.env` files with all environments in `/envs` dir (see section **Env**).
 
 1. Navigate to the Docker directory: `cd docker`
 2. Run: `docker compose up -d` to start the PostgreSQL database and the Savings Manager app.  
@@ -42,9 +42,18 @@ To get the latest version of the repository, simply pull it and rebuild the Dock
 A PostgreSQL database is required. To connect to the database, add a `.env` file in `/src/envs` with the following information:
 
 ##### Env
-```
-ENVIRONMENT=prod|dev|test
+The Savings Manager will load all required data from environment files.
 
+**Required environment files:**
+- `.env.general` (already exists)
+- `.env.test` (already exists)
+- `.env.dev` (must be added manually)
+
+In the `/envs` directory, you will find the `.env.test` and `.env.general` files, which already contain all necessary data (no modifications needed).
+
+Additionally, you need to create and add your own `.env.dev` file in the same directory, following the same structure as the `.env.test` file.
+
+```
 DB_DRIVER=postgresql+asyncpg
 DB_NAME=savings_manager
 
@@ -84,12 +93,6 @@ SMTP_PASSWORD=
 ```
 The SMTP settings will be explained later.
 
-The ENVIRONMENT variable in .env file will deactivate the uvicorn access logs, if value is set to: prod.
-All other values will activate the access logs.
-
-`uvicorn "main:app" [--no-access-log]`
-
-`uvicorn.run("...", ... , access_log=False|True)`
 
 ###### SqlAlchemy (ORM)
 We will use SQLAlchemy to manage and access the SQL database.

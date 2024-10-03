@@ -1,5 +1,6 @@
 """All helper functions are located here."""
 
+import os
 import tomllib
 from functools import cache
 from pathlib import Path
@@ -10,15 +11,40 @@ from dictalchemy import asdict
 from pydantic.alias_generators import to_camel
 from starlette.requests import Request
 
-from src.constants import WORKING_DIR_PATH
-from src.custom_types import AppEnvVariables
+from src.constants import ENVIRONMENT_ENV_FILE_PATHS
+from src.custom_types import AppEnvVariables, EnvironmentType
 
 
-@cache
-def get_app_env_variables() -> AppEnvVariables:
+def get_app_env_variables() -> tuple[EnvironmentType, AppEnvVariables]:
     """Helper function to get env settings."""
 
-    return AppEnvVariables(_env_file=WORKING_DIR_PATH.parent / "envs" / ".env")
+    environment_str = os.getenv("ENVIRONMENT")
+
+    if environment_str is None:
+        raise ValueError("ENVIRONMENT environment variable not set.")
+
+    try:
+        environment = EnvironmentType(environment_str.lower())
+    except:  # noqa: E722
+        expected_values = [environment_type.value for environment_type in EnvironmentType]
+        expected_values_str = ", ".join(expected_values)
+        raise ValueError(  # pylint: disable=raise-missing-from
+            f"ENVIRONMENT environment variable is invalid - expected: {expected_values_str}"
+        )
+
+    if environment is EnvironmentType.PROD:
+        if environment in ENVIRONMENT_ENV_FILE_PATHS:
+            app_env_variables = AppEnvVariables(
+                _env_file=ENVIRONMENT_ENV_FILE_PATHS[environment],
+            )
+        else:
+            app_env_variables = AppEnvVariables()
+    else:
+        app_env_variables = AppEnvVariables(
+            _env_file=ENVIRONMENT_ENV_FILE_PATHS[environment],
+        )
+
+    return environment, app_env_variables
 
 
 def to_camel_cleaned_suffix(field_name: str) -> str:

@@ -1,6 +1,7 @@
 """Pytest configurations and fixtures are located here."""
 
 import asyncio
+import os
 import subprocess
 import time
 from functools import partial
@@ -10,6 +11,7 @@ import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 from httpx import AsyncClient
 
+from src import utils
 from src.constants import WORKING_DIR_PATH
 from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType
 from src.db.db_manager import DBManager
@@ -23,16 +25,19 @@ pytest_plugins = ("pytest_asyncio",)
 """The pytest plugins which should be used to run tests."""
 
 
+@pytest_asyncio.fixture(scope="session", autouse=True)
+def set_test_environment() -> None:
+    """Set ENVIRONMENT to 'test'"""
+
+    os.environ["ENVIRONMENT"] = "test"
+
+
 @pytest_asyncio.fixture(scope="session", name="app_env_variables")
 def get_app_env_variables() -> AppEnvVariables:  # type: ignore
     """Test env settings"""
 
-    test_env_path = WORKING_DIR_PATH.parent / "envs" / ".env.test"
-    app_env_variables_ = AppEnvVariables(
-        _env_file=test_env_path,
-    )
-
-    yield app_env_variables_
+    _, app_env_variables = utils.get_app_env_variables()
+    yield app_env_variables
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -314,7 +319,7 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
     db_manager.truncate_tables = partial(truncate_tables, db_manager)  # type: ignore
 
     # clear db if not cleared in last test session
-    subprocess.call(("alembic", "-x", "testing", "downgrade", "base"))
+    subprocess.call(("alembic", "downgrade", "base"))
     time.sleep(1)
     # drop tables
     async with db_manager.async_engine.begin() as conn:
@@ -322,7 +327,7 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
     time.sleep(2)
 
     # create db tables and apply all db migrations
-    subprocess.call(("alembic", "-x", "testing", "upgrade", "head"))
+    subprocess.call(("alembic", "upgrade", "head"))
     time.sleep(2)
 
     yield db_manager

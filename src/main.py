@@ -4,12 +4,14 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
 
-from src.custom_types import AppEnvVariables, Environment
+from src.constants import GENERAL_ENV_FILE_PATH
+from src.custom_types import EnvironmentType
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
@@ -23,14 +25,15 @@ from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data, get_app_env_variables
 
+# load general environments (.env.general file)
+load_dotenv(dotenv_path=GENERAL_ENV_FILE_PATH)
+
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
 
-    app_env_variables: AppEnvVariables = (  # pylint: disable=redefined-outer-name
-        get_app_env_variables()
-    )
+    environment, app_env_variables = get_app_env_variables()  # pylint: disable=redefined-outer-name
 
     print("Create .pgpass for sql import/export functionality ...", flush=True)
     create_pgpass(app_env_variables=app_env_variables)
@@ -46,7 +49,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     db_manager: DBManager = DBManager(
         db_settings=app_env_variables,
         engine_args={
-            "echo": app_env_variables.environment is Environment.DEV,
+            "echo": environment is EnvironmentType.DEV,
         },
     )
     email_sender: EmailSender = EmailSender(
@@ -58,7 +61,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
         email_sender=email_sender,
     )
 
-    if app_env_variables.environment is Environment.PROD:
+    if environment is EnvironmentType.PROD:
         print("Start background tasks.")
         await background_tasks_runner.run()  # type: ignore
 
@@ -115,7 +118,7 @@ app.middleware("http")(handle_requests)
 
 
 if __name__ == "__main__":
-    app_env_variables: AppEnvVariables = get_app_env_variables()
+    environment, _ = get_app_env_variables()
 
     print("Start uvicorn server ...", flush=True)
     uvicorn.run(
@@ -124,8 +127,8 @@ if __name__ == "__main__":
         port=8001,
         loop="auto",
         workers=1,
-        reload=app_env_variables.environment is Environment.DEV,
-        access_log=app_env_variables.environment is not Environment.PROD,
+        reload=environment is EnvironmentType.DEV,
+        access_log=environment is not EnvironmentType.PROD,
         # disable access log for prod
     )
     print("Stop uvicorn server.", flush=True)
