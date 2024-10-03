@@ -1253,6 +1253,7 @@ async def test_import_sql_dump(
             exclude_keys=["created_at", "modified_at", "id"],
         )
 
+
 @pytest.mark.dependency
 async def test_get_users_empty(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -1287,8 +1288,8 @@ async def test_add_user(
 
 @pytest.mark.dependency(depends=["test_add_user"])
 async def test_get_user_by_credentials_success(
-        db_manager: DBManager,
-):
+    db_manager: DBManager,
+) -> None:
     user_data = {
         "user_login": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
         "user_password": "sicher-ist-nichts",
@@ -1297,7 +1298,7 @@ async def test_get_user_by_credentials_success(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )
-    assert user != None
+    assert user is not None
 
 
 @pytest.mark.dependency(depends=["test_get_user_by_credentials_success"])
@@ -1313,6 +1314,8 @@ async def test_update_user(
         user_password=user_data["user_password"],
     )
 
+    assert user is not None
+
     new_user_data = {
         "user_login": "hannelore@buxtehu.de",
     }
@@ -1327,6 +1330,7 @@ async def test_update_user(
         exclude_keys=["created_at", "modified_at", "id"],
     )
 
+
 @pytest.mark.dependency(depends=["test_update_user"])
 async def test_delete_user(
     db_manager: DBManager,
@@ -1339,6 +1343,8 @@ async def test_delete_user(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )
+    assert user is not None
+
     await db_manager.delete_user(
         user_id=user["id"],
     )
@@ -1349,8 +1355,8 @@ async def test_delete_user(
 
 @pytest.mark.dependency(depends=["test_delete_user"])
 async def get_user_by_credentials_fail(
-        db_manager: DBManager,
-):
+    db_manager: DBManager,
+) -> None:
     user_data = {
         "user_login": "hannelore@buxtehu.de",
         "user_password": "sicher-ist-nichts",
@@ -1359,4 +1365,4 @@ async def get_user_by_credentials_fail(
         user_login=user_data["user_login"],
         user_password=user_data["user_password"],
     )
-    assert user == None
+    assert user is None

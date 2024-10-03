@@ -1978,8 +1978,8 @@ class DBManager:  # pylint: disable=too-many-public-methods
         )
 
         if user is None or not await self.verify_password(
-                user_password,
-                user.user_password_hash,
+            user_password,
+            user.user_password_hash,
         ):
             return None
 
@@ -2029,4 +2029,3 @@ class DBManager:  # pylint: disable=too-many-public-methods
         """
 
         return self.pwd_context.hash(password)
-
