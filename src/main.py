@@ -115,8 +115,10 @@ app.add_middleware(
 # override registered exception handler of
 # - RateLimitExceeded
 # - RequestValidationError
+# - AuthJWTException
 app.add_exception_handler(RateLimitExceeded, response_exception)
 app.add_exception_handler(RequestValidationError, response_exception)
+app.add_exception_handler(AuthJWTException, response_exception)
 
 # handle requests and all other exceptions
 app.middleware("http")(handle_requests)

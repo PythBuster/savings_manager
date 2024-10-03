@@ -12,7 +12,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from src.app_logger import app_logger
 from src.custom_types import AppEnvVariables
 from src.db.db_manager import DBManager
-from src.report_sender.consants import SENDER_DIR_PATH
+from src.constants import SENDER_DIR_PATH
 from src.report_sender.sender import ReportSender
 from src.routes.exceptions import MissingSMTPSettingsError
 from src.utils import get_app_data, tabulate_str

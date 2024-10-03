@@ -20,7 +20,7 @@ from src.db.exceptions import (
 from src.routes.exceptions import MissingSMTPSettingsError
 
 
-async def response_exception(  # pylint: disable=too-many-return-statements
+async def response_exception(  # pylint: disable=too-many-return-statements, too-many-branches
     _: Request,
     exception: Exception,
 ) -> JSONResponse:

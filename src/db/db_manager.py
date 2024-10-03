@@ -60,6 +60,7 @@ from src.db.models import (
     MoneyboxNameHistory,
     SqlBase,
     Transaction,
+    User,
 )
 from src.utils import get_database_url
 

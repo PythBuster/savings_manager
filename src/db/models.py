@@ -405,3 +405,63 @@ class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
         comment="Metadata for the action, like app settings data.",
     )
     """Metadata for the action, like app settings data."""
+
+
+class User(SqlBase):  # pylint: disable=unsubscriptable-object, too-few-public-methods
+    """The User ORM."""
+
+    __tablename__ = "users"
+
+    user_login: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
+        nullable=False,
+        comment="The user login, which is an email address in this case.",
+    )
+    """The user login, which is an email address in this case."""
+
+    user_password_hash: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
+        String(60),
+        nullable=False,
+        comment="The hashed user password.",
+    )
+    """The hashed user password."""
+
+    _table_args__ = (
+        Index(
+            "idx_unique_user_login_active",
+            "name",
+            unique=True,
+            postgresql_where=text("is_active = true"),
+        ),
+        CheckConstraint(
+            "char_length(user_password_hash) == 60", name="ck_user_password_hash_total_len_60"
+        ),
+        CheckConstraint("char_length(user_login) > 0", name="ck_user_login_min_len_1"),
+    )
+
+    def asdict(  # type: ignore  # pylint: disable=too-many-arguments
+        self,
+        exclude=None,
+        exclude_underscore=None,
+        exclude_pk=None,
+        follow=None,
+        include=None,
+        only=None,
+        **kwargs,
+    ) -> dict[str, Any]:
+        """Overloaded method from make_class_dictable()."""
+
+        if exclude is None:
+            exclude = []
+
+        # always exclude user_password_hash
+        exclude.append("user_password_hash")
+
+        return super().asdict(  # pylint: disable=no-member
+            exclude=list(set(exclude)),  # remove duplicates by casting to set and back to list
+            exclude_underscore=exclude_underscore,
+            exclude_pk=exclude_pk,
+            follow=follow,
+            include=include,
+            only=only,
+            **kwargs,
+        )  # pylint: disable=duplicate-code
