@@ -21,6 +21,10 @@ def test_db_settings() -> None:  # pylint: disable= unused-argument
         smtp_port=1225,
         smtp_user_name="smtp user",
         smtp_password="<PASSWORD>",
+        authjwt_secret_key="secret",
+        authjwt_cookie_secure=False,
+        authjwt_cookie_csrf_protect=False,
+        authjwt_cookie_samesite="",
     )
 
     expected_database_url = "postgresql+asyncpg://postgres:<PASSWORD>@mylocalhost:8765/test_db"
@@ -41,6 +45,10 @@ def test_db_settings() -> None:  # pylint: disable= unused-argument
         smtp_port=1225,
         smtp_user_name="smtp user",
         smtp_password="<PASSWORD>",
+        authjwt_secret_key="secret",
+        authjwt_cookie_secure=False,
+        authjwt_cookie_csrf_protect=False,
+        authjwt_cookie_samesite="",
     )
 
     with pytest.raises(ValueError) as ex_info:

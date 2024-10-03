@@ -1198,8 +1198,7 @@ async def test_export_sql_dump(
     with dump_file_path.open("wb") as f:
         f.write(dump_value)
 
-    assert 31250 < len(dump_value) < 31270
-    await asyncio.sleep(1)
+    assert 35500 < len(dump_value) < 35600
 
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])

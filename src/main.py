@@ -10,6 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
 
+from src.auth.jwt_auth import UserAuthJWTBearer
 from src.constants import GENERAL_ENV_FILE_PATH
 from src.custom_types import EnvironmentType
 from src.db.db_manager import DBManager
@@ -32,6 +33,10 @@ load_dotenv(dotenv_path=GENERAL_ENV_FILE_PATH)
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """The fast api lifespan."""
+
+    # let the UserAuthJWTBearer initialize the singleton once
+    _ = UserAuthJWTBearer()
+    test = _()
 
     environment, app_env_variables = get_app_env_variables()  # pylint: disable=redefined-outer-name
 
