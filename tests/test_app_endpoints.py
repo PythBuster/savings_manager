@@ -45,13 +45,12 @@ async def test_reset_app_keep_app_settings(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
-    # Stelle sicher, dass das Mock-Objekt keine rekursive Schleife verursacht
     original_main = CommandLine.main
 
     with patch.object(CommandLine, "main") as mock_main:
 
         def patched_main(cmd_line, args) -> None:  # type: ignore
-            args = ["-x", "testing"] + args
+            args = ["-x", "ENVIRONMENT=test"] + args
             original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
@@ -102,7 +101,7 @@ async def test_reset_app_delete_app_settings(
     with patch.object(CommandLine, "main") as mock_main:
 
         def patched_main(cmd_line, args) -> None:  # type: ignore
-            args = ["-x", "testing"] + args
+            args = ["-x", "ENVIRONMENT=test"] + args
             original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
@@ -179,7 +178,7 @@ async def test_app_import_valid(client: AsyncClient) -> None:
     with patch.object(CommandLine, "main") as mock_main:
 
         def patched_main(cmd_line, args) -> None:  # type: ignore
-            args = ["-x", "testing"] + args
+            args = ["-x", "ENVIRONMENT=test"] + args
             original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
@@ -215,26 +214,50 @@ async def test_app_login_success(
         json=login_post_data,
     )
     assert response.status_code == status.HTTP_200_OK
+    assert len(response.headers.raw) == 3
+    assert response.headers.raw[-1][0] == b"set-cookie"
+    assert b"savings_manager=" in response.headers.raw[-1][1]
+    assert len(response.headers.raw[-1][1]) > len(b"savings_manager=.......")
 
     user = response.json()
     assert user is not None
     assert user["userLogin"] == login_post_data["userLogin"]
 
-    request.config.cache.set("login_state", "hash:....")
-
+    #request.config.cache.set("savings_manager", "hash:....")
 
 @pytest.mark.order(after="test_app_login_success")
 async def test_app_logout_success(
-    request: FixtureRequest,
     client: AsyncClient,
 ) -> None:
     response = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/logout",
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert len(response.headers.raw) == 1
+    assert response.headers.raw[-1][0] == b"set-cookie"
+    assert b"savings_manager=\"\"" in response.headers.raw[-1][1]
 
-    login_hash: str = request.config.cache.get("login_state", "")
-    assert login_hash == "hash:...."
 
-    # clear the request cache
-    Cache.clear_cache(request.config.cache._cachedir)
+@pytest.mark.order(after="test_app_logout_success")
+async def test_app_logout_fail(
+    client: AsyncClient,
+) -> None:
+    response = await client.delete(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/logout",
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+@pytest.mark.order(after="test_app_logout_fail")
+async def test_app_login_fail(
+    client: AsyncClient,
+) -> None:
+    login_post_data = {
+        "userLogin": "not-hannelore",
+        "userPassword": "sicher-ist-nichts",
+    }
+
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login",
+        json=login_post_data,
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED

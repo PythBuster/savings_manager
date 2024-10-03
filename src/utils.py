@@ -14,16 +14,25 @@ from src.constants import ENVIRONMENT_ENV_FILE_PATHS
 from src.custom_types import AppEnvVariables, EnvironmentType
 
 
-def get_app_env_variables() -> tuple[EnvironmentType, AppEnvVariables]:
-    """Helper function to get env settings."""
+def get_app_env_variables(
+        environment: EnvironmentType | None = None,
+) -> tuple[EnvironmentType, AppEnvVariables]:
+    """Helper function to get env settings.
 
-    environment_str = os.getenv("ENVIRONMENT")
-
-    if environment_str is None:
-        raise ValueError("ENVIRONMENT environment variable not set.")
+    :param environment: Environment type or None, defaults to None.
+    :type environment: :class:`EnvironmentType` | :class:`None`
+    :return: A tuple of environment and app env settings.
+    :rtype: :class:`tuple[EnvironmentType, AppEnvVariables]`
+    """
 
     try:
-        environment = EnvironmentType(environment_str.lower())
+        if environment is None:
+            environment_str = os.getenv("ENVIRONMENT")
+
+            if environment_str is None:
+                raise ValueError("ENVIRONMENT environment variable not set.")
+
+            environment = EnvironmentType(environment_str.lower())
     except:  # noqa: E722
         expected_values = [environment_type.value for environment_type in EnvironmentType]
         expected_values_str = ", ".join(expected_values)

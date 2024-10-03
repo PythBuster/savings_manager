@@ -1123,7 +1123,7 @@ async def test_reset_database_keep_app_settings(
     with patch.object(CommandLine, "main") as mock_main:
 
         def patched_main(cmd_line, args):  # type: ignore
-            args = ["-x", "testing"] + args
+            args = ["-x", "ENVIRONMENT=test"] + args
             original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
@@ -1160,7 +1160,7 @@ async def test_reset_database_delete_app_settings(
     with patch.object(CommandLine, "main") as mock_main:
 
         def patched_main(cmd_line, args) -> None:  # type: ignore
-            args = ["-x", "testing"] + args
+            args = ["-x", "ENVIRONMENT=test"] + args
             original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
@@ -1215,7 +1215,7 @@ async def test_import_sql_dump(
     with patch.object(CommandLine, "main") as mock_main:
 
         def patched_main(cmd_line, args) -> None:  # type: ignore
-            args = ["-x", "testing"] + args
+            args = ["-x", "ENVIRONMENT=test"] + args
             original_main(cmd_line, args)
 
         mock_main.side_effect = patched_main
@@ -1289,7 +1289,7 @@ async def test_add_user_success(
     )
 
 
-@pytest.mark.dependency(depends=["test_get_users_empty"])
+@pytest.mark.dependency(depends=["test_add_user_success"])
 async def test_add_user_failed(
     db_manager: DBManager,
 ) -> None:

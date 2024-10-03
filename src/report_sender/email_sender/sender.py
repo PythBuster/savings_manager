@@ -10,7 +10,7 @@ from aiosmtplib import SMTP
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from src.app_logger import app_logger
-from src.constants import SENDER_DIR_PATH
+from src.constants import SENDER_ROOT_DIR_PATH
 from src.custom_types import AppEnvVariables
 from src.db.db_manager import DBManager
 from src.report_sender.sender import ReportSender
@@ -36,7 +36,7 @@ class EmailSender(ReportSender):
 
         self.smtp_settings: AppEnvVariables = smtp_settings
 
-        sender_template_path: Path = SENDER_DIR_PATH / "email_sender" / "templates"
+        sender_template_path: Path = SENDER_ROOT_DIR_PATH / "email_sender" / "templates"
 
         jinja_env: Environment = Environment(
             loader=FileSystemLoader(sender_template_path),
@@ -170,15 +170,19 @@ class EmailSender(ReportSender):
         header_string_2: str = "Your new moneybox balances:"
 
         app_data_info: dict[str, Any] = get_app_data()
-        html_message: str = self.jinja_env.get_template(jinja_template_file).render(
-            app_name=app_data_info["name"],
-            app_version=app_data_info["version"],
-            header_string_1=header_string_1,
-            header_string_2=header_string_2,
-            moneyboxes_table_header=[header.lower() for header in headers],
-            moneyboxes_table_data=message_data["moneyboxes"],
-            total_balance=total_balance_str,
-        )
+        try:
+            html_message: str = self.jinja_env.get_template(jinja_template_file).render(
+                app_name=app_data_info["name"],
+                app_version=app_data_info["version"],
+                header_string_1=header_string_1,
+                header_string_2=header_string_2,
+                moneyboxes_table_header=[header.lower() for header in headers],
+                moneyboxes_table_data=message_data["moneyboxes"],
+                total_balance=total_balance_str,
+            )
+        except Exception as ex:
+            pass
+
         return plain_message, html_message
 
     async def _send_message(  # pylint: disable=arguments-differ

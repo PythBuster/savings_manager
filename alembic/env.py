@@ -1,6 +1,7 @@
 import asyncio
 import os
 from logging.config import fileConfig
+from traceback import print_tb
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
@@ -35,8 +36,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
-_, app_env_variables = get_app_env_variables()
+environment_str = context.get_x_argument(as_dictionary=True).get("ENVIRONMENT")
+_, app_env_variables = get_app_env_variables(environment=EnvironmentType(environment_str))
 
 database_url = get_database_url(db_settings=app_env_variables)
 config.set_main_option("sqlalchemy.url", database_url)

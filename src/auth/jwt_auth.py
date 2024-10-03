@@ -7,11 +7,16 @@ from async_fastapi_jwt_auth.auth_jwt import AuthJWT, AuthJWTBearer
 from blib2to3.pgen2.parse import lam_sub
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.security import HTTPBearer as SecurityHTTPBearer
 from pydantic import BaseModel, Field
 from sqlalchemy import lambda_stmt
+from starlette.requests import Request
+
+from starlette.responses import Response
 
 from src.custom_types import AppEnvVariables
 from src.utils import get_app_env_variables
+from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
 
 
 class JWTSettings(BaseModel):
@@ -75,45 +80,57 @@ class JWTSettings(BaseModel):
     from CSRF Attacks, default is None."""
 
 
-class UserAuthJWTBearer:
-    """Helper class to initialize and provide a singleton instance of AuthJWTBearer
-    for FastAPI endpoints.
+class UserAuthJWTBearer(SecurityHTTPBearer):
+    """Custom implementation of class `async_fastapi_jwt_auth.auth_jwt.AuthJWTBearer`.
 
-    This ensures the JWT configuration is loaded once, avoiding repeated initialization and
-    enhancing performance. Since the JWT settings do not change during the app's runtime,
-    reloading them is unnecessary.
+    This ensures the JWT configuration is loaded with correct settings.
 
-    This acts as a workaround for the `async_fastapi_jwt_auth` package (which is enabling
-    JWT authentication in FastAPI).
+    The official documentations is using a decorator for config loading approach.
+    But we will build an import order dependency, which is corralled with load_dotenv in main.
+
+    Before configuration of AuthJWT, the env var `ENVIRONMENT`need to be loaded from .env.general.
     """
 
-    _auth_jwt_instance: AuthJWTBearer | None = None
+    _config_loaded: bool = False
     _lock: Lock = Lock()
 
-    async def __call__(self) -> AuthJWTBearer:
-        """Returns the singleton instance of AuthJWTBearer, initializing it if needed."""
+    def __init__(
+        self,
+        *,
+        bearerFormat: str|None = None,
+        scheme_name: str|None = None,
+        description: str|None = None,
+        auto_error: bool = True,
+    ):
+        super().__init__(
+            bearerFormat=bearerFormat,
+            scheme_name=scheme_name,
+            description=description,
+            auto_error=auto_error,
+        )
 
-        if UserAuthJWTBearer._auth_jwt_instance is None:
+
+    async def __call__(
+        self,
+        req: Request = None,
+        res: Response = None,
+    ) -> AuthJWT:
+        """Returns the AuthJWT."""
+
+        if not UserAuthJWTBearer._config_loaded:
             async with UserAuthJWTBearer._lock:
-                # check twice to avoid re-init from waiting task
-                if UserAuthJWTBearer._auth_jwt_instance is None:
-                    self._initialize_jwt()
+                if not UserAuthJWTBearer._config_loaded:
+                    UserAuthJWTBearer._load_jwt_config()
+                    UserAuthJWTBearer._config_loaded = True
 
-        return UserAuthJWTBearer._auth_jwt_instance
+        return AuthJWT(req=req, res=res)
 
     @staticmethod
-    def _initialize_jwt() -> None:
-        """Internal method to initialize the AuthJWTBearer and load configuration."""
+    def _load_jwt_config() -> None:
+        """Internal method to configure the AuthJWT with custom settings."""
 
-        print("Initializing AuthJWTBearer...", flush=True)
-
-        # Load the JWT configuration
-        try:
-            AuthJWT.load_config(lambda: UserAuthJWTBearer._get_jwt_config())  # type: ignore
-            UserAuthJWTBearer._auth_jwt_instance = AuthJWTBearer()
-        except Exception as e:
-            print(f"Failed to initialize AuthJWTBearer: {e}", flush=True)
-            raise e
+        print("Load AuthJWT Configuration...", flush=True)
+        AuthJWT.load_config(lambda: UserAuthJWTBearer._get_jwt_config())  # type: ignore
 
     @staticmethod
     def _get_jwt_config() -> JWTSettings:
@@ -139,3 +156,6 @@ class UserAuthJWTBearer:
             authjwt_cookie_csrf_protect=app_env_variables.authjwt_cookie_csrf_protect,
             authjwt_cookie_samesite=same_site_str,
         )
+
+
+auth_dep = UserAuthJWTBearer()

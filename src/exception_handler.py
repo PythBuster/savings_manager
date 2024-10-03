@@ -1,7 +1,7 @@
 """All exception_handler logic are located here."""
 
 import sqlalchemy
-from async_fastapi_jwt_auth.exceptions import AuthJWTException
+from async_fastapi_jwt_auth.exceptions import AuthJWTException, MissingTokenError
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from slowapi.errors import RateLimitExceeded
@@ -17,7 +17,7 @@ from src.db.exceptions import (
     InvalidFileError,
     RecordNotFoundError,
 )
-from src.routes.exceptions import MissingSMTPSettingsError
+from src.routes.exceptions import MissingSMTPSettingsError, BadUsernameOrPasswordError
 
 
 async def response_exception(  # pylint: disable=too-many-return-statements, too-many-branches
@@ -36,6 +36,16 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
 
     app_logger.exception(exception)
 
+    if isinstance(exception, MissingTokenError):
+        return JSONResponse(
+            status_code=exception.status_code,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=exception.message,
+                )
+            ),
+        )
+
     if isinstance(exception, AuthJWTException):
         if "Signature has expired" in exception.message:
             status_code = status.HTTP_401_UNAUTHORIZED
@@ -47,6 +57,17 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,
+                )
+            ),
+        )
+
+    if isinstance(exception, BadUsernameOrPasswordError):
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=exception.message,
+                    details={"user_name": exception.user_name},
                 )
             ),
         )

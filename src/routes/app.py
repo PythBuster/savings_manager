@@ -11,7 +11,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
-from src.auth.jwt_auth import UserAuthJWTBearer
+from src.auth.jwt_auth import UserAuthJWTBearer, auth_dep
 from src.custom_types import EndpointRouteType
 from src.data_classes.requests import LoginUserRequest, ResetDataRequest
 from src.data_classes.responses import AppInfoResponse, LoginUserResponse
@@ -157,7 +157,7 @@ async def import_sql_dump(
 async def login(
     request: Request,
     user_request_data: LoginUserRequest,
-    jwt_authorize: Annotated[AuthJWT, Depends(UserAuthJWTBearer)],
+    jwt_authorize: Annotated[AuthJWT, Depends(auth_dep)],
 ) -> Response:
     """Endpoint for logging in.
     \f
@@ -180,7 +180,7 @@ async def login(
 
     if user is None:
         raise BadUsernameOrPasswordError(
-            user_name=user_request_data.user_name,
+            user_name=user_request_data.user_login,
         )
 
     user_valid_response_data = LoginUserResponse(**user)
@@ -195,11 +195,11 @@ async def login(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder(user_valid_response_data),
     )
+
     await jwt_authorize.set_access_cookies(
         encoded_access_token=access_token,
-        response=response,
+       response=response,
     )
-
     return response
 
 
@@ -209,7 +209,7 @@ async def login(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def logout(
-        jwt_authorize: Annotated[AuthJWT, Depends(UserAuthJWTBearer)],
+        jwt_authorize: Annotated[AuthJWT, Depends(auth_dep)],
 ) -> Response:
     """Endpoint for logging in.
     \f
@@ -221,5 +221,5 @@ async def logout(
     await jwt_authorize.jwt_required()
 
     response: Response = Response(status_code=status.HTTP_204_NO_CONTENT)
-    await jwt_authorize.unset_jwt_cookies(response=response)
+    await jwt_authorize.unset_access_cookies(response=response)
     return response

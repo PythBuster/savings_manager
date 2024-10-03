@@ -27,5 +27,5 @@ ENVIRONMENT_ENV_FILE_PATHS: dict[EnvironmentType, Path] = {
 GENERAL_ENV_FILE_PATH: Path = WORKING_DIR_PATH.parent / "envs" / ".env.general"
 """The general env file paths. Directly loaded on main module."""
 
-SENDER_DIR_PATH: Path = Path(__file__).parent
-"""The sender directory path."""
+SENDER_ROOT_DIR_PATH: Path = Path(__file__).parent / "report_sender"
+"""The sender root directory path."""

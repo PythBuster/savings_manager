@@ -319,7 +319,7 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
     db_manager.truncate_tables = partial(truncate_tables, db_manager)  # type: ignore
 
     # clear db if not cleared in last test session
-    subprocess.call(("alembic", "downgrade", "base"))
+    subprocess.call(("alembic", "-x", "ENVIRONMENT=test", "downgrade", "base"))
     time.sleep(1)
     # drop tables
     async with db_manager.async_engine.begin() as conn:
@@ -327,13 +327,13 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
     time.sleep(2)
 
     # create db tables and apply all db migrations
-    subprocess.call(("alembic", "upgrade", "head"))
+    subprocess.call(("alembic", "-x", "ENVIRONMENT=test", "upgrade", "head"))
     time.sleep(2)
 
     yield db_manager
 
     # downgrade the test database to base
-    subprocess.call(("alembic", "-x", "testing", "downgrade", "base"))
+    subprocess.call(("alembic", "-x", "ENVIRONMENT=test", "downgrade", "base"))
     time.sleep(1)
     # drop tables
     async with db_manager.async_engine.begin() as conn:
