@@ -43,7 +43,8 @@ def get_app_env_variables() -> AppEnvVariables:  # type: ignore
 @pytest_asyncio.fixture(scope="session")
 def event_loop() -> asyncio.AbstractEventLoop:  # type: ignore
     """Needed for https://github.com/igortg/pytest-async-sqlalchemy"""
-    loop = asyncio.get_event_loop()
+
+    loop = asyncio.new_event_loop()
     yield loop
     loop.close()
 
