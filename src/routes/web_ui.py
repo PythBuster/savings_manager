@@ -1,7 +1,7 @@
 """The web ui routes."""
 
 from fastapi import APIRouter
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, HTMLResponse
 
 web_ui_router: APIRouter = APIRouter(
     prefix="",
@@ -20,4 +20,4 @@ async def index() -> FileResponse:
     :rtype: :class:`FileResponse`
     """
 
-    return FileResponse("static/index.html")
+    return FileResponse("static/index.html", media_type="text/html")
