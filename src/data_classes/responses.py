@@ -870,7 +870,10 @@ class LoginUserResponse(BaseModel):
         json_schema_extra={
             "examples": [
                 {
+                    "id": 1,
                     "userLogin": "JohnDoe@mail.com",
+                    "createdAt": "2024-08-11 13:57:17.941840Z",
+                    "modifiedAt": "2024-08-11 15:03:17.312860Z",
                 },
             ],
         },

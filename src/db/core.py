@@ -18,7 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.db.exceptions import UpdateInstanceError
+from src.db.exceptions import UpdateInstanceError, RecordNotFoundError
 from src.db.models import SqlBase
 
 
@@ -208,6 +208,9 @@ async def deactivate_instance(
         orm_model=orm_model,
         record_id=record_id,
     )
+
+    if active_moneybox is None:
+        raise RecordNotFoundError(record_id=record_id, message="Record not found")
 
     if active_moneybox is not None:
         stmt: Update = (

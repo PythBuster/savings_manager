@@ -64,7 +64,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserLoginAlreadyExistError,
-    UserNotFoundError,
+    UserNotFoundError, RecordNotFoundError,
 )
 from src.db.models import (
     AppSettings,
@@ -406,18 +406,21 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     details={"priority": None},
                 )
 
-            deactivated: bool = await deactivate_instance(
-                async_session=session,
-                orm_model=cast(SqlBase, Moneybox),
-                record_id=moneybox_id,
-            )
-
-            if not deactivated:
-                raise DeleteInstanceError(
+            try:
+                deactivated: bool = await deactivate_instance(
+                    async_session=session,
+                    orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
-                    message="Failed to delete (deactivate) moneybox.",
-                    details={"deactivated": deactivated},
                 )
+
+                if not deactivated:
+                    raise DeleteInstanceError(
+                        record_id=moneybox_id,
+                        message="Failed to delete (deactivate) moneybox.",
+                        details={"deactivated": deactivated},
+                    )
+            except RecordNotFoundError as ex:
+                raise MoneyboxNotFoundError(moneybox_id=moneybox_id) from ex
 
             sorted_by_priority_prioritylist: list[dict[str, int | str]] = (
                 await self.get_prioritylist()
@@ -1880,13 +1883,17 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :raises CreateInstanceError: if creating database entry fails.
         """
 
-        exist_criteria: Exists = exists().where(User.user_login == user_login)
-        exists_stmt: Select = select(User).where(User.is_active.is_(True)).where(exist_criteria)
+        existing_user: Select = select(User).where(
+            and_(
+                User.is_active.is_(True),
+                User.user_login == user_login,
+            )
+        )
 
         async with self.async_sessionmaker() as session:
-            result: Result = await session.execute(exists_stmt)
+            result: Result = await session.execute(existing_user)
 
-        user_exists = result.scalar_one_or_none() is not None
+        user_exists = result.scalars().one_or_none() is not None
 
         if user_exists:
             raise UserLoginAlreadyExistError(user_login=user_login)
@@ -1959,13 +1966,24 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :type user_id: :class:`int`
 
         :raises DeleteInstanceError: if deleting user fails.
+                UserNotFoundError: if user does not exist.
         """
 
-        deactivated: bool = await deactivate_instance(
-            async_session=self.async_sessionmaker,
-            orm_model=cast(SqlBase, User),
-            record_id=user_id,
-        )
+        try:
+            deactivated: bool = await deactivate_instance(
+                async_session=self.async_sessionmaker,
+                orm_model=cast(SqlBase, User),
+                record_id=user_id,
+            )
+
+            if not deactivated:
+                raise DeleteInstanceError(
+                    record_id=user_id,
+                    message="Failed to delete (deactivate) user.",
+                    details={"deactivated": deactivated},
+                )
+        except RecordNotFoundError as ex:
+            raise UserNotFoundError(user_id=user_id) from ex
 
         if not deactivated:
             raise DeleteInstanceError(

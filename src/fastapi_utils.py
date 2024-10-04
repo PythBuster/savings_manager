@@ -1,7 +1,7 @@
 """The FastAPI helper functions for initializing etc.,..."""
 
 import os
-from typing import Callable
+from typing import Callable, Any
 
 from fastapi import FastAPI
 from pydantic.types import SecretType
@@ -18,7 +18,8 @@ from src.routes.email_sender import email_sender_router
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
-from src.routes.responses.custom_openapi_schema import custom_400_500_openapi_schema
+
+from src.routes.user import user_router
 from src.routes.web_ui import web_ui_router
 
 
@@ -87,6 +88,10 @@ def register_router(fastapi_app: FastAPI) -> None:
         prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
     fastapi_app.include_router(
+        user_router,
+        prefix=f"/{EndpointRouteType.USER}",
+    )
+    fastapi_app.include_router(
         web_ui_router,
         prefix="",
     )
@@ -119,3 +124,113 @@ def create_pgpass(app_env_variables: AppEnvVariables) -> None:
     PGPASS_FILE_PATH.chmod(0o600)
 
     os.environ["PGPASSFILE"] = str(PGPASS_FILE_PATH)
+
+
+def custom_400_500_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
+    """Override the OpenAPI schema for the given FastAPI app
+
+    For all endpoint paths, the following (unified) responses will be created:
+
+    - Status Code 400: For all 4XX responses (except: 401 and 403)
+    - Status Code 401
+    - Status Code 403
+    - Status Code 500: For all 5XX responses
+
+    **Note**: Status Codes 200 and 204 need to be defined in the routes' `responses=` argument.
+    This is because not every endpoint will return a 200 status. For example, some endpoints may only return 204.
+
+    :param fastapi_app: The fast api app.
+    :type fastapi_app: :class:`FastAPI`
+    :return: The new fast api openapi schema.
+    :rtype: :class:`dict[str, Any]`
+    """
+
+    if fastapi_app.openapi_schema:
+        return fastapi_app.openapi_schema
+
+    # adapt sets to exclude paths in autom. response code generations
+    api_root = EndpointRouteType.APP_ROOT
+    app_root = EndpointRouteType.APP
+
+    exclude_401_for_paths: set[str] = {
+        f"/{api_root}/{app_root}/login",
+    }
+    exclude_403_for_paths: set[str] = {
+        f"/{api_root}/{app_root}/login",
+    }
+
+    # call original openapi get the openapi schema
+    original_openapi: dict[str, Any] = fastapi_app.openapi_original()  # type: ignore
+
+    for path in original_openapi["paths"]:
+        for method in original_openapi["paths"][path]:
+            # remove default 422 status codes
+            if "422" in original_openapi["paths"][path][method]["responses"]:
+                del original_openapi["paths"][path][method]["responses"]["422"]
+
+            original_openapi["paths"][path][method]["responses"]["400"] = {
+                "description": "Bad Request",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "message": "Validation Error",
+                            "details": {
+                                "detail": [
+                                    {
+                                        "type": "string_type",
+                                        "loc": ["body", "name"],
+                                        "msg": "Input should be a valid string",
+                                        "input": 123,
+                                        "url": "https://errors.pydantic.dev/2.6/v/string_type",
+                                        # noqa: E501  # pylint: disable=line-too-long
+                                    }
+                                ]
+                            },
+                        },
+                    }
+                },
+            }
+
+            if path not in exclude_401_for_paths:
+                original_openapi["paths"][path][method]["responses"]["401"] = {
+                    "description": "Unauthorized",
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "message": "Unauthorized",
+                            },
+                        }
+                    },
+                }
+
+            if path not in exclude_403_for_paths:
+                original_openapi["paths"][path][method]["responses"]["403"] = {
+                    "description": "Forbidden",
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "message": "Forbidden",
+                            },
+                        }
+                    },
+                }
+
+            original_openapi["paths"][path][method]["responses"]["500"] = {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "message": "No Database Connection",
+                            "details": {
+                                "ip": "127.0.0.1",
+                            },
+                        },
+                    }
+                },
+            }
+
+    # override openapi schema with new one
+    fastapi_app.openapi_schema = original_openapi
+
+    # return new openapi schema
+    return fastapi_app.openapi_schema

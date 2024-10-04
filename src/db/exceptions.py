@@ -22,8 +22,8 @@ class InconsistentDatabaseError(ABC, Exception):
         super().__init__(message)
 
 
-class RecordNotFoundError(ABC, Exception):
-    """Base RecordNotFound Exception Class"""
+class RecordNotFoundError(Exception):
+    """Custom RecordNotFound Exception Class"""
 
     def __init__(self, record_id: int | None, message: str) -> None:
         """Initializer for the RecordNotFoundError instance.
@@ -163,7 +163,7 @@ class UserNotFoundError(RecordNotFoundError):
         :type user_id: :class:`int`
         """
 
-        message: str = f"User with id '{user_id}' does not exist."
+        message: str = f"User does not exist."
         super().__init__(record_id=user_id, message=message)
 
 
