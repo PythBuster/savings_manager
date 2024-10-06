@@ -174,13 +174,13 @@ async def login(
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
-        user_login=user_request_data.user_login,
+        user_name=user_request_data.user_name,
         user_password=user_request_data.user_password.get_secret_value(),
     )
 
     if user is None:
         raise BadUsernameOrPasswordError(
-            user_name=user_request_data.user_login,
+            user_name=user_request_data.user_name,
         )
 
     user_valid_response_data = LoginUserResponse(**user)

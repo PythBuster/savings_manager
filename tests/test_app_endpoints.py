@@ -195,13 +195,30 @@ async def test_app_import_valid(client: AsyncClient) -> None:
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-
 @pytest.mark.order(after="tests/test_db_manager.py::test_add_user_success")
+async def test_app_login_fail__invalid_password(
+    client: AsyncClient,
+) -> None:
+    login_post_data = {
+        "userName": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "userPassword": "incorrect-password",
+    }
+
+    response = await client.post(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login",
+        json=login_post_data,
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    content = response.json()
+    assert content["message"] == "Username or password incorrect."
+
+@pytest.mark.order(after="test_app_login_fail__invalid_password")
 async def test_app_login_success(
     client: AsyncClient,
 ) -> None:
     login_post_data = {
-        "userLogin": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "userName": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
         "userPassword": "sicher-ist-nichts",
     }
 
@@ -217,7 +234,7 @@ async def test_app_login_success(
 
     user = response.json()
     assert user is not None
-    assert user["userLogin"] == login_post_data["userLogin"]
+    assert user["userName"] == login_post_data["userName"]
 
 
 @pytest.mark.order(after="test_app_login_success")
@@ -248,7 +265,7 @@ async def test_app_login_fail(
     client: AsyncClient,
 ) -> None:
     login_post_data = {
-        "userLogin": "not-hannelore",
+        "userName": "not-hannelore",
         "userPassword": "sicher-ist-nichts",
     }
 
@@ -257,3 +274,4 @@ async def test_app_login_fail(
         json=login_post_data,
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+

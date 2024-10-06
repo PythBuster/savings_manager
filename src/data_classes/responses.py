@@ -853,14 +853,14 @@ class LoginUserResponse(BaseModel):
     ]
     """The modification date of the user."""
 
-    user_login: Annotated[
+    user_name: Annotated[
         str,
         Field(
-            validation_alias="user_login",
-            description="The user's login, which is email address in this case.",
+            validation_alias="user_name",
+            description="The user's name.",
         ),
     ]
-    """The user's login, which is email address in this case."""
+    """The user's name."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -871,7 +871,7 @@ class LoginUserResponse(BaseModel):
             "examples": [
                 {
                     "id": 1,
-                    "userLogin": "JohnDoe@mail.com",
+                    "userName": "JohnDoe@mail.com",
                     "createdAt": "2024-08-11 13:57:17.941840Z",
                     "modifiedAt": "2024-08-11 15:03:17.312860Z",
                 },
@@ -879,3 +879,13 @@ class LoginUserResponse(BaseModel):
         },
     )
     """The config of the model."""
+
+    # TODO: user_login will be renamend in orm, remove model_validator if done.
+    @model_validator(mode="before")
+    @classmethod
+    def transform_user_login_to_user_name(cls, data: dict[str, Any]) -> dict[str, Any]:
+        if "user_login" in data:
+            data["user_name"] = data["user_login"]
+            del data["user_login"]
+
+        return data

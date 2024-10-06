@@ -89,7 +89,7 @@ def register_router(fastapi_app: FastAPI) -> None:
     )
     fastapi_app.include_router(
         user_router,
-        prefix=f"/{EndpointRouteType.USER}",
+        prefix=f"/{EndpointRouteType.APP_ROOT}",
     )
     fastapi_app.include_router(
         web_ui_router,

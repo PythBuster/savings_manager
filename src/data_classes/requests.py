@@ -463,13 +463,15 @@ class ResetDataRequest(BaseModel):
 class LoginUserRequest(BaseModel):
     """The login user request model."""
 
-    user_login: Annotated[
-        str, Field(description="The user's login, which is email address in this case.")
+    user_name: Annotated[
+        str, Field(
+            description="The user's name."
+        ),
     ]
-    """The user's login, which is email address in this case."""
+    """The user's name."""
 
-    user_password: Annotated[SecretStr, Field(description="The user's login password.")]
-    """The user's login password."""
+    user_password: Annotated[SecretStr, Field(description="The user's password.")]
+    """The user's password."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -479,8 +481,60 @@ class LoginUserRequest(BaseModel):
         json_schema_extra={
             "examples": [
                 {
-                    "userLogin": "JohnDoe@mail.com",
+                    "userName": "JohnDoe@mail.com",
                     "userPassword": "myPassword",
+                },
+            ],
+        },
+    )
+    """The config of the model."""
+
+
+class LoginUserUpdatePasswordRequest(BaseModel):
+    """The login user update password request model."""
+
+    new_user_password: Annotated[
+        SecretStr,
+        Field(description="The user's new login password."),
+    ]
+    """The user's new login password."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "newUserPassword": "myNewPassword",
+                },
+            ],
+        },
+    )
+    """The config of the model."""
+
+
+class LoginUserUpdateNameRequest(BaseModel):
+    """The login user update name request model."""
+
+    new_user_name: Annotated[
+        str,
+        Field(
+            description="The user's new name."
+        )
+    ]
+    """The user's new name."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "newUserName": "JohnDoe@mail.com",
                 },
             ],
         },

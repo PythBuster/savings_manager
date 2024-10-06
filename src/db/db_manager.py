@@ -12,12 +12,10 @@ from typing import Any, Sequence, cast
 from fastapi.encoders import jsonable_encoder
 from passlib.context import CryptContext
 from sqlalchemy import (
-    Exists,
     Result,
     Select,
     and_,
     desc,
-    exists,
     insert,
     select,
     update,
@@ -63,7 +61,7 @@ from src.db.exceptions import (
     ProcessCommunicationError,
     TransferEqualMoneyboxError,
     UpdateInstanceError,
-    UserLoginAlreadyExistError,
+    UserNameAlreadyExistError,
     UserNotFoundError, RecordNotFoundError,
 )
 from src.db.models import (
@@ -1869,34 +1867,60 @@ class DBManager:  # pylint: disable=too-many-public-methods
                         message=stderr.decode("utf-8"),
                     )
 
-    async def add_user(self, user_login: str, user_password: str) -> dict[str, Any]:
-        """Create a user database entry and returns new entry.
+    async def _exists_active_user_name(
+            self,
+            user_name: str,
+            exclude_ids: list[int] | None = None
+    ) -> bool:
+        """Helper function to check, if username already exists in database
 
-        :param user_login: The user login.
-        :type user_login: :class:`str`
-        :param user_password: The password of the user. The password
-            will be hashed before persisting into database.
-        :type user_password: :class:`str`
-        :return: The new user database entry.
-        :rtype: :class:`dict[str, Any]`
-
-        :raises CreateInstanceError: if creating database entry fails.
+        :param user_name: User`s name.
+        :type user_name: :class:`str`
+        :param exclude_ids: User ids to ignore in check.
+        :type exclude_ids: :class:`list`
+        :return: True, if username exists in database, false if not.
+        :rtype: :class:`bool`
         """
+
+        if exclude_ids is None:
+            exclude_ids = []
 
         existing_user: Select = select(User).where(
             and_(
                 User.is_active.is_(True),
-                User.user_login == user_login,
+                User.user_login == user_name,
+                User.id.notin_(exclude_ids),
             )
         )
 
         async with self.async_sessionmaker() as session:
             result: Result = await session.execute(existing_user)
 
+        # will raise exception is more users with same name was found,
+        # we will accept exception as unexpected error for now
         user_exists = result.scalars().one_or_none() is not None
 
+        return user_exists
+
+    async def add_user(self, user_name: str, user_password: str) -> dict[str, Any]:
+        """Create a user database entry and returns new entry.
+
+        :param user_name: The username.
+        :type user_name: :class:`str`
+        :param user_password: The password of the user. The password
+            will be hashed before persisting into database.
+        :type user_password: :class:`str`
+        :return: The new user database entry.
+        :rtype: :class:`dict[str, Any]`
+
+        :raises UserNameAlreadyExistError: if username already exists.
+                CreateInstanceError: if creating database entry fails.
+        """
+
+        user_exists = await self._exists_active_user_name(user_name=user_name)
+
         if user_exists:
-            raise UserLoginAlreadyExistError(user_login=user_login)
+            raise UserNameAlreadyExistError(user_name=user_name)
 
         user: User | None = cast(
             User,
@@ -1904,7 +1928,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 async_session=self.async_sessionmaker,
                 orm_model=cast(SqlBase, User),
                 data={
-                    "user_login": user_login,
+                    "user_login": user_name,
                     "user_password_hash": await self.get_password_hash(password=user_password),
                 },
             ),
@@ -1918,28 +1942,22 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         return user.asdict()
 
-    async def update_user(
+    async def update_user_password(
         self,
         user_id: int,
-        user_data: dict[str, Any],
+        new_user_password: str,
     ) -> dict[str, Any]:
-        """Update a user database entry by ID and return updated entry.
+        """Update user password and return updated user.
 
         :param user_id: The id of the user.
         :type user_id: :class:`int`
-        :param user_data: The new user data.
-        :type user_data: :class:`dict`
+        :param new_user_password: The new user password.
+        :type new_user_password: :class:`str`
         :return: The updated user data.
         :rtype: :class:`dict`
         """
 
-        user_data_ = user_data.copy()
-
-        if "user_password" in user_data_:
-            user_data_["user_password_hash"] = await self.get_password_hash(
-                password=user_data_["user_password"]
-            )
-            del user_data_["user_password"]
+        hashed_password = await self.get_password_hash(password=new_user_password)
 
         updated_user: User | None = cast(
             User,
@@ -1947,17 +1965,62 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 async_session=self.async_sessionmaker,
                 record_id=user_id,
                 orm_model=cast(SqlBase, User),
-                data=user_data_,
+                data={"user_password_hash": hashed_password}
             ),
         )
 
         if updated_user is None:
             raise UpdateInstanceError(
                 record_id=user_id,
-                message="User update failed.",
+                message="Updating user password failed.",
             )
 
         return updated_user.asdict()
+
+    async def update_user_name(
+            self,
+            user_id: int,
+            new_user_name: str,
+    ) -> dict[str, Any]:
+        """Update username and return updated user.
+
+        :param user_id: The id of the user.
+        :type user_id: :class:`int`
+        :param new_user_name: The new username.
+        :type new_user_name: :class:`str`
+        :return: The updated user data.
+        :rtype: :class:`dict`
+
+        :raises UserNameAlreadyExistError: if username already exists.
+                UpdateInstanceError: if updating username fails.
+        """
+
+        user_exists = await self._exists_active_user_name(
+            user_name=new_user_name,
+            exclude_ids=[user_id],
+        )
+
+        if user_exists:
+            raise UserNameAlreadyExistError(user_name=new_user_name)
+
+        updated_user: User | None = cast(
+            User,
+            await update_instance(
+                async_session=self.async_sessionmaker,
+                record_id=user_id,
+                orm_model=cast(SqlBase, User),
+                data={"user_login": new_user_name}
+            ),
+        )
+
+        if updated_user is None:
+            raise UpdateInstanceError(
+                record_id=user_id,
+                message="Updating username failed.",
+            )
+
+        return updated_user.asdict()
+
 
     async def delete_user(self, user_id: int) -> None:
         """Delete a user database entry by given ID.
@@ -1994,15 +2057,14 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
     async def get_user_by_credentials(
         self,
-        user_login: str,
+        user_name: str,
         user_password: str,
     ) -> dict[str, Any] | None:
         """Get user by credentials. If user not found, rerun None, else
         user data as dict will be returned.
 
-        :param user_login: The login of the user, which is an email address
-            in this case.
-        :type user_login: :class:`str`
+        :param user_name: The name of the user.
+        :type user_name: :class:`str`
         :param user_password: The password of the user.
         :type user_password: :class:`str`
         :return: The user data, if not found, returns None.
@@ -2011,7 +2073,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         stmt: Select = select(User).where(  # type: ignore
             and_(
-                User.user_login == user_login,
+                User.user_login == user_name,
                 User.is_active.is_(True),
             )
         )

@@ -20,7 +20,23 @@ ADD_USER_RESPONSES: dict[status, dict[str, Any]] = {
         "model": LoginUserResponse,
     },
 }
-"""Further custom responses for endpoint POST: /user/{user_id}"""
+"""Further custom responses for endpoint POST: /user/register"""
+
+UPDATE_USER_PASSWORD_RESPONSES: dict[status, dict[str, Any]] = {
+    status.HTTP_200_OK: {
+        "description": "OK",
+        "model": LoginUserResponse,
+    },
+}
+"""Further custom responses for endpoint PATCH: /user/{user_id}/password"""
+
+UPDATE_USER_NAME_RESPONSES: dict[status, dict[str, Any]] = {
+    status.HTTP_200_OK: {
+        "description": "OK",
+        "model": LoginUserResponse,
+    },
+}
+"""Further custom responses for endpoint PATCH: /user/{user_id}/name"""
 
 DELETE_USER_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_204_NO_CONTENT: {

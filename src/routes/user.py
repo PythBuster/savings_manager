@@ -8,10 +8,11 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType
-from src.data_classes.requests import LoginUserRequest
+from src.data_classes.requests import LoginUserRequest, LoginUserUpdateNameRequest, LoginUserUpdatePasswordRequest
 from src.data_classes.responses import LoginUserResponse
 from src.db.db_manager import DBManager
-from src.routes.responses.user import GET_USER_RESPONSES, DELETE_USER_RESPONSES, ADD_USER_RESPONSES
+from src.routes.responses.user import GET_USER_RESPONSES, DELETE_USER_RESPONSES, ADD_USER_RESPONSES, \
+    UPDATE_USER_PASSWORD_RESPONSES, UPDATE_USER_NAME_RESPONSES
 
 user_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.USER}",
@@ -54,7 +55,7 @@ async def get_user(
 
 
 @user_router.post(
-    "",
+    "/register",
     response_model=LoginUserResponse,
     responses=ADD_USER_RESPONSES,
 )
@@ -78,9 +79,86 @@ async def add_user(
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     user = await db_manager.add_user(
-        user_login=user_create_request.user_login,
+        user_name=user_create_request.user_name,
         user_password=user_create_request.user_password.get_secret_value(),
     )
+    return user  # type: ignore
+
+# TODO: Require the current password before setting a new one!
+#   The user is authenticated, but for added security,
+#   it's better to prompt for the current password again.
+#   -> adapt code!
+@user_router.patch(
+    "/{user_id}/password",
+    response_model=LoginUserResponse,
+    responses=UPDATE_USER_PASSWORD_RESPONSES,
+)
+async def update_user_password(
+    request: Request,
+    user_id: Annotated[
+        int, Path(title="User ID", description="User ID to be updated.")
+    ],
+    user_data: Annotated[
+        LoginUserUpdatePasswordRequest,
+        Body(title="Update Password", description="The updating user password."),
+    ],
+) -> LoginUserResponse:
+    """Endpoint for updating users password.
+    \f
+
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param user_id: The user ID to be updated.
+    :type user_id: :class:`int`
+    :param user_data: The new user password.
+    :type user_data: :class:`LoginUserUpdatePasswordRequest`
+    :return: The updated user.
+    :rtype: :class:`LoginUserResponse`
+    """
+
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    user = await db_manager.update_user_password(
+        user_id=user_id,
+        new_user_password=user_data.new_user_password.get_secret_value(),
+    )
+
+    return user  # type: ignore
+
+
+@user_router.patch(
+    "/{user_id}/name",
+    response_model=LoginUserResponse,
+    responses=UPDATE_USER_NAME_RESPONSES,
+)
+async def update_user_name(
+    request: Request,
+    user_id: Annotated[
+        int, Path(title="User ID", description="User ID to be updated.")
+    ],
+    user_data: Annotated[
+        LoginUserUpdateNameRequest,
+        Body(title="Update Login (name)", description="The updating user login."),
+    ],
+) -> LoginUserResponse:
+    """Endpoint for updating username.
+    \f
+
+    :param request: The current request object.
+    :type request: :class:`Request`
+    :param user_id: The user ID to be updated.
+    :type user_id: :class:`int`
+    :param user_data: The new username.
+    :type user_data: :class:`LoginUserUpdateNameRequest`
+    :return: The updated user.
+    :rtype: :class:`LoginUserResponse`
+    """
+
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    user = await db_manager.update_user_name(
+        user_id=user_id,
+        new_user_name=user_data.new_user_name,
+    )
+
     return user  # type: ignore
 
 

@@ -16,5 +16,5 @@ class BadUsernameOrPasswordError(Exception):
 
     def __init__(self, user_name: str) -> None:
         self.user_name = user_name
-        self.message: str = "Username or password incorrect"
+        self.message: str = "Username or password incorrect."
         super().__init__(self.message)
