@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.28.0 (2024-10-06)
+### Features:
+- implement simple authentication including login and logout endpoints
+- implement jwt cookies to remember logged-in user
+- implement read, create, update and delete user endpoints
+
 ## 2.27.0 (2024-10-03)
 ### Changes:
 - simplify env handling by using separate env file for general settings
