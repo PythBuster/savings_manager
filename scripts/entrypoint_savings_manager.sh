@@ -1,5 +1,5 @@
 #!/bin/bash
 
-poetry run alembic upgrade head
+poetry run alembic -x ENVIRONMENT=dev upgrade head
 
 exec "$@"
