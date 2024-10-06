@@ -1,16 +1,10 @@
 """All app endpoints test are located here."""
 
-import asyncio
-import io
-from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
-import pytest
 from httpx import AsyncClient, Response
 from starlette import status
 
-from alembic.config import CommandLine
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.utils import equal_dict
@@ -31,7 +25,7 @@ async def test_user_add_success(client: AsyncClient) -> None:
     assert equal_dict(
         user,
         user_post_data,
-        exclude_keys=["userPassword","createdAt","modifiedAt","id"],
+        exclude_keys=["userPassword", "createdAt", "modifiedAt", "id"],
     )
 
     # add second user
@@ -52,6 +46,7 @@ async def test_user_add_success(client: AsyncClient) -> None:
         exclude_keys=["userPassword", "createdAt", "modifiedAt", "id"],
     )
 
+
 async def test_user_add_failed(client: AsyncClient) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
@@ -68,18 +63,17 @@ async def test_user_add_failed(client: AsyncClient) -> None:
 
 
 async def test_user_get_success(client: AsyncClient, db_manager: DBManager) -> None:
-    user_data: dict[str, str|int] = {
+    user_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
     }
-    db_user = await db_manager.get_user_by_credentials(
+    db_user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
         user_data["userName"],
         user_data["userPassword"],
     )
     assert db_user is not None
 
     user_id: int = db_user["id"]
-    user_data["id"] = user_id
 
     response: Response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}",
@@ -89,9 +83,10 @@ async def test_user_get_success(client: AsyncClient, db_manager: DBManager) -> N
     user: dict[str, Any] = response.json()
     assert equal_dict(
         user,
-        user_data,
-        exclude_keys=["userPassword","createdAt","modifiedAt"],
+        user_data | {"id": user_id},
+        exclude_keys=["userPassword", "createdAt", "modifiedAt"],
     )
+
 
 async def test_user_get_fail__non_existing_user_id(client: AsyncClient) -> None:
     non_existing_user_id: int = 12345
@@ -104,14 +99,15 @@ async def test_user_get_fail__non_existing_user_id(client: AsyncClient) -> None:
     content: dict[str, Any] = response.json()
     assert content["message"] == "User does not exist."
 
+
 async def test_user_update_password_success(client: AsyncClient, db_manager: DBManager) -> None:
     user_data: dict[str, str | int] = {
         "userName": "New User",
         "userPassword": "my-password-123",
     }
-    db_user: dict[str, Any] = await db_manager.get_user_by_credentials(
-        user_data["userName"],
-        user_data["userPassword"],
+    db_user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
+        user_name=user_data["userName"],
+        user_password=user_data["userPassword"],
     )
     assert db_user is not None
 
@@ -143,6 +139,7 @@ async def test_user_update_password_fail__user_id_not_exist(client: AsyncClient)
     content: dict[str, Any] = response.json()
     assert content["message"] == "Updating user password failed."
 
+
 async def test_user_update_name_success(client: AsyncClient, db_manager: DBManager) -> None:
     user_data: dict[str, str | int] = {
         "userName": "New User",
@@ -170,14 +167,17 @@ async def test_user_update_name_success(client: AsyncClient, db_manager: DBManag
     )
     assert db_user is None
 
-async def test_user_update_name_fail__username_already_exist(client: AsyncClient, db_manager: DBManager) -> None:
+
+async def test_user_update_name_fail__username_already_exist(
+    client: AsyncClient, db_manager: DBManager
+) -> None:
     user_data: dict[str, str | int] = {
         "userName": "another user",
         "userPassword": "my-another-password",
     }
-    db_user: dict[str, Any] = await db_manager.get_user_by_credentials(
-        user_data["userName"],
-        user_data["userPassword"],
+    db_user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
+        user_name=user_data["userName"],
+        user_password=user_data["userPassword"],
     )
     assert db_user is not None
 
@@ -194,7 +194,9 @@ async def test_user_update_name_fail__username_already_exist(client: AsyncClient
     assert content["message"] == "User already exists."
 
 
-async def test_user_update_name_fail__user_id_not_exist(client: AsyncClient, db_manager: DBManager) -> None:
+async def test_user_update_name_fail__user_id_not_exist(
+    client: AsyncClient,
+) -> None:
     non_existing_user_id: int = 12345
 
     response: Response = await client.patch(
@@ -205,6 +207,7 @@ async def test_user_update_name_fail__user_id_not_exist(client: AsyncClient, db_
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     content: dict[str, Any] = response.json()
     assert content["message"] == "Updating username failed."
+
 
 async def test_user_delete_fail__user_id_not_exist(client: AsyncClient) -> None:
     non_existing_user_id: int = 12345
@@ -217,14 +220,15 @@ async def test_user_delete_fail__user_id_not_exist(client: AsyncClient) -> None:
     content: dict[str, Any] = response.json()
     assert content["message"] == "User does not exist."
 
+
 async def test_user_delete_success(client: AsyncClient, db_manager: DBManager) -> None:
     user_data: dict[str, str | int] = {
         "userName": "Another Login",
         "userPassword": "<PASSWORD>",
     }
-    db_user: dict[str, Any] = await db_manager.get_user_by_credentials(
-        user_data["userName"],
-        user_data["userPassword"],
+    db_user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
+        user_name=user_data["userName"],
+        user_password=user_data["userPassword"],
     )
     assert db_user is not None
 

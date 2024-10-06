@@ -18,7 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.db.exceptions import UpdateInstanceError, RecordNotFoundError
+from src.db.exceptions import RecordNotFoundError, UpdateInstanceError
 from src.db.models import SqlBase
 
 
@@ -212,23 +212,20 @@ async def deactivate_instance(
     if active_moneybox is None:
         raise RecordNotFoundError(record_id=record_id, message="Record not found")
 
-    if active_moneybox is not None:
-        stmt: Update = (
-            update(orm_model)
-            .where(orm_model.id == record_id)
-            .values(is_active=False)
-            .returning(orm_model)
-        )
+    stmt: Update = (
+        update(orm_model)
+        .where(orm_model.id == record_id)
+        .values(is_active=False)
+        .returning(orm_model)
+    )
 
-        if isinstance(async_session, AsyncSession):
-            result: Result = await async_session.execute(stmt)
-        else:
-            async with async_session.begin() as session:
-                result = await session.execute(stmt)
+    if isinstance(async_session, AsyncSession):
+        result: Result = await async_session.execute(stmt)
+    else:
+        async with async_session.begin() as session:
+            result = await session.execute(stmt)
 
-        updated_instance: SqlBase = result.scalars().one_or_none()
+    updated_instance: SqlBase = result.scalars().one_or_none()
 
-        if updated_instance is not None:
-            return True
-
-    return False
+    if updated_instance is not None:
+        return True

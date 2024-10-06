@@ -1,7 +1,7 @@
 """The web ui routes."""
 
 from fastapi import APIRouter
-from starlette.responses import FileResponse, HTMLResponse
+from starlette.responses import FileResponse
 
 web_ui_router: APIRouter = APIRouter(
     prefix="",

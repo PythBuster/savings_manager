@@ -11,15 +11,7 @@ from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
 from passlib.context import CryptContext
-from sqlalchemy import (
-    Result,
-    Select,
-    and_,
-    desc,
-    insert,
-    select,
-    update,
-)
+from sqlalchemy import Result, Select, and_, desc, insert, select, update
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -59,10 +51,11 @@ from src.db.exceptions import (
     OverflowMoneyboxCantBeUpdatedError,
     OverflowMoneyboxNotFoundError,
     ProcessCommunicationError,
+    RecordNotFoundError,
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError, RecordNotFoundError,
+    UserNotFoundError,
 )
 from src.db.models import (
     AppSettings,
@@ -1868,9 +1861,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     )
 
     async def _exists_active_user_name(
-            self,
-            user_name: str,
-            exclude_ids: list[int] | None = None
+        self, user_name: str, exclude_ids: list[int] | None = None
     ) -> bool:
         """Helper function to check, if username already exists in database
 
@@ -1965,7 +1956,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 async_session=self.async_sessionmaker,
                 record_id=user_id,
                 orm_model=cast(SqlBase, User),
-                data={"user_password_hash": hashed_password}
+                data={"user_password_hash": hashed_password},
             ),
         )
 
@@ -1978,9 +1969,9 @@ class DBManager:  # pylint: disable=too-many-public-methods
         return updated_user.asdict()
 
     async def update_user_name(
-            self,
-            user_id: int,
-            new_user_name: str,
+        self,
+        user_id: int,
+        new_user_name: str,
     ) -> dict[str, Any]:
         """Update username and return updated user.
 
@@ -2009,7 +2000,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 async_session=self.async_sessionmaker,
                 record_id=user_id,
                 orm_model=cast(SqlBase, User),
-                data={"user_login": new_user_name}
+                data={"user_login": new_user_name},
             ),
         )
 
@@ -2020,7 +2011,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
             )
 
         return updated_user.asdict()
-
 
     async def delete_user(self, user_id: int) -> None:
         """Delete a user database entry by given ID.

@@ -1,7 +1,7 @@
 """The FastAPI helper functions for initializing etc.,..."""
 
 import os
-from typing import Callable, Any
+from typing import Any, Callable
 
 from fastapi import FastAPI
 from pydantic.types import SecretType
@@ -18,7 +18,6 @@ from src.routes.email_sender import email_sender_router
 from src.routes.moneybox import moneybox_router
 from src.routes.moneyboxes import moneyboxes_router
 from src.routes.prioritylist import prioritylist_router
-
 from src.routes.user import user_router
 from src.routes.web_ui import web_ui_router
 
@@ -137,7 +136,8 @@ def custom_400_500_openapi_schema(fastapi_app: FastAPI) -> dict[str, Any]:
     - Status Code 500: For all 5XX responses
 
     **Note**: Status Codes 200 and 204 need to be defined in the routes' `responses=` argument.
-    This is because not every endpoint will return a 200 status. For example, some endpoints may only return 204.
+    This is because not every endpoint will return a 200 status. For example, some endpoints
+    may only return 204.
 
     :param fastapi_app: The fast api app.
     :type fastapi_app: :class:`FastAPI`

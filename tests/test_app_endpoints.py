@@ -195,6 +195,7 @@ async def test_app_import_valid(client: AsyncClient) -> None:
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+
 @pytest.mark.order(after="tests/test_db_manager.py::test_add_user_success")
 async def test_app_login_fail__invalid_password(
     client: AsyncClient,
@@ -212,6 +213,7 @@ async def test_app_login_fail__invalid_password(
 
     content = response.json()
     assert content["message"] == "Username or password incorrect."
+
 
 @pytest.mark.order(after="test_app_login_fail__invalid_password")
 async def test_app_login_success(
@@ -274,4 +276,3 @@ async def test_app_login_fail(
         json=login_post_data,
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
-

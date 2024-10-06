@@ -2,17 +2,26 @@
 
 from typing import Annotated, cast
 
-from fastapi import APIRouter, Path, Body
+from fastapi import APIRouter, Body, Path
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType
-from src.data_classes.requests import LoginUserRequest, LoginUserUpdateNameRequest, LoginUserUpdatePasswordRequest
+from src.data_classes.requests import (
+    LoginUserRequest,
+    LoginUserUpdateNameRequest,
+    LoginUserUpdatePasswordRequest,
+)
 from src.data_classes.responses import LoginUserResponse
 from src.db.db_manager import DBManager
-from src.routes.responses.user import GET_USER_RESPONSES, DELETE_USER_RESPONSES, ADD_USER_RESPONSES, \
-    UPDATE_USER_PASSWORD_RESPONSES, UPDATE_USER_NAME_RESPONSES
+from src.routes.responses.user import (
+    ADD_USER_RESPONSES,
+    DELETE_USER_RESPONSES,
+    GET_USER_RESPONSES,
+    UPDATE_USER_NAME_RESPONSES,
+    UPDATE_USER_PASSWORD_RESPONSES,
+)
 
 user_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.USER}",
@@ -50,8 +59,7 @@ async def get_user(
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     user = await db_manager.get_user(user_id=user_id)
 
-    return user
-
+    return user  # type: ignore
 
 
 @user_router.post(
@@ -84,6 +92,7 @@ async def add_user(
     )
     return user  # type: ignore
 
+
 # TODO: Require the current password before setting a new one!
 #   The user is authenticated, but for added security,
 #   it's better to prompt for the current password again.
@@ -95,9 +104,7 @@ async def add_user(
 )
 async def update_user_password(
     request: Request,
-    user_id: Annotated[
-        int, Path(title="User ID", description="User ID to be updated.")
-    ],
+    user_id: Annotated[int, Path(title="User ID", description="User ID to be updated.")],
     user_data: Annotated[
         LoginUserUpdatePasswordRequest,
         Body(title="Update Password", description="The updating user password."),
@@ -132,9 +139,7 @@ async def update_user_password(
 )
 async def update_user_name(
     request: Request,
-    user_id: Annotated[
-        int, Path(title="User ID", description="User ID to be updated.")
-    ],
+    user_id: Annotated[int, Path(title="User ID", description="User ID to be updated.")],
     user_data: Annotated[
         LoginUserUpdateNameRequest,
         Body(title="Update Login (name)", description="The updating user login."),

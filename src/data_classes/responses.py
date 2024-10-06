@@ -884,6 +884,16 @@ class LoginUserResponse(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def transform_user_login_to_user_name(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Validator to rename user_login key from database to user_name key for the response.
+
+        Will be removed, when ORM column is renamend.
+
+        :param data: The orm data.
+        :type data: :class:`dict[str, Any]`
+        :return: The new data for pydantic model.
+        :rtype: :class:`dict[str, Any]`
+        """
+
         if "user_login" in data:
             data["user_name"] = data["user_login"]
             del data["user_login"]

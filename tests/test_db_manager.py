@@ -1404,6 +1404,7 @@ async def test_update_user_name(
     )
     assert user is None
 
+
 @pytest.mark.dependency(depends=["test_update_user_name"])
 async def test_update_user_password(
     db_manager: DBManager,

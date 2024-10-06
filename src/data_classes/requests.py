@@ -464,9 +464,8 @@ class LoginUserRequest(BaseModel):
     """The login user request model."""
 
     user_name: Annotated[
-        str, Field(
-            description="The user's name."
-        ),
+        str,
+        Field(description="The user's name."),
     ]
     """The user's name."""
 
@@ -518,12 +517,7 @@ class LoginUserUpdatePasswordRequest(BaseModel):
 class LoginUserUpdateNameRequest(BaseModel):
     """The login user update name request model."""
 
-    new_user_name: Annotated[
-        str,
-        Field(
-            description="The user's new name."
-        )
-    ]
+    new_user_name: Annotated[str, Field(description="The user's new name.")]
     """The user's new name."""
 
     model_config = ConfigDict(

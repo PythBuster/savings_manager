@@ -163,7 +163,7 @@ class UserNotFoundError(RecordNotFoundError):
         :type user_id: :class:`int`
         """
 
-        message: str = f"User does not exist."
+        message: str = "User does not exist."
         super().__init__(record_id=user_id, message=message)
 
 

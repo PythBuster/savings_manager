@@ -73,7 +73,7 @@ class JWTSettings(BaseModel):
     from CSRF Attacks, default is None."""
 
 
-class UserAuthJWTBearer(SecurityHTTPBearer):
+class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-methods
     """Custom implementation of class `async_fastapi_jwt_auth.auth_jwt.AuthJWTBearer`.
 
     This ensures the JWT configuration is loaded with correct settings.
