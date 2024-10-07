@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.28.1 + 2.28.2 (2024-10-06)
+### Changed:
+- fix: docker compose files by fixing alembic arguments
+- fix: adapt cleanup script and keep backups
+- change: call cleanup steck directly after back-upping in same backup.sh script (only one cronjob is running instead of two different)
+
 ## 2.28.0 (2024-10-06)
 ### Features:
 - implement simple authentication including login and logout endpoints
