@@ -137,7 +137,7 @@ async def test_user_update_password_fail__user_id_not_exist(client: AsyncClient)
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     content: dict[str, Any] = response.json()
-    assert content["message"] == "Updating user password failed."
+    assert content["message"] == "Record not found."
 
 
 async def test_user_update_name_success(client: AsyncClient, db_manager: DBManager) -> None:
@@ -206,7 +206,7 @@ async def test_user_update_name_fail__user_id_not_exist(
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     content: dict[str, Any] = response.json()
-    assert content["message"] == "Updating username failed."
+    assert content["message"] == "Record not found."
 
 
 async def test_user_delete_fail__user_id_not_exist(client: AsyncClient) -> None:

@@ -25,7 +25,12 @@ class InconsistentDatabaseError(ABC, Exception):
 class RecordNotFoundError(Exception):
     """Custom RecordNotFound Exception Class"""
 
-    def __init__(self, record_id: int | None, message: str) -> None:
+    def __init__(
+            self,
+            record_id: int | None,
+            message: str,
+            details: dict[str, Any] | None = None,
+    ) -> None:
         """Initializer for the RecordNotFoundError instance.
 
         :param record_id: The record id.
@@ -34,11 +39,15 @@ class RecordNotFoundError(Exception):
         :type message: :class:`str`
         """
 
+        if details is None:
+            details = {}
+
         self.record_id = record_id
         self.message: str = message
-        self.details: dict[str, Any] = {
-            "id": record_id,
+        details |= {
+            "record_id": record_id,
         }
+        self.details: dict[str, Any] = details
         super().__init__(message)
 
 
@@ -100,21 +109,18 @@ class CreateInstanceError(CrudDatabaseError):
 
     def __init__(
         self,
-        record_id: int | None,
         message: str,
         details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the CreateInstanceError instance.
 
-        :param record_id: The record id.
-        :type record_id: :class:`int`
         :param message: The error message.
         :type message: :class:`str`
         :param details: Additional information about the error.
         :type details: :class:`dict[str, Any]`
         """
 
-        super().__init__(record_id=record_id, message=message, details=details)
+        super().__init__(record_id=None, message=message, details=details)
 
 
 class DeleteInstanceError(CrudDatabaseError):
@@ -152,6 +158,26 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         message: str = f"Moneybox with id '{moneybox_id}' does not exist."
         super().__init__(record_id=moneybox_id, message=message)
 
+class MoneyboxNameNotFoundError(RecordNotFoundError):
+    """Custom MoneyboxNameNotFoundError Exception"""
+
+    def __init__(
+            self,
+            moneybox_id: int,
+            details: dict[str, Any] | None = None,
+    ) -> None:
+        """Initializer for the MoneyboxNameNotFoundError exception.
+
+        :param moneybox_id: The moneybox id.
+        :type moneybox_id: :class:`int`
+        """
+
+        message: str = f"No moneybox name is history found."
+        super().__init__(
+            record_id=moneybox_id,
+            message=message,
+            details=details,
+        )
 
 class UserNotFoundError(RecordNotFoundError):
     """Custom UserNotFoundError Exception"""
@@ -284,11 +310,11 @@ class HasBalanceError(DeleteInstanceError):
         super().__init__(record_id=moneybox_id, message=message, details={"balance": balance})
 
 
-class OverflowMoneyboxCantBeDeletedError(DeleteInstanceError):
-    """Custom OverflowMoneyboxCantBeDeletedError Exception"""
+class OverflowMoneyboxDeleteError(DeleteInstanceError):
+    """Custom OverflowMoneyboxDeleteError Exception"""
 
     def __init__(self, moneybox_id: int) -> None:
-        """Initializer for the OverflowMoneyboxCantBeDeletedError exception.
+        """Initializer for the OverflowMoneyboxDeleteError exception.
 
         :param moneybox_id: The moneybox id.
         :type moneybox_id: :class:`int`
@@ -298,11 +324,11 @@ class OverflowMoneyboxCantBeDeletedError(DeleteInstanceError):
         super().__init__(record_id=moneybox_id, message=message)
 
 
-class OverflowMoneyboxCantBeUpdatedError(UpdateInstanceError):
-    """Custom OverflowMoneyboxCantBeUpdatedError Exception"""
+class OverflowMoneyboxUpdatedError(UpdateInstanceError):
+    """Custom OverflowMoneyboxUpdatedError Exception"""
 
     def __init__(self, moneybox_id: int) -> None:
-        """Initializer for the OverflowMoneyboxCantBeUpdatedError exception.
+        """Initializer for the OverflowMoneyboxUpdatedError exception.
 
         :param moneybox_id: The moneybox id.
         :type moneybox_id: :class:`int`

@@ -6,6 +6,7 @@ from starlette import status
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.utils import equal_dict
+from tests.utils.db_manager import get_moneybox_id_by_name
 
 
 async def test_get_prioritylist(
@@ -49,10 +50,12 @@ async def test_update_prioritylist(  # pylint:disable=too-many-locals
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 1",
     )
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 2",
     )
 

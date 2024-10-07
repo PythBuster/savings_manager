@@ -47,15 +47,15 @@ from src.db.exceptions import (
     MoneyboxNotFoundByNameError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
-    OverflowMoneyboxCantBeDeletedError,
-    OverflowMoneyboxCantBeUpdatedError,
+    OverflowMoneyboxDeleteError,
+    OverflowMoneyboxUpdatedError,
     OverflowMoneyboxNotFoundError,
     ProcessCommunicationError,
     RecordNotFoundError,
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError,
+    UserNotFoundError, MoneyboxNameNotFoundError,
 )
 from src.db.models import (
     AppSettings,
@@ -211,7 +211,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         async with self.async_sessionmaker.begin() as session:
             moneybox_data["priority"] = 0
-            moneybox: Moneybox | None = cast(
+            moneybox: Moneybox = cast(
                 Moneybox,
                 await create_instance(
                     async_session=session,
@@ -219,13 +219,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     data=moneybox_data,
                 ),
             )
-
-            if moneybox is None:
-                raise CreateInstanceError(
-                    record_id=None,
-                    message="Failed to create moneybox.",
-                    details=moneybox_data,
-                )
 
         return moneybox.asdict()
 
@@ -237,52 +230,39 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         :return: The added moneybox data.
         :rtype: :class:`dict[str, Any]`
-
-        :raises: :class:`CreateInstanceError`: when something went wrong while
-            creating instance in database.
         """
 
-        async with self.async_sessionmaker.begin() as session:
-            priority_list: list[dict[str, int | str]] = await self.get_prioritylist()
-            moneybox_data["priority"] = (
-                1 if not priority_list else priority_list[-1]["priority"] + 1  # type: ignore
-            )
-
-            moneybox: Moneybox | None = cast(
-                Moneybox,
-                await create_instance(
-                    async_session=session,
-                    orm_model=cast(SqlBase, Moneybox),
-                    data=moneybox_data,
-                ),
-            )
-
-            if moneybox is None:
-                raise CreateInstanceError(
-                    record_id=None,
-                    message="Failed to create moneybox.",
-                    details=moneybox_data,
+        try:
+            async with self.async_sessionmaker.begin() as session:
+                priority_list: list[dict[str, int | str]] = await self.get_prioritylist()
+                moneybox_data["priority"] = (
+                    1 if not priority_list else priority_list[-1]["priority"] + 1  # type: ignore
                 )
 
-            moneybox_name_history_data: dict[str, str | int] = {
-                "name": moneybox.name,  # type: ignore
-                "moneybox_id": moneybox.id,
-            }
-            moneybox_name_history: MoneyboxNameHistory | None = cast(
-                MoneyboxNameHistory,
+                moneybox: Moneybox = cast(
+                    Moneybox,
+                    await create_instance(
+                        async_session=session,
+                        orm_model=cast(SqlBase, Moneybox),
+                        data=moneybox_data,
+                    ),
+                )
+
+                moneybox_name_history_data: dict[str, str | int] = {
+                    "name": moneybox.name,  # type: ignore
+                    "moneybox_id": moneybox.id,
+                }
+
                 await create_instance(
                     async_session=session,
                     orm_model=cast(SqlBase, MoneyboxNameHistory),
                     data=moneybox_name_history_data,
-                ),
-            )
-
-            if moneybox_name_history is None:
-                raise CreateInstanceError(
-                    record_id=None,
-                    message="Failed to create moneybox name history.",
-                    details=moneybox_name_history_data,
                 )
+        except Exception as ex:
+            raise CreateInstanceError(
+                message="Failed to create moneybox.",
+                details=moneybox_data,
+            ) from ex
 
         return moneybox.asdict()
 
@@ -301,9 +281,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :return: The updated moneybox data.
         :rtype: :class:`dict[str, Any]`
 
-        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
-            was not found in database.
-                :class:`OverflowMoneyboxCantBeUpdatedError`: when something went
+        :raises: :class:`OverflowMoneyboxUpdatedError`: when something went
             wrong while updating the overflow moneybox in db transaction.
                 :class:`UpdateInstanceError`: when something went
             wrong while updating progress in db transaction.
@@ -313,44 +291,40 @@ class DBManager:  # pylint: disable=too-many-public-methods
         _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
 
         if moneybox_id == _overflow_moneybox.id:
-            raise OverflowMoneyboxCantBeUpdatedError(moneybox_id=_overflow_moneybox.id)
+            raise OverflowMoneyboxUpdatedError(moneybox_id=_overflow_moneybox.id)
 
-        async with self.async_sessionmaker.begin() as session:
-            moneybox: Moneybox | None = cast(
-                Moneybox,
-                await update_instance(
-                    async_session=session,
-                    orm_model=cast(SqlBase, Moneybox),
-                    record_id=moneybox_id,
-                    data=moneybox_data,
-                ),
-            )
+        try:
+            async with self.async_sessionmaker.begin() as session:
+                moneybox: Moneybox = cast(
+                    Moneybox,
+                    await update_instance(
+                        async_session=session,
+                        orm_model=cast(SqlBase, Moneybox),
+                        record_id=moneybox_id,
+                        data=moneybox_data,
+                    ),
+                )
 
-            if moneybox is None:
-                raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+                if "name" in moneybox_data:
+                    moneybox_name_history_data: dict[str, str | int] = {
+                        "name": moneybox.name,  # type: ignore
+                        "moneybox_id": moneybox.id,
+                    }
 
-            if "name" in moneybox_data:
-                moneybox_name_history_data: dict[str, str | int] = {
-                    "name": moneybox.name,  # type: ignore
-                    "moneybox_id": moneybox.id,
-                }
-                moneybox_name_history: MoneyboxNameHistory | None = cast(
-                    MoneyboxNameHistory,
                     await create_instance(
                         async_session=session,
                         orm_model=cast(SqlBase, MoneyboxNameHistory),
                         data=moneybox_name_history_data,
-                    ),
-                )
-
-                if moneybox_name_history is None:
-                    raise UpdateInstanceError(
-                        record_id=None,
-                        message="Failed to update moneybox name history.",
-                        details=moneybox_name_history_data,
                     )
+        except Exception as ex:
+            raise UpdateInstanceError(
+                record_id=moneybox_id,
+                message="Failed to update moneybox.",
+                details=moneybox_data,
+            ) from ex
 
         return moneybox.asdict()
+
 
     async def delete_moneybox(self, moneybox_id: int) -> None:
         """DB Function to delete a moneybox by given id.
@@ -358,9 +332,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :param moneybox_id: The id of the moneybox.
         :type moneybox_id: :class:`int`
 
-        :raises: :class:`MoneyboxNotFoundError`: if given moneybox_id
-            was not found in database.
-                 :class:`OverflowMoneyboxCantBeDeletedError`: overflow moneybox
+        :raises: :class:`OverflowMoneyboxDeleteError`: overflow moneybox
             is not allowed to be deleted.
                 :class:`HasBalanceError`: a moneybox with a balance > 0
             is not allowed to be deleted.
@@ -374,44 +346,24 @@ class DBManager:  # pylint: disable=too-many-public-methods
         _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
 
         if moneybox["id"] == _overflow_moneybox.id:
-            raise OverflowMoneyboxCantBeDeletedError(moneybox_id=moneybox_id)
+            raise OverflowMoneyboxDeleteError(moneybox_id=moneybox_id)
 
         if moneybox["balance"] > 0:
             raise HasBalanceError(moneybox_id=moneybox_id, balance=moneybox["balance"])
 
         async with self.async_sessionmaker.begin() as session:
-            updated_moneybox: Moneybox | None = cast(
-                Moneybox,
-                await update_instance(
-                    async_session=session,
-                    orm_model=cast(SqlBase, Moneybox),
-                    record_id=moneybox_id,
-                    data={"priority": None},
-                ),
+            _ = await update_instance(
+                async_session=session,
+                orm_model=cast(SqlBase, Moneybox),
+                record_id=moneybox_id,
+                data={"priority": None},
             )
 
-            if not updated_moneybox:
-                raise UpdateInstanceError(
-                    record_id=moneybox_id,
-                    message="Failed to update moneybox priority.",
-                    details={"priority": None},
-                )
-
-            try:
-                deactivated: bool = await deactivate_instance(
-                    async_session=session,
-                    orm_model=cast(SqlBase, Moneybox),
-                    record_id=moneybox_id,
-                )
-
-                if not deactivated:
-                    raise DeleteInstanceError(
-                        record_id=moneybox_id,
-                        message="Failed to delete (deactivate) moneybox.",
-                        details={"deactivated": deactivated},
-                    )
-            except RecordNotFoundError as ex:
-                raise MoneyboxNotFoundError(moneybox_id=moneybox_id) from ex
+            await deactivate_instance(
+                async_session=session,
+                orm_model=cast(SqlBase, Moneybox),
+                record_id=moneybox_id,
+            )
 
             sorted_by_priority_prioritylist: list[dict[str, int | str]] = (
                 await self.get_prioritylist()
@@ -491,7 +443,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
                 moneybox.balance += deposit_transaction_data["amount"]  # type: ignore
 
-                updated_moneybox: Moneybox | None = cast(
+                updated_moneybox: Moneybox = cast(
                     Moneybox,
                     await update_instance(
                         async_session=session,
@@ -612,7 +564,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         if session is None:
             async with self.async_sessionmaker.begin() as session:
-                updated_moneybox: Moneybox | None = cast(
+                updated_moneybox: Moneybox = cast(
                     Moneybox,
                     await update_instance(
                         async_session=session,
@@ -895,14 +847,16 @@ class DBManager:  # pylint: disable=too-many-public-methods
         ]
 
     async def _get_historical_moneybox_name(
-        self, moneybox_id: int, from_datetime: datetime | None = None
+        self, moneybox_id: int, from_datetime: datetime
     ) -> str:
         """Get historical moneybox name for the given moneybox id within given datetime.
 
+        Note: It doesn't matter if the moneybox is deactivated (soft deleted => is_active=False)
+
         :param moneybox_id: The moneybox id.
         :type moneybox_id: :class:`int`
-        :param from_datetime: The datetime of the moneybox name, defaults to None.
-        :type from_datetime: :class:`datetime.datetime` | :class:`None`
+        :param from_datetime: The datetime of the moneybox name.
+        :type from_datetime: :class:`datetime.datetime`
         :return: The historical moneybox name for the given moneybox id within given datetime.
         :rtype: :class:`str`
 
@@ -910,23 +864,22 @@ class DBManager:  # pylint: disable=too-many-public-methods
             was not found in database.
         """
 
+        # check existence before working with it
+        _ = await self.get_moneybox(
+            moneybox_id=moneybox_id,
+            only_active_instances=False,
+        )
+
         stmt: Select = (
             select(MoneyboxNameHistory)  # type: ignore
             .order_by(desc(MoneyboxNameHistory.created_at))  # type: ignore
             .limit(1)
-        )
-
-        if from_datetime is None:
-            stmt = stmt.where(
+        ).where(
+            and_(
                 MoneyboxNameHistory.moneybox_id == moneybox_id,
+                MoneyboxNameHistory.created_at <= from_datetime,
             )
-        else:
-            stmt = stmt.where(
-                and_(
-                    MoneyboxNameHistory.moneybox_id == moneybox_id,
-                    MoneyboxNameHistory.created_at <= from_datetime,
-                )
-            )
+        )
 
         async with self.async_sessionmaker() as session:
             result: Result = await session.execute(stmt)  # type: ignore
@@ -937,48 +890,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
         )
 
         if moneybox_name_history is None:
-            raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
+            raise MoneyboxNameNotFoundError(
+                moneybox_id=moneybox_id,
+                details={"from_datetime": from_datetime},
+            )
 
         return moneybox_name_history.name
-
-    async def _get_moneybox_id_by_name(
-        self,
-        name: str,
-        only_active_instances: bool = True,
-    ) -> int:
-        """Get moneybox id for the given name.
-
-        :param name: The name of the moneybox.
-        :type name: :class:`str`
-        :param only_active_instances: If True, only active moneyboxes will be
-            returned, default to True.
-        :type only_active_instances: :class:`bool`
-        :return: The moneybox id for the given name.
-        :rtype: :class:`int`
-
-        :raises: :class:`MoneyboxNotFoundError`: if given moneybox name
-            was not found in database.
-        """
-
-        stmt: Select = select(Moneybox).where(  # type: ignore
-            Moneybox.name == name,
-        )
-
-        if only_active_instances:
-            stmt = stmt.where(Moneybox.is_active.is_(True))
-
-        async with self.async_sessionmaker() as session:
-            result: Result = await session.execute(stmt)  # type: ignore
-
-        moneybox: Moneybox | None = cast(
-            Moneybox,
-            result.scalars().one_or_none(),
-        )
-
-        if moneybox is None:
-            raise MoneyboxNotFoundByNameError(name=name)
-
-        return moneybox.id
 
     async def get_prioritylist(self) -> list[dict[str, int | str]]:
         """Get the priority list ASC ordered by priority.
@@ -1032,117 +949,82 @@ class DBManager:  # pylint: disable=too-many-public-methods
             wrong while updating progress in db transaction.
         """
 
-        updating_data: list[dict[str, int]] = [
-            {"id": priority["moneybox_id"], "priority": priority["priority"]}
+        moneybox_id_priority_map: dict[int, int] = {
+            priority["moneybox_id"]: priority["priority"]
             for priority in priorities
-        ]
-        len_priorities: int = len(priorities)
+        }
+
+        if len(moneybox_id_priority_map) < len(priorities):
+            raise UpdateInstanceError(
+                record_id=None,
+                message="Update priority list has duplicate moneybox ids.",
+                details={
+                    "moneybox_ids": [
+                        priority["moneybox_id"] for priority in priorities
+                    ]
+                },
+            )
 
         _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
+        moneybox_ids: set[int] = set(moneybox_id_priority_map.keys())
 
-        if _overflow_moneybox.id in (d["id"] for d in updating_data):
-            raise OverflowMoneyboxCantBeUpdatedError(
+        if _overflow_moneybox.id in set(moneybox_id_priority_map.keys()):
+            raise OverflowMoneyboxUpdatedError(
                 moneybox_id=_overflow_moneybox.id,
             )
 
-        if 0 in set(priority["priority"] for priority in priorities):
+        if 0 in set(moneybox_id_priority_map.values()):
             raise UpdateInstanceError(
                 record_id=None,
-                message="Updating priority=0 is not allowed (reserved for Overflow Moneybox)",
+                message="Updating priority=0 is not allowed (reserved for Overflow Moneybox).",
                 details={"prioritylist": priorities},  # type: ignore
             )
 
-        reset_data: list[dict[str, int | None]] = [
-            {
-                "id": priority["moneybox_id"],
-                "priority": None,
+        stmt = select(Moneybox).where(Moneybox.id.in_(moneybox_id_priority_map.keys()))
+
+        async def session_execution(_session: AsyncSession) -> list[Moneybox]:
+            # Get all Moneybox entries that are in the update list
+            result = await _session.execute(stmt)
+            _moneyboxes = result.scalars().all()
+
+            not_existing_moneybox_ids = moneybox_ids - {
+                moneybox.id for moneybox in _moneyboxes
             }
-            for priority in priorities
-        ]
+
+            if not_existing_moneybox_ids:
+                raise UpdateInstanceError(
+                    record_id=None,
+                    message="Tried to update non existing moneyboxes.",
+                    details={"non_existing_moneybox_ids": not_existing_moneybox_ids},
+                )
+
+            # reset priority of each entry to None
+            for moneybox in _moneyboxes:
+                moneybox.priority = None
+
+            # Flush changes into database
+            await _session.flush()
+
+            # Update each matched entry in the session
+            for moneybox in _moneyboxes:
+                moneybox.priority = moneybox_id_priority_map[moneybox.id]
+
+            return _moneyboxes  # type: ignore
+
 
         if session is None:
             async with self.async_sessionmaker.begin() as session:
-                # ORM Bulk UPDATE by Primary Key -> set priority to None
-                pre_updated_moneyboxes_result: Result = await session.execute(
-                    update(Moneybox)
-                    .where(Moneybox.id.in_([item["id"] for item in reset_data]))
-                    .values(priority=None)
-                    .returning(Moneybox.name, Moneybox.id, Moneybox.priority)
-                )
-                pre_updated_moneyboxes: list[tuple[Any, ...]] = (  # type: ignore
-                    pre_updated_moneyboxes_result.fetchall()
-                )
-
-                if len(pre_updated_moneyboxes) < len_priorities:
-                    raise UpdateInstanceError(
-                        record_id=None,
-                        message="Updating priorities failed. Some moneybox_ids may not exist.",
-                        details={"prioritylist": priorities},
-                    )
-
-                updated_moneyboxes: list[Moneybox] = []  # type: ignore
-
-                for entry in updating_data:
-                    updated_moneyboxes_result: Result = await session.execute(
-                        update(Moneybox)
-                        .where(Moneybox.id == entry["id"])
-                        .values(priority=entry["priority"])
-                        .returning(Moneybox.id, Moneybox.priority, Moneybox.name)
-                    )
-
-                    updated_moneyboxes.append(updated_moneyboxes_result.fetchone())  # type: ignore
-
-                if len(updated_moneyboxes) < len_priorities:
-                    raise UpdateInstanceError(
-                        record_id=None,
-                        message="Updating priorities failed. Some moneybox_ids may not exist.",
-                        details={"prioritylist": priorities},
-                    )
+                moneyboxes = await session_execution(_session=session)
         else:
-            # ORM Bulk UPDATE by Primary Key -> set priority to None
-            pre_updated_moneyboxes_result = await session.execute(
-                update(Moneybox)
-                .where(Moneybox.id.in_([item["id"] for item in reset_data]))
-                .values(priority=None)
-                .returning(Moneybox.name, Moneybox.id, Moneybox.priority)
-            )
-            pre_updated_moneyboxes: list[Moneybox] = (  # type: ignore
-                pre_updated_moneyboxes_result.fetchall()
-            )
-
-            if len(pre_updated_moneyboxes) < len_priorities:
-                raise UpdateInstanceError(
-                    record_id=None,
-                    message="Updating priorities failed. Some moneybox_ids may not exist.",
-                    details={"prioritylist": priorities},
-                )
-
-            updated_moneyboxes: list[Moneybox] = []  # type: ignore
-
-            for entry in updating_data:
-                updated_moneybox_result: Result = await session.execute(
-                    update(Moneybox)
-                    .where(Moneybox.id == entry["id"])
-                    .values(priority=entry["priority"])
-                    .returning(Moneybox.id, Moneybox.priority, Moneybox.name)
-                )
-
-                updated_moneyboxes.append(updated_moneybox_result.fetchone())  # type: ignore
-
-            if len(updated_moneyboxes) < len_priorities:
-                raise UpdateInstanceError(
-                    record_id=None,
-                    message="Updating priorities failed. Some moneybox_ids may not exist.",
-                    details={"prioritylist": priorities},
-                )
+            moneyboxes = await session_execution(_session=session)
 
         priority_map: list[dict[str, int | str]] = [
             {
-                "moneybox_id": moneybox_id,
-                "name": name,
-                "priority": priority,
+                "moneybox_id": moneybox.id,
+                "name": moneybox.name,
+                "priority": moneybox.priority,
             }
-            for moneybox_id, priority, name in updated_moneyboxes
+            for moneybox in moneyboxes
         ]
 
         return sorted(priority_map, key=lambda x: x["priority"])
@@ -1186,11 +1068,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :type app_settings_data: :class:`dict[str, Any]`
         :return: The updated app settings data.
         :rtype: :class:`dict[str, Any]`
-
-        :raises: :class:`AppSettingsNotFoundError`: if there are no overflow moneybox
-            in the database, missing moneybox with priority = 0.
-                 :class:`AutomatedSavingsError`: when something went wrong while session
-            transactions.
         """
 
         app_settings: AppSettings = await self._get_app_settings()
@@ -1206,10 +1083,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 ),
             )
 
-            if app_settings is None:
-                # TODO: adapt app_settings_id value later, if multiple settings are available
-                raise AppSettingsNotFoundError(app_settings_id=-1)
-
             if "is_automated_saving_active" in app_settings_data:
                 activate: bool = app_settings.is_automated_saving_active  # type: ignore
                 action_type: ActionType = (
@@ -1223,20 +1096,10 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     "details": jsonable_encoder(app_settings.asdict()),
                 }
 
-                automated_savings_log: dict[str, Any] = await self.add_automated_savings_logs(
+                await self.add_automated_savings_logs(
                     session=session,
                     automated_savings_log_data=automated_savings_log_data,
                 )
-
-                if automated_savings_log is None:
-                    raise AutomatedSavingsError(
-                        record_id=None,
-                        details={
-                            "automated_savings_log_data": jsonable_encoder(
-                                automated_savings_log_data
-                            ),
-                        },
-                    )
 
             if "savings_amount" in app_settings_data:
                 automated_savings_log_data = {
@@ -1244,20 +1107,11 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     "action_at": datetime.now(tz=timezone.utc),
                     "details": jsonable_encoder(app_settings.asdict()),
                 }
-                automated_savings_log = await self.add_automated_savings_logs(
+
+                await self.add_automated_savings_logs(
                     session=session,
                     automated_savings_log_data=automated_savings_log_data,
                 )
-
-                if automated_savings_log is None:
-                    raise AutomatedSavingsError(
-                        record_id=None,
-                        details={
-                            "automated_savings_log_data": jsonable_encoder(
-                                automated_savings_log_data
-                            ),
-                        },
-                    )
 
         return app_settings.asdict()
 
@@ -1295,19 +1149,19 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
     async def _overflow_moneybox_add_amount(
         self,
-        app_settings: AppSettings,
+        app_settings: dict[str, Any],
         overflow_moneybox: dict[str, Any],
-        add_amount: int,
+        amount: int,
         session: AsyncSession,
     ) -> dict[str, Any]:
         """Helper function for adding amount the overflow moneybox.
 
         :param app_settings: The app settings.
-        :type app_settings: :class:`AppSettings`
+        :type app_settings: :class:`dict[str, Any]`
         :param overflow_moneybox: The overflow moneybox.
         :type overflow_moneybox: :class:`dict[str, Any]`
-        :param add_amount: The amount to add.
-        :type add_amount: :class:`int`
+        :param amount: The amount to add.
+        :type amount: :class:`int`
         :param session: The current database session.
         :type session: :class:`AsyncSession`
         :return: The updated overflow moneybox.
@@ -1317,14 +1171,14 @@ class DBManager:  # pylint: disable=too-many-public-methods
             transactions.
         """
 
-        if add_amount <= 0:
+        if amount <= 0:
             return overflow_moneybox
 
         deposit_transaction_data: dict[str, int | str] = {
-            "amount": add_amount,
+            "amount": amount,
             "description": (
                 "Automated Savings with Overflow Moneybox Mode: "
-                f"{app_settings.overflow_moneybox_automated_savings_mode}"
+                f"{app_settings["overflow_moneybox_automated_savings_mode"]}"
             ),
         }
 
@@ -1339,12 +1193,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
         except Exception as ex:
             raise AutomatedSavingsError(
                 record_id=overflow_moneybox["id"],
-                message="AutomatedSavings failed while sub_amount() from overflow moneybox.",
+                message="AutomatedSavings failed while add_amount() from overflow moneybox.",
                 details={
                     "deposit_transaction_data": deposit_transaction_data,
                     "overflow_moneybox": jsonable_encoder(overflow_moneybox),
                     "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint:disable=line-too-long
-                    "app_settings": jsonable_encoder(app_settings.asdict()),
+                    "app_settings": jsonable_encoder(app_settings),
                 },
             ) from ex
 
@@ -1352,19 +1206,19 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
     async def _overflow_moneybox_sub_amount(
         self,
-        app_settings: AppSettings,
+        app_settings: dict[str, Any],
         overflow_moneybox: dict[str, Any],
-        sub_amount: int,
+        amount: int,
         session: AsyncSession,
     ) -> dict[str, Any]:
         """Helper function for subbing amount the overflow moneybox.
 
         :param app_settings: The app settings.
-        :type app_settings: :class:`AppSettings`
+        :type app_settings: :class:`dict[str, Any]`
         :param overflow_moneybox: The overflow moneybox.
         :type overflow_moneybox: :class:`dict[str, Any]`
-        :param sub_amount: The amount to sub.
-        :type sub_amount: :class:`int`
+        :param amount: The amount to sub.
+        :type amount: :class:`int`
         :param session: The current database session.
         :type session: :class:`AsyncSession`
         :return: The updated overflow moneybox.
@@ -1374,11 +1228,11 @@ class DBManager:  # pylint: disable=too-many-public-methods
             transactions.
         """
 
-        if sub_amount <= 0:
+        if amount <= 0:
             return overflow_moneybox
 
         withdraw_transaction_data: dict[str, int | str] = {
-            "amount": sub_amount,
+            "amount": amount,
             "description": (
                 "Automated Savings with Overflow Moneybox Mode: "
                 f"{OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES}"
@@ -1401,7 +1255,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     "withdraw_transaction_data": withdraw_transaction_data,
                     "overflow_moneybox": jsonable_encoder(overflow_moneybox),
                     "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint:disable=line-too-long
-                    "app_settings": jsonable_encoder(app_settings.asdict()),
+                    "app_settings": jsonable_encoder(app_settings),
                 },
             ) from ex
 
@@ -1454,16 +1308,16 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     session=session,
                     app_settings=app_settings,
                     overflow_moneybox=sorted_moneyboxes[0],
-                    sub_amount=from_overflow_moneybox_distributed_amount,
+                    amount=from_overflow_moneybox_distributed_amount,
                 )
 
             updated_moneyboxes: list[dict[str, Any]] = (
                 await self._distribute_automated_savings_amount(  # type: ignore  # noqa: ignore  # pylint:disable=line-too-long
                     session=session,
-                    sorted_moneyboxes=sorted_moneyboxes,
-                    respect_moneybox_savings_amount=True,
+                    sorted_by_priority_moneyboxes=sorted_moneyboxes,
+                    fill_mode=False,
                     distribute_amount=distribution_amount,
-                    app_settings=app_settings,
+                    app_settings=app_settings.asdict(),
                 )
             )
 
@@ -1492,17 +1346,17 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 # remove balance from overflow moneybox
                 updated_moneyboxes[0] = await self._overflow_moneybox_sub_amount(
                     session=session,
-                    app_settings=app_settings,
+                    app_settings=app_settings.asdict(),
                     overflow_moneybox=sorted_moneyboxes[0],
-                    sub_amount=updated_moneyboxes[0]["balance"],
+                    amount=updated_moneyboxes[0]["balance"],
                 )
 
                 _ = await self._distribute_automated_savings_amount(
                     session=session,
-                    sorted_moneyboxes=updated_moneyboxes,
-                    respect_moneybox_savings_amount=False,
+                    sorted_by_priority_moneyboxes=updated_moneyboxes,
+                    fill_mode=True,
                     distribute_amount=old_overflow_moneybox_balance,
-                    app_settings=app_settings,
+                    app_settings=app_settings.asdict(),
                 )
 
             # log automated saving
@@ -1514,18 +1368,10 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 ),
             }
 
-            try:
-                await self.add_automated_savings_logs(
-                    session=session,
-                    automated_savings_log_data=automated_savings_log_data,
-                )
-            except Exception as ex:
-                raise AutomatedSavingsError(
-                    record_id=None,
-                    details={
-                        "automated_savings_log_data": jsonable_encoder(automated_savings_log_data),
-                    },
-                ) from ex
+            await self.add_automated_savings_logs(
+                session=session,
+                automated_savings_log_data=automated_savings_log_data,
+            )
 
         return True
 
@@ -1533,24 +1379,29 @@ class DBManager:  # pylint: disable=too-many-public-methods
         self,
         session: AsyncSession,
         distribute_amount: int,
-        sorted_moneyboxes: list[dict[str, Any]],
-        respect_moneybox_savings_amount: bool,
-        app_settings: AppSettings,
+        sorted_by_priority_moneyboxes: list[dict[str, Any]],
+        fill_mode: bool,
+        app_settings: dict[str, Any],
     ) -> list[dict[str, Any]]:
-        """A separate helper function tu distribute amount to given moneyboxes.
+        """A separate helper function to distribute amount to given moneyboxes.
 
         :param session: Database session.
         :type session: :class:`AsyncSession`
         :param distribute_amount: The distributing amount.
         :type distribute_amount: int
-        :param sorted_moneyboxes: A list of moneyboxes sorted by priority (the overflow
-            moneybox included).
-        :type sorted_moneyboxes: :class:`list[dict[str, Any]]`
-        :param respect_moneybox_savings_amount: Flag to indicate if savings amount
-            of moneyboxes shall be respected.
-        :type respect_moneybox_savings_amount: bool
+        :param sorted_by_priority_moneyboxes: A list of moneyboxes ASC sorted by priority (the
+            overflow moneybox included).
+        :type sorted_by_priority_moneyboxes: :class:`list[dict[str, Any]]`
+        :param fill_mode: Flag to indicate whether the savings amount
+            of moneyboxes should be considered. This applies during the normal distribution process.
+
+            In Fill-Up Mode, the savings amount does not need to be considered because this mode
+            focuses on reaching the savings target by fully allocating (all-in) to the
+            highest-priority moneybox first, then moving on to the next in line, and so on.
+
+        :type fill_mode: :class:`bool`
         :param app_settings: The app settings.
-        :type app_settings: :class:`AppSettings`
+        :type app_settings: :class:`dict[str, Any]`
         :return: Returns an updated moneyboxes list (sorted by priority,
             overflow moneybox included).
         :rtype: :class:`list[dict[str, Any]]`
@@ -1560,25 +1411,22 @@ class DBManager:  # pylint: disable=too-many-public-methods
         """
 
         if distribute_amount <= 0:
-            return sorted_moneyboxes
+            return sorted_by_priority_moneyboxes
 
         updated_moneyboxes: list[dict[str, Any]] = [
-            sorted_moneyboxes[0]
+            sorted_by_priority_moneyboxes[0]
         ]  # add initially the overflow moneybox
 
-        for moneybox in sorted_moneyboxes[1:]:  # skip overflow moneybox (priority=0)
+        for moneybox in sorted_by_priority_moneyboxes[1:]:  # skip overflow moneybox (priority=0)
             amount_to_distribute: int = distribute_amount
 
-            if respect_moneybox_savings_amount:
+            # normal mode [NOT fill mode] (limit distribution amount to savings_amount)
+            #   fill mode need to ignore the wises of the moneybox
+            if not fill_mode:
                 amount_to_distribute = min(
-                    moneybox["savings_amount"],
+                    moneybox["savings_amount"],  # limit so savings_amount (wished amount)
                     amount_to_distribute,
                 )
-
-                if amount_to_distribute == 0:
-                    # Nothing to distribute, skip this moneybox
-                    updated_moneyboxes.append(moneybox)
-                    continue
 
             if moneybox["savings_target"] is not None:
                 missing_amount_until_target: int = moneybox["savings_target"] - moneybox["balance"]
@@ -1590,6 +1438,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     )
                 else:
                     # Moneybox is full (reached amount target )
+                    updated_moneyboxes.append(moneybox)
+                    continue
+            else:  # savings_target not set
+                if fill_mode:  # and savings_amount ignored -> means:
+                    # can't enforce distribution because there is no target to reach
+                    #  in fill mode
                     updated_moneyboxes.append(moneybox)
                     continue
 
@@ -1605,16 +1459,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     transaction_trigger=TransactionTrigger.AUTOMATICALLY,
                 )
                 updated_moneyboxes.append(updated_moneybox)
-                old_moneybox_balance: int = moneybox["balance"]
-
-                if updated_moneybox["balance"] != old_moneybox_balance + amount_to_distribute:
-                    raise AutomatedSavingsError(
-                        record_id=moneybox["id"],
-                        details={
-                            "amount_to_distribute": amount_to_distribute,
-                            "moneybox": jsonable_encoder(moneybox),
-                        },
-                    )
 
                 distribute_amount -= amount_to_distribute
             else:
@@ -1624,13 +1468,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
         # add the rest of app_savings_amount to overflow_moneybox if there is a rest
         rest_amount: int = distribute_amount
 
-        if rest_amount > 0:
-            updated_moneyboxes[0] = await self._overflow_moneybox_add_amount(
-                session=session,
-                app_settings=app_settings,
-                overflow_moneybox=updated_moneyboxes[0],
-                add_amount=rest_amount,
-            )
+        updated_moneyboxes[0] = await self._overflow_moneybox_add_amount(
+            session=session,
+            app_settings=app_settings,
+            overflow_moneybox=updated_moneyboxes[0],
+            amount=rest_amount,
+        )
 
         return updated_moneyboxes
 
@@ -1666,49 +1509,27 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
     async def add_automated_savings_logs(
         self,
+        session: AsyncSession,
         automated_savings_log_data: dict[str, Any],
-        session: AsyncSession | None = None,
     ) -> dict[str, Any]:
         """Add automated savings logs data into database.
 
-        :param automated_savings_log_data: Automated savings log data.
-        :type automated_savings_log_data: :class:`dict[str, Any]`
         :param session: Database session.
         :type session: :class:`AsyncSession`
+        :param automated_savings_log_data: Automated savings log data.
+        :type automated_savings_log_data: :class:`dict[str, Any]`
         :return: The created automated savings logs data.
         :rtype: :class:`dict[str, Any]`
-
-        :raises: :class:`CreateInstanceError`: if something went wrong while
-            creating database instance.
         """
 
-        automated_savings_logs: AutomatedSavingsLog | None = None
-
-        if session is None:
-            automated_savings_logs = cast(
-                AutomatedSavingsLog,
-                await create_instance(
-                    async_session=self.async_sessionmaker,
-                    orm_model=cast(SqlBase, AutomatedSavingsLog),
-                    data=automated_savings_log_data,
-                ),
-            )
-        else:
-            automated_savings_logs = cast(
-                AutomatedSavingsLog,
-                await create_instance(
-                    async_session=session,
-                    orm_model=cast(SqlBase, AutomatedSavingsLog),
-                    data=automated_savings_log_data,
-                ),
-            )
-
-        if automated_savings_logs is None:
-            raise CreateInstanceError(
-                record_id=None,
-                message="Failed to create automated_savings_log.",
-                details=automated_savings_log_data,
-            )
+        automated_savings_logs: AutomatedSavingsLog = cast(
+            AutomatedSavingsLog,
+            await create_instance(
+                async_session=session,
+                orm_model=cast(SqlBase, AutomatedSavingsLog),
+                data=automated_savings_log_data,
+            ),
+        )
 
         return automated_savings_logs.asdict()  # type: ignore
 
@@ -1913,7 +1734,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         if user_exists:
             raise UserNameAlreadyExistError(user_name=user_name)
 
-        user: User | None = cast(
+        user: User = cast(
             User,
             await create_instance(
                 async_session=self.async_sessionmaker,
@@ -1924,12 +1745,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 },
             ),
         )
-
-        if user is None:
-            raise CreateInstanceError(
-                record_id=None,
-                message="User creation failed.",
-            )
 
         return user.asdict()
 
@@ -1950,7 +1765,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         hashed_password = await self.get_password_hash(password=new_user_password)
 
-        updated_user: User | None = cast(
+        updated_user: User = cast(
             User,
             await update_instance(
                 async_session=self.async_sessionmaker,
@@ -1959,12 +1774,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 data={"user_password_hash": hashed_password},
             ),
         )
-
-        if updated_user is None:
-            raise UpdateInstanceError(
-                record_id=user_id,
-                message="Updating user password failed.",
-            )
 
         return updated_user.asdict()
 
@@ -1994,7 +1803,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         if user_exists:
             raise UserNameAlreadyExistError(user_name=new_user_name)
 
-        updated_user: User | None = cast(
+        updated_user: User = cast(
             User,
             await update_instance(
                 async_session=self.async_sessionmaker,
@@ -2003,12 +1812,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 data={"user_login": new_user_name},
             ),
         )
-
-        if updated_user is None:
-            raise UpdateInstanceError(
-                record_id=user_id,
-                message="Updating username failed.",
-            )
 
         return updated_user.asdict()
 
@@ -2023,27 +1826,13 @@ class DBManager:  # pylint: disable=too-many-public-methods
         """
 
         try:
-            deactivated: bool = await deactivate_instance(
+            await deactivate_instance(
                 async_session=self.async_sessionmaker,
                 orm_model=cast(SqlBase, User),
                 record_id=user_id,
             )
-
-            if not deactivated:
-                raise DeleteInstanceError(
-                    record_id=user_id,
-                    message="Failed to delete (deactivate) user.",
-                    details={"deactivated": deactivated},
-                )
         except RecordNotFoundError as ex:
             raise UserNotFoundError(user_id=user_id) from ex
-
-        if not deactivated:
-            raise DeleteInstanceError(
-                record_id=user_id,
-                message="Failed to delete (deactivate) user.",
-                details={"deactivated": deactivated},
-            )
 
     async def get_user_by_credentials(
         self,

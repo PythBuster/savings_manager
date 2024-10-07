@@ -18,7 +18,7 @@ from sqlalchemy import (
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.db.exceptions import RecordNotFoundError, UpdateInstanceError
+from src.db.exceptions import RecordNotFoundError, UpdateInstanceError, CreateInstanceError, DeleteInstanceError
 from src.db.models import SqlBase
 
 
@@ -26,7 +26,7 @@ async def create_instance(
     async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     data: dict[str, Any],
-) -> SqlBase | None:
+) -> SqlBase:
     """The core CREATE db function.
 
     :param async_session: The current async_session of the database or a session_maker,
@@ -37,18 +37,31 @@ async def create_instance(
     :param data: The ORM model data.
     :type data: :class:`dict[str, Any]`
     :return: The created db instance.
-    :rtype: :class:`SqlBase` | None
+    :rtype: :class:`SqlBase`
+
+    :raises: CreateInstanceError: if creating instance fails.
     """
 
-    stmt: Insert = insert(orm_model).values(data).returning(orm_model)
+    try:
+        stmt: Insert = insert(orm_model).values(data).returning(orm_model)
 
-    if isinstance(async_session, AsyncSession):
-        result: Result = await async_session.execute(stmt)
-    else:
-        async with async_session.begin() as session:
-            result = await session.execute(stmt)
+        if isinstance(async_session, AsyncSession):
+            result: Result = await async_session.execute(stmt)
+            instance: SqlBase = result.scalars().one()
+            await async_session.refresh(instance)
+        else:
+            async with async_session.begin() as session:
+                result = await session.execute(stmt)
+                instance = result.scalars().one()
+    except Exception as ex:
+        raise CreateInstanceError(
+            message="Failed creating instance",
+            details={
+                "table": orm_model.__name__,
+                "data": data,
+            }
+        ) from ex
 
-    instance: SqlBase | None = result.scalars().one()
     return instance
 
 
@@ -134,7 +147,7 @@ async def update_instance(
     orm_model: SqlBase,
     record_id: int,
     data: dict[str, Any],
-) -> SqlBase | None:
+) -> SqlBase:
     """The core UPDATE db function.
 
     :param async_session: The current async_session of the database or a session_maker,
@@ -149,45 +162,60 @@ async def update_instance(
     :return: The updated db instance
         or None, if given record_id does not exist.
     :rtype: :class:`SqlBase | None`
+
+    :raises: :class:`UpdateInstanceError`: if updating instance fails.
+             :class:`RecordNotFoundError`: if instance does not exist.
     """
 
-    if "created_at" in data:
-        del data["created_at"]
-
-    if "modified_at" in data:
-        del data["modified_at"]
-
-    if "is_active" in data:
-        del data["is_active"]
-
-    stmt: Update = (
-        update(orm_model).where(orm_model.id == record_id).values(data).returning(orm_model)
+    existing_instance: SqlBase | None = await read_instance(
+        async_session=async_session,
+        orm_model=orm_model,
+        record_id=record_id,
     )
 
+    if existing_instance is None:
+        raise RecordNotFoundError(record_id=record_id, message="Record not found.")
+
     try:
+        if "created_at" in data:
+            del data["created_at"]
+
+        if "modified_at" in data:
+            del data["modified_at"]
+
+        if "is_active" in data:
+            del data["is_active"]
+
+        stmt: Update = (
+            update(orm_model).where(orm_model.id == record_id).values(data).returning(orm_model)
+        )
+
         if isinstance(async_session, AsyncSession):
             result: Result = await async_session.execute(stmt)
+            instance: SqlBase = result.scalars().one()
+            await async_session.refresh(instance)
         else:
             async with async_session.begin() as session:
                 result = await session.execute(stmt)
-    except (DBAPIError, InvalidTextRepresentationError) as ex:
+                instance = result.scalars().one()
+
+    except Exception as ex:
         raise UpdateInstanceError(
             record_id=record_id,
-            message=str(ex),
-            details=data
-            | {
-                "exception": jsonable_encoder(ex),
-            },
+            message="Failed updating instance",
+            details={
+                "table": orm_model.__name__,
+                "data": data,
+            }
         ) from ex
 
-    return result.scalars().one_or_none()
-
+    return instance
 
 async def deactivate_instance(
     async_session: async_sessionmaker | AsyncSession,
     orm_model: SqlBase,
     record_id: int,
-) -> bool:
+) -> None:
     """The core deactivate db function. Specific update function to set `ìs_active`
     column to false.
 
@@ -199,33 +227,39 @@ async def deactivate_instance(
     :param record_id: The instance id.
     :type record_id: :class:`int`
 
-    :return: If deactivated successfully, returns True, otherwise returns False.
-    :rtype: :class:`bool`
+    :raises: :class:`DeleteInstanceError`: if deleting instance fails.
+             :class:`RecordNotFoundError`: if instance does not exist.
     """
 
-    active_moneybox: SqlBase | None = await read_instance(
+    existing_instance: SqlBase | None = await read_instance(
         async_session=async_session,
         orm_model=orm_model,
         record_id=record_id,
     )
 
-    if active_moneybox is None:
-        raise RecordNotFoundError(record_id=record_id, message="Record not found")
+    if existing_instance is None:
+        raise RecordNotFoundError(record_id=record_id, message="Record not found.")
 
-    stmt: Update = (
-        update(orm_model)
-        .where(orm_model.id == record_id)
-        .values(is_active=False)
-        .returning(orm_model)
-    )
+    try:
+        stmt: Update = (
+            update(orm_model)
+            .where(orm_model.id == record_id)
+            .values(is_active=False)
+            .returning(orm_model)
+        )
 
-    if isinstance(async_session, AsyncSession):
-        result: Result = await async_session.execute(stmt)
-    else:
-        async with async_session.begin() as session:
-            result = await session.execute(stmt)
-
-    updated_instance: SqlBase = result.scalars().one_or_none()
-
-    if updated_instance is not None:
-        return True
+        if isinstance(async_session, AsyncSession):
+            result: Result = await async_session.execute(stmt)
+            instance: SqlBase = result.scalars().one()
+            await async_session.refresh(instance)
+        else:
+            async with async_session.begin() as session:
+                _ = await session.execute(stmt)
+    except Exception as ex:
+        raise DeleteInstanceError(
+            record_id=record_id,
+            message="Failed updating instance",
+            details={
+                "table": orm_model.__name__,
+            }
+        ) from ex

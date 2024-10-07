@@ -10,6 +10,7 @@ from starlette import status
 from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.utils import equal_dict
+from tests.utils.db_manager import get_moneybox_id_by_name
 
 
 @pytest.mark.dependency(
@@ -152,7 +153,8 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: ignore  # pylint:disable=protected-access, line-too-long
+    moneybox_id = await get_moneybox_id_by_name(  # noqa: ignore  # pylint:disable=protected-access, line-too-long
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 2",
     )
     response = await client.get(
@@ -338,7 +340,8 @@ async def test_endpoint_update_moneybox__invalid_priority_0(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 1"
     )
 
@@ -447,7 +450,8 @@ async def test_endpoint_first_moneybox__modified_at_checks(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 1"
     )
 
@@ -488,7 +492,8 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 1"
     )
 
@@ -519,7 +524,8 @@ async def test_endpoint_delete_second_moneybox__status_204(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 1"
     )
 
@@ -555,7 +561,8 @@ async def test_endpoint_deposit_first_moneybox__status_200(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -594,7 +601,8 @@ async def test_endpoint_deposit_first_moneybox__status_422__fail_extra_field(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -618,7 +626,8 @@ async def test_endpoint_deposit_first_moneybox__status_422__missing_required_amo
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -644,7 +653,8 @@ async def test_endpoint_deposit_first_moneybox__status_422__negative_amount(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -671,7 +681,8 @@ async def test_endpoint_deposit_first_moneybox__status_422__zero_amount(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -699,7 +710,8 @@ async def test_endpoint_withdraw_first_moneybox__status_200(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -738,7 +750,8 @@ async def test_endpoint_withdraw_first_moneybox__status_422__fail_extra_field(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -763,7 +776,8 @@ async def test_endpoint_withdraw_first_moneybox__status_422__missing_required_am
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -789,7 +803,8 @@ async def test_endpoint_withdraw_first_moneybox__status_422__negative_amount(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -816,7 +831,8 @@ async def test_endpoint_withdraw_first_moneybox__status_422__zero_amount(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -843,7 +859,8 @@ async def test_endpoint_withdraw_first_moneybox__status_405__balance_negative(
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+           async_session=db_manager.async_sessionmaker,
             name="Test Box 1"
         )
     )
@@ -867,10 +884,12 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204(
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 2",
     )
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+    third_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 3",
     )
 
@@ -893,10 +912,12 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204__mi
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 2",
     )
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+    third_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 3",
     )
 
@@ -917,11 +938,13 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third__status_422__m
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 2",
     )
-    third_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
-        name="Test Box 3",
+    third_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
+        name ="Test Box 3",
     )
 
     transfer_data = {
@@ -944,7 +967,8 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__mi
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 2",
     )
 
@@ -968,7 +992,8 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__st
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    second_moneybox_id = await db_manager._get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint: disable=protected-access
+        async_session=db_manager.async_sessionmaker,
         name="Test Box 2",
     )
 
@@ -993,12 +1018,14 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third_status_422__ne
     db_manager: DBManager,
 ) -> None:
     second_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 2"
         )
     )
     third_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 3"
         )
     )
@@ -1025,12 +1052,14 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__ze
     db_manager: DBManager,
 ) -> None:
     second_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 2"
         )
     )
     third_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Test Box 3"
         )
     )
@@ -1058,8 +1087,9 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to
     db_manager: DBManager,
 ) -> None:
     second_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
-            name="Test Box 2"
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
+        name="Test Box 2"
         )
     )
 
@@ -1088,8 +1118,9 @@ async def test_endpoint_get_transactions_log_moneybox_second__status_200(  # noq
     db_manager: DBManager,
 ) -> None:
     second_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
-            name="Moneybox 2"
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
+        name="Moneybox 2"
         )
     )
 
@@ -1174,17 +1205,20 @@ async def test_endpoint_get_transactions_log_moneybox_third__status_200(  # noqa
     db_manager: DBManager,
 ) -> None:
     first_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Moneybox 1"
         )
     )
     third_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Moneybox 3"
         )
     )
     fourth_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Moneybox 4",
             only_active_instances=False,
         )
@@ -1275,7 +1309,8 @@ async def test_endpoint_get_transactions_log_moneybox_fifth__status_204(  # noqa
     db_manager: DBManager,
 ) -> None:
     fifth_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Moneybox 5"
         )
     )
@@ -1294,7 +1329,8 @@ async def test_endpoint_get_transactions_log_moneybox_fourth__status_404__delete
     db_manager: DBManager,
 ) -> None:
     third_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Moneybox 3"
         )
     )
@@ -1316,7 +1352,8 @@ async def test_endpoint_get_transactions_log_moneybox_sixth__status_404__not_exi
     db_manager: DBManager,
 ) -> None:
     fifth_moneybox_id = (
-        await db_manager._get_moneybox_id_by_name(  # pylint: disable=protected-access
+        await get_moneybox_id_by_name(  # pylint: disable=protected-access
+            async_session=db_manager.async_sessionmaker,
             name="Moneybox 5"
         )
     )
