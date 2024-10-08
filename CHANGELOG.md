@@ -2,6 +2,13 @@
 
 ## x.y.z (unreleased)
 
+## 2.29.0 (2024-10-08)
+### Changed:
+- added db_manager tests + refactored related code
+### Fixes:
+- fixed fill-up mode, moneyboxes with savings_target=None got savings, now in post-distribution 
+    of overflow moneyboxes (fill mode) moneyboxes will only get their savings_amount
+
 ## 2.28.1 + 2.28.2 (2024-10-06)
 ### Changed:
 - fix: docker compose files by fixing alembic arguments
