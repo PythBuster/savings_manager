@@ -1501,7 +1501,8 @@ async def test_export_sql_dump(
 
     assert 35500 < len(dump_value) < 35600
 
-
+@pytest.mark.dependency(depends=["test_export_sql_dump"])
+@pytest.mark.order(after="test_export_sql_dump")
 async def test_export_sql_dump_missing_dependency_error(
     db_manager: DBManager,
 ) -> None:
@@ -1511,7 +1512,8 @@ async def test_export_sql_dump_missing_dependency_error(
         with pytest.raises(MissingDependencyError, match="pg_dump not installed"):
             await db_manager.export_sql_dump()
 
-
+@pytest.mark.dependency(depends=["test_export_sql_dump"])
+@pytest.mark.order(after="test_export_sql_dump_missing_dependency_error")
 async def test_export_sql_dump_process_communication_error(
     db_manager: DBManager,
 ) -> None:
@@ -1577,7 +1579,8 @@ async def test_import_sql_dump(
             exclude_keys=["created_at", "modified_at", "id"],
         )
 
-
+@pytest.mark.dependency(depends=["test_import_sql_dump"])
+@pytest.mark.order(after="test_import_sql_dump")
 async def test_import_sql_dump_missing_dependency_error(
     db_manager: DBManager,
 ) -> None:
@@ -1605,7 +1608,8 @@ async def test_import_sql_dump_missing_dependency_error(
         with pytest.raises(MissingDependencyError, match="pg_restore not installed"):
             await db_manager.import_sql_dump(sql_dump=sql_dump)
 
-
+@pytest.mark.dependency(depends=["test_import_sql_dump"])
+@pytest.mark.order(after="test_import_sql_dump_missing_dependency_error")
 async def test_import_sql_dump_process_communication_error(
     db_manager: DBManager,
 ) -> None:
