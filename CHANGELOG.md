@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.29.1 (2024-10-08)
+### Fixes:
+- fix test pipeline by adapting test ordering
+
 ## 2.29.0 (2024-10-08)
 ### Changed:
 - added db_manager tests + refactored related code
