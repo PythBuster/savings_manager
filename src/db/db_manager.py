@@ -1166,7 +1166,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             "amount": amount,
             "description": (
                 "Automated Savings with Overflow Moneybox Mode: "
-                f"{app_settings["overflow_moneybox_automated_savings_mode"]}"
+                f"{app_settings['overflow_moneybox_automated_savings_mode']}"
             ),
         }
 
@@ -1185,7 +1185,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 details={
                     "deposit_transaction_data": deposit_transaction_data,
                     "overflow_moneybox": jsonable_encoder(overflow_moneybox),
-                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint:disable=line-too-long
+                    "overflow_moneybox_automated_savings_mode": app_settings['overflow_moneybox_automated_savings_mode'],  # noqa: ignore  # pylint:disable=line-too-long
                     "app_settings": jsonable_encoder(app_settings),
                 },
             ) from ex
@@ -1223,7 +1223,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             "amount": amount,
             "description": (
                 "Automated Savings with Overflow Moneybox Mode: "
-                f"{OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES}"
+                f"{app_settings['overflow_moneybox_automated_savings_mode']}"
             ),
         }
 
@@ -1242,7 +1242,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 details={
                     "withdraw_transaction_data": withdraw_transaction_data,
                     "overflow_moneybox": jsonable_encoder(overflow_moneybox),
-                    "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,  # noqa: ignore  # pylint:disable=line-too-long
+                    "overflow_moneybox_automated_savings_mode": app_settings['overflow_moneybox_automated_savings_mode'],  # noqa: ignore  # pylint:disable=line-too-long
                     "app_settings": jsonable_encoder(app_settings),
                 },
             ) from ex
@@ -1294,7 +1294,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
                 sorted_moneyboxes[0] = await self._overflow_moneybox_sub_amount(
                     session=session,
-                    app_settings=app_settings,
+                    app_settings=app_settings.asdict(),
                     overflow_moneybox=sorted_moneyboxes[0],
                     amount=from_overflow_moneybox_distributed_amount,
                 )
