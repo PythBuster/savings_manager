@@ -1,16 +1,18 @@
+"""The utils module of the db_manager."""
+
 from typing import cast
 
-from sqlalchemy import Select, Result, select
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
+from sqlalchemy import Result, Select, select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.db.exceptions import MoneyboxNotFoundByNameError
 from src.db.models import Moneybox
 
 
 async def get_moneybox_id_by_name(
-        async_session: async_sessionmaker | AsyncSession,
-        name: str,
-        only_active_instances: bool = True,
+    async_session: async_sessionmaker | AsyncSession,
+    name: str,
+    only_active_instances: bool = True,
 ) -> int:
     """Helper function to get moneybox id for the given name.
 

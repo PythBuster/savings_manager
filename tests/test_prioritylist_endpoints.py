@@ -50,13 +50,17 @@ async def test_update_prioritylist(  # pylint:disable=too-many-locals
     client: AsyncClient,
     db_manager: DBManager,
 ) -> None:
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1",
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker,
+            name="Test Box 1",
+        )
     )
-    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 2",
+    second_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker,
+            name="Test Box 2",
+        )
     )
 
     update_prioritylist_data = {

@@ -114,9 +114,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         await self.TEST_CASES_DATA[self.test_case]()  # type: ignore
 
     async def truncate_tables(
-            self,
-            exclude_table_names: list[str] | None = None,
-            create_overflow_moneybox: bool = True,
+        self,
+        exclude_table_names: list[str] | None = None,
+        create_overflow_moneybox: bool = True,
     ) -> None:
         """Truncate tables."""
 
@@ -1516,7 +1516,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             )
 
     async def dataset_test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0(
-            self
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0`.
@@ -1566,7 +1566,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             )
 
     async def dataset_test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none(
-            self
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none`.

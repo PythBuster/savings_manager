@@ -26,10 +26,10 @@ class RecordNotFoundError(Exception):
     """Custom RecordNotFound Exception Class"""
 
     def __init__(
-            self,
-            record_id: int | None,
-            message: str,
-            details: dict[str, Any] | None = None,
+        self,
+        record_id: int | None,
+        message: str,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the RecordNotFoundError instance.
 
@@ -158,13 +158,14 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         message: str = f"Moneybox with id '{moneybox_id}' does not exist."
         super().__init__(record_id=moneybox_id, message=message)
 
+
 class MoneyboxNameNotFoundError(RecordNotFoundError):
     """Custom MoneyboxNameNotFoundError Exception"""
 
     def __init__(
-            self,
-            moneybox_id: int,
-            details: dict[str, Any] | None = None,
+        self,
+        moneybox_id: int,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """Initializer for the MoneyboxNameNotFoundError exception.
 
@@ -172,12 +173,13 @@ class MoneyboxNameNotFoundError(RecordNotFoundError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = f"No moneybox name is history found."
+        message: str = "No moneybox name is history found."
         super().__init__(
             record_id=moneybox_id,
             message=message,
             details=details,
         )
+
 
 class UserNotFoundError(RecordNotFoundError):
     """Custom UserNotFoundError Exception"""

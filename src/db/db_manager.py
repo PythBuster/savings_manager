@@ -40,22 +40,21 @@ from src.db.exceptions import (
     AutomatedSavingsError,
     BalanceResultIsNegativeError,
     CreateInstanceError,
-    DeleteInstanceError,
     HasBalanceError,
     InconsistentDatabaseError,
     MissingDependencyError,
-    MoneyboxNotFoundByNameError,
+    MoneyboxNameNotFoundError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     OverflowMoneyboxDeleteError,
-    OverflowMoneyboxUpdatedError,
     OverflowMoneyboxNotFoundError,
+    OverflowMoneyboxUpdatedError,
     ProcessCommunicationError,
     RecordNotFoundError,
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError, MoneyboxNameNotFoundError,
+    UserNotFoundError,
 )
 from src.db.models import (
     AppSettings,
@@ -324,7 +323,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
             ) from ex
 
         return moneybox.asdict()
-
 
     async def delete_moneybox(self, moneybox_id: int) -> None:
         """DB Function to delete a moneybox by given id.
@@ -846,9 +844,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             for transaction in moneybox.transactions_log
         ]
 
-    async def _get_historical_moneybox_name(
-        self, moneybox_id: int, from_datetime: datetime
-    ) -> str:
+    async def _get_historical_moneybox_name(self, moneybox_id: int, from_datetime: datetime) -> str:
         """Get historical moneybox name for the given moneybox id within given datetime.
 
         Note: It doesn't matter if the moneybox is deactivated (soft deleted => is_active=False)
@@ -950,19 +946,14 @@ class DBManager:  # pylint: disable=too-many-public-methods
         """
 
         moneybox_id_priority_map: dict[int, int] = {
-            priority["moneybox_id"]: priority["priority"]
-            for priority in priorities
+            priority["moneybox_id"]: priority["priority"] for priority in priorities
         }
 
         if len(moneybox_id_priority_map) < len(priorities):
             raise UpdateInstanceError(
                 record_id=None,
                 message="Update priority list has duplicate moneybox ids.",
-                details={
-                    "moneybox_ids": [
-                        priority["moneybox_id"] for priority in priorities
-                    ]
-                },
+                details={"moneybox_ids": [priority["moneybox_id"] for priority in priorities]},
             )
 
         _overflow_moneybox: Moneybox = await self._get_overflow_moneybox()
@@ -987,9 +978,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             result = await _session.execute(stmt)
             _moneyboxes = result.scalars().all()
 
-            not_existing_moneybox_ids = moneybox_ids - {
-                moneybox.id for moneybox in _moneyboxes
-            }
+            not_existing_moneybox_ids = moneybox_ids - {moneybox.id for moneybox in _moneyboxes}
 
             if not_existing_moneybox_ids:
                 raise UpdateInstanceError(
@@ -1010,7 +999,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 moneybox.priority = moneybox_id_priority_map[moneybox.id]
 
             return _moneyboxes  # type: ignore
-
 
         if session is None:
             async with self.async_sessionmaker.begin() as session:

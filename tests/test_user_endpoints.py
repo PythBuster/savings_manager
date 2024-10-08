@@ -101,7 +101,7 @@ async def test_user_get_fail__non_existing_user_id(client: AsyncClient) -> None:
 
 
 async def test_user_update_password_success(client: AsyncClient, db_manager: DBManager) -> None:
-    user_data: dict[str, str | int] = {
+    user_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
     }
@@ -141,11 +141,11 @@ async def test_user_update_password_fail__user_id_not_exist(client: AsyncClient)
 
 
 async def test_user_update_name_success(client: AsyncClient, db_manager: DBManager) -> None:
-    user_data: dict[str, str | int] = {
+    user_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "<PASSWORD>",
     }
-    db_user: dict[str, Any] = await db_manager.get_user_by_credentials(
+    db_user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
         user_data["userName"],
         user_data["userPassword"],
     )
@@ -171,7 +171,7 @@ async def test_user_update_name_success(client: AsyncClient, db_manager: DBManag
 async def test_user_update_name_fail__username_already_exist(
     client: AsyncClient, db_manager: DBManager
 ) -> None:
-    user_data: dict[str, str | int] = {
+    user_data: dict[str, str] = {
         "userName": "another user",
         "userPassword": "my-another-password",
     }
@@ -222,7 +222,7 @@ async def test_user_delete_fail__user_id_not_exist(client: AsyncClient) -> None:
 
 
 async def test_user_delete_success(client: AsyncClient, db_manager: DBManager) -> None:
-    user_data: dict[str, str | int] = {
+    user_data: dict[str, str] = {
         "userName": "Another Login",
         "userPassword": "<PASSWORD>",
     }

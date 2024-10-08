@@ -2,10 +2,10 @@
 
 """All db_manager tests are located here."""
 import io
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.encoders import jsonable_encoder
@@ -27,20 +27,25 @@ from src.data_classes.requests import (
 from src.db.db_manager import DBManager
 from src.db.exceptions import (
     AppSettingsNotFoundError,
+    AutomatedSavingsError,
     BalanceResultIsNegativeError,
+    CreateInstanceError,
     HasBalanceError,
+    InconsistentDatabaseError,
+    MissingDependencyError,
+    MoneyboxNameNotFoundError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
+    OverflowMoneyboxNotFoundError,
+    OverflowMoneyboxUpdatedError,
+    ProcessCommunicationError,
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError, OverflowMoneyboxNotFoundError, CreateInstanceError, RecordNotFoundError,
-    MoneyboxNameNotFoundError, OverflowMoneyboxUpdatedError, MissingDependencyError, ProcessCommunicationError,
-    AutomatedSavingsError, InconsistentDatabaseError,
+    UserNotFoundError,
 )
-from src.db.models import Moneybox, AppSettings
+from src.db.models import AppSettings, Moneybox
 from src.utils import equal_dict
-from tests.conftest import default_test_data
 from tests.utils.db_manager import get_moneybox_id_by_name
 
 
@@ -59,45 +64,54 @@ async def test_create_db_manager_with_engine_args(
     db_manager = DBManager(db_settings=app_env_variables, engine_args={"echo": True})
     assert db_manager is not None
 
+
 async def test_overflow_moneybox_add_amount_success(
     load_test_data: None,  # pylint:disable=unused-argument
     db_manager: DBManager,
 ) -> None:
-    app_settings: AppSettings = await db_manager._get_app_settings()
-    overflow_moneybox: Moneybox = await db_manager._get_overflow_moneybox()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
+    overflow_moneybox: Moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     async with db_manager.async_sessionmaker.begin() as session:
-         update_overflow_moneybox = await db_manager._overflow_moneybox_add_amount(
+        update_overflow_moneybox = await db_manager._overflow_moneybox_add_amount(  # noqa: ignore  # pylint: disable=protected-access
             app_settings=app_settings.asdict(),
             overflow_moneybox=overflow_moneybox.asdict(),
-            amount = 5,
+            amount=5,
             session=session,
         )
 
     assert update_overflow_moneybox["balance"] == 5
 
     async with db_manager.async_sessionmaker.begin() as session:
-         update_overflow_moneybox = await db_manager._overflow_moneybox_add_amount(
+        update_overflow_moneybox = await db_manager._overflow_moneybox_add_amount(  # noqa: ignore  # pylint: disable=protected-access
             app_settings=app_settings.asdict(),
             overflow_moneybox=update_overflow_moneybox,
-            amount = -1, # should not have any effect, 'falltrough' inserted moneybox
+            amount=-1,  # should not have any effect, 'falltrough' inserted moneybox
             session=session,
         )
     assert update_overflow_moneybox["balance"] == 5
 
 
 async def test_overflow_moneybox_add_amount_fail(
-        db_manager: DBManager,
+    db_manager: DBManager,
 ) -> None:
-    app_settings: AppSettings = await db_manager._get_app_settings()
-    overflow_moneybox: Moneybox = await db_manager._get_overflow_moneybox()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
+    overflow_moneybox: Moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     overflow_moneybox_data: dict[str, Any] = overflow_moneybox.asdict()
     overflow_moneybox_data["id"] = 1234
 
     async with db_manager.async_sessionmaker.begin() as session:
         with pytest.raises(AutomatedSavingsError):
-            await db_manager._overflow_moneybox_add_amount(
+            await db_manager._overflow_moneybox_add_amount(  # noqa: ignore  # pylint: disable=protected-access
                 app_settings=app_settings.asdict(),
                 overflow_moneybox=overflow_moneybox_data,  # with non-existing id
                 amount=5,
@@ -108,41 +122,49 @@ async def test_overflow_moneybox_add_amount_fail(
 async def test_overflow_moneybox_sub_amount_success(
     db_manager: DBManager,
 ) -> None:
-    app_settings: AppSettings = await db_manager._get_app_settings()
-    overflow_moneybox: Moneybox = await db_manager._get_overflow_moneybox()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
+    overflow_moneybox: Moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     async with db_manager.async_sessionmaker.begin() as session:
-         update_overflow_moneybox = await db_manager._overflow_moneybox_sub_amount(
+        update_overflow_moneybox = await db_manager._overflow_moneybox_sub_amount(  # noqa: ignore  # pylint: disable=protected-access
             app_settings=app_settings.asdict(),
             overflow_moneybox=overflow_moneybox.asdict(),
-            amount = 3,
+            amount=3,
             session=session,
         )
 
     assert update_overflow_moneybox["balance"] == 2
 
     async with db_manager.async_sessionmaker.begin() as session:
-         update_overflow_moneybox = await db_manager._overflow_moneybox_sub_amount(
+        update_overflow_moneybox = await db_manager._overflow_moneybox_sub_amount(  # noqa: ignore  # pylint: disable=protected-access
             app_settings=app_settings.asdict(),
             overflow_moneybox=update_overflow_moneybox,
-            amount = -1, # should not have any effect, 'falltrough' inserted moneybox
+            amount=-1,  # should not have any effect, 'falltrough' inserted moneybox
             session=session,
         )
     assert update_overflow_moneybox["balance"] == 2
 
 
 async def test_overflow_moneybox_sub_amount_fail(
-        db_manager: DBManager,
+    db_manager: DBManager,
 ) -> None:
-    app_settings: AppSettings = await db_manager._get_app_settings()
-    overflow_moneybox: Moneybox = await db_manager._get_overflow_moneybox()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
+    overflow_moneybox: Moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     overflow_moneybox_data: dict[str, Any] = overflow_moneybox.asdict()
     overflow_moneybox_data["id"] = 1234
 
     async with db_manager.async_sessionmaker.begin() as session:
         with pytest.raises(AutomatedSavingsError):
-            await db_manager._overflow_moneybox_sub_amount(
+            await db_manager._overflow_moneybox_sub_amount(  # noqa: ignore  # pylint: disable=protected-access
                 app_settings=app_settings.asdict(),
                 overflow_moneybox=overflow_moneybox_data,  # with non-existing id
                 amount=5,
@@ -157,13 +179,17 @@ async def test_get_overflow_moneybox(
     with pytest.raises(OverflowMoneyboxNotFoundError):
         await db_manager._get_overflow_moneybox()  # pylint:disable=protected-access
 
+
 async def test_add_overflow_moneybox(
     db_manager: DBManager,
 ) -> None:
     with pytest.raises(CreateInstanceError):
         await db_manager._add_overflow_moneybox(  # pylint:disable=protected-access
-            moneybox_data={"unknown_key": "what else",}
+            moneybox_data={
+                "unknown_key": "what else",
+            }
         )
+
 
 @pytest.mark.dependency(name="test_add_moneybox_success")
 async def test_add_moneybox_success(
@@ -213,6 +239,7 @@ async def test_add_moneybox_success(
             "balance": 0,
         } | data
         assert result_moneybox_data == expected_moneybox_data
+
 
 @pytest.mark.dependency(depends=["test_add_moneybox_success"])
 async def test_add_moneybox_fail(
@@ -278,22 +305,27 @@ async def test_get_prioritylist(
 
 
 @pytest.mark.dependency(depends=["test_get_prioritylist"])
-async def test_update_priorities(db_manager: DBManager) -> None:   
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1",
+async def test_update_priorities(db_manager: DBManager) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker,
+            name="Test Box 1",
+        )
     )
-    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 2"
+    second_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 2"
+        )
     )
-    third_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 3"
+    third_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 3"
+        )
     )
-    fourth_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 4"
+    fourth_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 4"
+        )
     )
 
     new_priorities_1 = [
@@ -334,9 +366,7 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     with pytest.raises(UpdateInstanceError) as ex_info:
         await db_manager.update_prioritylist(priorities=new_priorities_2)
 
-    assert (
-        ex_info.value.message == "Tried to update non existing moneyboxes."
-    )
+    assert ex_info.value.message == "Tried to update non existing moneyboxes."
 
     # duplicate ids
     new_priorities_2 = [
@@ -350,12 +380,12 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     with pytest.raises(UpdateInstanceError) as ex_info:
         await db_manager.update_prioritylist(priorities=new_priorities_2)
 
-    assert (
-        ex_info.value.message == "Update priority list has duplicate moneybox ids."
-    )
+    assert ex_info.value.message == "Update priority list has duplicate moneybox ids."
 
     # fail updating overflow moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+    overflow_moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
+    )
     new_priorities_3 = [
         {"moneybox_id": overflow_moneybox.id, "priority": 0},
         {"moneybox_id": first_moneybox_id, "priority": 1},
@@ -367,13 +397,12 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     with pytest.raises(OverflowMoneyboxUpdatedError) as ex_info:
         await db_manager.update_prioritylist(priorities=new_priorities_3)
 
-    assert (
-        ex_info.value.message
-        == "Updating overflow moneybox is not allowed/possible!"
-    )
+    assert ex_info.value.message == "Updating overflow moneybox is not allowed/possible!"
 
     # fail setting priority 0 to another moneybox
-    overflow_moneybox = await db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+    overflow_moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
+    )
     new_priorities_4 = [
         {"moneybox_id": first_moneybox_id, "priority": 0},  # not allowed, should fail
         {"moneybox_id": second_moneybox_id, "priority": 2},
@@ -385,8 +414,8 @@ async def test_update_priorities(db_manager: DBManager) -> None:
         await db_manager.update_prioritylist(priorities=new_priorities_4)
 
     assert (
-            ex_info.value.message
-            == "Updating priority=0 is not allowed (reserved for Overflow Moneybox)."
+        ex_info.value.message
+        == "Updating priority=0 is not allowed (reserved for Overflow Moneybox)."
     )
 
     # reset to original priorities
@@ -396,9 +425,10 @@ async def test_update_priorities(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_update_priorities"])
 async def test_update_moneybox(db_manager: DBManager) -> None:
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1"
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
     )
 
     moneybox_data = {"name": "Test Box 1 - Updated"}
@@ -435,15 +465,19 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.record_id == moneybox_id
 
+
 @pytest.mark.dependency(depends=["test_update_moneybox"])
 async def test_get_historical_moneybox_name_success(db_manager: DBManager) -> None:
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1 - Updated"
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
+        )
     )
-    moneybox_name: str = await db_manager._get_historical_moneybox_name(  # pylint: disable=protected-access
-        moneybox_id=first_moneybox_id,
-        from_datetime=datetime.now(tz=timezone.utc) + timedelta(hours=2),
+    moneybox_name: str = (
+        await db_manager._get_historical_moneybox_name(  # pylint: disable=protected-access
+            moneybox_id=first_moneybox_id,
+            from_datetime=datetime.now(tz=timezone.utc) + timedelta(hours=2),
+        )
     )
 
     assert moneybox_name == "Test Box 1 - Updated"
@@ -451,9 +485,10 @@ async def test_get_historical_moneybox_name_success(db_manager: DBManager) -> No
 
 @pytest.mark.dependency(depends=["test_get_historical_moneybox_name_success"])
 async def test_get_historical_moneybox_name_fail(db_manager: DBManager) -> None:
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1 - Updated"
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
+        )
     )
 
     with pytest.raises(MoneyboxNameNotFoundError):
@@ -466,8 +501,7 @@ async def test_get_historical_moneybox_name_fail(db_manager: DBManager) -> None:
 @pytest.mark.dependency(depends=["test_get_historical_moneybox_name_fail"])
 async def test_get_moneybox(db_manager: DBManager) -> None:
     first_moneybox_id: int = await get_moneybox_id_by_name(  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1 - Updated"
+        async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
     )
     result_moneybox_data: dict[str, Any] = (
         await db_manager.get_moneybox(  # noqa: typing  # pylint:disable=protected-access
@@ -505,9 +539,10 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
 @pytest.mark.dependency(depends=["test_get_moneybox"], session="scope")
 async def test_delete_moneybox(db_manager: DBManager) -> None:
     # add amount to moneybox 3
-    third_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 3"
+    third_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 3"
+        )
     )
 
     deposit_transaction = DepositTransactionRequest(
@@ -549,9 +584,10 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_delete_moneybox"])
 async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1 - Updated"
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
+        )
     )
 
     moneybox_data = await db_manager.get_moneybox(moneybox_id=first_moneybox_id)
@@ -678,10 +714,11 @@ async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_add_amount_to_first_moneybox"])
-async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1 - Updated"
+async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = await get_moneybox_id_by_name(
+        async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
     )
 
     moneybox_data = await db_manager.get_moneybox(moneybox_id=first_moneybox_id)
@@ -826,15 +863,18 @@ async def test_sub_amount_from_moneybox(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
+
 @pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
 async def test_transfer_amount(db_manager: DBManager) -> None:
-    first_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1 - Updated"
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
+        )
     )
-    second_moneybox_id = await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 2"
+    second_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 2"
+        )
     )
 
     from_moneybox_data = await db_manager.get_moneybox(moneybox_id=second_moneybox_id)
@@ -1043,14 +1083,17 @@ async def test_get_transactions_logs_with_counterparty_to_deleted_moneybox(
     await db_manager.delete_moneybox(result_moneybox_data_4["id"])
 
 
-@pytest.mark.dependency(depends=["test_get_transactions_logs_with_counterparty_to_deleted_moneybox"])
+@pytest.mark.dependency(
+    depends=["test_get_transactions_logs_with_counterparty_to_deleted_moneybox"]
+)
 async def test_transactions_logs_between_overflow_moneybox(
     db_manager: DBManager,
 ) -> None:
-    overflow_moneybox: Moneybox = await db_manager._get_overflow_moneybox()
-    first_moneybox_id: int = await get_moneybox_id_by_name(  # pylint: disable:protected-access
-        async_session=db_manager.async_sessionmaker,
-        name="Test Box 1 - Updated"
+    overflow_moneybox: Moneybox = (
+        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
+    )
+    first_moneybox_id: int = await get_moneybox_id_by_name(
+        async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
     )
 
     transfer_transaction = TransferTransactionRequest(
@@ -1069,10 +1112,7 @@ async def test_transactions_logs_between_overflow_moneybox(
     assert transaction_logs[-1]["counterparty_moneybox_name"] == "Overflow Moneybox"
 
 
-
-@pytest.mark.dependency(
-    depends=["test_transactions_logs_between_overflow_moneybox"]
-)
+@pytest.mark.dependency(depends=["test_transactions_logs_between_overflow_moneybox"])
 async def test_get_app_settings_valid(db_manager: DBManager) -> None:
     _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
     app_settings = await db_manager.get_app_settings(app_settings_id=_app_settings.id)
@@ -1165,7 +1205,7 @@ async def test_get_app_settings_invalid(
 
     # test _get_app_settings helper function
     with pytest.raises(InconsistentDatabaseError):
-        await db_manager._get_app_settings()
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
 
 
 @pytest.mark.dependency(depends=["test_get_app_settings_invalid"])
@@ -1465,17 +1505,17 @@ async def test_export_sql_dump(
 async def test_export_sql_dump_missing_dependency_error(
     db_manager: DBManager,
 ) -> None:
-    with patch("src.db.db_manager.subprocess.Popen", side_effect=Exception("pg_dump not installed")):
+    with patch(
+        "src.db.db_manager.subprocess.Popen", side_effect=Exception("pg_dump not installed")
+    ):
         with pytest.raises(MissingDependencyError, match="pg_dump not installed"):
             await db_manager.export_sql_dump()
 
+
 async def test_export_sql_dump_process_communication_error(
-        db_manager: DBManager,
+    db_manager: DBManager,
 ) -> None:
-    with (
-        patch("src.db.db_manager.subprocess.Popen"),
-        patch("subprocess.Popen") as mock_popen
-    ):
+    with patch("src.db.db_manager.subprocess.Popen"), patch("subprocess.Popen") as mock_popen:
         mock_process = MagicMock()
         mock_process.communicate.return_value = (b"", b"Error message")
         mock_process.returncode = -1
@@ -1537,6 +1577,7 @@ async def test_import_sql_dump(
             exclude_keys=["created_at", "modified_at", "id"],
         )
 
+
 async def test_import_sql_dump_missing_dependency_error(
     db_manager: DBManager,
 ) -> None:
@@ -1549,9 +1590,7 @@ async def test_import_sql_dump_missing_dependency_error(
     with (
         patch(
             "src.db.db_manager.subprocess.Popen",
-            side_effect=Exception(
-             "pg_restore not installed"
-            ),
+            side_effect=Exception("pg_restore not installed"),
         ),
         patch.object(
             db_manager,
@@ -1566,8 +1605,9 @@ async def test_import_sql_dump_missing_dependency_error(
         with pytest.raises(MissingDependencyError, match="pg_restore not installed"):
             await db_manager.import_sql_dump(sql_dump=sql_dump)
 
+
 async def test_import_sql_dump_process_communication_error(
-        db_manager: DBManager,
+    db_manager: DBManager,
 ) -> None:
     dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
 
@@ -1596,6 +1636,7 @@ async def test_import_sql_dump_process_communication_error(
 
         with pytest.raises(ProcessCommunicationError, match="Error message"):
             await db_manager.import_sql_dump(sql_dump=sql_dump)
+
 
 @pytest.mark.dependency
 async def test_get_users_empty(
@@ -1821,18 +1862,20 @@ async def test_user_by_credentials_fail(
 
 
 async def test_distribute_automated_savings_amount__amount_0(
-        load_test_data: None,  # pylint: disable=unused-argument
-        db_manager: DBManager,
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
 ) -> None:
     distribute_amount: int = 0
     moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
     sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
-        moneyboxes, key=lambda item:item["priority"]
+        moneyboxes, key=lambda item: item["priority"]
     )
-    app_settings: AppSettings = await db_manager._get_app_settings()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(
+        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
             session=session,
             distribute_amount=distribute_amount,
             sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
@@ -1849,10 +1892,12 @@ async def test_distribute_automated_savings_amount__amount_negative(db_manager: 
     sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
         moneyboxes, key=lambda item: item["priority"]
     )
-    app_settings: AppSettings = await db_manager._get_app_settings()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(
+        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
             session=session,
             distribute_amount=distribute_amount,
             sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
@@ -1863,18 +1908,19 @@ async def test_distribute_automated_savings_amount__amount_negative(db_manager: 
     assert updated_moneyboxes == sorted_by_priority_moneyboxes
 
 
-async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none(
-        load_test_data: None,  # pylint: disable=unused-argument
-        db_manager: DBManager
+async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none(  # noqa: ignore  # pylint: disable=line-too-long
+    load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
 ) -> None:
     moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
     sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
         moneyboxes, key=lambda item: item["priority"]
     )
-    app_settings: AppSettings = await db_manager._get_app_settings()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(
+        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
             session=session,
             distribute_amount=app_settings.savings_amount,  # 150
             sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
@@ -1885,21 +1931,24 @@ async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with
     assert updated_moneyboxes[0]["balance"] == 140
     assert updated_moneyboxes[1]["balance"] == 5
     assert updated_moneyboxes[2]["balance"] == 5  # savings_amount = 0 but ignored in fill_mode
-    assert updated_moneyboxes[3]["balance"] == 0  # target: None and wants 10, but fill mode ignores wises
+    assert (
+        updated_moneyboxes[3]["balance"] == 0
+    )  # target: None and wants 10, but fill mode ignores wises
 
 
 async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0(
-        load_test_data: None,  # pylint: disable=unused-argument
-        db_manager: DBManager
+    load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
 ) -> None:
     moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
     sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
         moneyboxes, key=lambda item: item["priority"]
     )
-    app_settings: AppSettings = await db_manager._get_app_settings()
+    app_settings: AppSettings = (
+        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
+    )
 
     async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(
+        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
             session=session,
             distribute_amount=app_settings.savings_amount,  # 150
             sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
@@ -1910,4 +1959,6 @@ async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_wi
     assert updated_moneyboxes[0]["balance"] == 135
     assert updated_moneyboxes[1]["balance"] == 5
     assert updated_moneyboxes[2]["balance"] == 0  # savings_amount = 0 and respected in normal mode
-    assert updated_moneyboxes[3]["balance"] == 10 # savings_target=None, but respected savings_amount=10
+    assert (
+        updated_moneyboxes[3]["balance"] == 10
+    )  # savings_target=None, but respected savings_amount=10

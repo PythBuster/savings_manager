@@ -2,8 +2,6 @@
 
 from typing import Any
 
-from asyncpg import InvalidTextRepresentationError
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import (
     Insert,
     Result,
@@ -15,10 +13,14 @@ from sqlalchemy import (
     select,
     update,
 )
-from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from src.db.exceptions import RecordNotFoundError, UpdateInstanceError, CreateInstanceError, DeleteInstanceError
+from src.db.exceptions import (
+    CreateInstanceError,
+    DeleteInstanceError,
+    RecordNotFoundError,
+    UpdateInstanceError,
+)
 from src.db.models import SqlBase
 
 
@@ -59,7 +61,7 @@ async def create_instance(
             details={
                 "table": orm_model.__name__,
                 "data": data,
-            }
+            },
         ) from ex
 
     return instance
@@ -206,10 +208,11 @@ async def update_instance(
             details={
                 "table": orm_model.__name__,
                 "data": data,
-            }
+            },
         ) from ex
 
     return instance
+
 
 async def deactivate_instance(
     async_session: async_sessionmaker | AsyncSession,
@@ -261,5 +264,5 @@ async def deactivate_instance(
             message="Failed updating instance",
             details={
                 "table": orm_model.__name__,
-            }
+            },
         ) from ex
