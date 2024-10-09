@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.29.3 (2024-10-09)
+### Fixes:
+- adapt further occurrences for moneybox mod in transaction logs creation
+
 ## 2.29.2 (2024-10-09)
 ### Fixes:
 - fix syntax errors and log messages in transaction logs creation
