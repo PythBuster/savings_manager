@@ -20,14 +20,6 @@ src.routes.responses.app\_settings module
    :undoc-members:
    :show-inheritance:
 
-src.routes.responses.custom\_openapi\_schema module
----------------------------------------------------
-
-.. automodule:: src.routes.responses.custom_openapi_schema
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 src.routes.responses.email\_sender module
 -----------------------------------------
 
@@ -56,6 +48,14 @@ src.routes.responses.prioritylist module
 ----------------------------------------
 
 .. automodule:: src.routes.responses.prioritylist
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.routes.responses.user module
+--------------------------------
+
+.. automodule:: src.routes.responses.user
    :members:
    :undoc-members:
    :show-inheritance:

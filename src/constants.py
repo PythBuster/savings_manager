@@ -1,8 +1,10 @@
 """All settings/global data are located here."""
 
 from pathlib import Path
+from typing import Any
 
 from src.custom_types import EnvironmentType
+
 
 SPHINX_DIR_PATH: Path = (Path(__file__).parent.parent / "docs" / "sphinx" / "build").resolve()
 """The current sphinx directory."""

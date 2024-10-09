@@ -17,7 +17,7 @@ from src.custom_types import (
     AppEnvVariables,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType,
+    TransactionType, UserRoleType,
 )
 from src.data_classes.requests import (
     DepositTransactionRequest,
@@ -42,7 +42,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError,
+    UserNotFoundError, DeleteInstanceError,
 )
 from src.db.models import AppSettings, Moneybox
 from src.utils import equal_dict
@@ -1499,7 +1499,7 @@ async def test_export_sql_dump(
     with dump_file_path.open("wb") as f:
         f.write(dump_value)
 
-    assert 35500 < len(dump_value) < 35600
+    assert 35800 < len(dump_value) < 36000
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])
 @pytest.mark.order(after="test_export_sql_dump")
@@ -1666,6 +1666,7 @@ async def test_add_user_success(
 
     expected_user_data = {
         "user_name": "hannelore.von.buxtehude@eine-email-adresse-halt.de",
+        "role": UserRoleType.USER,
     }
 
     # TODO: will be renamed in orm model later, remove this if done
@@ -1680,6 +1681,35 @@ async def test_add_user_success(
 
 
 @pytest.mark.dependency(depends=["test_add_user_success"])
+async def test_add_admin_user_success(
+    db_manager: DBManager,
+) -> None:
+    user_data = {
+        "user_name": "admin2",
+        "user_password": "admin2",
+    }
+    user = await db_manager.add_user(
+        user_name=user_data["user_name"],
+        user_password=user_data["user_password"],
+        is_admin=True,
+    )
+
+    expected_user_data = {
+        "user_name": "admin2",
+        "role": UserRoleType.ADMIN,
+    }
+
+    # TODO: will be renamed in orm model later, remove this if done
+    user["user_name"] = user["user_login"]
+    del user["user_login"]
+
+    assert equal_dict(
+        dict_1=expected_user_data,
+        dict_2=user,
+        exclude_keys=["created_at", "modified_at", "id"],
+    )
+
+@pytest.mark.dependency(depends=["test_add_admin_user_success"])
 async def test_add_user_failed(
     db_manager: DBManager,
 ) -> None:
@@ -1720,6 +1750,7 @@ async def test_get_user(
 
     expected_user_data: dict[str, Any] = {
         "user_name": "hannelore2",
+        "role": UserRoleType.USER,
     }
     assert equal_dict(
         dict_1=user,
@@ -1762,29 +1793,29 @@ async def test_update_user_name(
     user["user_name"] = user["user_login"]
     del user["user_login"]
 
-    new_login: str = "hannelore@buxtehu.de"
-    old_login: str = user["user_name"]
+    new_name: str = "hannelore@buxtehu.de"
+    old_name: str = user["user_name"]
     user = await db_manager.update_user_name(
         user_id=user["id"],
-        new_user_name=new_login,
+        new_user_name=new_name,
     )
 
     # TODO: will be renamed in orm model later, remove this if done
     user["user_name"] = user["user_login"]
     del user["user_login"]
 
-    assert new_login == user["user_name"]
+    assert new_name == user["user_name"]
 
     # try to get same user with new credentials
     user = await db_manager.get_user_by_credentials(
-        user_name=new_login,
+        user_name=new_name,
         user_password="sicher-ist-nichts",
     )
     assert user is not None
 
     # try to get same user with old credentials
     user = await db_manager.get_user_by_credentials(
-        user_name=old_login,
+        user_name=old_name,
         user_password="sicher-ist-nichts",
     )
     assert user is None
@@ -1851,6 +1882,26 @@ async def test_delete_user(
 
 
 @pytest.mark.dependency(depends=["test_delete_user"])
+async def test_delete_admin_user_fail(
+    db_manager: DBManager,
+) -> None:
+    user_data: dict[str, str] = {
+        "user_name": "admin2",
+        "user_password": "admin2",
+    }
+    admin_user: dict[str, Any] | None = await db_manager.get_user_by_credentials(
+        user_name=user_data["user_name"],
+        user_password=user_data["user_password"],
+    )
+    assert admin_user is not None
+
+    with pytest.raises(DeleteInstanceError):
+        user_id: int = admin_user["id"]
+        await db_manager.delete_user(
+            user_id=user_id,
+        )
+
+@pytest.mark.dependency(depends=["test_delete_admin_user_fail"])
 async def test_user_by_credentials_fail(
     db_manager: DBManager,
 ) -> None:

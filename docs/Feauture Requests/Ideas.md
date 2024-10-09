@@ -27,3 +27,7 @@
 # Endpoint for error logs
 
 # Bug Report Endpoint / UI Mockup needed?
+
+# Use oauth2 as login?
+--> auth0? clerk?
+--> or implement own system? (e.g. google login, github, twitch, apple,...)

@@ -1,15 +1,25 @@
 """The JWT classes and functions are located here."""
-
+import json
 from asyncio import Lock
-from typing import Annotated
+from pyexpat.errors import messages
+from typing import Annotated, Any
 
 from async_fastapi_jwt_auth.auth_jwt import AuthJWT
+from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.security import HTTPBearer as SecurityHTTPBearer
 from pydantic import BaseModel, Field
 from starlette.requests import Request
 from starlette.responses import Response
 
-from src.utils import get_app_env_variables
+from src.auth.exceptions import MissingRoleError
+from src.custom_types import UserRoleType, EndpointRouteType
+from src.utils import get_app_env_variables, get_app_data
+
+APP_DATA: dict[str, Any] = get_app_data()
+MAJOR_VERSION: int = int(APP_DATA["version"].split(".")[0])
+LOGIN_REQUEST_PATH: str = f'/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login'
+
+MAJOR_VERSION = 1234  # while testing, remove after finishing issue
 
 
 class JWTSettings(BaseModel):
@@ -87,6 +97,10 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
     _config_loaded: bool = False
     _lock: Lock = Lock()
 
+    def __init__(self, access_limited_to_roles: list[UserRoleType] | None = None):
+        self.access_limited_to_roles: list[UserRoleType]|None = access_limited_to_roles
+        super().__init__()
+
     async def __call__(
         self,
         req: Request = None,
@@ -100,7 +114,25 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
                     UserAuthJWTBearer._load_jwt_config()
                     UserAuthJWTBearer._config_loaded = True
 
-        return AuthJWT(req=req, res=res)
+        auth_jwt = AuthJWT(req=req, res=res)
+
+        if MAJOR_VERSION >= 4:
+            if req.scope["path"] != LOGIN_REQUEST_PATH:
+                await auth_jwt.jwt_required()
+
+                if self.access_limited_to_roles is not None:
+                    subject_json: str = await auth_jwt.get_jwt_subject()
+                    subject: dict[str, Any] = json.loads(subject_json)
+
+                    user_role: str = subject["role"]
+
+                    if user_role not in self.access_limited_to_roles:
+                        raise MissingRoleError(
+                            status_code=403,
+                            message="Not authorized. Missing role."
+                        )
+
+        return auth_jwt
 
     @staticmethod
     def _load_jwt_config() -> None:
@@ -134,6 +166,3 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
             authjwt_cookie_csrf_protect=app_env_variables.authjwt_cookie_csrf_protect,
             authjwt_cookie_samesite=same_site_str,
         )
-
-
-auth_dep = UserAuthJWTBearer()

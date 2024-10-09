@@ -2,20 +2,22 @@
 
 from typing import Any
 
+import pytest
 from httpx import AsyncClient, Response
 from starlette import status
 
-from src.custom_types import EndpointRouteType
+from src.custom_types import EndpointRouteType, UserRoleType
 from src.db.db_manager import DBManager
 from src.utils import equal_dict
 
-
-async def test_user_add_success(client: AsyncClient) -> None:
+async def test_user_add_success(
+        admin_authed_client: AsyncClient
+) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
     }
-    response: Response = await client.post(
+    response: Response = await admin_authed_client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
         json=user_post_data,
     )
@@ -24,7 +26,7 @@ async def test_user_add_success(client: AsyncClient) -> None:
     user: dict[str, Any] = response.json()
     assert equal_dict(
         user,
-        user_post_data,
+        user_post_data | {"role": UserRoleType.USER},
         exclude_keys=["userPassword", "createdAt", "modifiedAt", "id"],
     )
 
@@ -33,7 +35,7 @@ async def test_user_add_success(client: AsyncClient) -> None:
         "userName": "another user",
         "userPassword": "my-another-password",
     }
-    response_2: Response = await client.post(
+    response_2: Response = await admin_authed_client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
         json=user_post_data_2,
     )
@@ -42,17 +44,18 @@ async def test_user_add_success(client: AsyncClient) -> None:
     user_2: dict[str, Any] = response_2.json()
     assert equal_dict(
         user_2,
-        user_post_data_2,
+        user_post_data_2 | {"role": UserRoleType.USER},
         exclude_keys=["userPassword", "createdAt", "modifiedAt", "id"],
     )
 
-
-async def test_user_add_failed(client: AsyncClient) -> None:
+async def test_user_add_failed(
+        admin_authed_client: AsyncClient
+) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
     }
-    response: Response = await client.post(
+    response: Response = await admin_authed_client.post(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
         json=user_post_data,
     )
@@ -62,7 +65,10 @@ async def test_user_add_failed(client: AsyncClient) -> None:
     assert content["message"] == "User already exists."
 
 
-async def test_user_get_success(client: AsyncClient, db_manager: DBManager) -> None:
+async def test_user_get_success(
+        admin_authed_client: AsyncClient,
+        db_manager: DBManager,
+) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
@@ -75,7 +81,7 @@ async def test_user_get_success(client: AsyncClient, db_manager: DBManager) -> N
 
     user_id: int = db_user["id"]
 
-    response: Response = await client.get(
+    response: Response = await admin_authed_client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}",
     )
     assert response.status_code == status.HTTP_200_OK
@@ -83,15 +89,17 @@ async def test_user_get_success(client: AsyncClient, db_manager: DBManager) -> N
     user: dict[str, Any] = response.json()
     assert equal_dict(
         user,
-        user_data | {"id": user_id},
+        user_data | {"id": user_id, "role": UserRoleType.USER},
         exclude_keys=["userPassword", "createdAt", "modifiedAt"],
     )
 
 
-async def test_user_get_fail__non_existing_user_id(client: AsyncClient) -> None:
+async def test_user_get_fail__non_existing_user_id(
+        admin_authed_client: AsyncClient,
+) -> None:
     non_existing_user_id: int = 12345
 
-    response: Response = await client.get(
+    response: Response = await admin_authed_client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{non_existing_user_id}",
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -100,7 +108,10 @@ async def test_user_get_fail__non_existing_user_id(client: AsyncClient) -> None:
     assert content["message"] == "User does not exist."
 
 
-async def test_user_update_password_success(client: AsyncClient, db_manager: DBManager) -> None:
+async def test_user_update_password_success(
+        admin_authed_client: AsyncClient,
+        db_manager: DBManager,
+) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
@@ -114,7 +125,7 @@ async def test_user_update_password_success(client: AsyncClient, db_manager: DBM
     user_id: int = db_user["id"]
     new_user_password: str = "<PASSWORD>"
 
-    response: Response = await client.patch(
+    response: Response = await admin_authed_client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}/password",
         json={"newUserPassword": new_user_password},
     )
@@ -128,10 +139,12 @@ async def test_user_update_password_success(client: AsyncClient, db_manager: DBM
     assert db_user is None
 
 
-async def test_user_update_password_fail__user_id_not_exist(client: AsyncClient) -> None:
+async def test_user_update_password_fail__user_id_not_exist(
+        admin_authed_client: AsyncClient,
+) -> None:
     non_existing_user_id: int = 12345
 
-    response: Response = await client.patch(
+    response: Response = await admin_authed_client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{non_existing_user_id}/password",
         json={"newUserPassword": "test"},
     )
@@ -140,7 +153,7 @@ async def test_user_update_password_fail__user_id_not_exist(client: AsyncClient)
     assert content["message"] == "Record not found."
 
 
-async def test_user_update_name_success(client: AsyncClient, db_manager: DBManager) -> None:
+async def test_user_update_name_success(admin_authed_client: AsyncClient, db_manager: DBManager) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "<PASSWORD>",
@@ -154,7 +167,7 @@ async def test_user_update_name_success(client: AsyncClient, db_manager: DBManag
     user_id: int = db_user["id"]
     new_user_name = "Another Login"
 
-    response: Response = await client.patch(
+    response: Response = await admin_authed_client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}/name",
         json={"newUserName": new_user_name},
     )
@@ -169,7 +182,7 @@ async def test_user_update_name_success(client: AsyncClient, db_manager: DBManag
 
 
 async def test_user_update_name_fail__username_already_exist(
-    client: AsyncClient, db_manager: DBManager
+    admin_authed_client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "another user",
@@ -184,7 +197,7 @@ async def test_user_update_name_fail__username_already_exist(
     user_id: int = db_user["id"]
     new_user_name = "Another Login"
 
-    response: Response = await client.patch(
+    response: Response = await admin_authed_client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}/name",
         json={"newUserName": new_user_name},
     )
@@ -195,11 +208,11 @@ async def test_user_update_name_fail__username_already_exist(
 
 
 async def test_user_update_name_fail__user_id_not_exist(
-    client: AsyncClient,
+    admin_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
-    response: Response = await client.patch(
+    response: Response = await admin_authed_client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{non_existing_user_id}/name",
         json={"newUserName": "test"},
     )
@@ -209,10 +222,10 @@ async def test_user_update_name_fail__user_id_not_exist(
     assert content["message"] == "Record not found."
 
 
-async def test_user_delete_fail__user_id_not_exist(client: AsyncClient) -> None:
+async def test_user_delete_fail__user_id_not_exist(admin_authed_client: AsyncClient) -> None:
     non_existing_user_id: int = 12345
 
-    response: Response = await client.delete(
+    response: Response = await admin_authed_client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{non_existing_user_id}"
     )
 
@@ -221,7 +234,7 @@ async def test_user_delete_fail__user_id_not_exist(client: AsyncClient) -> None:
     assert content["message"] == "User does not exist."
 
 
-async def test_user_delete_success(client: AsyncClient, db_manager: DBManager) -> None:
+async def test_user_delete_success(admin_authed_client: AsyncClient, db_manager: DBManager) -> None:
     user_data: dict[str, str] = {
         "userName": "Another Login",
         "userPassword": "<PASSWORD>",
@@ -234,7 +247,7 @@ async def test_user_delete_success(client: AsyncClient, db_manager: DBManager) -
 
     user_id: int = db_user["id"]
 
-    response: Response = await client.delete(
+    response: Response = await admin_authed_client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}"
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT

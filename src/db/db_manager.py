@@ -26,7 +26,7 @@ from src.custom_types import (
     AppEnvVariables,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType,
+    TransactionType, UserRoleType,
 )
 from src.db.core import (
     create_instance,
@@ -54,7 +54,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError,
+    UserNotFoundError, DeleteInstanceError,
 )
 from src.db.models import (
     AppSettings,
@@ -1709,7 +1709,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         return user_exists
 
-    async def add_user(self, user_name: str, user_password: str) -> dict[str, Any]:
+    async def add_user(
+            self,
+            user_name: str,
+            user_password: str,
+            is_admin: bool = False,
+    ) -> dict[str, Any]:
         """Create a user database entry and returns new entry.
 
         :param user_name: The username.
@@ -1717,6 +1722,9 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :param user_password: The password of the user. The password
             will be hashed before persisting into database.
         :type user_password: :class:`str`
+        :param is_admin: Assign role ADMIN to user if True,
+            otherwise assign role USER, defaults to False.
+        :type is_admin: :class:`UserRoleType`
         :return: The new user database entry.
         :rtype: :class:`dict[str, Any]`
 
@@ -1737,6 +1745,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 data={
                     "user_login": user_name,
                     "user_password_hash": await self.get_password_hash(password=user_password),
+                    "role": UserRoleType.ADMIN if is_admin else UserRoleType.USER,
                 },
             ),
         )
@@ -1819,6 +1828,15 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :raises DeleteInstanceError: if deleting user fails.
                 UserNotFoundError: if user does not exist.
         """
+
+        user: dict[str, Any] = await self.get_user(user_id=user_id)
+
+        if user["role"] is UserRoleType.ADMIN:
+            raise DeleteInstanceError(
+                record_id=user_id,
+                message="An admin user can't be deleted.",
+                details=user
+            )
 
         try:
             await deactivate_instance(

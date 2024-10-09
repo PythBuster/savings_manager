@@ -1,6 +1,7 @@
 """The general/basic root routes."""
 
 import io
+import json
 from datetime import datetime
 from typing import Annotated, Any, cast
 
@@ -11,8 +12,8 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
-from src.auth.jwt_auth import auth_dep
-from src.custom_types import EndpointRouteType
+from src.auth.jwt_auth import UserAuthJWTBearer
+from src.custom_types import EndpointRouteType, UserRoleType
 from src.data_classes.requests import LoginUserRequest, ResetDataRequest
 from src.data_classes.responses import AppInfoResponse, LoginUserResponse
 from src.db.db_manager import DBManager
@@ -157,7 +158,7 @@ async def import_sql_dump(
 async def login(
     request: Request,
     user_request_data: LoginUserRequest,
-    jwt_authorize: Annotated[AuthJWT, Depends(auth_dep)],
+    jwt_authorize: Annotated[AuthJWT, Depends(UserAuthJWTBearer())],
 ) -> Response:
     """Endpoint for logging in.
     \f
@@ -186,16 +187,15 @@ async def login(
     user_valid_response_data = LoginUserResponse(**user)
 
     access_token: str = await jwt_authorize.create_access_token(
-        subject=str(user["id"]),
+        subject=user_valid_response_data.model_dump_json(by_alias=True),
         expires_time=7 * 24 * 60 * 60,  # 7 days
     )
 
     # Set the JWT cookie in the response
     response: JSONResponse = JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=jsonable_encoder(user_valid_response_data),
+        content=jsonable_encoder(user_valid_response_data.model_dump(by_alias=True)),
     )
-
     await jwt_authorize.set_access_cookies(
         encoded_access_token=access_token,
         response=response,
@@ -209,16 +209,14 @@ async def login(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def logout(
-    jwt_authorize: Annotated[AuthJWT, Depends(auth_dep)],
+    jwt_authorize: Annotated[AuthJWT, Depends(UserAuthJWTBearer())],
 ) -> Response:
     """Endpoint for logging in.
     \f
 
-    :param jwt_authorize: The JWT authorizer dependency.
+    :param jwt_authorize: Auth
     :type jwt_authorize: :class:`AuthJWT`
     """
-
-    await jwt_authorize.jwt_required()
 
     response: Response = Response(status_code=status.HTTP_204_NO_CONTENT)
     await jwt_authorize.unset_access_cookies(response=response)

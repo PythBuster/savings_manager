@@ -12,14 +12,6 @@ Subpackages
 Submodules
 ----------
 
-src.report\_sender.consants module
-----------------------------------
-
-.. automodule:: src.report_sender.consants
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 src.report\_sender.sender module
 --------------------------------
 

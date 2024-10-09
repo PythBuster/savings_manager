@@ -19,7 +19,7 @@ from pydantic_extra_types.semantic_version import SemanticVersion
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType,
+    TransactionType, UserRoleType,
 )
 from src.utils import to_camel_cleaned_suffix
 
@@ -862,6 +862,14 @@ class LoginUserResponse(BaseModel):
     ]
     """The user's name."""
 
+    role: Annotated[
+        UserRoleType,
+        Field(
+            description="The role of the user.",
+        ),
+    ]
+    """The role of the user."""
+
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
@@ -872,6 +880,7 @@ class LoginUserResponse(BaseModel):
                 {
                     "id": 1,
                     "userName": "JohnDoe@mail.com",
+                    "role": UserRoleType.USER,
                     "createdAt": "2024-08-11 13:57:17.941840Z",
                     "modifiedAt": "2024-08-11 15:03:17.312860Z",
                 },
@@ -886,7 +895,7 @@ class LoginUserResponse(BaseModel):
     def transform_user_login_to_user_name(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Validator to rename user_login key from database to user_name key for the response.
 
-        Will be removed, when ORM column is renamend.
+        Will be removed, when ORM column is renamed.
 
         :param data: The orm data.
         :type data: :class:`dict[str, Any]`
