@@ -2,12 +2,14 @@
 
 from typing import Annotated, cast
 
-from fastapi import APIRouter, Body, Path
+from async_fastapi_jwt_auth import AuthJWT
+from fastapi import APIRouter, Body, Path, Depends
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
 
-from src.custom_types import EndpointRouteType
+from src.auth.jwt_auth import UserAuthJWTBearer
+from src.custom_types import EndpointRouteType, UserRoleType
 from src.data_classes.requests import (
     LoginUserRequest,
     LoginUserUpdateNameRequest,
@@ -44,14 +46,28 @@ async def get_user(
             description="User ID to be retrieved.",
         ),
     ],
+    jwt_authorize: Annotated[
+        AuthJWT,
+        Depends(
+            UserAuthJWTBearer(
+                access_limited_to_roles=[
+                    UserRoleType.ADMIN,
+                ],
+            )
+        )
+    ],
 ) -> LoginUserResponse:
-    """Endpoint for getting user by user_id.
+    """*Required user role: ADMIN*
+
+    Endpoint for getting user by user_id.
     \f
 
     :param request: The current request object.
     :type request: :class:`Request`
     :param user_id: The user ID to be retrieved.
     :type user_id: :class:`int`
+    :param jwt_authorize: The authorized user token.
+    :type jwt_authorize: :class:`AuthJWT`
     :return: The requested user data.
     :rtype: :class:`LoginUserResponse`
     """
@@ -73,14 +89,26 @@ async def add_user(
         LoginUserRequest,
         Body(title="Post Data", description="The new moneybox data."),
     ],
+    jwt_authorize: Annotated[
+        AuthJWT,
+        Depends(
+            UserAuthJWTBearer(
+                access_limited_to_roles=[UserRoleType.ADMIN],
+            )
+        )
+    ],
 ) -> LoginUserResponse:
-    """Endpoint for creating new user.
+    """*Required user role: ADMIN*
+
+    Endpoint for creating new user.
     \f
 
     :param request: The current request object.
     :type request: :class:`Request`
     :param user_create_request: The data of the new user.
     :type user_create_request: :class:`LoginUserRequest`
+    :param jwt_authorize: The authorized user token.
+    :type jwt_authorize: :class:`AuthJWT`
     :return: The requested user data.
     :rtype: :class:`LoginUserResponse`
     """
@@ -109,8 +137,19 @@ async def update_user_password(
         LoginUserUpdatePasswordRequest,
         Body(title="Update Password", description="The updating user password."),
     ],
+    jwt_authorize: Annotated[
+        AuthJWT,
+        Depends(
+            UserAuthJWTBearer(
+                access_limited_to_roles=[UserRoleType.ADMIN],
+            )
+        )
+    ],
 ) -> LoginUserResponse:
-    """Endpoint for updating users password.
+    """*Required user role: ADMIN*
+
+    Endpoint for updating users password.
+
     \f
 
     :param request: The current request object.
@@ -119,6 +158,8 @@ async def update_user_password(
     :type user_id: :class:`int`
     :param user_data: The new user password.
     :type user_data: :class:`LoginUserUpdatePasswordRequest`
+    :param jwt_authorize: The authorized user token.
+    :type jwt_authorize: :class:`AuthJWT`
     :return: The updated user.
     :rtype: :class:`LoginUserResponse`
     """
@@ -144,8 +185,18 @@ async def update_user_name(
         LoginUserUpdateNameRequest,
         Body(title="Update Login (name)", description="The updating user login."),
     ],
+    jwt_authorize: Annotated[
+        AuthJWT,
+        Depends(
+            UserAuthJWTBearer(
+                access_limited_to_roles=[UserRoleType.ADMIN],
+            )
+        )
+    ],
 ) -> LoginUserResponse:
-    """Endpoint for updating username.
+    """*Required user role: ADMIN*
+
+    Endpoint for updating username.
     \f
 
     :param request: The current request object.
@@ -154,6 +205,8 @@ async def update_user_name(
     :type user_id: :class:`int`
     :param user_data: The new username.
     :type user_data: :class:`LoginUserUpdateNameRequest`
+    :param jwt_authorize: The authorized user token.
+    :type jwt_authorize: :class:`AuthJWT`
     :return: The updated user.
     :rtype: :class:`LoginUserResponse`
     """
@@ -181,14 +234,28 @@ async def delete_user(
             description="User ID to be deleted.",
         ),
     ],
+    jwt_authorize: Annotated[
+        AuthJWT,
+        Depends(
+            UserAuthJWTBearer(
+                access_limited_to_roles=[UserRoleType.ADMIN],
+            )
+        )
+    ],
 ) -> Response:
-    """Endpoint for deleting user by user_id.
+    """*Required user role: ADMIN*
+
+    Endpoint for deleting user by user_id.
     \f
 
     :param request: The current request object.
     :type request: :class:`Request`
     :param user_id: The user ID to be deleted.
     :type user_id: :class:`int`
+    :param jwt_authorize: The authorized user token.
+    :type jwt_authorize: :class:`AuthJWT`
+    :return: Status 204, if successfully deleted.
+    :rtype: :class:`Response`
     """
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)

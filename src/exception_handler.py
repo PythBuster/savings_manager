@@ -10,6 +10,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from src.app_logger import app_logger
+from src.auth.exceptions import MissingRoleError
 from src.data_classes.responses import HTTPErrorResponse
 from src.db.exceptions import (
     CrudDatabaseError,
@@ -46,7 +47,18 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             ),
         )
 
-    if isinstance(exception, AuthJWTException):
+    if isinstance(exception, MissingRoleError):
+        message: str = exception.message
+        return JSONResponse(
+            status_code=exception.status_code,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=message,
+                )
+            ),
+        )
+
+    if issubclass(exception.__class__, AuthJWTException):
         if "Signature has expired" in exception.message:
             status_code = status.HTTP_401_UNAUTHORIZED
         else:
@@ -190,7 +202,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
         )
 
     if isinstance(exception, InvalidFileError):
-        message = exception.message
+        message: str = exception.message
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content=jsonable_encoder(

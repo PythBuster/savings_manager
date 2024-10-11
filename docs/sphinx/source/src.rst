@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   src.auth
    src.data_classes
    src.db
    src.report_sender
@@ -39,6 +40,14 @@ src.custom\_types module
    :undoc-members:
    :show-inheritance:
 
+src.decorators module
+---------------------
+
+.. automodule:: src.decorators
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 src.exception\_handler module
 -----------------------------
 
@@ -47,10 +56,18 @@ src.exception\_handler module
    :undoc-members:
    :show-inheritance:
 
-src.limiter module
-------------------
+src.fastapi\_metadata module
+----------------------------
 
-.. automodule:: src.limiter
+.. automodule:: src.fastapi_metadata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.fastapi\_utils module
+-------------------------
+
+.. automodule:: src.fastapi_utils
    :members:
    :undoc-members:
    :show-inheritance:
@@ -59,6 +76,14 @@ src.main module
 ---------------
 
 .. automodule:: src.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.singleton module
+--------------------
+
+.. automodule:: src.singleton
    :members:
    :undoc-members:
    :show-inheritance:

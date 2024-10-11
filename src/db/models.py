@@ -21,7 +21,7 @@ from src.custom_types import (
     ActionType,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType,
+    TransactionType, UserRoleType,
 )
 from src.utils import as_dict
 
@@ -424,6 +424,14 @@ class User(SqlBase):  # pylint: disable=unsubscriptable-object, too-few-public-m
         comment="The hashed user password.",
     )
     """The hashed user password."""
+
+    role: Mapped[UserRoleType] = mapped_column(
+        nullable=False,
+        default=UserRoleType.USER,
+        server_default=UserRoleType.USER.value.upper(),
+        comment="The role type within the user.",
+    )
+    """The role type within the user."""
 
     _table_args__ = (
         Index(

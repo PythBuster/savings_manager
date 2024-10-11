@@ -155,7 +155,12 @@ Just for documentation: `alembic init -t async alembic` in project root dir will
 
 **Create new migration:**
 
-`alembic revision --autogenerate -m "Added account table"`
+
+***dev***:\
+`alembic -x ENVIRONEMNT=dev revision --autogenerate -m "Added account table"`
+
+***prod***:\
+`alembic -x ENVIRONEMNT=prod revision --autogenerate -m "Added account table"`
 
 # RUN
 

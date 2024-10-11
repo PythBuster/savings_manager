@@ -7,6 +7,16 @@ from pydantic import ConfigDict, SecretStr, model_validator
 from pydantic_settings import BaseSettings
 
 
+class UserRoleType(StrEnum):
+    """The user roles used for authentication."""
+
+    ADMIN = "admin"
+    """The admin role"""
+
+    USER = "user"
+    """The user role"""
+
+
 class EndpointRouteType(StrEnum):
     """The endpoint names."""
 

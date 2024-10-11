@@ -68,6 +68,22 @@ src.routes.prioritylist module
    :undoc-members:
    :show-inheritance:
 
+src.routes.user module
+----------------------
+
+.. automodule:: src.routes.user
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.routes.web\_ui module
+-------------------------
+
+.. automodule:: src.routes.web_ui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
