@@ -118,10 +118,8 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
                 await auth_jwt.jwt_required()
 
                 if self.access_limited_to_roles is not None:
-                    subject_json: str = await auth_jwt.get_jwt_subject()
-                    subject: dict[str, Any] = json.loads(subject_json)
-
-                    user_role: str = subject["role"]
+                    jwt_dict: dict[str, Any] = await auth_jwt.get_raw_jwt()
+                    user_role: UserRoleType = UserRoleType(jwt_dict["role"])
 
                     if user_role not in self.access_limited_to_roles:
                         raise MissingRoleError(

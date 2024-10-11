@@ -186,7 +186,8 @@ async def login(
     user_valid_response_data = LoginUserResponse(**user)
 
     access_token: str = await jwt_authorize.create_access_token(
-        subject=user_valid_response_data.model_dump_json(by_alias=True),
+        subject=str(user_valid_response_data.id_),
+        user_claims={"role": str(user_valid_response_data.role)},
         expires_time=7 * 24 * 60 * 60,  # 7 days
     )
 

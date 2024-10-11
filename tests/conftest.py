@@ -389,7 +389,8 @@ async def admin_role_authed_client(
     jwt_authorize: AuthJWT = AuthJWT()
 
     access_token: str = await jwt_authorize.create_access_token(
-        subject=json.dumps(user_data),
+        subject=str(user_data["id"]),
+        user_claims={"role": str(user_data["role"])},
         expires_time=60 * 60,
     )
 
@@ -426,7 +427,8 @@ async def user_role_authed_client(
     jwt_authorize: AuthJWT = AuthJWT()
 
     access_token: str = await jwt_authorize.create_access_token(
-        subject=json.dumps(user_data),
+        subject=str(user_data["id"]),
+        user_claims={"role": str(user_data["role"])},
         expires_time=60 * 60,
     )
 
