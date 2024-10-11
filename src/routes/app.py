@@ -1,7 +1,6 @@
 """The general/basic root routes."""
 
 import io
-import json
 from datetime import datetime
 from typing import Annotated, Any, cast
 
@@ -13,7 +12,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
 from src.auth.jwt_auth import UserAuthJWTBearer
-from src.custom_types import EndpointRouteType, UserRoleType
+from src.custom_types import EndpointRouteType
 from src.data_classes.requests import LoginUserRequest, ResetDataRequest
 from src.data_classes.responses import AppInfoResponse, LoginUserResponse
 from src.db.db_manager import DBManager

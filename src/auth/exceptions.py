@@ -1,3 +1,5 @@
+"""All auth related exceptions are located here."""
+
 from async_fastapi_jwt_auth.exceptions import AuthJWTException
 
 

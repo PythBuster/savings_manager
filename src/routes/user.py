@@ -3,7 +3,7 @@
 from typing import Annotated, cast
 
 from async_fastapi_jwt_auth import AuthJWT
-from fastapi import APIRouter, Body, Path, Depends
+from fastapi import APIRouter, Body, Depends, Path
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
@@ -46,7 +46,7 @@ async def get_user(
             description="User ID to be retrieved.",
         ),
     ],
-    jwt_authorize: Annotated[
+    jwt_authorize: Annotated[  # pylint: disable=unused-argument
         AuthJWT,
         Depends(
             UserAuthJWTBearer(
@@ -54,7 +54,7 @@ async def get_user(
                     UserRoleType.ADMIN,
                 ],
             )
-        )
+        ),
     ],
 ) -> LoginUserResponse:
     """*Required user role: ADMIN*
@@ -89,13 +89,13 @@ async def add_user(
         LoginUserRequest,
         Body(title="Post Data", description="The new moneybox data."),
     ],
-    jwt_authorize: Annotated[
+    jwt_authorize: Annotated[  # pylint: disable=unused-argument
         AuthJWT,
         Depends(
             UserAuthJWTBearer(
                 access_limited_to_roles=[UserRoleType.ADMIN],
             )
-        )
+        ),
     ],
 ) -> LoginUserResponse:
     """*Required user role: ADMIN*
@@ -137,13 +137,13 @@ async def update_user_password(
         LoginUserUpdatePasswordRequest,
         Body(title="Update Password", description="The updating user password."),
     ],
-    jwt_authorize: Annotated[
+    jwt_authorize: Annotated[  # pylint: disable=unused-argument
         AuthJWT,
         Depends(
             UserAuthJWTBearer(
                 access_limited_to_roles=[UserRoleType.ADMIN],
             )
-        )
+        ),
     ],
 ) -> LoginUserResponse:
     """*Required user role: ADMIN*
@@ -185,13 +185,13 @@ async def update_user_name(
         LoginUserUpdateNameRequest,
         Body(title="Update Login (name)", description="The updating user login."),
     ],
-    jwt_authorize: Annotated[
+    jwt_authorize: Annotated[  # pylint: disable=unused-argument
         AuthJWT,
         Depends(
             UserAuthJWTBearer(
                 access_limited_to_roles=[UserRoleType.ADMIN],
             )
-        )
+        ),
     ],
 ) -> LoginUserResponse:
     """*Required user role: ADMIN*
@@ -234,13 +234,13 @@ async def delete_user(
             description="User ID to be deleted.",
         ),
     ],
-    jwt_authorize: Annotated[
+    jwt_authorize: Annotated[  # pylint: disable=unused-argument
         AuthJWT,
         Depends(
             UserAuthJWTBearer(
                 access_limited_to_roles=[UserRoleType.ADMIN],
             )
-        )
+        ),
     ],
 ) -> Response:
     """*Required user role: ADMIN*

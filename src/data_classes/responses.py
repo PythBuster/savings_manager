@@ -19,7 +19,8 @@ from pydantic_extra_types.semantic_version import SemanticVersion
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType, UserRoleType,
+    TransactionType,
+    UserRoleType,
 )
 from src.utils import to_camel_cleaned_suffix
 

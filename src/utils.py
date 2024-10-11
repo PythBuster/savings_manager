@@ -127,7 +127,7 @@ def equal_dict(
     return dict_1_filtered == dict_2_filtered
 
 
-def as_dict(  # type: ignore  # pylint: disable=missing-function-docstring, too-many-arguments
+def as_dict(  # type: ignore  # noqa: ignore  # pylint: disable=missing-function-docstring, too-many-arguments, too-many-positional-arguments
     model: "SqlBase",  # type: ignore  # noqa: F821
     exclude=None,
     exclude_underscore=None,

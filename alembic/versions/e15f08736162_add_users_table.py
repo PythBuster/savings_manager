@@ -8,10 +8,10 @@ Create Date: 2024-10-08 10:29:43.678220
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 from passlib.context import CryptContext
 
+from alembic import op
 from src.custom_types import UserRoleType
 
 # revision identifiers, used by Alembic.

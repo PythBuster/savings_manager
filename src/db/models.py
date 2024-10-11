@@ -21,7 +21,8 @@ from src.custom_types import (
     ActionType,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType, UserRoleType,
+    TransactionType,
+    UserRoleType,
 )
 from src.utils import as_dict
 
@@ -88,7 +89,7 @@ class SqlBase(AbstractConcreteBase, Base):  # pylint: disable=too-few-public-met
     )
     """The note of this record."""
 
-    def asdict(  # type: ignore  # pylint: disable=too-many-arguments
+    def asdict(  # type: ignore  # pylint: disable=too-many-arguments, too-many-positional-arguments
         self,
         exclude=None,
         exclude_underscore=None,
@@ -425,7 +426,7 @@ class User(SqlBase):  # pylint: disable=unsubscriptable-object, too-few-public-m
     )
     """The hashed user password."""
 
-    role: Mapped[UserRoleType] = mapped_column(
+    role: Mapped[UserRoleType] = mapped_column(  # pylint: disable=unsubscriptable-object
         nullable=False,
         default=UserRoleType.USER,
         server_default=UserRoleType.USER.value.upper(),
@@ -446,7 +447,7 @@ class User(SqlBase):  # pylint: disable=unsubscriptable-object, too-few-public-m
         CheckConstraint("char_length(user_login) > 0", name="ck_user_login_min_len_1"),
     )
 
-    def asdict(  # type: ignore  # pylint: disable=too-many-arguments
+    def asdict(  # type: ignore  # pylint: disable=too-many-arguments, too-many-positional-arguments
         self,
         exclude=None,
         exclude_underscore=None,

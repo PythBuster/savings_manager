@@ -2,7 +2,6 @@
 
 from typing import Any
 
-import pytest
 from httpx import AsyncClient, Response
 from starlette import status
 
@@ -10,9 +9,8 @@ from src.custom_types import EndpointRouteType, UserRoleType
 from src.db.db_manager import DBManager
 from src.utils import equal_dict
 
-async def test_user_add_as_admin__success(
-        admin_role_authed_client: AsyncClient
-) -> None:
+
+async def test_user_add_as_admin__success(admin_role_authed_client: AsyncClient) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
@@ -49,9 +47,7 @@ async def test_user_add_as_admin__success(
     )
 
 
-async def test_user_add_as_user__fail__403(
-        user_role_authed_client: AsyncClient
-) -> None:
+async def test_user_add_as_user__fail__403(user_role_authed_client: AsyncClient) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
@@ -74,9 +70,7 @@ async def test_user_add_as_user__fail__403(
     assert response_2.status_code == status.HTTP_403_FORBIDDEN
 
 
-async def test_user_add_non_authed__fail__401(
-        client: AsyncClient
-) -> None:
+async def test_user_add_non_authed__fail__401(client: AsyncClient) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
@@ -100,7 +94,7 @@ async def test_user_add_non_authed__fail__401(
 
 
 async def test_user_add_as_admin__fail__user_already_exist(
-        admin_role_authed_client: AsyncClient
+    admin_role_authed_client: AsyncClient,
 ) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
@@ -116,9 +110,8 @@ async def test_user_add_as_admin__fail__user_already_exist(
     assert content["message"] == "User already exists."
 
 
-
 async def test_user_add_as_user__fail__user_already_exist__but_403(
-        user_role_authed_client: AsyncClient
+    user_role_authed_client: AsyncClient,
 ) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
@@ -131,9 +124,7 @@ async def test_user_add_as_user__fail__user_already_exist__but_403(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-async def test_user_add_non_authed__fail__user_already_exist__but_401(
-        client: AsyncClient
-) -> None:
+async def test_user_add_non_authed__fail__user_already_exist__but_401(client: AsyncClient) -> None:
     user_post_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "my-password-123",
@@ -146,8 +137,8 @@ async def test_user_add_non_authed__fail__user_already_exist__but_401(
 
 
 async def test_user_get_as_admin__success(
-        admin_role_authed_client: AsyncClient,
-        db_manager: DBManager,
+    admin_role_authed_client: AsyncClient,
+    db_manager: DBManager,
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
@@ -175,8 +166,8 @@ async def test_user_get_as_admin__success(
 
 
 async def test_user_get_as_user__fail__403(
-        user_role_authed_client: AsyncClient,
-        db_manager: DBManager,
+    user_role_authed_client: AsyncClient,
+    db_manager: DBManager,
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
@@ -197,8 +188,8 @@ async def test_user_get_as_user__fail__403(
 
 
 async def test_user_get_as_non_authed__fail__401(
-        client: AsyncClient,
-        db_manager: DBManager,
+    client: AsyncClient,
+    db_manager: DBManager,
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
@@ -219,7 +210,7 @@ async def test_user_get_as_non_authed__fail__401(
 
 
 async def test_user_get_as_admin__fail__non_existing_user_id(
-        admin_role_authed_client: AsyncClient,
+    admin_role_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -232,9 +223,8 @@ async def test_user_get_as_admin__fail__non_existing_user_id(
     assert content["message"] == "User does not exist."
 
 
-
 async def test_user_get_as_user__fail__non_existing_user_id__but_403(
-        user_role_authed_client: AsyncClient,
+    user_role_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -244,9 +234,8 @@ async def test_user_get_as_user__fail__non_existing_user_id__but_403(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-
 async def test_user_get_non_authed__fail__non_existing_user_id__but_401(
-        client: AsyncClient,
+    client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -257,8 +246,8 @@ async def test_user_get_non_authed__fail__non_existing_user_id__but_401(
 
 
 async def test_user_update_password_as_admin__success(
-        admin_role_authed_client: AsyncClient,
-        db_manager: DBManager,
+    admin_role_authed_client: AsyncClient,
+    db_manager: DBManager,
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
@@ -286,9 +275,10 @@ async def test_user_update_password_as_admin__success(
     )
     assert db_user is None
 
+
 async def test_user_update_password_as_user__fail__403(
-        user_role_authed_client: AsyncClient,
-        db_manager: DBManager,
+    user_role_authed_client: AsyncClient,
+    db_manager: DBManager,
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
@@ -311,8 +301,8 @@ async def test_user_update_password_as_user__fail__403(
 
 
 async def test_user_update_password_non_authed__fail__401(
-        client: AsyncClient,
-        db_manager: DBManager,
+    client: AsyncClient,
+    db_manager: DBManager,
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
@@ -335,7 +325,7 @@ async def test_user_update_password_non_authed__fail__401(
 
 
 async def test_user_update_password_as_admin__fail__user_id_not_exist(
-        admin_role_authed_client: AsyncClient,
+    admin_role_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -348,9 +338,8 @@ async def test_user_update_password_as_admin__fail__user_id_not_exist(
     assert content["message"] == "Record not found."
 
 
-
 async def test_user_update_password_as_user__fail__user_id_not_exist__but_403(
-        user_role_authed_client: AsyncClient,
+    user_role_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -362,7 +351,7 @@ async def test_user_update_password_as_user__fail__user_id_not_exist__but_403(
 
 
 async def test_user_update_password_non_authed__fail__user_id_not_exist__but_401(
-        client: AsyncClient,
+    client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -372,7 +361,10 @@ async def test_user_update_password_non_authed__fail__user_id_not_exist__but_401
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-async def test_user_update_name_as_admin__success(admin_role_authed_client: AsyncClient, db_manager: DBManager) -> None:
+
+async def test_user_update_name_as_admin__success(
+    admin_role_authed_client: AsyncClient, db_manager: DBManager
+) -> None:
     user_data: dict[str, str] = {
         "userName": "New User",
         "userPassword": "<PASSWORD>",
@@ -401,8 +393,7 @@ async def test_user_update_name_as_admin__success(admin_role_authed_client: Asyn
 
 
 async def test_user_update_name_as_user__fail__403(
-        user_role_authed_client: AsyncClient,
-        db_manager: DBManager
+    user_role_authed_client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "Another Login",
@@ -424,11 +415,8 @@ async def test_user_update_name_as_user__fail__403(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-
-
 async def test_user_update_name_non_authed__fail__401(
-        client: AsyncClient,
-        db_manager: DBManager
+    client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "Another Login",
@@ -451,7 +439,7 @@ async def test_user_update_name_non_authed__fail__401(
 
 
 async def test_user_update_name_as_admin__fail__username_already_exist(
-        admin_role_authed_client: AsyncClient, db_manager: DBManager
+    admin_role_authed_client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "another user",
@@ -477,7 +465,7 @@ async def test_user_update_name_as_admin__fail__username_already_exist(
 
 
 async def test_user_update_name_as_user__fail__username_already_exist__but_403(
-        user_role_authed_client: AsyncClient, db_manager: DBManager
+    user_role_authed_client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "another user",
@@ -500,7 +488,7 @@ async def test_user_update_name_as_user__fail__username_already_exist__but_403(
 
 
 async def test_user_update_name_non_authed__fail__username_already_exist__but_401(
-        client: AsyncClient, db_manager: DBManager
+    client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "another user",
@@ -521,8 +509,9 @@ async def test_user_update_name_non_authed__fail__username_already_exist__but_40
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+
 async def test_user_update_name_as_admin__fail__user_id_not_exist(
-        admin_role_authed_client: AsyncClient,
+    admin_role_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -536,9 +525,8 @@ async def test_user_update_name_as_admin__fail__user_id_not_exist(
     assert content["message"] == "Record not found."
 
 
-
 async def test_user_update_name_as_user__fail__user_id_not_exist__but_403(
-        user_role_authed_client: AsyncClient,
+    user_role_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -551,7 +539,7 @@ async def test_user_update_name_as_user__fail__user_id_not_exist__but_403(
 
 
 async def test_user_update_name_non_authed__fail__user_id_not_exist__but_401(
-        client: AsyncClient,
+    client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -562,7 +550,10 @@ async def test_user_update_name_non_authed__fail__user_id_not_exist__but_401(
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-async def test_user_delete_as_admin__fail__user_id_not_exist(admin_role_authed_client: AsyncClient) -> None:
+
+async def test_user_delete_as_admin__fail__user_id_not_exist(
+    admin_role_authed_client: AsyncClient,
+) -> None:
     non_existing_user_id: int = 12345
 
     response: Response = await admin_role_authed_client.delete(
@@ -575,7 +566,7 @@ async def test_user_delete_as_admin__fail__user_id_not_exist(admin_role_authed_c
 
 
 async def test_user_delete_as_user__fail__user_id_not_exist__but_403(
-        user_role_authed_client: AsyncClient,
+    user_role_authed_client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -586,9 +577,8 @@ async def test_user_delete_as_user__fail__user_id_not_exist__but_403(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-
 async def test_user_delete_non_authed__fail__user_id_not_exist__but_401(
-        client: AsyncClient,
+    client: AsyncClient,
 ) -> None:
     non_existing_user_id: int = 12345
 
@@ -600,8 +590,7 @@ async def test_user_delete_non_authed__fail__user_id_not_exist__but_401(
 
 
 async def test_user_delete_as_user__fail__403(
-        user_role_authed_client: AsyncClient,
-        db_manager: DBManager
+    user_role_authed_client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "Another Login",
@@ -622,8 +611,7 @@ async def test_user_delete_as_user__fail__403(
 
 
 async def test_user_delete_non_authed__fail__401(
-        client: AsyncClient,
-        db_manager: DBManager
+    client: AsyncClient, db_manager: DBManager
 ) -> None:
     user_data: dict[str, str] = {
         "userName": "Another Login",
@@ -642,7 +630,10 @@ async def test_user_delete_non_authed__fail__401(
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-async def test_user_delete_as_admin__success(admin_role_authed_client: AsyncClient, db_manager: DBManager) -> None:
+
+async def test_user_delete_as_admin__success(
+    admin_role_authed_client: AsyncClient, db_manager: DBManager
+) -> None:
     user_data: dict[str, str] = {
         "userName": "Another Login",
         "userPassword": "<PASSWORD>",
@@ -659,5 +650,3 @@ async def test_user_delete_as_admin__success(admin_role_authed_client: AsyncClie
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}"
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT
-
-

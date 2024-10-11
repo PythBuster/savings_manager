@@ -17,7 +17,8 @@ from src.custom_types import (
     AppEnvVariables,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType, UserRoleType,
+    TransactionType,
+    UserRoleType,
 )
 from src.data_classes.requests import (
     DepositTransactionRequest,
@@ -30,6 +31,7 @@ from src.db.exceptions import (
     AutomatedSavingsError,
     BalanceResultIsNegativeError,
     CreateInstanceError,
+    DeleteInstanceError,
     HasBalanceError,
     InconsistentDatabaseError,
     MissingDependencyError,
@@ -42,7 +44,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError, DeleteInstanceError,
+    UserNotFoundError,
 )
 from src.db.models import AppSettings, Moneybox
 from src.utils import equal_dict
@@ -1501,6 +1503,7 @@ async def test_export_sql_dump(
 
     assert 35800 < len(dump_value) < 36000
 
+
 @pytest.mark.dependency(depends=["test_export_sql_dump"])
 @pytest.mark.order(after="test_export_sql_dump")
 async def test_export_sql_dump_missing_dependency_error(
@@ -1511,6 +1514,7 @@ async def test_export_sql_dump_missing_dependency_error(
     ):
         with pytest.raises(MissingDependencyError, match="pg_dump not installed"):
             await db_manager.export_sql_dump()
+
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])
 @pytest.mark.order(after="test_export_sql_dump_missing_dependency_error")
@@ -1579,6 +1583,7 @@ async def test_import_sql_dump(
             exclude_keys=["created_at", "modified_at", "id"],
         )
 
+
 @pytest.mark.dependency(depends=["test_import_sql_dump"])
 @pytest.mark.order(after="test_import_sql_dump")
 async def test_import_sql_dump_missing_dependency_error(
@@ -1607,6 +1612,7 @@ async def test_import_sql_dump_missing_dependency_error(
     ):
         with pytest.raises(MissingDependencyError, match="pg_restore not installed"):
             await db_manager.import_sql_dump(sql_dump=sql_dump)
+
 
 @pytest.mark.dependency(depends=["test_import_sql_dump"])
 @pytest.mark.order(after="test_import_sql_dump_missing_dependency_error")
@@ -1708,6 +1714,7 @@ async def test_add_admin_user_success(
         dict_2=user,
         exclude_keys=["created_at", "modified_at", "id"],
     )
+
 
 @pytest.mark.dependency(depends=["test_add_admin_user_success"])
 async def test_add_user_failed(
@@ -1900,6 +1907,7 @@ async def test_delete_admin_user_fail(
         await db_manager.delete_user(
             user_id=user_id,
         )
+
 
 @pytest.mark.dependency(depends=["test_delete_admin_user_fail"])
 async def test_user_by_credentials_fail(

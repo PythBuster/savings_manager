@@ -6,29 +6,28 @@ import os
 import subprocess
 import time
 from functools import partial
-from http.cookiejar import Cookie, CookieJar
-
 from typing import AsyncGenerator
 
-import httpx
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 from async_fastapi_jwt_auth import AuthJWT
 from httpx import AsyncClient, Cookies
-from starlette import status
-from starlette.responses import Response, JSONResponse
+from starlette.responses import Response
 
 from src import utils
 from src.auth.jwt_auth import UserAuthJWTBearer
 from src.constants import WORKING_DIR_PATH
-from src.custom_types import AppEnvVariables, TransactionTrigger, TransactionType, EndpointRouteType, UserRoleType
+from src.custom_types import (
+    AppEnvVariables,
+    TransactionTrigger,
+    TransactionType,
+    UserRoleType,
+)
 from src.db.db_manager import DBManager
-from src.db.exceptions import UserNameAlreadyExistError
 from src.db.models import Base
 from src.main import app, register_router, set_custom_openapi_schema
 from src.report_sender.email_sender.sender import EmailSender
 from src.singleton import limiter
-from tests.utils.auth import create_jwt_access_token
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
 
 pytest_plugins = ("pytest_asyncio",)
@@ -360,37 +359,35 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
         ]
     )
 
+
 @pytest_asyncio.fixture(scope="function")
 async def admin_role_authed_client(
-        client: AsyncClient,
-        db_manager: DBManager,
+    client: AsyncClient,
 ) -> Response:
     """Fixture to log in as user with ADMIN role.
 
     :param client: The mocked client
     :type client: :class:`AsyncClient`
-    :param db_manager: The mocked db manager.
-    :type db_manager: :class:`DBManager`
     :return: The admin authenticated client.
     :rtype: :class:`AsyncClient`
     """
 
     # token of admin: "admin_auth_test_admin" (user_password="admin")
-
-    user_data ={
-        "id":42,
-        "createdAt":"2024-10-10T16:55:28.008563+00:00",
-        "modifiedAt":None,
-        "userName":"admin_auth_test_admin",
-        "role":UserRoleType.ADMIN,
+    user_data = {
+        "id": 42,
+        "createdAt": "2024-10-10T16:55:28.008563+00:00",
+        "modifiedAt": None,
+        "userName": "admin_auth_test_admin",
+        "role": UserRoleType.ADMIN,
     }
 
-    UserAuthJWTBearer._load_jwt_config()  # load custom AuthJWT config before initializing an AuthJWT instance
+    # load custom AuthJWT config before initializing an AuthJWT instance
+    UserAuthJWTBearer._load_jwt_config()  # pylint: disable=protected-access
     jwt_authorize: AuthJWT = AuthJWT()
 
     access_token: str = await jwt_authorize.create_access_token(
         subject=json.dumps(user_data),
-        expires_time=60*60,
+        expires_time=60 * 60,
     )
 
     client.cookies = Cookies({"savings_manager": access_token})
@@ -400,39 +397,34 @@ async def admin_role_authed_client(
     client.cookies = None
 
 
-
-
 @pytest_asyncio.fixture(scope="function")
 async def user_role_authed_client(
-        client: AsyncClient,
-        db_manager: DBManager,
+    client: AsyncClient,
 ) -> Response:
     """Fixture to log in as user with USER role.
 
     :param client: The mocked client
     :type client: :class:`AsyncClient`
-    :param db_manager: The mocked db manager.
-    :type db_manager: :class:`DBManager`
     :return: The admin authenticated client.
     :rtype: :class:`AsyncClient`
     """
 
     # token of user: "just_a_user" (user_password="user")
-
-    user_data ={
-        "id":42,
-        "createdAt":"2024-10-10T16:55:28.008563+00:00",
-        "modifiedAt":None,
-        "userName":"just_a_user",
-        "role":UserRoleType.USER,
+    user_data = {
+        "id": 42,
+        "createdAt": "2024-10-10T16:55:28.008563+00:00",
+        "modifiedAt": None,
+        "userName": "just_a_user",
+        "role": UserRoleType.USER,
     }
 
-    UserAuthJWTBearer._load_jwt_config()  # load custom AuthJWT config before initializing an AuthJWT instance
+    # load custom AuthJWT config before initializing an AuthJWT instance
+    UserAuthJWTBearer._load_jwt_config()  # pylint: disable=protected-access
     jwt_authorize: AuthJWT = AuthJWT()
 
     access_token: str = await jwt_authorize.create_access_token(
         subject=json.dumps(user_data),
-        expires_time=60*60,
+        expires_time=60 * 60,
     )
 
     client.cookies = Cookies({"savings_manager": access_token})

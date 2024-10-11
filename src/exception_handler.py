@@ -59,7 +59,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
         )
 
     if issubclass(exception.__class__, AuthJWTException):
-        if "Signature has expired" in exception.message:
+        if "Signature has expired" in exception.message:  # type: ignore
             status_code = status.HTTP_401_UNAUTHORIZED
         else:
             status_code = status.HTTP_400_BAD_REQUEST
@@ -68,7 +68,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             status_code=status_code,
             content=jsonable_encoder(
                 HTTPErrorResponse(
-                    message=exception.message,
+                    message=exception.message,  # type: ignore
                 )
             ),
         )
@@ -202,7 +202,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
         )
 
     if isinstance(exception, InvalidFileError):
-        message: str = exception.message
+        message = exception.message
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content=jsonable_encoder(

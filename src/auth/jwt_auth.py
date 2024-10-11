@@ -1,23 +1,22 @@
 """The JWT classes and functions are located here."""
+
 import json
 from asyncio import Lock
-from pyexpat.errors import messages
 from typing import Annotated, Any
 
 from async_fastapi_jwt_auth.auth_jwt import AuthJWT
-from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.security import HTTPBearer as SecurityHTTPBearer
 from pydantic import BaseModel, Field
 from starlette.requests import Request
 from starlette.responses import Response
 
 from src.auth.exceptions import MissingRoleError
-from src.custom_types import UserRoleType, EndpointRouteType
-from src.utils import get_app_env_variables, get_app_data
+from src.custom_types import EndpointRouteType, UserRoleType
+from src.utils import get_app_data, get_app_env_variables
 
 APP_DATA: dict[str, Any] = get_app_data()
 MAJOR_VERSION: int = int(APP_DATA["version"].split(".")[0])
-LOGIN_REQUEST_PATH: str = f'/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login'
+LOGIN_REQUEST_PATH: str = f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login"
 
 MAJOR_VERSION = 1234  # while testing, remove after finishing issue
 
@@ -98,7 +97,7 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
     _lock: Lock = Lock()
 
     def __init__(self, access_limited_to_roles: list[UserRoleType] | None = None):
-        self.access_limited_to_roles: list[UserRoleType]|None = access_limited_to_roles
+        self.access_limited_to_roles: list[UserRoleType] | None = access_limited_to_roles
         super().__init__()
 
     async def __call__(
@@ -128,8 +127,7 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
 
                     if user_role not in self.access_limited_to_roles:
                         raise MissingRoleError(
-                            status_code=403,
-                            message="Not authorized. Missing role."
+                            status_code=403, message="Not authorized. Missing role."
                         )
 
         return auth_jwt

@@ -26,7 +26,8 @@ from src.custom_types import (
     AppEnvVariables,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType, UserRoleType,
+    TransactionType,
+    UserRoleType,
 )
 from src.db.core import (
     create_instance,
@@ -40,6 +41,7 @@ from src.db.exceptions import (
     AutomatedSavingsError,
     BalanceResultIsNegativeError,
     CreateInstanceError,
+    DeleteInstanceError,
     HasBalanceError,
     InconsistentDatabaseError,
     MissingDependencyError,
@@ -54,7 +56,7 @@ from src.db.exceptions import (
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
-    UserNotFoundError, DeleteInstanceError,
+    UserNotFoundError,
 )
 from src.db.models import (
     AppSettings,
@@ -388,7 +390,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
     # TODO refactor: add_amount and  # pylint: disable=fixme
     #  sub_amount are almost identical, combine in one function?
-    async def add_amount(  # pylint:disable=too-many-locals, too-many-arguments
+    async def add_amount(  # noqa: ignore  pylint:disable=too-many-locals, too-many-arguments, too-many-positional-arguments
         self,
         moneybox_id: int,
         deposit_transaction_data: dict[str, Any],
@@ -497,7 +499,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         return updated_moneybox.asdict()  # type: ignore
 
-    async def sub_amount(  # pylint: disable=too-many-arguments
+    async def sub_amount(  # pylint: disable=too-many-arguments, too-many-positional-arguments
         self,
         moneybox_id: int,
         withdraw_transaction_data: dict[str, Any],
@@ -730,7 +732,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 session=session,
             )
 
-    async def _add_transfer_log(  # pylint: disable=too-many-arguments
+    async def _add_transfer_log(  # noqa: ignore  # pylint: disable=too-many-arguments, too-many-positional-arguments
         self,
         moneybox_id: int,
         description: str,
@@ -1162,16 +1164,13 @@ class DBManager:  # pylint: disable=too-many-public-methods
         if amount <= 0:
             return overflow_moneybox
 
-        overflow_mode: OverflowMoneyboxAutomatedSavingsModeType = (
-            app_settings["overflow_moneybox_automated_savings_mode"]
-        )
+        overflow_mode: OverflowMoneyboxAutomatedSavingsModeType = app_settings[
+            "overflow_moneybox_automated_savings_mode"
+        ]
 
         deposit_transaction_data: dict[str, int | str] = {
             "amount": amount,
-            "description": (
-                "Automated Savings with Overflow Moneybox Mode: "
-                f"{overflow_mode}"
-            ),
+            "description": ("Automated Savings with Overflow Moneybox Mode: " f"{overflow_mode}"),
         }
 
         try:
@@ -1223,15 +1222,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
         if amount <= 0:
             return overflow_moneybox
 
-        overflow_mode: OverflowMoneyboxAutomatedSavingsModeType = (
-            app_settings["overflow_moneybox_automated_savings_mode"]
-        )
+        overflow_mode: OverflowMoneyboxAutomatedSavingsModeType = app_settings[
+            "overflow_moneybox_automated_savings_mode"
+        ]
         withdraw_transaction_data: dict[str, int | str] = {
             "amount": amount,
-            "description": (
-                "Automated Savings with Overflow Moneybox Mode: "
-                f"{overflow_mode}"
-            ),
+            "description": ("Automated Savings with Overflow Moneybox Mode: " f"{overflow_mode}"),
         }
 
         try:
@@ -1370,7 +1366,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         return True
 
-    async def _distribute_automated_savings_amount(  # noqa: ignore  # pylint:disable=too-many-locals, too-many-arguments
+    async def _distribute_automated_savings_amount(  # noqa: ignore  # pylint:disable=too-many-locals, too-many-arguments, too-many-positional-arguments
         self,
         session: AsyncSession,
         distribute_amount: int,
@@ -1710,10 +1706,10 @@ class DBManager:  # pylint: disable=too-many-public-methods
         return user_exists
 
     async def add_user(
-            self,
-            user_name: str,
-            user_password: str,
-            is_admin: bool = False,
+        self,
+        user_name: str,
+        user_password: str,
+        is_admin: bool = False,
     ) -> dict[str, Any]:
         """Create a user database entry and returns new entry.
 
@@ -1833,9 +1829,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         if user["role"] is UserRoleType.ADMIN:
             raise DeleteInstanceError(
-                record_id=user_id,
-                message="An admin user can't be deleted.",
-                details=user
+                record_id=user_id, message="An admin user can't be deleted.", details=user
             )
 
         try:
