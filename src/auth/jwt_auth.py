@@ -14,11 +14,9 @@ from src.auth.exceptions import MissingRoleError
 from src.custom_types import EndpointRouteType, UserRoleType
 from src.utils import get_app_data, get_app_env_variables
 
-APP_DATA: dict[str, Any] = get_app_data()
-MAJOR_VERSION: int = int(APP_DATA["version"].split(".")[0])
-LOGIN_REQUEST_PATH: str = f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login"
-
-MAJOR_VERSION = 1234  # while testing, remove after finishing issue
+_APP_DATA: dict[str, Any] = get_app_data()
+_APP_MAJOR_VERSION: int = int(_APP_DATA["version"].split(".")[0])
+_LOGIN_REQUEST_PATH: str = f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login"
 
 
 class JWTSettings(BaseModel):
@@ -115,8 +113,8 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
 
         auth_jwt = AuthJWT(req=req, res=res)
 
-        if MAJOR_VERSION >= 4:
-            if req.scope["path"] != LOGIN_REQUEST_PATH:
+        if _APP_MAJOR_VERSION >= 3:
+            if req.scope["path"] != _LOGIN_REQUEST_PATH:
                 await auth_jwt.jwt_required()
 
                 if self.access_limited_to_roles is not None:
