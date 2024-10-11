@@ -2,6 +2,14 @@
 
 ## x.y.z (unreleased)
 
+## 2.30.0 (2024-10-11)
+### Feature:
+- add user roles: ADMIN and USER
+- protect user endpoints (requires user role ADMIN)
+## Changes:
+- adapt user db migration
+- add user role to JWT
+
 ## 2.29.3 (2024-10-09)
 ### Fixes:
 - adapt further occurrences for moneybox mod in transaction logs creation
