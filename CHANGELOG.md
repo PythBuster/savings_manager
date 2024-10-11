@@ -2,6 +2,9 @@
 
 ## x.y.z (unreleased)
 
+## 2.31.0 (2024-10-11)
+- adapt JWT data structure to comply with RFC 7519
+
 ## 2.30.0 (2024-10-11)
 ### Feature:
 - add user roles: ADMIN and USER
