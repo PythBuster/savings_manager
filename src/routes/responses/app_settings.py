@@ -12,7 +12,7 @@ GET_APP_SETTINGS_RESPONSES: dict[status, dict[str, Any]] = {
         "model": AppSettingsResponse,
     },
 }
-"""Further custom responses for for endpoint GET: /settings."""
+"""Responses for for endpoint GET: /settings."""
 
 
 UPDATE_APP_SETTINGS_RESPONSES: dict[status, dict[str, Any]] = {

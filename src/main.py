@@ -45,9 +45,6 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     print("Create .pgpass for sql import/export functionality ...", flush=True)
     create_pgpass(app_env_variables=app_env_variables)
 
-    print("Set custom openapi schema ...", flush=True)
-    set_custom_openapi_schema(fastapi_app=fastapi_app)
-
     print(f"Register routers (id={id(fastapi_app)}) ...", flush=True)
     register_router(fastapi_app=fastapi_app)
 

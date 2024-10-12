@@ -22,7 +22,7 @@ moneyboxes_router: APIRouter = APIRouter(
     response_model=MoneyboxesResponse,
     responses=GET_MONEYBOXES_RESPONSES,
 )
-async def get_moneyboxes(
+async def get_moneyboxes_endpoint(
     request: Request,
 ) -> MoneyboxesResponse:
     """Endpoint for getting moneyboxes.

@@ -20,7 +20,7 @@ ADD_USER_RESPONSES: dict[status, dict[str, Any]] = {
         "model": LoginUserResponse,
     },
 }
-"""Further custom responses for endpoint POST: /user/register"""
+"""Further custom responses for endpoint POST: /user"""
 
 UPDATE_USER_PASSWORD_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {

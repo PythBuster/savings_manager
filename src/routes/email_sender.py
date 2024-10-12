@@ -14,20 +14,20 @@ from src.report_sender.email_sender.sender import EmailSender
 from src.routes.responses.email_sender import SEND_TESTEMAIL_RESPONSES
 from src.singleton import limiter
 
-email_sender_router: APIRouter = APIRouter(
+email_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.EMAIL_SENDER}",
     tags=[EndpointRouteType.EMAIL_SENDER],
 )
 """The moneybox router."""
 
 
-@email_sender_router.patch(
+@email_router.patch(
     "/send-testemail",
     responses=SEND_TESTEMAIL_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
 @limiter.limit("1/minute")
-async def send_testemail(request: Request) -> Response:
+async def patch_email_send_testemail_endpoint(request: Request) -> Response:
     """Endpoint for sending a test email. Limited to 1 request per minute.
     \f
 

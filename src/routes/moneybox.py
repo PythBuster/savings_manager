@@ -40,7 +40,7 @@ moneybox_router: APIRouter = APIRouter(
     response_model=MoneyboxResponse,
     responses=GET_MONEYBOX_RESPONSES,
 )
-async def get_moneybox(
+async def get_moneybox_endpoint(
     request: Request,
     moneybox_id: Annotated[
         int, Path(title="Moneybox ID", description="Moneybox ID to be retrieved.")
@@ -67,7 +67,7 @@ async def get_moneybox(
     response_model=MoneyboxResponse,
     responses=CREATE_MONEYBOX_RESPONSES,
 )
-async def add_moneybox(
+async def post_moneybox_endpoint(
     request: Request,
     moneybox_create_request: Annotated[
         MoneyboxCreateRequest,
@@ -97,7 +97,7 @@ async def add_moneybox(
     response_model=MoneyboxResponse,
     responses=UPDATE_MONEYBOX_RESPONSES,
 )
-async def update_moneybox(
+async def patch_moneybox_endpoint(
     request: Request,
     moneybox_id: Annotated[
         int, Path(title="Moneybox ID", description="Moneybox ID to be updated.")
@@ -133,7 +133,7 @@ async def update_moneybox(
     responses=DELETE_MONEYBOX_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
-async def delete_moneybox(
+async def delete_moneybox_endpoint(
     request: Request,
     moneybox_id: Annotated[
         int,
@@ -159,11 +159,11 @@ async def delete_moneybox(
 
 
 @moneybox_router.post(
-    "/{moneybox_id}/balance/add",
+    "/{moneybox_id}/deposit",
     response_model=MoneyboxResponse,
     responses=DEPOSIT_MONEYBOX_RESPONSES,
 )
-async def deposit_moneybox(
+async def post_moneybox_deposit_endpoint(
     request: Request,
     moneybox_id: Annotated[
         int, Path(title="Moneybox ID", description="Moneybox ID to be deposited.")
@@ -176,7 +176,7 @@ async def deposit_moneybox(
         ),
     ],
 ) -> MoneyboxResponse:
-    """Endpoint to add amount to moneybox by moneybox_id.
+    """Endpoint to add amount to moneybox by moneybox_id (deposit).
     \f
 
     :param request: The current request object.
@@ -200,7 +200,7 @@ async def deposit_moneybox(
 
 
 @moneybox_router.post(
-    "/{moneybox_id}/balance/sub",
+    "/{moneybox_id}/withdraw",
     response_model=MoneyboxResponse,
     responses=WITHDRAW_MONEYBOX_RESPONSES,
 )
@@ -219,7 +219,7 @@ async def withdraw_moneybox(
         ),
     ],
 ) -> MoneyboxResponse:
-    """Endpoint to sub balance from moneybox by moneybox_id.
+    """Endpoint to sub balance from moneybox by moneybox_id (withdraw).
     \f
 
     :param request: The current request object.
@@ -244,11 +244,11 @@ async def withdraw_moneybox(
 
 
 @moneybox_router.post(
-    "/{moneybox_id}/balance/transfer",
+    "/{moneybox_id}/transfer",
     responses=TRANSFER_MONEYBOX_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
-async def transfer_balance(
+async def post_moneybox_transfer_endpoint(
     request: Request,
     moneybox_id: Annotated[
         int, Path(title="Moneybox ID", description="Moneybox ID to be transferred from.")
@@ -263,12 +263,12 @@ async def transfer_balance(
         ),
     ],
 ) -> Response:
-    """Endpoint to transfer balance from `moneybox_id` to `to_moneybox_id`.
+    """Endpoint to transfer a specified amount from `moneybox_id` to `to_moneybox_id`.
     \f
 
     :param request: The current request object.
     :type request: :class:`Request`
-    :param moneybox_id: The moneybox ID where the balance shall be transferred from.
+    :param moneybox_id: The moneybox ID where the specified amount shall be transferred from.
     :param transfer_transaction: The data of the transfer, including the moneybox id
         where the balance shall be transferred to.
     :return: The response object with the status code included.

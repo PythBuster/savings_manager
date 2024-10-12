@@ -1,6 +1,8 @@
 """All exception_handler logic are located here."""
+from typing import cast
 
 import sqlalchemy
+from aiosmtplib import SMTPException
 from async_fastapi_jwt_auth.exceptions import AuthJWTException, MissingTokenError
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
@@ -158,6 +160,22 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=error_message,
+                )
+            ),
+        )
+
+    if issubclass(exception.__class__, SMTPException):
+        smtp_base_exception: SMTPException = cast(
+            SMTPException,
+            exception,
+        )
+        message: str = smtp_base_exception.message
+
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=message,
                 )
             ),
         )

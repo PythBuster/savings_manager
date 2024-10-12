@@ -26,7 +26,7 @@ from src.custom_types import (
 )
 from src.db.db_manager import DBManager
 from src.db.models import Base
-from src.main import app, register_router, set_custom_openapi_schema
+from src.main import app, register_router
 from src.report_sender.email_sender.sender import EmailSender
 from src.singleton import limiter
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
@@ -280,7 +280,6 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
     :rtype: AsyncGenerator
     """
 
-    set_custom_openapi_schema(fastapi_app=app)
     register_router(fastapi_app=app)
 
     # Load fixtures

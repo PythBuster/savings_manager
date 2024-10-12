@@ -29,7 +29,7 @@ app_settings_router: APIRouter = APIRouter(
     response_model=AppSettingsResponse,
     responses=GET_APP_SETTINGS_RESPONSES,
 )
-async def get_app_settings(
+async def get_app_settings_endpoint(
     request: Request,
 ) -> AppSettingsResponse:
     """Endpoint for getting app settings.
@@ -53,7 +53,7 @@ async def get_app_settings(
     response_model=AppSettingsResponse,
     responses=UPDATE_APP_SETTINGS_RESPONSES,
 )
-async def update_app_settings(
+async def patch_app_settings_endpoint(
     request: Request,
     app_settings_request: Annotated[
         AppSettingsRequest,

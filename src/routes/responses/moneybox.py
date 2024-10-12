@@ -43,7 +43,7 @@ DEPOSIT_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
         "model": MoneyboxResponse,
     },
 }
-"""Further custom responses for endpoint (deposit) POST: /moneybox/{moneybox_id}/balance/add."""
+"""Further custom responses for endpoint (deposit) POST: /moneybox/{moneybox_id}/deposit."""
 
 WITHDRAW_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
@@ -51,15 +51,14 @@ WITHDRAW_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
         "model": MoneyboxResponse,
     },
 }
-"""Further custom responses for endpoint (withdraw) POST: /moneybox/{moneybox_id}/balance/sub."""
+"""Further custom responses for endpoint (withdraw) POST: /moneybox/{moneybox_id}/withdraw."""
 
 TRANSFER_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_204_NO_CONTENT: {
         "description": "No Content",
     },
 }
-"""Further custom responses for endpoint (transfer)
-POST: /moneybox/{moneybox_id}/balance/transfer."""
+"""Further custom responses for endpoint (transfer) POST: /moneybox/{moneybox_id}/transfer."""
 
 
 MONEYBOX_TRANSACTION_LOGS_RESPONSES: dict[status, dict[str, Any]] = {

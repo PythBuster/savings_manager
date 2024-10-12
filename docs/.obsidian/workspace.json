@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
+                "file": "Architecture/Endpoints.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
+                "file": "Architecture/Endpoints.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Feauture Requests/Ideas.md",
+                "file": "Architecture/Endpoints.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Feauture Requests/Ideas.md"
+                "file": "Architecture/Endpoints.md"
               }
             }
           }
@@ -148,6 +148,7 @@
   },
   "active": "1bdf787dcc5f54b4",
   "lastOpenFiles": [
+    "Feauture Requests/Ideas.md",
     "ui/draft/App_v2_SavingsManagerUI.png",
     "ui/draft/App_v1_SavingsManagerUI.png",
     "ui/draft/App Version 2.md",
@@ -168,8 +169,6 @@
     "Diagram 1.svg",
     "Diagram 2.svg",
     "_changelog_template.md",
-    "ui/draft/FullTransactionLogs_v1.png",
-    "Feauture Requests/Ideas.md",
     "Guidelines/Code/Quality Assurence.md",
     "Guidelines/Code/Code Style.md",
     "vulture_whitelist.def",

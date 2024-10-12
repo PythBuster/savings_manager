@@ -28,7 +28,7 @@ prioritylist_router: APIRouter = APIRouter(
     response_model=PrioritylistResponse,
     responses=GET_PRIORITYLIST_RESPONSES,
 )
-async def get_prioritylist(
+async def get_prioritylist_endpoint(
     request: Request,
 ) -> PrioritylistResponse | Response:
     """Endpoint for getting prioritylist. Note: Returns a list SORTED by priority (asc).
@@ -55,7 +55,7 @@ async def get_prioritylist(
     response_model=PrioritylistResponse,
     responses=UPDATE_PRIORITYLIST_RESPONSES,
 )
-async def update_prioritylist(
+async def patch_prioritylist_endpoint(
     request: Request,
     prioritylist: Annotated[
         PrioritylistRequest,
