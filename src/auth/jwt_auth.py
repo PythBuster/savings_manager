@@ -18,6 +18,7 @@ _APP_DATA: dict[str, Any] = get_app_data()
 _APP_MAJOR_VERSION: int = int(_APP_DATA["version"].split(".")[0])
 _LOGIN_REQUEST_PATH: str = f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login"
 
+_APP_MAJOR_VERSION = 4
 
 class JWTSettings(BaseModel):
     """The JWT settings model for"""

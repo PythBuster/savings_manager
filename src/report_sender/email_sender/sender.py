@@ -64,7 +64,6 @@ class EmailSender(ReportSender):
             plain_message: str = (
                 "This is a test email.\nYour SMTP outgoing data are correct, congratulations! :)"
             )
-
             receiver: dict[str, str] = {
                 "to": to,
                 "subj": f"Test Email from {self.versioned_app_name} ({today_dt_str})",

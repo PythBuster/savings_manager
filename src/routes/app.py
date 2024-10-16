@@ -21,7 +21,7 @@ from src.routes.exceptions import BadUsernameOrPasswordError
 from src.routes.responses.app import (
     DELETE_APP_LOGOUT_RESPONSES,
     GET_APP_EXPORT_RESPONSES,
-    GET_APP_INFO_RESPONSES,
+    GET_APP_METADATA_RESPONSES,
     POST_APP_IMPORT_RESPONSES,
     POST_APP_LOGIN_RESPONSES,
     POST_APP_RESET_RESPONSES,
@@ -38,7 +38,7 @@ app_router: APIRouter = APIRouter(
 @app_router.get(
     "/metadata",
     response_model=AppInfoResponse,
-    responses=GET_APP_INFO_RESPONSES,
+    responses=GET_APP_METADATA_RESPONSES,
 )
 async def get_app_metadata_endpoint() -> AppInfoResponse:
     """Endpoint for getting app infos like appVersion, appName etc.

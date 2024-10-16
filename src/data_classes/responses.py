@@ -12,9 +12,10 @@ from pydantic import (
     StringConstraints,
     computed_field,
     field_validator,
-    model_validator,
+    model_validator, model_serializer, field_serializer,
 )
 from pydantic_extra_types.semantic_version import SemanticVersion
+from pygments.lexer import default
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,

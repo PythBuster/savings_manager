@@ -144,7 +144,7 @@ async def test_endpoint_get_moneybox_status_404_non_existing(
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/10",
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
@@ -285,11 +285,11 @@ async def test_endpoint_add_moneybox__one__status_422__balance_postdata(
         json=moneybox_data,
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.dependency
-async def test_endpoint_update_overflow_moneybox(
+async def test_endpoint_update_overflow_moneybox__fail_409__modification_not_allowed(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
@@ -309,12 +309,12 @@ async def test_endpoint_update_overflow_moneybox(
         json=moneybox_data_1,
     )
     content = response_1.json()
-    assert response_1.status_code == status.HTTP_400_BAD_REQUEST
-    assert content["message"] == "Updating overflow moneybox is not allowed/possible!"
+    assert response_1.status_code == status.HTTP_409_CONFLICT
+    assert content["message"] == "It is not allowed to modify the Overflow Moneybox!"
 
 
 @pytest.mark.dependency
-async def test_endpoint_delete_overflow_moneybox__status_405(
+async def test_endpoint_delete_overflow_moneybox__status_409(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
@@ -325,17 +325,17 @@ async def test_endpoint_delete_overflow_moneybox__status_405(
     response = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{moneybox_id}"
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_409_CONFLICT
     assert response.json() == {
         "details": {
             "id": moneybox_id,
         },
-        "message": "Deleting overflow moneybox is not allowed/possible!",
+        "message": "It is not allowed to delete the Overflow Moneybox!",
     }
 
 
 @pytest.mark.dependency
-async def test_endpoint_update_moneybox__invalid_priority_0(
+async def test_endpoint_update_moneybox__status_422__invalid_priority_0(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
@@ -357,7 +357,7 @@ async def test_endpoint_update_moneybox__invalid_priority_0(
         json=moneybox_data,
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     content = response.json()
     assert content["details"]["args"][0][0]["msg"] == "Input should be greater than or equal to 1"
@@ -508,7 +508,7 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
         json=moneybox_data_1,
     )
 
-    assert response_1.status_code == status.HTTP_400_BAD_REQUEST
+    assert response_1.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     # unknown extra field not allowed in update data
     moneybox_data_2 = {"name": "Updated Test Box 1", "unknwon_field": "xyz"}
@@ -518,7 +518,7 @@ async def test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_
         json=moneybox_data_2,
     )
 
-    assert response_2.status_code == status.HTTP_400_BAD_REQUEST
+    assert response_2.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.dependency
@@ -555,7 +555,7 @@ async def test_endpoint_delete_second_moneybox__status_204(
     response = await client.delete(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}"
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
@@ -574,7 +574,7 @@ async def test_endpoint_deposit_first_moneybox__status_200(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/add",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/deposit",  # noqa: typing  # pylint: disable=line-too-long
         json=deposit_data,
     )
     moneybox = response.json()
@@ -611,11 +611,11 @@ async def test_endpoint_deposit_first_moneybox__status_422__fail_extra_field(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/add",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/deposit",  # noqa: typing  # pylint: disable=line-too-long
         json=deposit_data,
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.dependency
@@ -632,12 +632,12 @@ async def test_endpoint_deposit_first_moneybox__status_422__missing_required_amo
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/add",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/deposit",  # noqa: typing  # pylint: disable=line-too-long
         json=deposit_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "missing" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -657,12 +657,12 @@ async def test_endpoint_deposit_first_moneybox__status_422__negative_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/add",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/deposit",  # noqa: typing  # pylint: disable=line-too-long
         json=deposit_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -682,12 +682,12 @@ async def test_endpoint_deposit_first_moneybox__status_422__zero_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/add",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/deposit",  # noqa: typing  # pylint: disable=line-too-long
         json=deposit_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -708,7 +708,7 @@ async def test_endpoint_withdraw_first_moneybox__status_200(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/sub",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/withdraw",  # noqa: typing  # pylint: disable=line-too-long
         json=withdraw_data,
     )
     moneybox = response.json()
@@ -746,11 +746,11 @@ async def test_endpoint_withdraw_first_moneybox__status_422__fail_extra_field(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/sub",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/withdraw",  # noqa: typing  # pylint: disable=line-too-long
         json=withdraw_data,
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.dependency
@@ -767,12 +767,12 @@ async def test_endpoint_withdraw_first_moneybox__status_422__missing_required_am
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/sub",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/withdraw",  # noqa: typing  # pylint: disable=line-too-long
         json=withdraw_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "missing" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -792,12 +792,12 @@ async def test_endpoint_withdraw_first_moneybox__status_422__negative_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/sub",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/withdraw",  # noqa: typing  # pylint: disable=line-too-long
         json=withdraw_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -817,17 +817,17 @@ async def test_endpoint_withdraw_first_moneybox__status_422__zero_amount(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/sub",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/withdraw",  # noqa: typing  # pylint: disable=line-too-long
         json=withdraw_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
 
-async def test_endpoint_withdraw_first_moneybox__status_405__balance_negative(
+async def test_endpoint_withdraw_first_moneybox__status_409__balance_negative(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
     db_manager: DBManager,
@@ -842,11 +842,11 @@ async def test_endpoint_withdraw_first_moneybox__status_405__balance_negative(
     }
 
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/balance/sub",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}/withdraw",  # noqa: typing  # pylint: disable=line-too-long
         json=withdraw_data,
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_409_CONFLICT
 
 
 @pytest.mark.dependency
@@ -874,7 +874,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204(
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
 
@@ -905,7 +905,7 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_204__mi
         "toMoneyboxId": third_moneybox_id,
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
 
@@ -935,12 +935,12 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third__status_422__m
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "missing" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -962,12 +962,12 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__mi
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "missing" == content["details"]["args"][0][0]["type"]
     assert "toMoneyboxId" in content["details"]["args"][0][0]["loc"]
 
@@ -989,12 +989,12 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__st
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "missing" == content["details"]["args"][0][0]["type"]
     assert "toMoneyboxId" in content["details"]["args"][0][0]["loc"]
 
@@ -1017,12 +1017,12 @@ async def test_endpoint_transfer_amount_moneybox_seconds_to_third_status_422__ne
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -1045,12 +1045,12 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_422__ze
         "description": "Transfer money.",
     }
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
     content = response.json()
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "greater_than_equal" == content["details"]["args"][0][0]["type"]
     assert "amount" in content["details"]["args"][0][0]["loc"]
 
@@ -1076,11 +1076,11 @@ async def test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to
 
     # ...but third_moneybox not found is expected here
     response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/balance/transfer",  # noqa: typing  # pylint: disable=line-too-long
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{second_moneybox_id}/transfer",  # noqa: typing  # pylint: disable=line-too-long
         json=transfer_data,
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
@@ -1297,7 +1297,7 @@ async def test_endpoint_get_transactions_log_moneybox_fourth__status_404__delete
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{fourth_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.dependency
@@ -1318,4 +1318,4 @@ async def test_endpoint_get_transactions_log_moneybox_sixth__status_404__not_exi
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{sith_moneybox_id}/transactions",  # noqa: typing  # pylint: disable=line-too-long
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND

@@ -155,7 +155,7 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = f"Moneybox with id '{moneybox_id}' does not exist."
+        message: str = f"Moneybox not found."
         super().__init__(record_id=moneybox_id, message=message)
 
 
@@ -235,11 +235,14 @@ class NonPositiveAmountError(UpdateInstanceError):
         :type amount: :class:`int`
         """
 
-        message: str = (
-            f"Can't add or sub amount less than 1 '{amount}' to Moneybox '{moneybox_id}'."
-        )
         self.amount: int = amount
-        super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
+
+        message: str = "Can't add or sub amount <= 0."
+        super().__init__(
+            record_id=moneybox_id,
+            message=message,
+            details={"amount": amount},
+        )
 
 
 class TransferEqualMoneyboxError(UpdateInstanceError):
@@ -322,7 +325,7 @@ class OverflowMoneyboxDeleteError(DeleteInstanceError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = "Deleting overflow moneybox is not allowed/possible!"
+        message: str = "It is not allowed to delete the Overflow Moneybox!"
         super().__init__(record_id=moneybox_id, message=message)
 
 
@@ -336,7 +339,7 @@ class OverflowMoneyboxUpdatedError(UpdateInstanceError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = "Updating overflow moneybox is not allowed/possible!"
+        message: str = "It is not allowed to modify the Overflow Moneybox!"
         super().__init__(record_id=moneybox_id, message=message)
 
 

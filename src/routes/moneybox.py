@@ -18,22 +18,22 @@ from src.data_classes.requests import (
 from src.data_classes.responses import MoneyboxResponse, TransactionLogsResponse
 from src.db.db_manager import DBManager
 from src.routes.responses.moneybox import (
-    CREATE_MONEYBOX_RESPONSES,
+    POST_MONEYBOX_RESPONSES,
     DELETE_MONEYBOX_RESPONSES,
-    DEPOSIT_MONEYBOX_RESPONSES,
+    POST_MONEYBOX_DEPOSIT_RESPONSES,
     GET_MONEYBOX_RESPONSES,
     MONEYBOX_TRANSACTION_LOGS_RESPONSES,
     TRANSFER_MONEYBOX_RESPONSES,
-    UPDATE_MONEYBOX_RESPONSES,
+    PATCH_MONEYBOX_RESPONSES,
     WITHDRAW_MONEYBOX_RESPONSES,
 )
+
 
 moneybox_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOX}",
     tags=[EndpointRouteType.MONEYBOX],
 )
 """The moneybox router."""
-
 
 @moneybox_router.get(
     "/{moneybox_id}",
@@ -65,7 +65,7 @@ async def get_moneybox_endpoint(
 @moneybox_router.post(
     "",
     response_model=MoneyboxResponse,
-    responses=CREATE_MONEYBOX_RESPONSES,
+    responses=POST_MONEYBOX_RESPONSES,
 )
 async def post_moneybox_endpoint(
     request: Request,
@@ -95,7 +95,7 @@ async def post_moneybox_endpoint(
 @moneybox_router.patch(
     "/{moneybox_id}",
     response_model=MoneyboxResponse,
-    responses=UPDATE_MONEYBOX_RESPONSES,
+    responses=PATCH_MONEYBOX_RESPONSES,
 )
 async def patch_moneybox_endpoint(
     request: Request,
@@ -161,7 +161,7 @@ async def delete_moneybox_endpoint(
 @moneybox_router.post(
     "/{moneybox_id}/deposit",
     response_model=MoneyboxResponse,
-    responses=DEPOSIT_MONEYBOX_RESPONSES,
+    responses=POST_MONEYBOX_DEPOSIT_RESPONSES,
 )
 async def post_moneybox_deposit_endpoint(
     request: Request,
