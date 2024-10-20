@@ -1,9 +1,23 @@
-FROM python:3.12
+FROM python:3.12-slim
 
 LABEL maintainer="PythBuster <pythbuster@gmail.com>"
 
-RUN apt-get update && apt-get install -y --no-install-recommends python3-poetry python3-dev
+# Install and set pipx binary path
+RUN pip install --no-cache --upgrade pipx
+ENV PATH="/root/.local/bin:$PATH"
 
+# Install poetry via pipx
+RUN pipx install poetry
+RUN pipx ensurepath
+
+# Create and the working directory
+RUN mkdir /savings_manager
+WORKDIR /savings_manager
+
+# Copy dependencies first to take advantage of caching
+COPY poetry.lock pyproject.toml /savings_manager/
+
+# Now copy the rest of the code
 COPY src /savings_manager/src
 COPY temp /savings_manager/temp
 COPY envs /savings_manager/envs
@@ -12,15 +26,14 @@ COPY docs/sphinx /savings_manager/docs/sphinx
 COPY static /savings_manager/static
 COPY alembic /savings_manager/alembic
 COPY alembic.ini /savings_manager/alembic.ini
-COPY poetry.lock /savings_manager/poetry.lock
-COPY pyproject.toml /savings_manager/pyproject.toml
 COPY README.md /savings_manager/README.md
 
-WORKDIR /savings_manager
+# Install dependencies without dev packages
+RUN poetry install --no-root --without dev
 
-ENV PYTHONPATH="${PYTHONPATH}:/src"
+# Set the Python path
+ENV PYTHONPATH="${PYTHONPATH}:/savings_manager/src"
 
-RUN poetry install --without dev
-
+# Entrypoint and CMD
 ENTRYPOINT ["sh", "scripts/entrypoint_savings_manager.sh"]
 CMD ["poetry", "run", "python", "-m", "src.main"]
