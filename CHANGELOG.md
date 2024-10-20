@@ -2,7 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.32.0 (2024-10-20)
+## Changes:
+- adapt app Dockerfile and install poetry over pipx to install a python3.12 version or poetry
+
 ## 2.31.0 (2024-10-11)
+## Changes:
 - adapt JWT data structure to comply with RFC 7519
 
 ## 2.30.0 (2024-10-11)
