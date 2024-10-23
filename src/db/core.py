@@ -50,7 +50,6 @@ async def create_instance(
         if isinstance(async_session, AsyncSession):
             result: Result = await async_session.execute(stmt)
             instance: SqlBase = result.scalars().one()
-            await async_session.refresh(instance)
         else:
             async with async_session.begin() as session:
                 result = await session.execute(stmt)
@@ -100,7 +99,7 @@ async def read_instance(
     if isinstance(async_session, AsyncSession):
         result: Result = await async_session.execute(stmt)  # type: ignore
     else:
-        async with async_session.begin() as session:
+        async with async_session() as session:
             result: Result = await session.execute(stmt)  # type: ignore
 
     instance: SqlBase | None = result.scalars().one_or_none()
@@ -137,7 +136,7 @@ async def read_instances(
     if isinstance(async_session, AsyncSession):
         result: Result = await async_session.execute(stmt)  # type: ignore
     else:
-        async with async_session.begin() as session:
+        async with async_session() as session:
             result: Result = await session.execute(stmt)  # type: ignore
 
     instances: Sequence[SqlBase] = result.scalars().all()
@@ -163,20 +162,11 @@ async def update_instance(
     :type data: :class:`dict[str, Any]`
     :return: The updated db instance
         or None, if given record_id does not exist.
-    :rtype: :class:`SqlBase | None`
+    :rtype: :class:`SqlBase`
 
     :raises: :class:`UpdateInstanceError`: if updating instance fails.
              :class:`RecordNotFoundError`: if instance does not exist.
     """
-
-    existing_instance: SqlBase | None = await read_instance(
-        async_session=async_session,
-        orm_model=orm_model,
-        record_id=record_id,
-    )
-
-    if existing_instance is None:
-        raise RecordNotFoundError(record_id=record_id, message="Record not found.")
 
     try:
         if "created_at" in data:
@@ -194,13 +184,9 @@ async def update_instance(
 
         if isinstance(async_session, AsyncSession):
             result: Result = await async_session.execute(stmt)
-            instance: SqlBase = result.scalars().one()
-            await async_session.refresh(instance)
         else:
             async with async_session.begin() as session:
                 result = await session.execute(stmt)
-                instance = result.scalars().one()
-
     except Exception as ex:
         raise UpdateInstanceError(
             record_id=record_id,
@@ -210,6 +196,14 @@ async def update_instance(
                 "data": data,
             },
         ) from ex
+
+    instance: SqlBase = result.scalars().one_or_none()
+
+    if instance is None:
+        raise RecordNotFoundError(
+            record_id=record_id,
+            message="Record not found.",
+        )
 
     return instance
 
@@ -234,15 +228,6 @@ async def deactivate_instance(
              :class:`RecordNotFoundError`: if instance does not exist.
     """
 
-    existing_instance: SqlBase | None = await read_instance(
-        async_session=async_session,
-        orm_model=orm_model,
-        record_id=record_id,
-    )
-
-    if existing_instance is None:
-        raise RecordNotFoundError(record_id=record_id, message="Record not found.")
-
     try:
         stmt: Update = (
             update(orm_model)
@@ -253,11 +238,9 @@ async def deactivate_instance(
 
         if isinstance(async_session, AsyncSession):
             result: Result = await async_session.execute(stmt)
-            instance: SqlBase = result.scalars().one()
-            await async_session.refresh(instance)
         else:
             async with async_session.begin() as session:
-                _ = await session.execute(stmt)
+                result: Result = await session.execute(stmt)
     except Exception as ex:
         raise DeleteInstanceError(
             record_id=record_id,
@@ -266,3 +249,11 @@ async def deactivate_instance(
                 "table": orm_model.__name__,
             },
         ) from ex
+
+    instance: SqlBase = result.scalars().one_or_none()
+
+    if instance is None:
+        raise RecordNotFoundError(
+            record_id=record_id,
+            message="Record not found.",
+        )

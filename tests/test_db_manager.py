@@ -399,12 +399,9 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     with pytest.raises(OverflowMoneyboxUpdatedError) as ex_info:
         await db_manager.update_prioritylist(priorities=new_priorities_3)
 
-    assert ex_info.value.message == "Updating overflow moneybox is not allowed/possible!"
+    assert ex_info.value.message == "It is not allowed to modify the Overflow Moneybox!"
 
     # fail setting priority 0 to another moneybox
-    overflow_moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
-    )
     new_priorities_4 = [
         {"moneybox_id": first_moneybox_id, "priority": 0},  # not allowed, should fail
         {"moneybox_id": second_moneybox_id, "priority": 2},
@@ -531,7 +528,7 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.get_moneybox(moneybox_id=moneybox_id)
 
-        assert f"Moneybox with id '{moneybox_id}' does not exist." == ex_info.value.message
+        assert "Moneybox not found." == ex_info.value.message
         assert isinstance(ex_info.value.details, dict)
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.details["record_id"] == moneybox_id
@@ -551,7 +548,7 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
         amount=1,
         description="Bonus.",
     )
-    await db_manager.add_amount(
+    mb = await db_manager.add_amount(
         moneybox_id=third_moneybox_id,
         deposit_transaction_data=deposit_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,
@@ -577,7 +574,7 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.delete_moneybox(moneybox_id=moneybox_id)
 
-        assert f"Moneybox with id '{moneybox_id}' does not exist." == ex_info.value.message
+        assert "Moneybox not found." == ex_info.value.message
         assert isinstance(ex_info.value.details, dict)
         assert jsonable_encoder(ex_info.value.details) is not None
         assert ex_info.value.details["record_id"] == moneybox_id
@@ -814,13 +811,13 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
         )
 
     assert (
-        f"Can't sub amount '1000' from Moneybox '{first_moneybox_id}'. Not enough balance to sub."
-        == ex_info.value.message
+        "Can't sub amount. Not enough balance to sub." == ex_info.value.message
     )
     assert isinstance(ex_info.value.details, dict)
-    assert len(ex_info.value.details) == 2
-    assert ex_info.value.details["id"] == first_moneybox_id
+    assert len(ex_info.value.details) == 3
+    assert ex_info.value.details["record_id"] == first_moneybox_id
     assert ex_info.value.details["amount"] == 1000
+    assert ex_info.value.details["balance"] == -1000
     assert ex_info.value.record_id == first_moneybox_id
 
     with pytest.raises(NonPositiveAmountError) as ex_info:
@@ -831,11 +828,8 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert (
-        ex_info.value.message
-        == f"Can't add or sub amount less than 1 '0' to Moneybox '{first_moneybox_id}'."
-    )
-    assert ex_info.value.details == {"amount": 0, "id": first_moneybox_id}
+    assert ex_info.value.message == "Can't add or sub amount <= 0."
+    assert ex_info.value.details == {"amount": 0, "record_id": first_moneybox_id}
     assert ex_info.value.record_id == first_moneybox_id
 
     with pytest.raises(NonPositiveAmountError) as ex_info:
@@ -848,11 +842,8 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert (
-        ex_info.value.message
-        == f"Can't add or sub amount less than 1 '-1' to Moneybox '{first_moneybox_id}'."
-    )
-    assert ex_info.value.details == {"amount": -1, "id": first_moneybox_id}
+    assert ex_info.value.message == "Can't add or sub amount <= 0."
+    assert ex_info.value.details == {"amount": -1, "record_id": first_moneybox_id}
     assert ex_info.value.record_id == first_moneybox_id
 
     with pytest.raises(MoneyboxNotFoundError):
@@ -987,10 +978,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    expected_exception_message = (
-        f"Can't sub amount '1000' from Moneybox '{from_moneybox_data['id']}'. "
-        "Not enough balance to sub."
-    )
+    expected_exception_message = "Can't sub amount. Not enough balance to sub."
     assert ex_info.value.message == expected_exception_message
 
     with pytest.raises(TransferEqualMoneyboxError) as ex_info:

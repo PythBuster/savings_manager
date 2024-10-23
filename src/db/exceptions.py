@@ -77,7 +77,7 @@ class CrudDatabaseError(ABC, Exception):
             details = {}
 
         self.details: dict[str, Any] = details | {
-            "id": record_id,
+            "record_id": record_id,
         }
         super().__init__(message)
 
@@ -155,7 +155,7 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = f"Moneybox with id '{moneybox_id}' does not exist."
+        message: str = f"Moneybox not found."
         super().__init__(record_id=moneybox_id, message=message)
 
 
@@ -235,11 +235,14 @@ class NonPositiveAmountError(UpdateInstanceError):
         :type amount: :class:`int`
         """
 
-        message: str = (
-            f"Can't add or sub amount less than 1 '{amount}' to Moneybox '{moneybox_id}'."
-        )
         self.amount: int = amount
-        super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
+
+        message: str = "Can't add or sub amount <= 0."
+        super().__init__(
+            record_id=moneybox_id,
+            message=message,
+            details={"amount": amount},
+        )
 
 
 class TransferEqualMoneyboxError(UpdateInstanceError):
@@ -269,27 +272,34 @@ class TransferEqualMoneyboxError(UpdateInstanceError):
             },
         )
 
-        del self.details["id"]
+        del self.details["record_id"]
 
 
 class BalanceResultIsNegativeError(UpdateInstanceError):
     """Custom BalanceResultIsNegativeError Exception"""
 
-    def __init__(self, moneybox_id: int, amount: int) -> None:
+    def __init__(self, moneybox_id: int, amount: int, balance: int) -> None:
         """Initializer for the BalanceResultIsNegativeError exception.
 
         :param moneybox_id: The moneybox id.
         :type moneybox_id: :class:`int`
         :param amount: The falsy amount.
         :type amount: :class:`int`
+        :param balance: The current balance of the moneybox.
+        :type balance: :class:`int`
         """
 
-        message: str = (
-            f"Can't sub amount '{amount}' from Moneybox '{moneybox_id}'. "
-            "Not enough balance to sub."
-        )
+        message: str = "Can't sub amount. Not enough balance to sub."
         self.amount: int = amount
-        super().__init__(record_id=moneybox_id, message=message, details={"amount": amount})
+        self.balance: int = balance
+        super().__init__(
+            record_id=moneybox_id,
+            message=message,
+            details={
+                "amount": self.amount,
+                "balance": self.balance,
+            },
+        )
 
 
 class HasBalanceError(DeleteInstanceError):
@@ -322,7 +332,7 @@ class OverflowMoneyboxDeleteError(DeleteInstanceError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = "Deleting overflow moneybox is not allowed/possible!"
+        message: str = "It is not allowed to delete the Overflow Moneybox!"
         super().__init__(record_id=moneybox_id, message=message)
 
 
@@ -336,7 +346,7 @@ class OverflowMoneyboxUpdatedError(UpdateInstanceError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = "Updating overflow moneybox is not allowed/possible!"
+        message: str = "It is not allowed to modify the Overflow Moneybox!"
         super().__init__(record_id=moneybox_id, message=message)
 
 

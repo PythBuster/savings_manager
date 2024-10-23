@@ -20,7 +20,6 @@ from src.fastapi_utils import (
     create_pgpass,
     handle_requests,
     register_router,
-    set_custom_openapi_schema,
 )
 from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner

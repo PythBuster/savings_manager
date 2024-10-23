@@ -11,8 +11,5 @@ GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
         "description": "OK",
         "model": MoneyboxesResponse,
     },
-    status.HTTP_204_NO_CONTENT: {
-        "description": "No Content",
-    },
 }
 """Further custom responses for endpoint GET: /moneyboxes."""

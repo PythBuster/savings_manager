@@ -14,15 +14,15 @@ from src.report_sender.email_sender.sender import EmailSender
 from src.routes.exceptions import MissingSMTPSettingsError
 from src.routes.responses.app_settings import (
     GET_APP_SETTINGS_RESPONSES,
-    UPDATE_APP_SETTINGS_RESPONSES,
+    PATCH_APP_SETTINGS_RESPONSES,
 )
+
 
 app_settings_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.APP_SETTINGS}",
     tags=[EndpointRouteType.APP_SETTINGS],
 )
 """The moneybox router."""
-
 
 @app_settings_router.get(
     "",
@@ -51,7 +51,7 @@ async def get_app_settings_endpoint(
 @app_settings_router.patch(
     "",
     response_model=AppSettingsResponse,
-    responses=UPDATE_APP_SETTINGS_RESPONSES,
+    responses=PATCH_APP_SETTINGS_RESPONSES,
 )
 async def patch_app_settings_endpoint(
     request: Request,

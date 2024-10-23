@@ -16,7 +16,7 @@ async def test_user_add_as_admin__success(admin_role_authed_client: AsyncClient)
         "userPassword": "my-password-123",
     }
     response: Response = await admin_role_authed_client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data,
     )
     assert response.status_code == status.HTTP_200_OK
@@ -34,7 +34,7 @@ async def test_user_add_as_admin__success(admin_role_authed_client: AsyncClient)
         "userPassword": "my-another-password",
     }
     response_2: Response = await admin_role_authed_client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data_2,
     )
     assert response_2.status_code == status.HTTP_200_OK
@@ -53,7 +53,7 @@ async def test_user_add_as_user__fail__403(user_role_authed_client: AsyncClient)
         "userPassword": "my-password-123",
     }
     response: Response = await user_role_authed_client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data,
     )
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -64,7 +64,7 @@ async def test_user_add_as_user__fail__403(user_role_authed_client: AsyncClient)
         "userPassword": "my-another-password",
     }
     response_2: Response = await user_role_authed_client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data_2,
     )
     assert response_2.status_code == status.HTTP_403_FORBIDDEN
@@ -76,7 +76,7 @@ async def test_user_add_non_authed__fail__401(client: AsyncClient) -> None:
         "userPassword": "my-password-123",
     }
     response: Response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data,
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -87,7 +87,7 @@ async def test_user_add_non_authed__fail__401(client: AsyncClient) -> None:
         "userPassword": "my-another-password",
     }
     response_2: Response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data_2,
     )
     assert response_2.status_code == status.HTTP_401_UNAUTHORIZED
@@ -101,10 +101,10 @@ async def test_user_add_as_admin__fail__user_already_exist(
         "userPassword": "my-password-123",
     }
     response: Response = await admin_role_authed_client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data,
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_409_CONFLICT
 
     content: dict[str, Any] = response.json()
     assert content["message"] == "User already exists."
@@ -118,7 +118,7 @@ async def test_user_add_as_user__fail__user_already_exist__but_403(
         "userPassword": "my-password-123",
     }
     response: Response = await user_role_authed_client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data,
     )
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -130,7 +130,7 @@ async def test_user_add_non_authed__fail__user_already_exist__but_401(client: As
         "userPassword": "my-password-123",
     }
     response: Response = await client.post(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/register",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}",
         json=user_post_data,
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
@@ -217,7 +217,7 @@ async def test_user_get_as_admin__fail__non_existing_user_id(
     response: Response = await admin_role_authed_client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{non_existing_user_id}",
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
     content: dict[str, Any] = response.json()
     assert content["message"] == "User does not exist."
@@ -333,7 +333,7 @@ async def test_user_update_password_as_admin__fail__user_id_not_exist(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{non_existing_user_id}/password",
         json={"newUserPassword": "test"},
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
     content: dict[str, Any] = response.json()
     assert content["message"] == "Record not found."
 
@@ -458,7 +458,7 @@ async def test_user_update_name_as_admin__fail__username_already_exist(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{user_id}/name",
         json={"newUserName": new_user_name},
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_409_CONFLICT
 
     content: dict[str, Any] = response.json()
     assert content["message"] == "User already exists."
@@ -520,7 +520,7 @@ async def test_user_update_name_as_admin__fail__user_id_not_exist(
         json={"newUserName": "test"},
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
     content: dict[str, Any] = response.json()
     assert content["message"] == "Record not found."
 
@@ -560,7 +560,7 @@ async def test_user_delete_as_admin__fail__user_id_not_exist(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.USER}/{non_existing_user_id}"
     )
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
     content: dict[str, Any] = response.json()
     assert content["message"] == "User does not exist."
 

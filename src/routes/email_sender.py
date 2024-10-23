@@ -11,7 +11,7 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
 from src.report_sender.email_sender.sender import EmailSender
-from src.routes.responses.email_sender import SEND_TESTEMAIL_RESPONSES
+from src.routes.responses.email_sender import PATCH_EMAIL_SEND_TESTEMAIL_RESPONSES
 from src.singleton import limiter
 
 email_router: APIRouter = APIRouter(
@@ -23,7 +23,7 @@ email_router: APIRouter = APIRouter(
 
 @email_router.patch(
     "/send-testemail",
-    responses=SEND_TESTEMAIL_RESPONSES,
+    responses=PATCH_EMAIL_SEND_TESTEMAIL_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
 @limiter.limit("1/minute")

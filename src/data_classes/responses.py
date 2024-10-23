@@ -12,9 +12,10 @@ from pydantic import (
     StringConstraints,
     computed_field,
     field_validator,
-    model_validator,
+    model_validator, model_serializer, field_serializer,
 )
 from pydantic_extra_types.semantic_version import SemanticVersion
+from pygments.lexer import default
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
@@ -227,7 +228,7 @@ class MoneyboxesResponse(BaseModel):
                     "moneyboxes": [
                         {
                             "id": 1,
-                            "name": "672c0145-c910-4ce8-8202-d6ce9ba405a4",
+                            "name": "Overflow Moneybox",
                             "balance": 0,
                             "savingsAmount": 0,
                             "savingsTarget": None,

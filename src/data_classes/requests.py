@@ -452,7 +452,7 @@ class ResetDataRequest(BaseModel):
         json_schema_extra={
             "examples": [
                 {
-                    "keepApp_Settings": True,
+                    "keepAppSettings": True,
                 },
             ],
         },
