@@ -7,14 +7,16 @@ services:
     volumes:
       - /mnt/nas/savings_manager/db_backups:/postgres_backup
       #- /home/david/dev/test:/postgres_backup
+    depends_on:
+      postgres_database:
+        condition: service_healthy
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: savings_manager
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
       BACKUP_DIR: /postgres_backup
     networks:
       - savings_manager_network
-
 
   postgres_database:
     container_name: docker_postgres_database
@@ -24,14 +26,14 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: savings_manager
-      BACKUP_DIR: /savings_manager/db_backups
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      BACKUP_DIR: /postgres_backup
     networks:
       - savings_manager_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      test: [ "CMD-SHELL", "pg_isready", "-U", "$${POSTGRES_USER}", "-d", "$${POSTGRES_DB}" ]
       interval: 5s
       retries: 3
       start_period: 30s
@@ -42,12 +44,12 @@ services:
     ports:
       - "8765:5432"
     environment:
-      POSTGRES_PASSWORD: test_postgres
-      POSTGRES_USER: test_postgres
-      POSTGRES_DB: savings_manager
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
-      interval: 5s
+      test: [ "CMD-SHELL", "pg_isready", "-U", "$${POSTGRES_USER}",  "-d", "$${POSTGRES_DB}" ]
+      interval: 10s
       retries: 3
       start_period: 30s
       timeout: 10s
@@ -62,18 +64,18 @@ services:
         condition: service_healthy
       postgres_database_backup:
         condition: service_started
-        # health check of postgres would be nice :D
     links:
       - postgres_database
     ports:
       - "64000:8001"
     environment:
-      DB_DRIVER: postgresql+asyncpg
-      DB_NAME: savings_manager
-      DB_HOST: postgres_database
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_HOST: postgres_database  # set fix to postgres docker! don't use the env var
+
+      DB_DRIVER: ${DB_DRIVER}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - savings_manager_network
 
