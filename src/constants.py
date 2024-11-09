@@ -19,7 +19,7 @@ PGPASS_FILE_PATH: Path = (WORKING_DIR_PATH.parent / "temp" / ".pgpass").resolve(
 ENVIRONMENT_ENV_FILE_PATHS: dict[EnvironmentType, Path] = {
     EnvironmentType.TEST: WORKING_DIR_PATH.parent / "envs" / ".env.test",
     EnvironmentType.DEV: WORKING_DIR_PATH.parent / "envs" / ".env.dev",
-    # EnvironmentType.PROD: WORKING_DIR_PATH.parent / "envs" / ".env.prod",
+    EnvironmentType.PROD: WORKING_DIR_PATH.parent / "envs" / ".env.dev",
 }
 """The ENVIRONMENT env file paths."""
 
