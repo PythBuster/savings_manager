@@ -49,6 +49,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             ),
             "test_endpoint_get_moneyboxes__status_200__total_6": self.dataset_test_endpoint_get_moneyboxes__status_200__total_6,
             "test_endpoint_get_moneyboxes__status_204__no_content": self.truncate_tables,  # no data needed
+            "test_get_months_for_reaching_savings_targets__status_200__total_3": self.dataset_test_get_months_for_reaching_savings_targets__status_200__total_3,
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing,
             "test_endpoint_get_moneybox_status_404_non_existing": self.truncate_tables,  # no data needed,
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100,
@@ -181,6 +182,76 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "savings_amount": 0,
                 "savings_target": None,
                 "priority": 5,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_get_months_for_reaching_savings_targets__status_200__total_3(self):
+        """The data generation function for test_case:
+        `test_get_months_for_reaching_savings_targets__status_200__total_4`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 2000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            { # expectation: reached savings target in 5 months
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            { # takes 1000 from month 6 upwards
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            { # get 1000 from month 6 upwards, expectation: reached target in month 16
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            {  # expectation: reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            {  # expectation: not part of result, will never reach savings target
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 1000,
             },
         ]
 

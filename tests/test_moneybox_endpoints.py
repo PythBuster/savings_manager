@@ -107,6 +107,31 @@ async def test_endpoint_get_moneyboxes__status_204__no_content(
 
 
 @pytest.mark.dependency
+async def test_get_months_for_reaching_savings_targets__status_200__total_3(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/reaching_savings_targets",
+    )
+
+    # there should be always at least one moneybox: the overflow moneybox
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 3
+
+    calculated_months = [
+        reaching_savings_targets["amountOfMonths"]
+        for reaching_savings_targets in content["reachingSavingsTargets"]
+    ]
+
+    assert 0 in calculated_months
+    assert 5 in calculated_months
+    assert 15 in calculated_months
+
+
+@pytest.mark.dependency
 async def test_endpoint_get_moneybox__second_moneybox__status_200_existing(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,

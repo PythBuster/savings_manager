@@ -967,6 +967,7 @@ class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
         json_schema_extra={
             "examples": [
                 {
+                    "total": 2,
                     "reachingSavingsTargets": [
                         {
                             "moneyboxId": 1,
@@ -982,3 +983,10 @@ class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
         },
     )
     """The config of the model."""
+
+    @computed_field  # type: ignore
+    @property
+    def total(self) -> int:
+        """The count of results."""
+
+        return len(self.reaching_savings_targets)
