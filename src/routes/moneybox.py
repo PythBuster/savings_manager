@@ -196,6 +196,7 @@ async def deposit_moneybox(
         transaction_type=TransactionType.DIRECT,
         transaction_trigger=TransactionTrigger.MANUALLY,
     )
+
     return moneybox_data  # type: ignore
 
 

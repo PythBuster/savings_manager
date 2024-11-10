@@ -909,3 +909,76 @@ class LoginUserResponse(BaseModel):
             del data["user_login"]
 
         return data
+
+class MoneyboxReachingSavingsTargetsResponse(BaseModel):
+    moneybox_id: Annotated[
+        int,
+        Field(
+            validation_alias="moneybox_id",
+            description="The id of the moneybox.",
+        )
+    ]
+    """The id of the moneybox."""
+
+    amount_of_months: Annotated[
+        int,
+        Field(
+            validation_alias="amount_of_months",
+            description="The amount of months for reaching the savings target.",
+        )
+    ]
+    """The amount of months for reaching the savings target."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "moneyboxId": 1,
+                    "amountOfMonths": 15,
+                },
+                {
+                    "moneyboxId": 3,
+                    "amountOfMonths": 5,
+                },
+            ],
+        },
+    )
+    """The config of the model."""
+
+class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
+    reaching_savings_targets: Annotated[
+        list[MoneyboxReachingSavingsTargetsResponse],
+        Field(
+            validation_alias="reaching_savings_targets",
+            description="A map reaching savings targets (map of moneybox_id and amount of months).",
+        )
+    ]
+    """A map reaching savings targets (map of moneybox_id and amount of months)."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        strict=True,
+        alias_generator=to_camel_cleaned_suffix,
+        json_schema_extra={
+            "examples": [
+                {
+                    "reachingSavingsTargets": [
+                        {
+                            "moneyboxId": 1,
+                            "amountOfMonths": 15,
+                        },
+                        {
+                            "moneyboxId": 3,
+                            "amountOfMonths": 5,
+                        },
+                    ],
+                },
+            ],
+        },
+    )
+    """The config of the model."""

@@ -4,7 +4,7 @@ from typing import Any
 
 from starlette import status
 
-from src.data_classes.responses import MoneyboxesResponse
+from src.data_classes.responses import MoneyboxesResponse, MoneyboxesReachingSavingsTargetsResponse
 
 GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
@@ -16,3 +16,14 @@ GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
     },
 }
 """Further custom responses for endpoint GET: /moneyboxes."""
+
+GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES: dict[status, dict[str, Any]] = {
+    status.HTTP_200_OK: {
+        "description": "OK",
+        "model": MoneyboxesReachingSavingsTargetsResponse,
+    },
+    status.HTTP_204_NO_CONTENT: {
+        "description": "No Content",
+    },
+}
+"""Further custom responses for endpoint GET: /moneyboxes/reaching_savings_targets."""
