@@ -5,7 +5,7 @@ from typing import Any, cast
 from fastapi import APIRouter
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import Response, JSONResponse
 
 from src.custom_types import EndpointRouteType, OverflowMoneyboxAutomatedSavingsModeType
 from src.data_classes.responses import MoneyboxesResponse, MoneyboxesReachingSavingsTargetsResponse
@@ -52,7 +52,6 @@ async def get_moneyboxes(
     }
     return response_moneyboxes_data  # type: ignore
 
-
 @moneyboxes_router.get(
     "/reaching_savings_targets",
     response_model=MoneyboxesReachingSavingsTargetsResponse,
@@ -76,11 +75,10 @@ async def get_months_for_reaching_savings_targets(
     app_settings: AppSettings = await db_manager._get_app_settings()
 
     overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType = app_settings.overflow_moneybox_automated_savings_mode
-    savings_amount: int = app_settings.savings_amount
 
     reaching_savings_targets: dict[int, int] = calculate_months_for_reaching_savings_targets(
         moneyboxes=moneyboxes_data,
-        savings_amount=savings_amount,
+        app_settings=app_settings.asdict(),
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
 
@@ -91,5 +89,36 @@ async def get_months_for_reaching_savings_targets(
                 for key, value in reaching_savings_targets.items()
             ]
         }
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+
+@moneyboxes_router.get(
+    "/next_automated_savings_moneyboxes",
+    response_model=MoneyboxesReachingSavingsTargetsResponse,
+    responses=GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES,
+)
+async def get_months_for_reaching_savings_targets(
+        request: Request,
+) -> Response:
+
+    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
+    moneyboxes_data: list[dict[str, Any]] = await db_manager.get_moneyboxes()
+    app_settings: AppSettings = await db_manager._get_app_settings()
+
+    overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType = app_settings.overflow_moneybox_automated_savings_mode
+
+    next_month_moneyboxes: dict[int, int] = calculate_months_for_reaching_savings_targets(
+        moneyboxes=moneyboxes_data,
+        app_settings=app_settings.asdict(),
+        overflow_moneybox_mode=overflow_moneybox_mode,
+        only_for_next_n_months=1,
+    )
+
+    if next_month_moneyboxes:
+        return JSONResponse(
+            content={"moneyboxIds": list(next_month_moneyboxes.keys())}
+        )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

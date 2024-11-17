@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.33.0 (2024-11-17)
+## Feature:
+- add calculation algorithm to calculate the reaching months of savings targets
+- add endpoints to get these values
+
 ## 2.32.0 (2024-10-20)
 ## Changes:
 - adapt app Dockerfile and install poetry over pipx to install a python3.12 version or poetry
