@@ -3,11 +3,14 @@
 from typing import Any, cast
 
 from fastapi import APIRouter
+from starlette import status
 from starlette.requests import Request
+from starlette.responses import Response
 
 from src.custom_types import EndpointRouteType, OverflowMoneyboxAutomatedSavingsModeType
 from src.data_classes.responses import MoneyboxesResponse, MoneyboxesReachingSavingsTargetsResponse
 from src.db.db_manager import DBManager
+from src.db.exceptions import InconsistentDatabaseError, OverflowMoneyboxNotFoundError
 from src.db.models import AppSettings
 from src.routes.responses.moneyboxes import GET_MONEYBOXES_RESPONSES, GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES
 from src.utils import calculate_months_for_reaching_savings_targets
@@ -33,10 +36,16 @@ async def get_moneyboxes(
     :param request: The current request object.
     :return: The list of moneyboxes.
     :rtype: :class:`MoneyboxesResponse`
+
+    :raises OverflowMoneyboxNotFoundError: if moneyboxes result is empty, it means, that
+        the overflow moneybox is missing. At least the overflow moneybox has into the results.
     """
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     moneyboxes_data: list[dict[str, Any]] = await db_manager.get_moneyboxes()
+
+    if not moneyboxes_data:  # expected at least the overflow moneybox
+        raise OverflowMoneyboxNotFoundError()
 
     response_moneyboxes_data: dict[str, list[dict[str, Any]]] = {
         "moneyboxes": moneyboxes_data,
@@ -51,7 +60,7 @@ async def get_moneyboxes(
 )
 async def get_months_for_reaching_savings_targets(
         request: Request,
-) -> MoneyboxesReachingSavingsTargetsResponse:
+) -> MoneyboxesReachingSavingsTargetsResponse | Response:
     """Endpoint for getting the number of months for reaching savings targets of the moneyboxes, if
     a savings target is set.
     \f
@@ -75,9 +84,12 @@ async def get_months_for_reaching_savings_targets(
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
 
-    return { # type: ignore
-        "reaching_savings_targets": [
-            {"moneybox_id": key, "amount_of_months": value}
-            for key, value in reaching_savings_targets.items()
-        ]
-    }
+    if reaching_savings_targets:
+        return { # type: ignore
+            "reaching_savings_targets": [
+                {"moneybox_id": key, "amount_of_months": value}
+                for key, value in reaching_savings_targets.items()
+            ]
+        }
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

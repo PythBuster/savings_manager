@@ -175,8 +175,21 @@ def calculate_months_for_reaching_savings_targets(
         savings_amount: int,
         overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType,
 ) -> dict[int, int]:
+    """Calculates the reaching savings amount based on moneyboxes and savings_amount.
 
-    if savings_amount <= 0:
+    Note: moneyboxes with savings_target = None will be ignored and not part of the results.
+
+    :param moneyboxes: The moneyboxes the calculation will be work with.
+    :type moneyboxes: :class:`list[dict[str, Any]]`
+    :param savings_amount: The current (monthly) savings amount.
+    :type savings_amount: :class:`int`
+    :param overflow_moneybox_mode: The current overflow moneybox mode.
+    :type overflow_moneybox_mode: :class:`OverflowMoneyboxModeType`
+    :return: The calculated months for reaching savings amount. Moneyboxes without
+        savings_target will not be part of the results.
+    """
+
+    if savings_amount <= 0 or not moneyboxes:
         return {}
 
     moneyboxes_reached_targets: dict[int, int] = {}
@@ -185,6 +198,13 @@ def calculate_months_for_reaching_savings_targets(
     )
 
     simulated_month: int = 1
+    overflow_moneybox: dict[str, Any] = moneyboxes_sorted_by_priority[0]
+
+    # preprocess:
+    # - check if there are moneyboxes, that already reached their savings targets
+    for moneybox in moneyboxes_sorted_by_priority[1:]:
+        if moneybox["savings_target"] is not None and moneybox["balance"] >= moneybox["savings_target"]:
+            moneyboxes_reached_targets[moneybox["id"]] = 0
 
     def all_targets_reached() -> bool:
         return not any(
@@ -194,14 +214,6 @@ def calculate_months_for_reaching_savings_targets(
                 moneyboxes,
             )
         )
-
-    overflow_moneybox: dict[str, Any] = moneyboxes_sorted_by_priority[0]
-
-    # preprocess:
-    # - check if there are moneyboxes, that already reached their savings targets
-    for moneybox in moneyboxes_sorted_by_priority[1:]:
-        if moneybox["savings_target"] is not None and moneybox["balance"] >= moneybox["savings_target"]:
-            moneyboxes_reached_targets[moneybox["id"]] = 0
 
     while not all_targets_reached():
         # mode 2

@@ -274,3 +274,114 @@ def test_calculate_months_for_reaching_savings_targets__success__mode_fill_up():
     assert 1 not in result_1
     assert result_1[4] == 1
     assert result_1[5] == 2
+
+
+def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_empty_moneyboxes():
+    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
+    savings_amount = 10000
+    moneyboxes: list[dict[str, Any]] = []
+
+    result = calculate_months_for_reaching_savings_targets(
+        moneyboxes=moneyboxes,
+        savings_amount=savings_amount,
+        overflow_moneybox_mode=overflow_moneybox_mode,
+    )
+    assert result == {}
+
+def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_savings_amount_of_zero():
+    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
+    savings_amount = 0
+    moneyboxes: list[dict[str, Any]] = [
+        { # expectation: reached savings target in 1 month
+            "id": 3,
+            "priority": 1,
+            "balance": 0,
+            "savings_amount": 10000,
+            "savings_target": 10000,
+        },
+        { # takes 1000 from month 2 upwards
+            "id": 2,
+            "priority": 2,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": None,
+        },
+        { # expectation: reached savings target in 1 month (filled up from overflow moneybox)
+            "id": 4,
+            "priority": 3,
+            "balance": 0,
+            "savings_amount": 2000,
+            "savings_target": 10000,
+        },
+        {  # expectation: reached savings target in 3 months
+            "id": 5,
+            "priority": 4,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": 5000,
+        },
+        { # overflow moneybox
+            # fill up moneybox 4
+            "id": 1,
+            "priority": 0,
+            "balance": 10000,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+    ]
+
+    result = calculate_months_for_reaching_savings_targets(
+        moneyboxes=moneyboxes,
+        savings_amount=savings_amount,
+        overflow_moneybox_mode=overflow_moneybox_mode,
+    )
+    assert result == {}
+
+def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_negative_savings_amount():
+    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
+    savings_amount = -1
+    moneyboxes: list[dict[str, Any]] = [
+        { # expectation: reached savings target in 1 month
+            "id": 3,
+            "priority": 1,
+            "balance": 0,
+            "savings_amount": 10000,
+            "savings_target": 10000,
+        },
+        { # takes 1000 from month 2 upwards
+            "id": 2,
+            "priority": 2,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": None,
+        },
+        { # expectation: reached savings target in 1 month (filled up from overflow moneybox)
+            "id": 4,
+            "priority": 3,
+            "balance": 0,
+            "savings_amount": 2000,
+            "savings_target": 10000,
+        },
+        {  # expectation: reached savings target in 3 months
+            "id": 5,
+            "priority": 4,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": 5000,
+        },
+        { # overflow moneybox
+            # fill up moneybox 4
+            "id": 1,
+            "priority": 0,
+            "balance": 10000,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+    ]
+
+    result = calculate_months_for_reaching_savings_targets(
+        moneyboxes=moneyboxes,
+        savings_amount=savings_amount,
+        overflow_moneybox_mode=overflow_moneybox_mode,
+    )
+    assert result == {}
