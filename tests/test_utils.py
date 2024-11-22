@@ -118,6 +118,7 @@ def test_equal_dict(
 def test_calculate_months_for_reaching_savings_targets__success__mode_collect():
     overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.COLLECT
     savings_amount = 2000
+
     moneyboxes: list[dict[str, Any]] = [
         { # expectation: reached savings target in 5 months
             "id": 3,
@@ -165,13 +166,16 @@ def test_calculate_months_for_reaching_savings_targets__success__mode_collect():
 
     result_1 = calculate_months_for_reaching_savings_targets(
         moneyboxes=moneyboxes,
-        savings_amount=savings_amount,
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
 
-    assert result_1[3] == 5
-    assert result_1[4] == 15
-    assert result_1[5] == 0
+    assert result_1[3][-1].month == 5
+    assert result_1[4][-1].month == 15
+    assert result_1[5][-1].month == 0
     assert 1 not in result_1
     assert 6 not in result_1
 
@@ -213,13 +217,16 @@ def test_calculate_months_for_reaching_savings_targets__success__mode_add_to_sav
 
     result_1 = calculate_months_for_reaching_savings_targets(
         moneyboxes=moneyboxes,
-        savings_amount=savings_amount,
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
 
-    assert result_1[3] == 1
+    assert result_1[3][-1].month == 1
     assert 1 not in result_1
-    assert result_1[4] == 3
+    assert result_1[4][-1].month == 3
 
 
 def test_calculate_months_for_reaching_savings_targets__success__mode_fill_up():
@@ -266,14 +273,17 @@ def test_calculate_months_for_reaching_savings_targets__success__mode_fill_up():
 
     result_1 = calculate_months_for_reaching_savings_targets(
         moneyboxes=moneyboxes,
-        savings_amount=savings_amount,
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
 
-    assert result_1[3] == 1
+    assert result_1[3][-1].month == 1
     assert 1 not in result_1
-    assert result_1[4] == 1
-    assert result_1[5] == 2
+    assert result_1[4][-1].month == 1
+    assert result_1[5][-1].month == 2
 
 
 def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_empty_moneyboxes():
@@ -283,7 +293,10 @@ def test_calculate_months_for_reaching_savings_targets__success__empty_result_ca
 
     result = calculate_months_for_reaching_savings_targets(
         moneyboxes=moneyboxes,
-        savings_amount=savings_amount,
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
     assert result == {}
@@ -332,7 +345,10 @@ def test_calculate_months_for_reaching_savings_targets__success__empty_result_ca
 
     result = calculate_months_for_reaching_savings_targets(
         moneyboxes=moneyboxes,
-        savings_amount=savings_amount,
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
     assert result == {}
@@ -381,7 +397,50 @@ def test_calculate_months_for_reaching_savings_targets__success__empty_result_ca
 
     result = calculate_months_for_reaching_savings_targets(
         moneyboxes=moneyboxes,
-        savings_amount=savings_amount,
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
         overflow_moneybox_mode=overflow_moneybox_mode,
     )
     assert result == {}
+
+
+def test_calculate_months_for_reaching_savings_targets__success__monthly_savings_amount_0__init_reached_target():
+    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
+    savings_amount = 0
+    moneyboxes: list[dict[str, Any]] = [
+        { # expectation: reached savings target in 1 month
+            "id": 3,
+            "priority": 1,
+            "balance": 10000,  # initial full
+            "savings_amount": 500,
+            "savings_target": 10000,
+        },
+        { # takes 1000 from month 2 upwards
+            "id": 2,
+            "priority": 2,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": None,
+        },
+        { # overflow moneybox
+            "id": 1,
+            "priority": 0,
+            "balance": 0,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+    ]
+
+    result = calculate_months_for_reaching_savings_targets(
+        moneyboxes=moneyboxes,
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
+        overflow_moneybox_mode=overflow_moneybox_mode,
+    )
+
+    assert result[3][-1].month == 0
+    assert 2 not in result

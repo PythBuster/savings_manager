@@ -7,7 +7,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 
-from src.custom_types import EndpointRouteType, OverflowMoneyboxAutomatedSavingsModeType
+from src.custom_types import EndpointRouteType, OverflowMoneyboxAutomatedSavingsModeType, MoneyboxSavingsMonthData
 from src.data_classes.responses import MoneyboxesResponse, MoneyboxesReachingSavingsTargetsResponse
 from src.db.db_manager import DBManager
 from src.db.exceptions import InconsistentDatabaseError, OverflowMoneyboxNotFoundError
@@ -76,22 +76,23 @@ async def get_months_for_reaching_savings_targets(
 
     overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType = app_settings.overflow_moneybox_automated_savings_mode
 
-    reaching_savings_targets: dict[int, int] = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes_data,
-        app_settings=app_settings.asdict(),
-        overflow_moneybox_mode=overflow_moneybox_mode,
+    reaching_savings_targets: dict[int, list[MoneyboxSavingsMonthData]] = (
+        calculate_months_for_reaching_savings_targets(
+            moneyboxes=moneyboxes_data,
+            app_settings=app_settings.asdict(),
+            overflow_moneybox_mode=overflow_moneybox_mode,
+        )
     )
 
     if reaching_savings_targets:
         return { # type: ignore
             "reaching_savings_targets": [
-                {"moneybox_id": key, "amount_of_months": value}
-                for key, value in reaching_savings_targets.items()
+                {"moneybox_id": moneybox_id, "amount_of_months": list_of_distributions[-1].month}
+                for moneybox_id, list_of_distributions in reaching_savings_targets.items()
             ]
         }
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
 
 
 @moneyboxes_router.get(
@@ -109,16 +110,23 @@ async def get_months_for_reaching_savings_targets(
 
     overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType = app_settings.overflow_moneybox_automated_savings_mode
 
-    next_month_moneyboxes: dict[int, int] = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes_data,
-        app_settings=app_settings.asdict(),
-        overflow_moneybox_mode=overflow_moneybox_mode,
-        only_for_next_n_months=1,
+    next_month_moneyboxes:  dict[int, list[MoneyboxSavingsMonthData]] = (
+        calculate_months_for_reaching_savings_targets(
+            moneyboxes=moneyboxes_data,
+            app_settings=app_settings.asdict(),
+            overflow_moneybox_mode=overflow_moneybox_mode,
+        )
     )
 
     if next_month_moneyboxes:
         return JSONResponse(
-            content={"moneyboxIds": list(next_month_moneyboxes.keys())}
+            content={
+                "moneyboxIds": [
+                    moneybox_id
+                    for moneybox_id, list_of_distributions in next_month_moneyboxes.items()
+                    if list_of_distributions[0].month == 1
+                ]
+            }
         )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -2,6 +2,7 @@
 
 import asyncio
 import io
+from curses.ascii import isalpha
 from pathlib import Path
 from unittest.mock import patch
 
@@ -34,6 +35,11 @@ async def test_app_metadata_valid(client: AsyncClient) -> None:
     )
 
     ver_parts = str(app_data["appVersion"]).split(".")
+    minor_parts = ver_parts[-1].split("-", 1)
+
+    if len(minor_parts) > 1:
+        ver_parts[-1] = minor_parts[0]
+        assert len(minor_parts[1]) > 1
 
     for part in ver_parts:
         assert part.isdigit()
