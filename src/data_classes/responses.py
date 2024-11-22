@@ -910,13 +910,16 @@ class LoginUserResponse(BaseModel):
 
         return data
 
+
 class MoneyboxReachingSavingsTargetsResponse(BaseModel):
+    """The single moneybox reaching savings target response model."""
+
     moneybox_id: Annotated[
         int,
         Field(
             validation_alias="moneybox_id",
             description="The id of the moneybox.",
-        )
+        ),
     ]
     """The id of the moneybox."""
 
@@ -925,7 +928,7 @@ class MoneyboxReachingSavingsTargetsResponse(BaseModel):
         Field(
             validation_alias="amount_of_months",
             description="The amount of months for reaching the savings target.",
-        )
+        ),
     ]
     """The amount of months for reaching the savings target."""
 
@@ -949,13 +952,16 @@ class MoneyboxReachingSavingsTargetsResponse(BaseModel):
     )
     """The config of the model."""
 
+
 class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
+    """The collection of moneybox reaching savings target response model."""
+
     reaching_savings_targets: Annotated[
         list[MoneyboxReachingSavingsTargetsResponse],
         Field(
             validation_alias="reaching_savings_targets",
             description="A map reaching savings targets (map of moneybox_id and amount of months).",
-        )
+        ),
     ]
     """A map reaching savings targets (map of moneybox_id and amount of months)."""
 

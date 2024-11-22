@@ -4,8 +4,8 @@ import asyncio
 from datetime import datetime
 from typing import Any
 
-import pytest
 import httpx
+import pytest
 from httpx import AsyncClient
 from starlette import status
 
@@ -113,7 +113,7 @@ async def test_endpoint_get_moneyboxes__fail__missing_overflow_moneybox(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
-    response: httpx.Response =  await client.get(
+    response: httpx.Response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}",
     )
 
@@ -124,6 +124,7 @@ async def test_endpoint_get_moneyboxes__fail__missing_overflow_moneybox(
         "Inconsistent Database! No overflow moneybox found in database! "
         "There has to be one moneybox with priority = 0 as column value!"
     )
+
 
 @pytest.mark.dependency
 async def test_get_months_for_reaching_savings_targets__status_200__total_3(
@@ -148,6 +149,7 @@ async def test_get_months_for_reaching_savings_targets__status_200__total_3(
     assert 0 in calculated_months
     assert 5 in calculated_months
     assert 15 in calculated_months
+
 
 @pytest.mark.dependency
 async def test_get_months_for_reaching_savings_targets__status_204__no_data(
@@ -189,7 +191,6 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing(
         dict_2=expected_moneybox_data,  # type: ignore
         exclude_keys=["createdAt", "modifiedAt"],
     )
-
 
 
 @pytest.mark.dependency

@@ -2,6 +2,7 @@
 
 import os
 import tomllib
+from collections import defaultdict
 from functools import cache
 from pathlib import Path
 from typing import Any, Sequence
@@ -11,7 +12,12 @@ from dictalchemy import asdict
 from pydantic.alias_generators import to_camel
 
 from src.constants import ENVIRONMENT_ENV_FILE_PATHS
-from src.custom_types import AppEnvVariables, EnvironmentType, OverflowMoneyboxAutomatedSavingsModeType
+from src.custom_types import (
+    AppEnvVariables,
+    EnvironmentType,
+    MoneyboxSavingsMonthData,
+    OverflowMoneyboxAutomatedSavingsModeType,
+)
 
 
 def get_app_env_variables(
@@ -170,31 +176,37 @@ def tabulate_str(headers: Sequence, rows: Sequence, show_index: bool = False) ->
         showindex=show_index,
     )
 
-def calculate_months_for_reaching_savings_targets(
-        moneyboxes: list[dict[str, Any]],
-        savings_amount: int,
-        overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType,
-) -> dict[int, int]:
+
+def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-branches
+    moneyboxes: list[dict[str, Any]],
+    app_settings: dict[str, Any],
+    overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType,
+) -> dict[int, list[MoneyboxSavingsMonthData]]:
     """Calculates the reaching savings amount based on moneyboxes and savings_amount.
 
     Note: moneyboxes with savings_target = None will be ignored and not part of the results.
 
     :param moneyboxes: The moneyboxes the calculation will be work with.
     :type moneyboxes: :class:`list[dict[str, Any]]`
-    :param savings_amount: The current (monthly) savings amount.
-    :type savings_amount: :class:`int`
+    :param app_settings: The settings data of the app.
+    :type app_settings: :class:`dict[str, Any]`
     :param overflow_moneybox_mode: The current overflow moneybox mode.
     :type overflow_moneybox_mode: :class:`OverflowMoneyboxModeType`
     :return: The calculated months for reaching savings amount. Moneyboxes without
         savings_target will not be part of the results.
+    :rtype: :class:`dict[int, list[MoneyboxSavingsMonthData]]`
     """
 
-    if savings_amount <= 0 or not moneyboxes:
+    if not moneyboxes or not app_settings["is_automated_saving_active"]:
         return {}
 
-    moneyboxes_reached_targets: dict[int, int] = {}
-    moneyboxes_sorted_by_priority: list[dict[str, Any]] = (
-        sorted(moneyboxes, key=lambda item: item["priority"])
+    moneyboxes_reached_targets: set[int] = set()
+    moneybox_with_savings_target_distribution_data: dict[int, list[MoneyboxSavingsMonthData]] = (
+        defaultdict(list)
+    )
+
+    moneyboxes_sorted_by_priority: list[dict[str, Any]] = sorted(
+        moneyboxes, key=lambda item: item["priority"]
     )
 
     simulated_month: int = 1
@@ -203,8 +215,24 @@ def calculate_months_for_reaching_savings_targets(
     # preprocess:
     # - check if there are moneyboxes, that already reached their savings targets
     for moneybox in moneyboxes_sorted_by_priority[1:]:
-        if moneybox["savings_target"] is not None and moneybox["balance"] >= moneybox["savings_target"]:
-            moneyboxes_reached_targets[moneybox["id"]] = 0
+        if (
+            moneybox["savings_target"] is not None
+            and moneybox["balance"] >= moneybox["savings_target"]
+        ):
+            moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
+                MoneyboxSavingsMonthData(
+                    moneybox_id=moneybox["id"],
+                    savings_amount=0,
+                    month=0,
+                )
+            )
+            moneyboxes_reached_targets.add(moneybox["id"])
+
+    # TODO: write/add unit test!
+    #  -> create testdata, where initially a moneybox has reached his target
+    #    + set savings_amount = 0
+    if app_settings["savings_amount"] <= 0:
+        return moneybox_with_savings_target_distribution_data
 
     def all_targets_reached() -> bool:
         return not any(
@@ -215,13 +243,16 @@ def calculate_months_for_reaching_savings_targets(
             )
         )
 
-    while not all_targets_reached():
+    while not all_targets_reached():  # pylint: disable=too-many-nested-blocks
         # mode 2
-        if overflow_moneybox_mode is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT:
-            current_savings_amount = savings_amount + overflow_moneybox["balance"]
+        if (
+            overflow_moneybox_mode
+            is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT
+        ):
+            current_savings_amount = app_settings["savings_amount"] + overflow_moneybox["balance"]
             overflow_moneybox["balance"] = 0
-        else: # mode 1
-            current_savings_amount = savings_amount
+        else:  # mode 1
+            current_savings_amount = app_settings["savings_amount"]
 
         for moneybox in moneyboxes_sorted_by_priority[1:]:
             if moneybox["id"] in moneyboxes_reached_targets:
@@ -238,10 +269,22 @@ def calculate_months_for_reaching_savings_targets(
 
             moneybox["balance"] += distribution_amount
 
+            if distribution_amount > 0 and moneybox["savings_target"] is not None:
+                moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
+                    MoneyboxSavingsMonthData(
+                        moneybox_id=moneybox["id"],
+                        month=simulated_month,
+                        savings_amount=distribution_amount,
+                    )
+                )
+
             if moneybox["id"] not in moneyboxes_reached_targets:
                 # target for moneybox reached
-                if moneybox["savings_target"] is not None and moneybox["balance"] >= moneybox["savings_target"]:
-                    moneyboxes_reached_targets[moneybox["id"]] = simulated_month
+                if (
+                    moneybox["savings_target"] is not None
+                    and moneybox["balance"] >= moneybox["savings_target"]
+                ):
+                    moneyboxes_reached_targets.add(moneybox["id"])
 
             current_savings_amount -= distribution_amount
 
@@ -252,7 +295,10 @@ def calculate_months_for_reaching_savings_targets(
             overflow_moneybox["balance"] += current_savings_amount
 
         # mode 3
-        if overflow_moneybox_mode is OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES:
+        if (
+            overflow_moneybox_mode
+            is OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
+        ):
             if overflow_moneybox["balance"] > 0:
                 for moneybox in moneyboxes_sorted_by_priority[1:]:
                     if moneybox["id"] in moneyboxes_reached_targets:
@@ -266,16 +312,27 @@ def calculate_months_for_reaching_savings_targets(
                         distribution_amount = min(amount_till_target, overflow_moneybox["balance"])
 
                         moneybox["balance"] += distribution_amount
+                        moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
+                            MoneyboxSavingsMonthData(
+                                moneybox_id=moneybox["id"],
+                                month=simulated_month,
+                                savings_amount=distribution_amount,
+                                additional_data="Add amount by fillup-mode from Overflow Moneybox.",
+                            )
+                        )
+
                         overflow_moneybox["balance"] -= distribution_amount
 
                         # target for moneybox reached
-                        if moneybox["savings_target"] is not None and moneybox["balance"] >= moneybox[
-                            "savings_target"]:
-                            moneyboxes_reached_targets[moneybox["id"]] = simulated_month
+                        if (
+                            moneybox["savings_target"] is not None
+                            and moneybox["balance"] >= moneybox["savings_target"]
+                        ):
+                            moneyboxes_reached_targets.add(moneybox["id"])
 
                     if overflow_moneybox["balance"] <= 0:
                         break
 
         simulated_month += 1
 
-    return moneyboxes_reached_targets
+    return moneybox_with_savings_target_distribution_data

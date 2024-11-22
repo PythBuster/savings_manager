@@ -1,5 +1,6 @@
 """All custom types are located here."""
 
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Self
 
@@ -216,3 +217,14 @@ class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
     """After the automated savings process, the entire balance from the overflow
     moneybox should be distributed to the moneyboxes with upper limits, in the order of
     the priority list. Try to fill them up."""
+
+
+@dataclass(frozen=True)
+class MoneyboxSavingsMonthData:
+    """Data structure for moneybox savings month
+    for calculate_months_for_reaching_savings_targets algorithm"""
+
+    moneybox_id: int
+    savings_amount: int
+    month: int
+    additional_data: str = ""
