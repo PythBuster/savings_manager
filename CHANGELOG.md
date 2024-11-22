@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.34.0 (2024-11-22)
+## Feature:
+- add endpoint to get moneybox ids that will be saved in the next month
+# Changed:
+- adapt calculation algorithm for reaching targets
+
 ## 2.33.0 (2024-11-17)
 ## Feature:
 - add calculation algorithm to calculate the reaching months of savings targets
