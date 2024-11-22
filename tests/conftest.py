@@ -1,7 +1,6 @@
 """Pytest configurations and fixtures are located here."""
 
 import asyncio
-import json
 import os
 import subprocess
 import time
@@ -14,8 +13,8 @@ from async_fastapi_jwt_auth import AuthJWT
 from httpx import AsyncClient, Cookies
 from starlette.responses import Response
 
-from src import utils
 import src.auth.jwt_auth as jwt_auth_
+from src import utils
 from src.auth.jwt_auth import UserAuthJWTBearer
 from src.constants import WORKING_DIR_PATH
 from src.custom_types import (
@@ -35,7 +34,8 @@ pytest_plugins = ("pytest_asyncio",)
 """The pytest plugins which should be used to run tests."""
 
 # mock app major version at least to 3 to test user ROLES (jwt role authorization)
-jwt_auth_._APP_MAJOR_VERSION = 3 if jwt_auth_._APP_MAJOR_VERSION < 3 else jwt_auth_._APP_MAJOR_VERSION
+jwt_auth_.APP_MAJOR_VERSION = 3 if jwt_auth_.APP_MAJOR_VERSION < 3 else jwt_auth_.APP_MAJOR_VERSION
+
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 def set_test_environment() -> None:

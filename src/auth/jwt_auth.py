@@ -1,6 +1,5 @@
 """The JWT classes and functions are located here."""
 
-import json
 from asyncio import Lock
 from typing import Annotated, Any
 
@@ -14,9 +13,9 @@ from src.auth.exceptions import MissingRoleError
 from src.custom_types import EndpointRouteType, UserRoleType
 from src.utils import get_app_data, get_app_env_variables
 
-_APP_DATA: dict[str, Any] = get_app_data()
-_APP_MAJOR_VERSION: int = int(_APP_DATA["version"].split(".")[0])
-_LOGIN_REQUEST_PATH: str = f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login"
+APP_DATA: dict[str, Any] = get_app_data()
+APP_MAJOR_VERSION: int = int(APP_DATA["version"].split(".")[0])
+LOGIN_REQUEST_PATH: str = f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login"
 
 
 class JWTSettings(BaseModel):
@@ -113,8 +112,8 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
 
         auth_jwt = AuthJWT(req=req, res=res)
 
-        if _APP_MAJOR_VERSION >= 3:
-            if req.scope["path"] != _LOGIN_REQUEST_PATH:
+        if APP_MAJOR_VERSION >= 3:
+            if req.scope["path"] != LOGIN_REQUEST_PATH:
                 await auth_jwt.jwt_required()
 
                 if self.access_limited_to_roles is not None:

@@ -2,7 +2,6 @@
 
 import asyncio
 import io
-from curses.ascii import isalpha
 from pathlib import Path
 from unittest.mock import patch
 

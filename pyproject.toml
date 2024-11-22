@@ -104,7 +104,7 @@ load-plugins=[
 
 # see: https://github.com/christopherpickering/pylint-per-file-ignores
 [tool.pylint-per-file-ignores]
-"tests/test_user_endpoints.py"="missing-function-docstring"
+"test_user_endpoints.py"="missing-function-docstring"
 "tests/test_fastapi_utils.py"="missing-function-docstring"
 "test_app_endpoints.py"="missing-function-docstring"
 "test_email_sender_endpoints.py"="missing-function-docstring"
@@ -113,7 +113,7 @@ load-plugins=[
 "test_db_manager.py"="missing-function-docstring"
 "test_moneybox_endpoints.py"="missing-function-docstring, too-many-locals, too-many-lines"
 "test_prioritylist_endpoints.py"="missing-function-docstring"
-"test_utils.py"="missing-function-docstring"
+"tests/test_utils.py"="missing-function-docstring, line-too-long"
 "test_custom_openapi_schema.py"="missing-function-docstring"
 "/routes/"="missing-function-docstring"
 "requests.py"="duplicate-code"

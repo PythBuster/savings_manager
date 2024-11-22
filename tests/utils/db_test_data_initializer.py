@@ -49,16 +49,16 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             ),
             "test_endpoint_get_moneyboxes__status_200__total_6": self.dataset_test_endpoint_get_moneyboxes__status_200__total_6,
             "test_endpoint_get_moneyboxes__status_200__only_overflow_moneybox": self.truncate_tables,
-            "test_endpoint_get_moneyboxes__fail__missing_overflow_moneybox":
-                partial(
-                    self.truncate_tables, create_overflow_moneybox=False,
-                ),
+            "test_endpoint_get_moneyboxes__fail__missing_overflow_moneybox": partial(
+                self.truncate_tables,
+                create_overflow_moneybox=False,
+            ),
             "test_get_months_for_reaching_savings_targets__status_200__total_3": self.dataset_test_get_months_for_reaching_savings_targets__status_200__total_3,
             "test_get_months_for_reaching_savings_targets__status_204__no_data": partial(
-                    self.truncate_tables,
-                    exclude_table_names=["app_settings"],
-                    create_overflow_moneybox=False,
-                ),
+                self.truncate_tables,
+                exclude_table_names=["app_settings"],
+                create_overflow_moneybox=False,
+            ),
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing,
             "test_endpoint_get_moneybox_status_404_non_existing": self.truncate_tables,
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100,
@@ -199,7 +199,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_get_months_for_reaching_savings_targets__status_200__total_3(self):
+    async def dataset_test_get_months_for_reaching_savings_targets__status_200__total_3(
+        self,
+    ) -> None:
         """The data generation function for test_case:
         `test_get_months_for_reaching_savings_targets__status_200__total_4`.
         """
@@ -227,21 +229,21 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         )
 
         moneyboxes_data = [
-            { # expectation: reached savings target in 5 months
+            {  # expectation: reached savings target in 5 months
                 "name": "Test Box 3",
                 "priority": 1,
                 "balance": 0,
                 "savings_amount": 2500,
                 "savings_target": 10000,
             },
-            { # takes 1000 from month 6 upwards
+            {  # takes 1000 from month 6 upwards
                 "name": "Test Box 2",
                 "priority": 2,
                 "balance": 0,
                 "savings_amount": 1000,
                 "savings_target": None,
             },
-            { # get 1000 from month 6 upwards, expectation: reached target in month 16
+            {  # get 1000 from month 6 upwards, expectation: reached target in month 16
                 "name": "Test Box 4",
                 "priority": 3,
                 "balance": 1000,
