@@ -250,7 +250,7 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
 
         for _moneybox in _moneyboxes:
             # Skip moneyboxes without a savings_target
-            if _moneybox["savings_target"] is None:
+            if _moneybox["savings_target"] is None or _moneybox["savings_amount"] <= 0:
                 continue
 
             # Check if the target is still not reached
