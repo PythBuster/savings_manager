@@ -2,30 +2,38 @@
 
 ## x.y.z (unreleased)
 
+## 2.35.0 (2024-12-08)
+### Changes:
+- extend endpoint response status codes and improve swagger UI documentation
+- adapt some documentation and implement further tests
+- improve existing tests
+### Fixes:
+- fix infinite loop in calculation the reaching months of savings targets
+
 ## 2.34.0 (2024-11-22)
-## Feature:
+### Features:
 - add endpoint to get moneybox ids that will be saved in the next month
-# Changed:
+### Changes:
 - adapt calculation algorithm for reaching targets
 
 ## 2.33.0 (2024-11-17)
-## Feature:
+### Features:
 - add calculation algorithm to calculate the reaching months of savings targets
 - add endpoints to get these values
 
 ## 2.32.0 (2024-10-20)
-## Changes:
+### Changes:
 - adapt app Dockerfile and install poetry over pipx to install a python3.12 version or poetry
 
 ## 2.31.0 (2024-10-11)
-## Changes:
+### Changes:
 - adapt JWT data structure to comply with RFC 7519
 
 ## 2.30.0 (2024-10-11)
-### Feature:
+### Features:
 - add user roles: ADMIN and USER
 - protect user endpoints (requires user role ADMIN)
-## Changes:
+### Changes:
 - adapt user db migration
 - add user role to JWT
 
@@ -42,14 +50,14 @@
 - fix test pipeline by adapting test ordering
 
 ## 2.29.0 (2024-10-08)
-### Changed:
+### Changes:
 - added db_manager tests + refactored related code
 ### Fixes:
 - fixed fill-up mode, moneyboxes with savings_target=None got savings, now in post-distribution 
     of overflow moneyboxes (fill mode) moneyboxes will only get their savings_amount
 
 ## 2.28.1 + 2.28.2 (2024-10-06)
-### Changed:
+### Changes:
 - fix: docker compose files by fixing alembic arguments
 - fix: adapt cleanup script and keep backups
 - change: call cleanup steck directly after back-upping in same backup.sh script (only one cronjob is running instead of two different)

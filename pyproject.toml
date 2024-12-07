@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Savings Manager"
-version = "2.34.0"
+version = "2.35.0"
 description = "Savings Manager is an intuitive app for managing your savings using virtual moneyboxes. Allocate budgets, automate savings, and set priorities to reach goals faster. The app adjusts automatically when you withdraw, ensuring your plan stays on track. Easily transfer funds between moneyboxes or make manual deposits, giving you full control over your savings journey."
 authors = ["'PythBuster' <'pythbuster@gmail.com'>"]
 readme = "README.md"
