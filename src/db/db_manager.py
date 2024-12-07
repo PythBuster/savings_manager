@@ -259,6 +259,8 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     orm_model=cast(SqlBase, MoneyboxNameHistory),
                     data=moneybox_name_history_data,
                 )
+        except InconsistentDatabaseError:
+            raise
         except Exception as ex:
             raise CreateInstanceError(
                 message="Failed to create moneybox.",
@@ -336,8 +338,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
             is not allowed to be deleted.
                 :class:`HasBalanceError`: a moneybox with a balance > 0
             is not allowed to be deleted.
-                :class:`UpdateInstanceError`: when something went
-            wrong while updating progress in db transaction.
                 :class:`DeleteInstanceError`: when something went
             wrong while deleting progress in db transaction.
         """
@@ -420,10 +420,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     is <= 0.
         """
 
-        if deposit_transaction_data["amount"] == 0:
+        amount: int = deposit_transaction_data["amount"]
+
+        if amount <= 0:
             raise NonPositiveAmountError(
                 moneybox_id=moneybox_id,
-                amount=deposit_transaction_data["amount"],
+                amount=amount,
             )
 
         # Determine the session to use
@@ -441,7 +443,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 if moneybox is None:
                     raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-                moneybox.balance += deposit_transaction_data["amount"]  # type: ignore
+                new_balance: int = moneybox.balance + amount
 
                 updated_moneybox: Moneybox = cast(
                     Moneybox,
@@ -449,7 +451,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                         async_session=session,
                         orm_model=cast(SqlBase, Moneybox),
                         record_id=moneybox_id,
-                        data=moneybox.asdict(),
+                        data={"balance": new_balance},
                     ),
                 )
 
@@ -475,7 +477,8 @@ class DBManager:  # pylint: disable=too-many-public-methods
             if moneybox is None:
                 raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-            moneybox.balance += deposit_transaction_data["amount"]  # type: ignore
+            new_balance: int = moneybox.balance + amount
+            session.expunge(moneybox)
 
             updated_moneybox = cast(
                 Moneybox,
@@ -483,7 +486,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     async_session=session,
                     orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
-                    data=moneybox.asdict(),
+                    data={"balance": new_balance},
                 ),
             )
 
@@ -557,10 +560,14 @@ class DBManager:  # pylint: disable=too-many-public-methods
         if moneybox is None:
             raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-        moneybox.balance -= amount  # type: ignore
+        new_balance: int = moneybox.balance - amount  # type: ignore
 
-        if moneybox.balance < 0:  # type: ignore
-            raise BalanceResultIsNegativeError(moneybox_id=moneybox_id, amount=amount)
+        if new_balance < 0:  # type: ignore
+            raise BalanceResultIsNegativeError(
+                moneybox_id=moneybox_id,
+                amount=amount,
+                balance=new_balance,
+            )
 
         if session is None:
             async with self.async_sessionmaker.begin() as session:
@@ -570,7 +577,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                         async_session=session,
                         orm_model=cast(SqlBase, Moneybox),
                         record_id=moneybox_id,
-                        data=moneybox.asdict(),
+                        data={"balance": new_balance},
                     ),
                 )
 
@@ -584,13 +591,15 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     session=session,
                 )
         else:
+            session.expunge(moneybox)
+
             updated_moneybox = cast(
                 Moneybox,
                 await update_instance(
                     async_session=session,
                     orm_model=cast(SqlBase, Moneybox),
                     record_id=moneybox_id,
-                    data=moneybox.asdict(),
+                    data={"balance": new_balance},
                 ),
             )
 
@@ -629,6 +638,8 @@ class DBManager:  # pylint: disable=too-many-public-methods
             was not found in database.
                  :class:`BalanceResultIsNegativeError`:
             if result of withdraws from_moneybox_id is negative.
+                :class:`NonPositiveAmountError`:
+            if amount to transfer is negative or zero.
                 :class:`TransferEqualMoneyboxError`:
             if transfer shall happen within the same moneybox.
         """
@@ -682,6 +693,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 raise BalanceResultIsNegativeError(
                     moneybox_id=from_moneybox_id,
                     amount=amount,
+                    balance=new_from_moneybox_data["balance"],
                 )
 
             new_to_moneybox_data: dict[str, int] = {"balance": to_moneybox.balance + amount}
@@ -896,10 +908,14 @@ class DBManager:  # pylint: disable=too-many-public-methods
         return moneybox_name_history.name
 
     async def get_prioritylist(self) -> list[dict[str, int | str]]:
-        """Get the priority list ASC ordered by priority.
+        """Get the priority list ASC ordered by priority
+        (overflow moneybox NOT included).
 
         :return: The priority list.
         :rtype: :class:`list[dict[str, int|str]]`
+
+        :raises: :class:`InconsistentDatabaseError`: if at least one (active) moneybox has
+            `priority=None`.
         """
 
         stmt: Select = (
@@ -925,6 +941,14 @@ class DBManager:  # pylint: disable=too-many-public-methods
             if priority != 0
         ]
 
+        if any(moneybox["priority"] is None for moneybox in priority_map):
+            raise InconsistentDatabaseError(
+                message="At least one (active) moneybox has priority of 'None'",
+                details={
+                    "priorities": priority_map,
+                },
+            )
+
         return priority_map
 
     async def update_prioritylist(
@@ -941,7 +965,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :return: The updated priority list (moneybox_id to priority and name map).
         :rtype: :class:`list[dict[str, str|int]]`
 
-        :raises: :class:`OverflowMoneyboxCantBeUpdatedError`: when something went
+        :raises: :class:`OverflowMoneyboxUpdatedError`: when something went
             wrong while updating the overflow moneybox in db transaction.
                  :class:`UpdateInstanceError`: when something went
             wrong while updating progress in db transaction.

@@ -47,34 +47,26 @@ class EmailSender(ReportSender):
             jinja_env=jinja_env,
         )
 
-    async def send_testemail(self, to: str) -> bool:
+    async def send_testemail(self, to: str) -> None:
         """The test email sender function to test the SMTP outgoing data settings.
 
         :param to: The email address to send the test email to.
         :type to: :class:`str`
-        :return: True, if send was successfully, otherwise returns False.
-        :rtype: :class:`bool`
         """
 
-        try:
-            today_dt_str: str = datetime.now(tz=timezone.utc).isoformat(
-                sep=" ",
-                timespec="seconds",
-            )
-            plain_message: str = (
-                "This is a test email.\nYour SMTP outgoing data are correct, congratulations! :)"
-            )
+        today_dt_str: str = datetime.now(tz=timezone.utc).isoformat(
+            sep=" ",
+            timespec="seconds",
+        )
+        plain_message: str = (
+            "This is a test email.\nYour SMTP outgoing data are correct, congratulations! :)"
+        )
+        receiver: dict[str, str] = {
+            "to": to,
+            "subj": f"Test Email from {self.versioned_app_name} ({today_dt_str})",
+        }
 
-            receiver: dict[str, str] = {
-                "to": to,
-                "subj": f"Test Email from {self.versioned_app_name} ({today_dt_str})",
-            }
-
-            await self._send_message(plain_message=plain_message, receiver=receiver)
-            return True
-        except Exception as ex:  # pylint: disable=broad-exception-caught
-            app_logger.exception(ex)
-            return False
+        await self._send_message(plain_message=plain_message, receiver=receiver)
 
     async def send_email_automated_savings_done_successfully(self, to: str) -> None:
         """The send email function which will be called after automated savings

@@ -37,7 +37,7 @@ user_router: APIRouter = APIRouter(
     response_model=LoginUserResponse,
     responses=GET_USER_RESPONSES,
 )
-async def get_user(
+async def get_user_endpoint(
     request: Request,
     user_id: Annotated[
         int,
@@ -79,11 +79,11 @@ async def get_user(
 
 
 @user_router.post(
-    "/register",
+    "",
     response_model=LoginUserResponse,
     responses=ADD_USER_RESPONSES,
 )
-async def add_user(
+async def post_user_endpoint(
     request: Request,
     user_create_request: Annotated[
         LoginUserRequest,
@@ -130,7 +130,7 @@ async def add_user(
     response_model=LoginUserResponse,
     responses=UPDATE_USER_PASSWORD_RESPONSES,
 )
-async def update_user_password(
+async def patch_user_password_endpoint(
     request: Request,
     user_id: Annotated[int, Path(title="User ID", description="User ID to be updated.")],
     user_data: Annotated[
@@ -178,7 +178,7 @@ async def update_user_password(
     response_model=LoginUserResponse,
     responses=UPDATE_USER_NAME_RESPONSES,
 )
-async def update_user_name(
+async def patch_user_name_endpoint(
     request: Request,
     user_id: Annotated[int, Path(title="User ID", description="User ID to be updated.")],
     user_data: Annotated[
@@ -225,7 +225,7 @@ async def update_user_name(
     responses=DELETE_USER_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_user(
+async def delete_user_endpoint(
     request: Request,
     user_id: Annotated[
         int,

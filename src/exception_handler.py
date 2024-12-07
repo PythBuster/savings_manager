@@ -1,9 +1,13 @@
 """All exception_handler logic are located here."""
 
+from typing import cast
+
 import sqlalchemy
+from aiosmtplib import SMTPException
 from async_fastapi_jwt_auth.exceptions import AuthJWTException, MissingTokenError
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
+from pydantic import ValidationError
 from slowapi.errors import RateLimitExceeded
 from starlette import status
 from starlette.requests import Request
@@ -17,6 +21,9 @@ from src.db.exceptions import (
     InconsistentDatabaseError,
     InvalidFileError,
     RecordNotFoundError,
+    MissingDependencyError,
+    ProcessCommunicationError,
+    OverflowMoneyboxDeleteError,
 )
 from src.routes.exceptions import BadUsernameOrPasswordError, MissingSMTPSettingsError
 
@@ -35,6 +42,8 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
     :rtype: :class:`JSONResponse`
     """
 
+    # DO NOT LOG PASSWORDS!
+    # TODO: check exception (message?) if contains string like "userPassword"...
     app_logger.exception(exception)
 
     if isinstance(exception, MissingTokenError):
@@ -43,7 +52,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -54,7 +63,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=message,
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -69,7 +78,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,  # type: ignore
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -80,18 +89,18 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
                 HTTPErrorResponse(
                     message=exception.message,
                     details={"user_name": exception.user_name},
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
     if isinstance(exception, InconsistentDatabaseError):
         return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_409_CONFLICT,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,
                     details=exception.details,
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -104,29 +113,40 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
                 HTTPErrorResponse(
                     message="No database connection.",  # type: ignore
                     details={"message": arg_2},  # type: ignore
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
     if issubclass(exception.__class__, RecordNotFoundError):
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_404_NOT_FOUND,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,  # type: ignore
                     details=exception.details,  # type: ignore
-                )
+                ).model_dump(exclude_none=True)
+            ),
+        )
+
+    if isinstance(exception, OverflowMoneyboxDeleteError):
+        return JSONResponse(
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=exception.message,  # type: ignore
+                    details=exception.details,  # type: ignore
+                ).model_dump(exclude_none=True)
             ),
         )
 
     if issubclass(exception.__class__, CrudDatabaseError):
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=exception.message,  # type: ignore
                     details=exception.details,  # type: ignore
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -146,7 +166,7 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
                         "params": exception.params,
                         "detail": detail.strip(),
                     },  # type: ignore
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -158,46 +178,58 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=error_message,
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
-    if isinstance(exception, RequestValidationError):
+    if issubclass(exception.__class__, SMTPException):
+        smtp_base_exception: SMTPException = cast(
+            SMTPException,
+            exception,
+        )
+        message: str = smtp_base_exception.message
+
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             content=jsonable_encoder(
                 HTTPErrorResponse(
-                    message="Invalid request data",
-                    details={
-                        "args": exception.args,
-                        "body": exception.body,
-                    },
-                )
+                    message=message,
+                ).model_dump(exclude_none=True)
             ),
         )
 
-    if isinstance(exception, ResponseValidationError):
+    if (
+        isinstance(exception, RequestValidationError)
+        or isinstance(exception, ResponseValidationError)
+        or isinstance(exception, ValidationError)
+    ):
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=jsonable_encoder(
                 HTTPErrorResponse(
-                    message="Invalid response data",
+                    message="Validation Error",
                     details={
-                        "args": exception.args,
-                        "body": exception.body,
+                        "errors": [
+                            {
+                                "type": error["type"],
+                                "message": error["msg"],
+                                "field": error["loc"][-1],
+                            }
+                            for error in exception.errors()
+                        ],
                     },
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
     if isinstance(exception, RateLimitExceeded):
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message="Rate limit exceeded",
                     details={"limit": exception.detail},
-                )
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -208,7 +240,27 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             content=jsonable_encoder(
                 HTTPErrorResponse(
                     message=message,
-                )
+                ).model_dump(exclude_none=True)
+            ),
+        )
+
+    if isinstance(exception, MissingDependencyError):
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=exception.message,
+                ).model_dump(exclude_none=True)
+            ),
+        )
+
+    if isinstance(exception, ProcessCommunicationError):
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=jsonable_encoder(
+                HTTPErrorResponse(
+                    message=exception.message,
+                ).model_dump(exclude_none=True)
             ),
         )
 
@@ -222,6 +274,6 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
                     "exception": exception.__class__.__name__,
                     "args": exception.args,
                 },
-            )
+            ).model_dump(exclude_none=True)
         ),
     )

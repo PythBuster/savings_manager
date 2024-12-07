@@ -57,7 +57,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_get_months_for_reaching_savings_targets__status_204__no_data": partial(
                 self.truncate_tables,
                 exclude_table_names=["app_settings"],
-                create_overflow_moneybox=False,
+                create_overflow_moneybox=True,
             ),
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing,
             "test_endpoint_get_moneybox_status_404_non_existing": self.truncate_tables,
@@ -67,15 +67,15 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_endpoint_add_moneybox__two__status_200": self.truncate_tables,
             "test_endpoint_add_moneybox__one__status_422__balance_postdata": self.truncate_tables,
             "test_endpoint_delete_overflow_moneybox__status_405": self.dataset_test_endpoint_delete_overflow_moneybox__status_405,
-            "test_endpoint_update_overflow_moneybox": self.dataset_test_endpoint_update_overflow_moneybox,
-            "test_endpoint_update_moneybox__invalid_priority_0": self.dataset_test_endpoint_update_moneybox__invalid_priority_0,
+            "test_endpoint_update_overflow_moneybox__fail_409__modification_not_allowed": self.dataset_test_endpoint_update_overflow_moneybox__fail_409__modification_not_allowed,
+            "test_endpoint_update_moneybox__status_422__invalid_priority_0": self.dataset_test_endpoint_update_moneybox__status_422__invalid_priority_0,
             "test_endpoint_update_moneybox__last_moneybox__namechange": self.dataset_test_endpoint_update_moneybox__last_moneybox__namechange,
             "test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields": self.dataset_test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields,
             "test_endpoint_first_moneybox__modified_at_checks": self.dataset_test_endpoint_first_moneybox__modified_at_checks,
             "test_endpoint_delete_second_moneybox__status_204": self.dataset_test_endpoint_delete_second_moneybox__status_204,
             "test_endpoint_deposit_first_moneybox__status_200": self.dataset_test_endpoint_deposit_first_moneybox__status_200,
             "test_endpoint_withdraw_first_moneybox__status_200": self.dataset_test_endpoint_withdraw_first_moneybox__status_200,
-            "test_endpoint_withdraw_first_moneybox__status_405__balance_negative": self.dataset_test_endpoint_withdraw_first_moneybox__status_405__balance_negative,
+            "test_endpoint_withdraw_first_moneybox__status_409__balance_negative": self.dataset_test_endpoint_withdraw_first_moneybox__status_409__balance_negative,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_204__missing_description_field,
             "test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found": self.dataset_test_endpoint_transfer_amount_moneybox_second_to_third__status_404__to_moneybox_third_not_found,
@@ -351,9 +351,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    async def dataset_test_endpoint_update_moneybox__invalid_priority_0(self) -> None:
+    async def dataset_test_endpoint_update_moneybox__status_422__invalid_priority_0(self) -> None:
         """The data generation function for test_case:
-        `test_endpoint_update_moneybox__invalid_priority_0`.
+        `test_endpoint_update_moneybox__status_422__invalid_priority_0`.
         """
 
         await self.truncate_tables()
@@ -426,9 +426,11 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
 
         await self.truncate_tables()
 
-    async def dataset_test_endpoint_update_overflow_moneybox(self) -> None:
+    async def dataset_test_endpoint_update_overflow_moneybox__fail_409__modification_not_allowed(
+        self,
+    ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_update_overflow_moneybox`.
+        `test_endpoint_update_overflow_moneybox__fail_409__modification_not_allowed`.
         """
 
         await self.truncate_tables()
@@ -608,11 +610,11 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    async def dataset_test_endpoint_withdraw_first_moneybox__status_405__balance_negative(
+    async def dataset_test_endpoint_withdraw_first_moneybox__status_409__balance_negative(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_endpoint_withdraw_first_moneybox__status_405__balance_negative`.
+        `test_endpoint_withdraw_first_moneybox__status_409__balance_negative`.
         """
 
         await self.truncate_tables()

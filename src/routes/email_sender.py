@@ -11,23 +11,23 @@ from src.custom_types import EndpointRouteType
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
 from src.report_sender.email_sender.sender import EmailSender
-from src.routes.responses.email_sender import SEND_TESTEMAIL_RESPONSES
+from src.routes.responses.email_sender import PATCH_EMAIL_SEND_TESTEMAIL_RESPONSES
 from src.singleton import limiter
 
-email_sender_router: APIRouter = APIRouter(
+email_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.EMAIL_SENDER}",
     tags=[EndpointRouteType.EMAIL_SENDER],
 )
 """The moneybox router."""
 
 
-@email_sender_router.patch(
+@email_router.patch(
     "/send-testemail",
-    responses=SEND_TESTEMAIL_RESPONSES,
+    responses=PATCH_EMAIL_SEND_TESTEMAIL_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,  # set default status code to 204
 )
 @limiter.limit("1/minute")
-async def send_testemail(request: Request) -> Response:
+async def patch_email_send_testemail_endpoint(request: Request) -> Response:
     """Endpoint for sending a test email. Limited to 1 request per minute.
     \f
 
@@ -43,9 +43,6 @@ async def send_testemail(request: Request) -> Response:
     app_settings: AppSettings = (
         await db_manager._get_app_settings()  # pylint: disable=protected-access
     )
-    succeeded: bool = await email_sender.send_testemail(to=app_settings.user_email_address)
+    await email_sender.send_testemail(to=app_settings.user_email_address)
 
-    if succeeded:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

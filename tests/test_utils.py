@@ -12,7 +12,6 @@ from src.utils import (
     get_database_url,
 )
 
-
 def test_db_settings() -> None:  # pylint: disable= unused-argument
     db_settings = AppEnvVariables(
         db_driver="postgresql+asyncpg",
@@ -423,9 +422,7 @@ def test_calculate_months_for_reaching_savings_targets__success__empty_result_ca
     assert result == {}
 
 
-def test_calculate_months_for_reaching_savings_targets__success__monthly_savings_amount_0__init_reached_target() -> (
-    None
-):
+def test_calculate_months_for_reaching_savings_targets__success__monthly_savings_amount_0__init_reached_target() -> None:
     overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
     savings_amount = 0
     moneyboxes: list[dict[str, Any]] = [

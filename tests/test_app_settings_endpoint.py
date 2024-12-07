@@ -49,4 +49,4 @@ async def test_update_app_settings_invalid_data(client: AsyncClient) -> None:
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP_SETTINGS}",
         json=update_data,
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

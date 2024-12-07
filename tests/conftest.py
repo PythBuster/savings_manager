@@ -10,7 +10,7 @@ from typing import AsyncGenerator
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 from async_fastapi_jwt_auth import AuthJWT
-from httpx import AsyncClient, Cookies
+from httpx import AsyncClient, Cookies, ASGITransport
 from starlette.responses import Response
 
 import src.auth.jwt_auth as jwt_auth_
@@ -25,7 +25,7 @@ from src.custom_types import (
 )
 from src.db.db_manager import DBManager
 from src.db.models import Base
-from src.main import app, register_router, set_custom_openapi_schema
+from src.main import app, register_router
 from src.report_sender.email_sender.sender import EmailSender
 from src.singleton import limiter
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
@@ -280,7 +280,6 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
     :rtype: AsyncGenerator
     """
 
-    set_custom_openapi_schema(fastapi_app=app)
     register_router(fastapi_app=app)
 
     # Load fixtures
@@ -289,8 +288,8 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
     app.state.email_sender = email_sender
     app.state.limiter = limiter
 
-    async with AsyncClient(app=app, base_url="http://127.0.0.1:8999") as client:
-        yield client
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://127.0.0.1:8999") as async_client:
+        yield async_client
 
 
 @pytest_asyncio.fixture(scope="session", name="db_manager")
@@ -333,24 +332,23 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
 
     # clear db if not cleared in last test session
     subprocess.call(("alembic", "-x", "ENVIRONMENT=test", "downgrade", "base"))
-    time.sleep(1)
-    # drop tables
-    async with db_manager.async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
     time.sleep(2)
+    # drop tables
+    # async with db_manager.async_engine.begin() as conn:
+    #   await conn.run_sync(Base.metadata.drop_all)
+    # await asyncio.sleep(2)
 
     # create db tables and apply all db migrations
     subprocess.call(("alembic", "-x", "ENVIRONMENT=test", "upgrade", "head"))
-    time.sleep(2)
+    time.sleep(1)
 
     yield db_manager
+
+    await db_manager.async_engine.dispose()
 
     # downgrade the test database to base
     subprocess.call(("alembic", "-x", "ENVIRONMENT=test", "downgrade", "base"))
     time.sleep(1)
-    # drop tables
-    async with db_manager.async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
 
     print("DB Manager removed.", flush=True)
 
@@ -361,7 +359,6 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
             f"{WORKING_DIR_PATH.parent / 'scripts' / 'down_test_database.sh'}",
         ]
     )
-
 
 @pytest_asyncio.fixture(scope="function")
 async def admin_role_authed_client(

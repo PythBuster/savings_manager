@@ -21,7 +21,7 @@ from src.routes.exceptions import BadUsernameOrPasswordError
 from src.routes.responses.app import (
     DELETE_APP_LOGOUT_RESPONSES,
     GET_APP_EXPORT_RESPONSES,
-    GET_APP_INFO_RESPONSES,
+    GET_APP_METADATA_RESPONSES,
     POST_APP_IMPORT_RESPONSES,
     POST_APP_LOGIN_RESPONSES,
     POST_APP_RESET_RESPONSES,
@@ -38,9 +38,9 @@ app_router: APIRouter = APIRouter(
 @app_router.get(
     "/metadata",
     response_model=AppInfoResponse,
-    responses=GET_APP_INFO_RESPONSES,
+    responses=GET_APP_METADATA_RESPONSES,
 )
-async def get_app_infos() -> AppInfoResponse:
+async def get_app_metadata_endpoint() -> AppInfoResponse:
     """Endpoint for getting app infos like appVersion, appName etc.
     \f
 
@@ -62,7 +62,7 @@ async def get_app_infos() -> AppInfoResponse:
     responses=POST_APP_RESET_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def reset_app(
+async def post_app_reset_endpoint(
     request: Request,
     reset_data: ResetDataRequest,
 ) -> Response:
@@ -91,7 +91,7 @@ async def reset_app(
     responses=GET_APP_EXPORT_RESPONSES,
     response_class=StreamingResponse,
 )
-async def export_sql_dump(
+async def get_app_export_endpoint(
     request: Request,
 ) -> StreamingResponse:
     """Endpoint for exporting SQL dump.
@@ -124,7 +124,7 @@ async def export_sql_dump(
     responses=POST_APP_IMPORT_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def import_sql_dump(
+async def post_app_import_endpoint(
     request: Request,
     file: UploadFile = File(),
 ) -> Response:
@@ -154,7 +154,7 @@ async def import_sql_dump(
     "/login",
     responses=POST_APP_LOGIN_RESPONSES,
 )
-async def login(
+async def post_app_login_endpoint(
     request: Request,
     user_request_data: LoginUserRequest,
     jwt_authorize: Annotated[AuthJWT, Depends(UserAuthJWTBearer())],
@@ -208,7 +208,7 @@ async def login(
     responses=DELETE_APP_LOGOUT_RESPONSES,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def logout(
+async def delete_app_logout_endpoint(
     jwt_authorize: Annotated[AuthJWT, Depends(UserAuthJWTBearer())],
 ) -> Response:
     """Endpoint for logging in.

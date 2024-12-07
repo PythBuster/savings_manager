@@ -15,6 +15,7 @@ async def test_create_instance(
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
+        "priority": 3,
     }
 
     created_instance: Moneybox = await create_instance(  # type: ignore

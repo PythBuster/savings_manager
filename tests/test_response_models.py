@@ -232,6 +232,16 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
         {
             "moneyboxes": [
                 {
+                    "id": 0,
+                    "name": "Overflow Moneybox",
+                    "balance": 0,
+                    "savings_amount": 0,
+                    "savings_target": None,
+                    "priority": 0,
+                    "created_at": datetime.now(tz=timezone.utc),
+                    "modified_at": None,
+                },
+                {
                     "id": 1,
                     "name": "Holiday",
                     "balance": 1000,
@@ -255,6 +265,16 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
         },
         {
             "moneyboxes": [
+                {
+                    "id": 0,
+                    "name": "Overflow Moneybox",
+                    "balance": 0,
+                    "savings_amount": 0,
+                    "savings_target": None,
+                    "priority": 0,
+                    "created_at": datetime.now(tz=timezone.utc),
+                    "modified_at": None,
+                },
                 {
                     "id": 1,
                     "name": "Holiday",
@@ -292,7 +312,7 @@ def test_moneyboxes_response_valid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"moneyboxes": []},  # Empty moneyboxes list
+        {"moneyboxes": []},  # Empty moneyboxes list (missing overflow moneybox
         {
             "moneyboxes": [
                 {
@@ -734,3 +754,100 @@ def test_app_settings_response_invalid(data: dict[str, Any]) -> None:
     """Test AppSettingsResponse creation with invalid data."""
     with pytest.raises(ValidationError):
         AppSettingsResponse(**data)
+
+
+def test_validate_multiple_overflow_moneyboxes():
+    """Test that the validator raises an error when multiple Overflow Moneyboxes are present."""
+    moneyboxes = [
+        MoneyboxResponse(
+            id=1,
+            name="Overflow Moneybox 1",
+            balance=0,
+            savings_amount=0,
+            savings_target=None,
+            priority=0,
+            created_at="2024-08-13 02:50:41.837275+00:00",
+            modified_at=None,
+        ),
+        MoneyboxResponse(
+            id=2,
+            name="Overflow Moneybox 2",
+            balance=0,
+            savings_amount=0,
+            savings_target=None,
+            priority=0,
+            created_at="2024-08-13 02:50:41.837275+00:00",
+            modified_at=None,
+        ),
+        MoneyboxResponse(
+            id=3,
+            name="Holiday",
+            balance=1000,
+            savings_amount=50,
+            savings_target=50000,
+            priority=1,
+            created_at="2024-08-13 02:50:41.837275+00:00",
+            modified_at=None,
+        ),
+    ]
+
+    with pytest.raises(ValidationError, match="Multiple Overflow Moneyboxes are not allowed"):
+        MoneyboxesResponse(moneyboxes=moneyboxes)
+
+
+def test_validate_missing_overflow_moneybox():
+    """Test that the validator raises an error when no Overflow Moneybox is present."""
+    moneyboxes = [
+        MoneyboxResponse(
+            id=1,
+            name="Holiday",
+            balance=1000,
+            savings_amount=50,
+            savings_target=50000,
+            priority=1,
+            created_at="2024-08-13 02:50:41.837275+00:00",
+            modified_at=None,
+        ),
+        MoneyboxResponse(
+            id=2,
+            name="Emergency Fund",
+            balance=2000,
+            savings_amount=100,
+            savings_target=10000,
+            priority=2,
+            created_at="2024-08-14 02:50:41.837275+00:00",
+            modified_at=None,
+        ),
+    ]
+
+    with pytest.raises(ValidationError, match="Missing Overflow Moneybox"):
+        MoneyboxesResponse(moneyboxes=moneyboxes)
+
+
+def test_validate_valid_moneyboxes():
+    """Test that no errors are raised for valid moneyboxes configuration."""
+    moneyboxes = [
+        MoneyboxResponse(
+            id=1,
+            name="Overflow Moneybox",
+            balance=0,
+            savings_amount=0,
+            savings_target=None,
+            priority=0,
+            created_at="2024-08-13 02:50:41.837275+00:00",
+            modified_at=None,
+        ),
+        MoneyboxResponse(
+            id=2,
+            name="Holiday",
+            balance=1000,
+            savings_amount=50,
+            savings_target=50000,
+            priority=1,
+            created_at="2024-08-15 02:50:41.837275+00:00",
+            modified_at=None,
+        ),
+    ]
+
+    response = MoneyboxesResponse(moneyboxes=moneyboxes)
+    assert response.total == 2  # Ensure the total computed field works correctly

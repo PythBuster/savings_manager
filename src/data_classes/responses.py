@@ -1,5 +1,6 @@
 """All response models are located here."""
 
+from collections import Counter
 from datetime import datetime
 from typing import Annotated, Any, Self
 
@@ -13,8 +14,11 @@ from pydantic import (
     computed_field,
     field_validator,
     model_validator,
+    model_serializer,
+    field_serializer,
 )
 from pydantic_extra_types.semantic_version import SemanticVersion
+from pygments.lexer import default
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
@@ -227,7 +231,7 @@ class MoneyboxesResponse(BaseModel):
                     "moneyboxes": [
                         {
                             "id": 1,
-                            "name": "672c0145-c910-4ce8-8202-d6ce9ba405a4",
+                            "name": "Overflow Moneybox",
                             "balance": 0,
                             "savingsAmount": 0,
                             "savingsTarget": None,
@@ -251,6 +255,20 @@ class MoneyboxesResponse(BaseModel):
         },
     )
     """The config of the model."""
+
+    @model_validator(mode="after")
+    def validate_if_overflow_moneybox_exists(
+        self,
+    ) -> Self:
+        count_priority_0_moneyboxes = Counter(moneybox.priority for moneybox in self.moneyboxes)
+
+        if count_priority_0_moneyboxes[0] > 1:
+            raise ValueError("Multiple Overflow Moneyboxes are not allowed.")
+
+        if count_priority_0_moneyboxes[0] == 0:
+            raise ValueError("Missing Overflow Moneybox.")
+
+        return self
 
     @computed_field  # type: ignore
     @property
@@ -926,6 +944,7 @@ class MoneyboxReachingSavingsTargetsResponse(BaseModel):
     amount_of_months: Annotated[
         int,
         Field(
+            ge=0,
             validation_alias="amount_of_months",
             description="The amount of months for reaching the savings target.",
         ),

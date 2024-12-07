@@ -17,7 +17,6 @@ from src.data_classes.responses import (
     MoneyboxesResponse,
 )
 from src.db.db_manager import DBManager
-from src.db.exceptions import OverflowMoneyboxNotFoundError
 from src.db.models import AppSettings
 from src.routes.responses.moneyboxes import (
     GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES,
@@ -37,7 +36,7 @@ moneyboxes_router: APIRouter = APIRouter(
     response_model=MoneyboxesResponse,
     responses=GET_MONEYBOXES_RESPONSES,
 )
-async def get_moneyboxes(
+async def get_moneyboxes_endpoint(
     request: Request,
 ) -> MoneyboxesResponse:
     """Endpoint for getting moneyboxes.
@@ -54,8 +53,7 @@ async def get_moneyboxes(
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     moneyboxes_data: list[dict[str, Any]] = await db_manager.get_moneyboxes()
 
-    if not moneyboxes_data:  # expected at least the overflow moneybox
-        raise OverflowMoneyboxNotFoundError()
+    _ = MoneyboxesResponse(moneyboxes=moneyboxes_data)
 
     response_moneyboxes_data: dict[str, list[dict[str, Any]]] = {
         "moneyboxes": moneyboxes_data,
@@ -84,6 +82,10 @@ async def get_reaching_savings_targets(
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     moneyboxes_data: list[dict[str, Any]] = await db_manager.get_moneyboxes()
+
+    # validate before continuing
+    _ = MoneyboxesResponse(moneyboxes=moneyboxes_data)
+
     app_settings: AppSettings = (
         await db_manager._get_app_settings()  # pylint: disable=protected-access
     )
@@ -119,9 +121,20 @@ async def get_reaching_savings_targets(
 async def get_next_automated_savings_moneyboxes(
     request: Request,
 ) -> Response:
+    """Collect and return a list of moneybox IDs that would receive savings next month (automated saving).
+    \f
+
+    :param request: The current request object.
+    :return: A list of moneybox IDs.
+    :rtype: :class:`Response`
+    """
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
     moneyboxes_data: list[dict[str, Any]] = await db_manager.get_moneyboxes()
+
+    # validate before continuing
+    _ = MoneyboxesResponse(moneyboxes=moneyboxes_data)
+
     app_settings: AppSettings = (
         await db_manager._get_app_settings()  # pylint: disable=protected-access
     )

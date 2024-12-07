@@ -4,7 +4,7 @@
 import io
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -25,6 +25,7 @@ from src.data_classes.requests import (
     TransferTransactionRequest,
     WithdrawTransactionRequest,
 )
+from src.db.core import create_instance
 from src.db.db_manager import DBManager
 from src.db.exceptions import (
     AppSettingsNotFoundError,
@@ -46,12 +47,13 @@ from src.db.exceptions import (
     UserNameAlreadyExistError,
     UserNotFoundError,
 )
-from src.db.models import AppSettings, Moneybox
+from src.db.models import AppSettings, Moneybox, SqlBase
 from src.utils import equal_dict
 from tests.utils.db_manager import get_moneybox_id_by_name
 
 
 @pytest.mark.order(1)
+@pytest.mark.asyncio
 async def test_if_test_db_is_used(db_manager: DBManager) -> None:
     assert (
         db_manager.db_connection_string
@@ -60,13 +62,14 @@ async def test_if_test_db_is_used(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency
+@pytest.mark.asyncio
 async def test_create_db_manager_with_engine_args(
     app_env_variables: AppEnvVariables,
 ) -> None:
     db_manager = DBManager(db_settings=app_env_variables, engine_args={"echo": True})
     assert db_manager is not None
 
-
+@pytest.mark.asyncio
 async def test_overflow_moneybox_add_amount_success(
     load_test_data: None,  # pylint:disable=unused-argument
     db_manager: DBManager,
@@ -97,7 +100,7 @@ async def test_overflow_moneybox_add_amount_success(
         )
     assert update_overflow_moneybox["balance"] == 5
 
-
+@pytest.mark.asyncio
 async def test_overflow_moneybox_add_amount_fail(
     db_manager: DBManager,
 ) -> None:
@@ -120,7 +123,7 @@ async def test_overflow_moneybox_add_amount_fail(
                 session=session,
             )
 
-
+@pytest.mark.asyncio
 async def test_overflow_moneybox_sub_amount_success(
     db_manager: DBManager,
 ) -> None:
@@ -150,7 +153,7 @@ async def test_overflow_moneybox_sub_amount_success(
         )
     assert update_overflow_moneybox["balance"] == 2
 
-
+@pytest.mark.asyncio
 async def test_overflow_moneybox_sub_amount_fail(
     db_manager: DBManager,
 ) -> None:
@@ -173,7 +176,7 @@ async def test_overflow_moneybox_sub_amount_fail(
                 session=session,
             )
 
-
+@pytest.mark.asyncio
 async def test_get_overflow_moneybox(
     load_test_data: None,  # pylint:disable=unused-argument
     db_manager: DBManager,
@@ -181,7 +184,7 @@ async def test_get_overflow_moneybox(
     with pytest.raises(OverflowMoneyboxNotFoundError):
         await db_manager._get_overflow_moneybox()  # pylint:disable=protected-access
 
-
+@pytest.mark.asyncio
 async def test_add_overflow_moneybox(
     db_manager: DBManager,
 ) -> None:
@@ -194,6 +197,7 @@ async def test_add_overflow_moneybox(
 
 
 @pytest.mark.dependency(name="test_add_moneybox_success")
+@pytest.mark.asyncio
 async def test_add_moneybox_success(
     load_test_data: None,  # pylint:disable=unused-argument
     db_manager: DBManager,
@@ -244,6 +248,7 @@ async def test_add_moneybox_success(
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox_success"])
+@pytest.mark.asyncio
 async def test_add_moneybox_fail(
     db_manager: DBManager,
 ) -> None:
@@ -269,6 +274,7 @@ async def test_add_moneybox_fail(
 
 
 @pytest.mark.dependency(depends=["test_add_moneybox_fail"])
+@pytest.mark.asyncio
 async def test_get_prioritylist(
     db_manager: DBManager,
 ) -> None:
@@ -307,6 +313,7 @@ async def test_get_prioritylist(
 
 
 @pytest.mark.dependency(depends=["test_get_prioritylist"])
+@pytest.mark.asyncio
 async def test_update_priorities(db_manager: DBManager) -> None:
     first_moneybox_id = (
         await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
@@ -399,12 +406,9 @@ async def test_update_priorities(db_manager: DBManager) -> None:
     with pytest.raises(OverflowMoneyboxUpdatedError) as ex_info:
         await db_manager.update_prioritylist(priorities=new_priorities_3)
 
-    assert ex_info.value.message == "Updating overflow moneybox is not allowed/possible!"
+    assert ex_info.value.message == "It is not allowed to modify the Overflow Moneybox!"
 
     # fail setting priority 0 to another moneybox
-    overflow_moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
-    )
     new_priorities_4 = [
         {"moneybox_id": first_moneybox_id, "priority": 0},  # not allowed, should fail
         {"moneybox_id": second_moneybox_id, "priority": 2},
@@ -426,6 +430,7 @@ async def test_update_priorities(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_update_priorities"])
+@pytest.mark.asyncio
 async def test_update_moneybox(db_manager: DBManager) -> None:
     first_moneybox_id = (
         await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
@@ -469,6 +474,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_update_moneybox"])
+@pytest.mark.asyncio
 async def test_get_historical_moneybox_name_success(db_manager: DBManager) -> None:
     first_moneybox_id = (
         await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
@@ -486,6 +492,7 @@ async def test_get_historical_moneybox_name_success(db_manager: DBManager) -> No
 
 
 @pytest.mark.dependency(depends=["test_get_historical_moneybox_name_success"])
+@pytest.mark.asyncio
 async def test_get_historical_moneybox_name_fail(db_manager: DBManager) -> None:
     first_moneybox_id = (
         await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
@@ -501,6 +508,7 @@ async def test_get_historical_moneybox_name_fail(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_get_historical_moneybox_name_fail"])
+@pytest.mark.asyncio
 async def test_get_moneybox(db_manager: DBManager) -> None:
     first_moneybox_id: int = await get_moneybox_id_by_name(  # pylint:disable=protected-access
         async_session=db_manager.async_sessionmaker, name="Test Box 1 - Updated"
@@ -531,14 +539,15 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.get_moneybox(moneybox_id=moneybox_id)
 
-        assert f"Moneybox with id '{moneybox_id}' does not exist." == ex_info.value.message
+        assert "Moneybox not found." == ex_info.value.message
         assert isinstance(ex_info.value.details, dict)
         assert jsonable_encoder(ex_info.value.details) is not None
-        assert ex_info.value.details["record_id"] == moneybox_id
+        assert ex_info.value.details["id"] == moneybox_id
         assert ex_info.value.record_id == moneybox_id
 
 
 @pytest.mark.dependency(depends=["test_get_moneybox"], session="scope")
+@pytest.mark.asyncio
 async def test_delete_moneybox(db_manager: DBManager) -> None:
     # add amount to moneybox 3
     third_moneybox_id = (
@@ -551,7 +560,7 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
         amount=1,
         description="Bonus.",
     )
-    await db_manager.add_amount(
+    mb = await db_manager.add_amount(
         moneybox_id=third_moneybox_id,
         deposit_transaction_data=deposit_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,
@@ -577,14 +586,15 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
         with pytest.raises(MoneyboxNotFoundError) as ex_info:
             await db_manager.delete_moneybox(moneybox_id=moneybox_id)
 
-        assert f"Moneybox with id '{moneybox_id}' does not exist." == ex_info.value.message
+        assert "Moneybox not found." == ex_info.value.message
         assert isinstance(ex_info.value.details, dict)
         assert jsonable_encoder(ex_info.value.details) is not None
-        assert ex_info.value.details["record_id"] == moneybox_id
+        assert ex_info.value.details["id"] == moneybox_id
         assert ex_info.value.record_id == moneybox_id
 
 
 @pytest.mark.dependency(depends=["test_delete_moneybox"])
+@pytest.mark.asyncio
 async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
     first_moneybox_id = (
         await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
@@ -716,6 +726,7 @@ async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_add_amount_to_first_moneybox"])
+@pytest.mark.asyncio
 async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
     db_manager: DBManager,
 ) -> None:
@@ -813,14 +824,12 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert (
-        f"Can't sub amount '1000' from Moneybox '{first_moneybox_id}'. Not enough balance to sub."
-        == ex_info.value.message
-    )
+    assert "Can't sub amount. Not enough balance to sub." == ex_info.value.message
     assert isinstance(ex_info.value.details, dict)
-    assert len(ex_info.value.details) == 2
+    assert len(ex_info.value.details) == 3
     assert ex_info.value.details["id"] == first_moneybox_id
     assert ex_info.value.details["amount"] == 1000
+    assert ex_info.value.details["balance"] == -1000
     assert ex_info.value.record_id == first_moneybox_id
 
     with pytest.raises(NonPositiveAmountError) as ex_info:
@@ -831,10 +840,7 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert (
-        ex_info.value.message
-        == f"Can't add or sub amount less than 1 '0' to Moneybox '{first_moneybox_id}'."
-    )
+    assert ex_info.value.message == "Can't add or sub amount <= 0."
     assert ex_info.value.details == {"amount": 0, "id": first_moneybox_id}
     assert ex_info.value.record_id == first_moneybox_id
 
@@ -848,10 +854,7 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert (
-        ex_info.value.message
-        == f"Can't add or sub amount less than 1 '-1' to Moneybox '{first_moneybox_id}'."
-    )
+    assert ex_info.value.message == "Can't add or sub amount <= 0."
     assert ex_info.value.details == {"amount": -1, "id": first_moneybox_id}
     assert ex_info.value.record_id == first_moneybox_id
 
@@ -867,6 +870,7 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
 
 
 @pytest.mark.dependency(depends=["test_sub_amount_from_moneybox"])
+@pytest.mark.asyncio
 async def test_transfer_amount(db_manager: DBManager) -> None:
     first_moneybox_id = (
         await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
@@ -987,10 +991,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    expected_exception_message = (
-        f"Can't sub amount '1000' from Moneybox '{from_moneybox_data['id']}'. "
-        "Not enough balance to sub."
-    )
+    expected_exception_message = "Can't sub amount. Not enough balance to sub."
     assert ex_info.value.message == expected_exception_message
 
     with pytest.raises(TransferEqualMoneyboxError) as ex_info:
@@ -1005,7 +1006,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
             transaction_trigger=TransactionTrigger.MANUALLY,
         )
 
-    assert ex_info.value.message == "Can't transfer within the same moneybox"
+    assert ex_info.value.message == "Can't transfer within the same moneybox."
     assert ex_info.value.details == {
         "amount": 123,
         "fromMoneyboxId": first_moneybox_id,
@@ -1026,6 +1027,7 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_transfer_amount"])
+@pytest.mark.asyncio
 async def test_get_transactions_logs_with_counterparty_to_deleted_moneybox(
     db_manager: DBManager,
 ) -> None:
@@ -1088,6 +1090,7 @@ async def test_get_transactions_logs_with_counterparty_to_deleted_moneybox(
 @pytest.mark.dependency(
     depends=["test_get_transactions_logs_with_counterparty_to_deleted_moneybox"]
 )
+@pytest.mark.asyncio
 async def test_transactions_logs_between_overflow_moneybox(
     db_manager: DBManager,
 ) -> None:
@@ -1115,6 +1118,7 @@ async def test_transactions_logs_between_overflow_moneybox(
 
 
 @pytest.mark.dependency(depends=["test_transactions_logs_between_overflow_moneybox"])
+@pytest.mark.asyncio
 async def test_get_app_settings_valid(db_manager: DBManager) -> None:
     _app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
     app_settings = await db_manager.get_app_settings(app_settings_id=_app_settings.id)
@@ -1136,6 +1140,7 @@ async def test_get_app_settings_valid(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_get_app_settings_valid"])
+@pytest.mark.asyncio
 async def test_update_app_settings_valid(db_manager: DBManager) -> None:
     update_data_1 = {
         "savings_amount": 0,
@@ -1184,6 +1189,7 @@ async def test_update_app_settings_valid(db_manager: DBManager) -> None:
 
 
 @pytest.mark.dependency(depends=["test_update_app_settings_valid"])
+@pytest.mark.asyncio
 async def test_update_app_settings_invalid(db_manager: DBManager) -> None:
     update_data = {
         # results to asyncpg.exceptions.InvalidTextRepresentationError
@@ -1211,6 +1217,7 @@ async def test_get_app_settings_invalid(
 
 
 @pytest.mark.dependency(depends=["test_get_app_settings_invalid"])
+@pytest.mark.asyncio
 async def test_add_automated_savings_log_valid_with_session(
     db_manager: DBManager,
 ) -> None:
@@ -1252,6 +1259,7 @@ async def test_add_automated_savings_log_valid_with_session(
     "action_type",
     [ActionType.APPLIED_AUTOMATED_SAVING, ActionType.DEACTIVATED_AUTOMATED_SAVING],
 )
+@pytest.mark.asyncio
 async def test_get_automated_savings_logs(db_manager: DBManager, action_type: ActionType) -> None:
     expected_data = {
         ActionType.APPLIED_AUTOMATED_SAVING: [
@@ -1298,6 +1306,7 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
 
 
 @pytest.mark.dependency(depends=["test_get_automated_savings_logs"])
+@pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_collect(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1337,6 +1346,7 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
 
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_collect"])
+@pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1376,6 +1386,7 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
 
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_add_to_amount"])
+@pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_fill_up(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1415,6 +1426,7 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
 
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
+@pytest.mark.asyncio
 async def test_reset_database_keep_app_settings(
     load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
 ) -> None:
@@ -1451,6 +1463,7 @@ async def test_reset_database_keep_app_settings(
 
 
 @pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
+@pytest.mark.asyncio
 async def test_reset_database_delete_app_settings(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1489,6 +1502,7 @@ async def test_reset_database_delete_app_settings(
 
 @pytest.mark.dependency(depends=["test_reset_database_delete_app_settings"])
 @pytest.mark.order(after="tests/test_fastapi_utils.py::test_create_pgpass")
+@pytest.mark.asyncio
 async def test_export_sql_dump(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1506,6 +1520,7 @@ async def test_export_sql_dump(
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])
 @pytest.mark.order(after="test_export_sql_dump")
+@pytest.mark.asyncio
 async def test_export_sql_dump_missing_dependency_error(
     db_manager: DBManager,
 ) -> None:
@@ -1518,6 +1533,7 @@ async def test_export_sql_dump_missing_dependency_error(
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])
 @pytest.mark.order(after="test_export_sql_dump_missing_dependency_error")
+@pytest.mark.asyncio
 async def test_export_sql_dump_process_communication_error(
     db_manager: DBManager,
 ) -> None:
@@ -1533,6 +1549,7 @@ async def test_export_sql_dump_process_communication_error(
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])
 @pytest.mark.order(after="tests/test_app_endpoints.py::test_app_export_valid")
+@pytest.mark.asyncio
 async def test_import_sql_dump(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1586,6 +1603,7 @@ async def test_import_sql_dump(
 
 @pytest.mark.dependency(depends=["test_import_sql_dump"])
 @pytest.mark.order(after="test_import_sql_dump")
+@pytest.mark.asyncio
 async def test_import_sql_dump_missing_dependency_error(
     db_manager: DBManager,
 ) -> None:
@@ -1616,6 +1634,7 @@ async def test_import_sql_dump_missing_dependency_error(
 
 @pytest.mark.dependency(depends=["test_import_sql_dump"])
 @pytest.mark.order(after="test_import_sql_dump_missing_dependency_error")
+@pytest.mark.asyncio
 async def test_import_sql_dump_process_communication_error(
     db_manager: DBManager,
 ) -> None:
@@ -1649,6 +1668,7 @@ async def test_import_sql_dump_process_communication_error(
 
 
 @pytest.mark.dependency
+@pytest.mark.asyncio
 async def test_get_users_empty(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1658,6 +1678,7 @@ async def test_get_users_empty(
 
 
 @pytest.mark.dependency(depends=["test_get_users_empty"])
+@pytest.mark.asyncio
 async def test_add_user_success(
     db_manager: DBManager,
 ) -> None:
@@ -1687,6 +1708,7 @@ async def test_add_user_success(
 
 
 @pytest.mark.dependency(depends=["test_add_user_success"])
+@pytest.mark.asyncio
 async def test_add_admin_user_success(
     db_manager: DBManager,
 ) -> None:
@@ -1717,6 +1739,7 @@ async def test_add_admin_user_success(
 
 
 @pytest.mark.dependency(depends=["test_add_admin_user_success"])
+@pytest.mark.asyncio
 async def test_add_user_failed(
     db_manager: DBManager,
 ) -> None:
@@ -1734,6 +1757,7 @@ async def test_add_user_failed(
 
 
 @pytest.mark.dependency(depends=["test_add_user_failed"])
+@pytest.mark.asyncio
 async def test_get_user(
     db_manager: DBManager,
 ) -> None:
@@ -1767,6 +1791,7 @@ async def test_get_user(
 
 
 @pytest.mark.dependency(depends=["test_get_user"])
+@pytest.mark.asyncio
 async def test_get_user_by_credentials_success(
     db_manager: DBManager,
 ) -> None:
@@ -1782,6 +1807,7 @@ async def test_get_user_by_credentials_success(
 
 
 @pytest.mark.dependency(depends=["test_get_user_by_credentials_success"])
+@pytest.mark.asyncio
 async def test_update_user_name(
     db_manager: DBManager,
 ) -> None:
@@ -1829,6 +1855,7 @@ async def test_update_user_name(
 
 
 @pytest.mark.dependency(depends=["test_update_user_name"])
+@pytest.mark.asyncio
 async def test_update_user_password(
     db_manager: DBManager,
 ) -> None:
@@ -1866,6 +1893,7 @@ async def test_update_user_password(
 
 
 @pytest.mark.dependency(depends=["test_update_user_password"])
+@pytest.mark.asyncio
 async def test_delete_user(
     db_manager: DBManager,
 ) -> None:
@@ -1889,6 +1917,7 @@ async def test_delete_user(
 
 
 @pytest.mark.dependency(depends=["test_delete_user"])
+@pytest.mark.asyncio
 async def test_delete_admin_user_fail(
     db_manager: DBManager,
 ) -> None:
@@ -1910,6 +1939,7 @@ async def test_delete_admin_user_fail(
 
 
 @pytest.mark.dependency(depends=["test_delete_admin_user_fail"])
+@pytest.mark.asyncio
 async def test_user_by_credentials_fail(
     db_manager: DBManager,
 ) -> None:
@@ -1923,7 +1953,7 @@ async def test_user_by_credentials_fail(
     )
     assert user is None
 
-
+@pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__amount_0(
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
@@ -1948,7 +1978,7 @@ async def test_distribute_automated_savings_amount__amount_0(
 
     assert updated_moneyboxes == sorted_by_priority_moneyboxes
 
-
+@pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__amount_negative(db_manager: DBManager) -> None:
     distribute_amount: int = -20
     moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
@@ -1970,7 +2000,7 @@ async def test_distribute_automated_savings_amount__amount_negative(db_manager: 
 
     assert updated_moneyboxes == sorted_by_priority_moneyboxes
 
-
+@pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none(  # noqa: ignore  # pylint: disable=line-too-long
     load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
 ) -> None:
@@ -1998,7 +2028,7 @@ async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with
         updated_moneyboxes[3]["balance"] == 0
     )  # target: None and wants 10, but fill mode ignores wises
 
-
+@pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0(
     load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
 ) -> None:
@@ -2025,3 +2055,34 @@ async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_wi
     assert (
         updated_moneyboxes[3]["balance"] == 10
     )  # savings_target=None, but respected savings_amount=10
+
+
+@pytest.mark.dependency
+@pytest.mark.asyncio
+async def test_create_instance__new_moneybox_with_priority_none__fail__get_prioritylist(
+    db_manager: DBManager,
+) -> None:
+    # test different combinations of initial values
+    moneybox_data: dict[str, Any] = {
+        "name": "Test Box 42",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": None,  # is allowed for create_instance(..), but
+        # ... leads to database inconsistency
+    }
+
+    await create_instance(
+        async_session=db_manager.async_sessionmaker,
+        orm_model=cast(SqlBase, Moneybox),
+        data=moneybox_data,
+    )
+
+    with pytest.raises(InconsistentDatabaseError) as ex:
+        await db_manager.get_prioritylist()
+
+    assert (
+        ex.value.message
+        == "Inconsistent Database! At least one (active) moneybox has priority of 'None'"
+    )
+    assert "priorities" in ex.value.details

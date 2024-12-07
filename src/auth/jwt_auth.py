@@ -17,6 +17,8 @@ APP_DATA: dict[str, Any] = get_app_data()
 APP_MAJOR_VERSION: int = int(APP_DATA["version"].split(".")[0])
 LOGIN_REQUEST_PATH: str = f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP}/login"
 
+_APP_MAJOR_VERSION = 4
+
 
 class JWTSettings(BaseModel):
     """The JWT settings model for"""
@@ -87,7 +89,7 @@ class UserAuthJWTBearer(SecurityHTTPBearer):  # pylint: disable=too-few-public-m
     The official documentations is using a decorator for config loading approach.
     But we will build an import order dependency, which is corralled with load_dotenv in main.
 
-    Before configuration of AuthJWT, the env var `ENVIRONMENT`need to be loaded from .env.general.
+    Before configuration of AuthJWT, the env var `ENVIRONMENT`need to be loaded from postgres_server.env.general.
     """
 
     _config_loaded: bool = False

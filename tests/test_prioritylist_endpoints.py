@@ -99,7 +99,7 @@ async def test_update_prioritylist(  # pylint:disable=too-many-locals
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}",
         json=invalid_update_prioritylist,
     )
-    assert response_invalid.status_code == status.HTTP_400_BAD_REQUEST
+    assert response_invalid.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     # Attempting to update the overflow moneybox with moneybox_id=1
     overflow_update_prioritylist_data = {
@@ -112,4 +112,4 @@ async def test_update_prioritylist(  # pylint:disable=too-many-locals
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.PRIORITYLIST}",
         json=overflow_update_prioritylist_data,
     )
-    assert response_overflow.status_code == status.HTTP_400_BAD_REQUEST
+    assert response_overflow.status_code == status.HTTP_409_CONFLICT
