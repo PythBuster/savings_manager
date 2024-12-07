@@ -4,7 +4,7 @@ from typing import Any
 
 from starlette import status
 
-from src.data_classes.responses import PrioritylistResponse, HTTPErrorResponse
+from src.data_classes.responses import HTTPErrorResponse, PrioritylistResponse
 
 GET_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
@@ -25,12 +25,12 @@ GET_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
                             {
                                 "moneybox_id": 1,
                                 "name": "Holiday",
-                                "priority": 'None',
+                                "priority": "None",
                             },
                             {
                                 "moneybox_id": 2,
                                 "name": "Car",
-                                "priority": '2',
+                                "priority": "2",
                             },
                         ],
                     },
@@ -113,12 +113,12 @@ UPDATE_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
                             {
                                 "moneybox_id": 1,
                                 "name": "Holiday",
-                                "priority": 'None',
+                                "priority": "None",
                             },
                             {
                                 "moneybox_id": 2,
                                 "name": "Car",
-                                "priority": '2',
+                                "priority": "2",
                             },
                         ],
                     },

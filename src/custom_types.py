@@ -228,3 +228,14 @@ class MoneyboxSavingsMonthData:
     savings_amount: int
     month: int
     additional_data: str = ""
+
+
+class DBViolationErrorType(StrEnum):
+    """The checkconstraint names of all models defined as enum."""
+
+    SET_REPORTS_VIA_EMAIL_BUT_NO_EMAIL_ADDRESS = (
+        "ck_app_settings_send_reports_via_email_requires_email_address"
+    )
+    """Checkconstraint in AppSettings table/model."""
+
+    UNKNOWN = "unknown"

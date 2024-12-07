@@ -5,7 +5,11 @@ from typing import Any
 
 from starlette import status
 
-from src.data_classes.responses import AppInfoResponse, LoginUserResponse, HTTPErrorResponse
+from src.data_classes.responses import (
+    AppInfoResponse,
+    HTTPErrorResponse,
+    LoginUserResponse,
+)
 
 GET_APP_METADATA_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {

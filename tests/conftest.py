@@ -10,7 +10,7 @@ from typing import AsyncGenerator
 import pytest_asyncio
 from _pytest.fixtures import FixtureRequest
 from async_fastapi_jwt_auth import AuthJWT
-from httpx import AsyncClient, Cookies, ASGITransport
+from httpx import ASGITransport, AsyncClient, Cookies
 from starlette.responses import Response
 
 import src.auth.jwt_auth as jwt_auth_
@@ -288,7 +288,9 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
     app.state.email_sender = email_sender
     app.state.limiter = limiter
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://127.0.0.1:8999") as async_client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://127.0.0.1:8999"
+    ) as async_client:
         yield async_client
 
 
@@ -359,6 +361,7 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
             f"{WORKING_DIR_PATH.parent / 'scripts' / 'down_test_database.sh'}",
         ]
     )
+
 
 @pytest_asyncio.fixture(scope="function")
 async def admin_role_authed_client(

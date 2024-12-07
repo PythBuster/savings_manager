@@ -1086,6 +1086,12 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         app_settings: AppSettings = await self._get_app_settings()
 
+        updating_data = {
+            key: app_settings_data[key]
+            for key, value in app_settings.asdict().items()
+            if key in app_settings_data and value != app_settings_data[key]
+        }
+
         async with self.async_sessionmaker.begin() as session:
             app_settings = cast(
                 AppSettings,
@@ -1093,7 +1099,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     async_session=session,
                     orm_model=cast(SqlBase, AppSettings),
                     record_id=app_settings.id,
-                    data=app_settings_data,
+                    data=updating_data,
                 ),
             )
 

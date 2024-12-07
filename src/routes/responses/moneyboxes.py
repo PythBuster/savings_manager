@@ -5,11 +5,10 @@ from typing import Any
 from starlette import status
 
 from src.data_classes.responses import (
+    HTTPErrorResponse,
     MoneyboxesReachingSavingsTargetsResponse,
     MoneyboxesResponse,
-    HTTPErrorResponse,
 )
-
 
 GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
@@ -218,4 +217,3 @@ GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES: dict[status, dict[str, Any]] 
 - GET: /moneyboxes/reaching_savings_targets
 - GET: /moneyboxes/next_automated_savings_moneyboxes
 """
-

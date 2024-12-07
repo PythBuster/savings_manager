@@ -123,7 +123,10 @@ async def test_endpoint_get_moneyboxes__fail__missing_overflow_moneybox(
     content: dict[str, Any] = response.json()
     assert content["message"] == "Validation Error"
     assert len(content["details"]["errors"]) == 1
-    assert content["details"]["errors"][0]["message"] == "List should have at least 1 item after validation, not 0"
+    assert (
+        content["details"]["errors"][0]["message"]
+        == "List should have at least 1 item after validation, not 0"
+    )
     assert content["details"]["errors"][0]["type"] == "too_short"
 
 

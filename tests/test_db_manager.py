@@ -69,6 +69,7 @@ async def test_create_db_manager_with_engine_args(
     db_manager = DBManager(db_settings=app_env_variables, engine_args={"echo": True})
     assert db_manager is not None
 
+
 @pytest.mark.asyncio
 async def test_overflow_moneybox_add_amount_success(
     load_test_data: None,  # pylint:disable=unused-argument
@@ -100,6 +101,7 @@ async def test_overflow_moneybox_add_amount_success(
         )
     assert update_overflow_moneybox["balance"] == 5
 
+
 @pytest.mark.asyncio
 async def test_overflow_moneybox_add_amount_fail(
     db_manager: DBManager,
@@ -122,6 +124,7 @@ async def test_overflow_moneybox_add_amount_fail(
                 amount=5,
                 session=session,
             )
+
 
 @pytest.mark.asyncio
 async def test_overflow_moneybox_sub_amount_success(
@@ -153,6 +156,7 @@ async def test_overflow_moneybox_sub_amount_success(
         )
     assert update_overflow_moneybox["balance"] == 2
 
+
 @pytest.mark.asyncio
 async def test_overflow_moneybox_sub_amount_fail(
     db_manager: DBManager,
@@ -176,6 +180,7 @@ async def test_overflow_moneybox_sub_amount_fail(
                 session=session,
             )
 
+
 @pytest.mark.asyncio
 async def test_get_overflow_moneybox(
     load_test_data: None,  # pylint:disable=unused-argument
@@ -183,6 +188,7 @@ async def test_get_overflow_moneybox(
 ) -> None:
     with pytest.raises(OverflowMoneyboxNotFoundError):
         await db_manager._get_overflow_moneybox()  # pylint:disable=protected-access
+
 
 @pytest.mark.asyncio
 async def test_add_overflow_moneybox(
@@ -1953,6 +1959,7 @@ async def test_user_by_credentials_fail(
     )
     assert user is None
 
+
 @pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__amount_0(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -1978,6 +1985,7 @@ async def test_distribute_automated_savings_amount__amount_0(
 
     assert updated_moneyboxes == sorted_by_priority_moneyboxes
 
+
 @pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__amount_negative(db_manager: DBManager) -> None:
     distribute_amount: int = -20
@@ -1999,6 +2007,7 @@ async def test_distribute_automated_savings_amount__amount_negative(db_manager: 
         )
 
     assert updated_moneyboxes == sorted_by_priority_moneyboxes
+
 
 @pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none(  # noqa: ignore  # pylint: disable=line-too-long
@@ -2027,6 +2036,7 @@ async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with
     assert (
         updated_moneyboxes[3]["balance"] == 0
     )  # target: None and wants 10, but fill mode ignores wises
+
 
 @pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0(

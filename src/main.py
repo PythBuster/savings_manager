@@ -16,11 +16,7 @@ from src.custom_types import EnvironmentType
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
-from src.fastapi_utils import (
-    create_pgpass,
-    handle_requests,
-    register_router,
-)
+from src.fastapi_utils import create_pgpass, handle_requests, register_router
 from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data, get_app_env_variables
@@ -103,9 +99,16 @@ app: FastAPI = FastAPI(
 # register/override middlewares, exceptions handlers
 print("Register/override middlewares, exceptions handlers ...", flush=True)
 
+allowed_origins = [
+    # production
+    "http://192.168.2.106:64000",
+    # dev
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
 app.add_middleware(
     CORSMiddleware,  # type: ignore
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

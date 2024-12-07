@@ -195,6 +195,7 @@ async def update_instance(
             details={
                 "table": orm_model.__name__,
                 "data": data,
+                "error": str(ex),
             },
         ) from ex
 

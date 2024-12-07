@@ -4,7 +4,11 @@ from typing import Any
 
 from starlette import status
 
-from src.data_classes.responses import MoneyboxResponse, TransactionLogsResponse, HTTPErrorResponse
+from src.data_classes.responses import (
+    HTTPErrorResponse,
+    MoneyboxResponse,
+    TransactionLogsResponse,
+)
 
 GET_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {

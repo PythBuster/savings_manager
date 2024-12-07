@@ -17,7 +17,6 @@ from src.routes.responses.app_settings import (
     PATCH_APP_SETTINGS_RESPONSES,
 )
 
-
 app_settings_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.APP_SETTINGS}",
     tags=[EndpointRouteType.APP_SETTINGS],

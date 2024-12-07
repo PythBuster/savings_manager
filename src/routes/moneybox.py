@@ -18,16 +18,15 @@ from src.data_classes.requests import (
 from src.data_classes.responses import MoneyboxResponse, TransactionLogsResponse
 from src.db.db_manager import DBManager
 from src.routes.responses.moneybox import (
-    POST_MONEYBOX_RESPONSES,
     DELETE_MONEYBOX_RESPONSES,
-    POST_MONEYBOX_DEPOSIT_RESPONSES,
     GET_MONEYBOX_RESPONSES,
     GET_MONEYBOX_TRANSACTION_LOGS_RESPONSES,
-    POST_TRANSFER_MONEYBOX_RESPONSES,
     PATCH_MONEYBOX_RESPONSES,
+    POST_MONEYBOX_DEPOSIT_RESPONSES,
+    POST_MONEYBOX_RESPONSES,
     POST_MONEYBOX_WITHDRAW_RESPONSES,
+    POST_TRANSFER_MONEYBOX_RESPONSES,
 )
-
 
 moneybox_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOX}",

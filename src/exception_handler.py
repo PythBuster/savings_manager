@@ -15,17 +15,19 @@ from starlette.responses import JSONResponse
 
 from src.app_logger import app_logger
 from src.auth.exceptions import MissingRoleError
+from src.custom_types import DBViolationErrorType
 from src.data_classes.responses import HTTPErrorResponse
 from src.db.exceptions import (
     CrudDatabaseError,
     InconsistentDatabaseError,
     InvalidFileError,
-    RecordNotFoundError,
     MissingDependencyError,
-    ProcessCommunicationError,
     OverflowMoneyboxDeleteError,
+    ProcessCommunicationError,
+    RecordNotFoundError,
 )
 from src.routes.exceptions import BadUsernameOrPasswordError, MissingSMTPSettingsError
+from src.utils import extract_database_violation_error
 
 
 async def response_exception(  # pylint: disable=too-many-return-statements, too-many-branches
@@ -140,11 +142,25 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
         )
 
     if issubclass(exception.__class__, CrudDatabaseError):
+        message = exception.message
+
+        if "error" in exception.details:
+            db_violation: DBViolationErrorType = await extract_database_violation_error(
+                exception.details["error"]
+            )
+
+            match db_violation:
+                case DBViolationErrorType.SET_REPORTS_VIA_EMAIL_BUT_NO_EMAIL_ADDRESS:
+                    message = "Email reports can't be activated, no email address set."
+
+                case DBViolationErrorType.UNKNOWN:
+                    raise ValueError(f"Not allowed state: {db_violation=}")
+
         return JSONResponse(
             status_code=status.HTTP_409_CONFLICT,
             content=jsonable_encoder(
                 HTTPErrorResponse(
-                    message=exception.message,  # type: ignore
+                    message=message,  # type: ignore
                     details=exception.details,  # type: ignore
                 ).model_dump(exclude_none=True)
             ),
