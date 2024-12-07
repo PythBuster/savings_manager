@@ -242,7 +242,7 @@ async def deactivate_instance(
             result: Result = await async_session.execute(stmt)
         else:
             async with async_session.begin() as session:
-                result: Result = await session.execute(stmt)
+                result = await session.execute(stmt)
     except Exception as ex:
         raise DeleteInstanceError(
             record_id=record_id,

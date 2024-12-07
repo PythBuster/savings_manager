@@ -8,7 +8,6 @@ class MissingSMTPSettingsError(Exception):
         """Initialize the MissingSMTPSettingsError instance."""
 
         self.message: str = "SMTP settings incomplete. Can't send email."
-        self.message: str = "SMTP settings incomplete. Can't send email."
         super().__init__(self.message)
 
 

@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """All response models are located here."""
 
 from collections import Counter
@@ -12,13 +13,10 @@ from pydantic import (
     Field,
     StringConstraints,
     computed_field,
-    field_serializer,
     field_validator,
-    model_serializer,
     model_validator,
 )
 from pydantic_extra_types.semantic_version import SemanticVersion
-from pygments.lexer import default
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
@@ -260,6 +258,8 @@ class MoneyboxesResponse(BaseModel):
     def validate_if_overflow_moneybox_exists(
         self,
     ) -> Self:
+        """Validates if overflow moneybox exits."""
+
         count_priority_0_moneyboxes = Counter(moneybox.priority for moneybox in self.moneyboxes)
 
         if count_priority_0_moneyboxes[0] > 1:

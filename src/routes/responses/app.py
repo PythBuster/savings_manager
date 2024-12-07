@@ -1,6 +1,5 @@
 """Further app SwaggerUI response codes and examples are located here."""
 
-import json
 from typing import Any
 
 from starlette import status

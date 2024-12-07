@@ -155,7 +155,7 @@ class MoneyboxNotFoundError(RecordNotFoundError):
         :type moneybox_id: :class:`int`
         """
 
-        message: str = f"Moneybox not found."
+        message: str = "Moneybox not found."
         super().__init__(record_id=moneybox_id, message=message)
 
 

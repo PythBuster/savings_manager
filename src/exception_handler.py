@@ -142,16 +142,16 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
         )
 
     if issubclass(exception.__class__, CrudDatabaseError):
-        message = exception.message
+        error_message: str = exception.message  # type: ignore
 
-        if "error" in exception.details:
+        if "error" in exception.details:  # type: ignore
             db_violation: DBViolationErrorType = await extract_database_violation_error(
-                exception.details["error"]
+                exception.details["error"]  # type: ignore
             )
 
             match db_violation:
                 case DBViolationErrorType.SET_REPORTS_VIA_EMAIL_BUT_NO_EMAIL_ADDRESS:
-                    message = "Email reports can't be activated, no email address set."
+                    error_message = "Email reports can't be activated, no email address set."
 
                 case DBViolationErrorType.UNKNOWN:
                     raise ValueError(f"Not allowed state: {db_violation=}")
@@ -160,14 +160,14 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             status_code=status.HTTP_409_CONFLICT,
             content=jsonable_encoder(
                 HTTPErrorResponse(
-                    message=message,  # type: ignore
+                    message=error_message,  # type: ignore
                     details=exception.details,  # type: ignore
                 ).model_dump(exclude_none=True)
             ),
         )
 
     if isinstance(exception, sqlalchemy.exc.IntegrityError):
-        error_message: str = exception.args[0]
+        error_message = exception.args[0]
         error_parts: list[str] = error_message.split(":")
         exception_type, message, *details = error_parts
         detail: str = "".join(details)
@@ -203,22 +203,18 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
             SMTPException,
             exception,
         )
-        message: str = smtp_base_exception.message
+        error_message = smtp_base_exception.message
 
         return JSONResponse(
             status_code=status.HTTP_409_CONFLICT,
             content=jsonable_encoder(
                 HTTPErrorResponse(
-                    message=message,
+                    message=error_message,
                 ).model_dump(exclude_none=True)
             ),
         )
 
-    if (
-        isinstance(exception, RequestValidationError)
-        or isinstance(exception, ResponseValidationError)
-        or isinstance(exception, ValidationError)
-    ):
+    if isinstance(exception, (RequestValidationError, ResponseValidationError, ValidationError)):
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=jsonable_encoder(
@@ -250,12 +246,12 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
         )
 
     if isinstance(exception, InvalidFileError):
-        message = exception.message
+        error_message = exception.message
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content=jsonable_encoder(
                 HTTPErrorResponse(
-                    message=message,
+                    message=error_message,
                 ).model_dump(exclude_none=True)
             ),
         )

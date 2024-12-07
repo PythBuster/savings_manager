@@ -295,7 +295,7 @@ def test_calculate_months_for_reaching_savings_targets__success__mode_fill_up() 
     assert result_1[5][-1].month == 2
 
 
-def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_empty_moneyboxes() -> (
+def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_empty_moneyboxes() -> (  # noqa: E501  # pylint: disable=line-too-long
     None
 ):
     overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
@@ -313,7 +313,7 @@ def test_calculate_months_for_reaching_savings_targets__success__empty_result_ca
     assert result == {}
 
 
-def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_savings_amount_of_zero() -> (
+def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_savings_amount_of_zero() -> (  # noqa: E501  # pylint: disable=line-too-long
     None
 ):
     overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
@@ -368,7 +368,7 @@ def test_calculate_months_for_reaching_savings_targets__success__empty_result_ca
     assert result == {}
 
 
-def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_negative_savings_amount() -> (
+def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_negative_savings_amount() -> (  # noqa: E501  # pylint: disable=line-too-long
     None
 ):
     overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
@@ -423,7 +423,7 @@ def test_calculate_months_for_reaching_savings_targets__success__empty_result_ca
     assert result == {}
 
 
-def test_calculate_months_for_reaching_savings_targets__success__monthly_savings_amount_0__init_reached_target() -> (
+def test_calculate_months_for_reaching_savings_targets__success__monthly_savings_amount_0__init_reached_target() -> (  # noqa: E501  # pylint: disable=line-too-long
     None
 ):
     overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES

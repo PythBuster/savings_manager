@@ -50,7 +50,10 @@ GET_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
                                 "errors": [
                                     {
                                         "type": "too_short",
-                                        "message": "List should have at least 1 item after validation, not 0",
+                                        "message": (
+                                            "List should have at least 1 "
+                                            "item after validation, not 0"
+                                        ),
                                         "field": "prioritylist",
                                     },
                                 ]
@@ -138,7 +141,10 @@ UPDATE_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
                                 "errors": [
                                     {
                                         "type": "too_short",
-                                        "message": "List should have at least 1 item after validation, not 0",
+                                        "message": (
+                                            "List should have at least 1 "
+                                            "item after validation, not 0"
+                                        ),
                                         "field": "prioritylist",
                                     },
                                 ]
@@ -171,7 +177,10 @@ UPDATE_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
                                 "errors": [
                                     {
                                         "type": "too_short",
-                                        "message": "List should have at least 1 item after validation, not 0",
+                                        "message": (
+                                            "List should have at least 1 "
+                                            "item after validation, not 0"
+                                        ),
                                         "field": "prioritylist",
                                     },
                                 ]
@@ -185,7 +194,10 @@ UPDATE_PRIORITYLIST_RESPONSES: dict[status, dict[str, Any]] = {
                                 "errors": [
                                     {
                                         "type": "too_short",
-                                        "message": "List should have at least 1 item after validation, not 0",
+                                        "message": (
+                                            "List should have at least 1 item "
+                                            "after validation, not 0"
+                                        ),
                                         "field": "moneyboxes",
                                     },
                                     {

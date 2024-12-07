@@ -9,7 +9,6 @@ from typing import Any
 from aiosmtplib import SMTP
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from src.app_logger import app_logger
 from src.constants import SENDER_ROOT_DIR_PATH
 from src.custom_types import AppEnvVariables
 from src.db.db_manager import DBManager

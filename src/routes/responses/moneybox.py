@@ -94,7 +94,10 @@ POST_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
         "content": {
             "application/json": {
                 "example": HTTPErrorResponse(
-                    message="Inconsistent Database! At least one (active) moneybox has priority of 'None'",
+                    message=(
+                        "Inconsistent Database! At least one (active) "
+                        "moneybox has priority of 'None'"
+                    ),
                     details={
                         "priorities": [
                             {
@@ -326,8 +329,8 @@ DELETE_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
                     "HasBalanceError": {
                         "value": HTTPErrorResponse(
                             message=(
-                                f"Deleting moneyboxes with balance > 0 is not allowed. "
-                                f"Moneybox '1' has balance 1234."
+                                "Deleting moneyboxes with balance > 0 is not allowed. "
+                                "Moneybox '1' has balance 1234."
                             ),
                             details={
                                 "id": 1,
@@ -338,8 +341,8 @@ DELETE_MONEYBOX_RESPONSES: dict[status, dict[str, Any]] = {
                     "UpdateInstanceError 1": {
                         "value": HTTPErrorResponse(
                             message=(
-                                f"Deleting moneyboxes with balance > 0 is not allowed. "
-                                f"Moneybox '1' has balance 1234."
+                                "Deleting moneyboxes with balance > 0 is not allowed. "
+                                "Moneybox '1' has balance 1234."
                             ),
                             details={
                                 "id": 1,

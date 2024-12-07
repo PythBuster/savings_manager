@@ -756,7 +756,7 @@ def test_app_settings_response_invalid(data: dict[str, Any]) -> None:
         AppSettingsResponse(**data)
 
 
-def test_validate_multiple_overflow_moneyboxes():
+def test_validate_multiple_overflow_moneyboxes() -> None:
     """Test that the validator raises an error when multiple Overflow Moneyboxes are present."""
     moneyboxes = [
         MoneyboxResponse(
@@ -795,7 +795,7 @@ def test_validate_multiple_overflow_moneyboxes():
         MoneyboxesResponse(moneyboxes=moneyboxes)
 
 
-def test_validate_missing_overflow_moneybox():
+def test_validate_missing_overflow_moneybox() -> None:
     """Test that the validator raises an error when no Overflow Moneybox is present."""
     moneyboxes = [
         MoneyboxResponse(
@@ -824,7 +824,7 @@ def test_validate_missing_overflow_moneybox():
         MoneyboxesResponse(moneyboxes=moneyboxes)
 
 
-def test_validate_valid_moneyboxes():
+def test_validate_valid_moneyboxes() -> None:
     """Test that no errors are raised for valid moneyboxes configuration."""
     moneyboxes = [
         MoneyboxResponse(

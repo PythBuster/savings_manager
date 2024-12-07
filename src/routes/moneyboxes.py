@@ -121,7 +121,8 @@ async def get_reaching_savings_targets(
 async def get_next_automated_savings_moneyboxes(
     request: Request,
 ) -> Response:
-    """Collect and return a list of moneybox IDs that would receive savings next month (automated saving).
+    """Collect and return a list of moneybox IDs that would receive
+    savings next month (automated saving).
     \f
 
     :param request: The current request object.

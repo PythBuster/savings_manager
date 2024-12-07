@@ -477,7 +477,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             if moneybox is None:
                 raise MoneyboxNotFoundError(moneybox_id=moneybox_id)
 
-            new_balance: int = moneybox.balance + amount
+            new_balance = moneybox.balance + amount
             session.expunge(moneybox)
 
             updated_moneybox = cast(

@@ -1,7 +1,7 @@
 """The FastAPI helper functions for initializing etc.,..."""
 
 import os
-from typing import Any, Callable
+from typing import Callable
 
 from fastapi import FastAPI
 from pydantic.types import SecretType

@@ -243,7 +243,8 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
 
         :param _moneyboxes: List of moneyboxes to evaluate.
         :type _moneyboxes: :class:`list[dict[str, Any]]`
-        :return: True if all moneyboxes with a savings_target have reached their target, otherwise False.
+        :return: True if all moneyboxes with a savings_target have reached their target,
+            otherwise False.
         :rtype: :class:`bool`
         """
 

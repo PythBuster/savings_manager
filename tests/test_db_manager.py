@@ -566,7 +566,7 @@ async def test_delete_moneybox(db_manager: DBManager) -> None:
         amount=1,
         description="Bonus.",
     )
-    mb = await db_manager.add_amount(
+    _ = await db_manager.add_amount(
         moneybox_id=third_moneybox_id,
         deposit_transaction_data=deposit_transaction.model_dump(),
         transaction_type=TransactionType.DIRECT,

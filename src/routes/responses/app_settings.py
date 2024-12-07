@@ -4,7 +4,6 @@ from typing import Any
 
 from starlette import status
 
-from src.data_classes.requests import AppSettingsRequest
 from src.data_classes.responses import AppSettingsResponse, HTTPErrorResponse
 
 GET_APP_SETTINGS_RESPONSES: dict[status, dict[str, Any]] = {
