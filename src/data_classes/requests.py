@@ -53,6 +53,15 @@ class MoneyboxCreateRequest(BaseModel):
     ]
     """"The current savings target. Is relevant for the automated distributed saving progress."""
 
+    description: Annotated[
+        str,
+        Field(
+            default="",
+            description="The description of the moneybox.",
+        ),
+    ]
+    """The description of the moneybox."""
+
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
@@ -64,6 +73,7 @@ class MoneyboxCreateRequest(BaseModel):
                     "name": "Holiday",
                     "savingsAmount": 0,
                     "savingsTarget": 50000,
+                    "description": "The budget for holiday.",
                 }
             ]
         },
@@ -125,6 +135,15 @@ class MoneyboxUpdateRequest(BaseModel):
     ]
     """The current priority of the moneybox."""
 
+    description: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="The description of the moneybox.",
+        ),
+    ]
+    """The description of the moneybox."""
+
     model_config = ConfigDict(
         extra="forbid",
         frozen=True,
@@ -137,24 +156,22 @@ class MoneyboxUpdateRequest(BaseModel):
                     "savingsAmount": 0,
                     "savingsTarget": 50000,
                     "priority": 1,
+                    "description": "The budget for holiday.",
                 }
             ]
         },
     )
     """The config of the model."""
 
-    @field_validator("name")
+    @field_validator("name", "description")
     @classmethod
-    def validate_name_for_leading_trailing_spaces(cls, value: str | None) -> str | None:
-        """Check for leading and trailing whitespaces in value."""
+    def transform_strings_and_remove_leading_trailing_spaces(cls, value: str | None) -> str | None:
+        """Remove leading and trailing whitespaces in 'name' and 'description'."""
 
         if value is None:
             return value
 
-        if value != value.strip():
-            raise ValueError("Leading and trailing spaces in name are not allowed.")
-
-        return value
+        return value.strip()
 
 
 class DepositTransactionRequest(BaseModel):

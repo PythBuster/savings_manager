@@ -37,6 +37,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 0,
+                "description": "",
             },
             {
                 "name": "Test Box 1",
@@ -45,6 +46,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 1,  # pylint: disable=duplicate-code
+                "description": "",
             },
             {
                 "name": "Test Box 2",
@@ -53,6 +55,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 2,
+                "description": "",
             },
             {
                 "name": "Test Box 3",
@@ -61,6 +64,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 3,
+                "description": "",
             },
             {
                 "name": "Test Box 4",
@@ -69,6 +73,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 4,
+                "description": "",
             },
             {
                 "name": "Test Box 5",
@@ -77,6 +82,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 5,
+                "description": "",
             },
         ],
     }
@@ -187,6 +193,7 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -230,6 +237,7 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 2,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -263,6 +271,7 @@ async def test_endpoint_add_moneybox__one__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -296,6 +305,7 @@ async def test_endpoint_add_moneybox__two__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response_1.status_code == status.HTTP_200_OK
@@ -323,6 +333,7 @@ async def test_endpoint_add_moneybox__two__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 2,
+        "description": "",
     }
 
     assert response_2.status_code == status.HTTP_200_OK
@@ -455,6 +466,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 3,
+        "description": "",
     }
 
     response_4 = await client.patch(
@@ -481,6 +493,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response_2.status_code == status.HTTP_200_OK
@@ -501,6 +514,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 2,
+        "description": "",
     }
 
     assert response_3.status_code == status.HTTP_200_OK
@@ -652,6 +666,7 @@ async def test_endpoint_deposit_first_moneybox__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -802,6 +817,7 @@ async def test_endpoint_withdraw_first_moneybox__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK

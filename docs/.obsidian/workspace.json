@@ -23,12 +23,14 @@
             "id": "3e263c9449dc1d50",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "ui/draft/SavingsManagerUI_v2.png"
+                "file": "Architecture/Endpoints.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "SavingsManagerUI_v2"
+              "icon": "lucide-file",
+              "title": "Endpoints"
             }
           }
         ],
@@ -175,6 +177,7 @@
   },
   "active": "3e263c9449dc1d50",
   "lastOpenFiles": [
+    "ui/draft/SavingsManagerUI_v2.png",
     "_changelog_template.md",
     "ui/draft/SavingsManagerUI_v1.png",
     "ui/draft/FullTransactionLogs_v2.png",
@@ -189,7 +192,6 @@
     "Feauture Requests/Ideas.md",
     "Architecture/Database App v2.md",
     "Architecture/Database App v1.md",
-    "ui/draft/SavingsManagerUI_v2.png",
     "ui/draft/App_v1_SavingsManagerUI.png",
     "Diagram 2.svg",
     "Guidelines/Code/Code Style.md",

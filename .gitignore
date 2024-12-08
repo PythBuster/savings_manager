@@ -6,6 +6,7 @@
 .env.dev
 /static/*
 *.sql
+.pgpass
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template

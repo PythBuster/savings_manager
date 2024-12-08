@@ -259,8 +259,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     orm_model=cast(SqlBase, MoneyboxNameHistory),
                     data=moneybox_name_history_data,
                 )
-        except InconsistentDatabaseError:
-            raise
         except Exception as ex:
             raise CreateInstanceError(
                 message="Failed to create moneybox.",

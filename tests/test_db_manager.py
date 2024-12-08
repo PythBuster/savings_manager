@@ -249,6 +249,7 @@ async def test_add_moneybox_success(
             "priority": priority + 1,
             "id": result_moneybox_data["id"],
             "balance": 0,
+            "description": "",
         } | data
         assert result_moneybox_data == expected_moneybox_data
 
@@ -462,6 +463,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
         "savings_amount": 0,
         "savings_target": None,
         "priority": 1,
+        "description": "",
     }
     assert result_moneybox_data == expected_moneybox_data
 
@@ -537,6 +539,7 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
         "savings_amount": 0,
         "savings_target": None,
         "priority": 1,
+        "description": "",
     }
     assert result_moneybox_data == expected_moneybox_data
 
@@ -1521,7 +1524,7 @@ async def test_export_sql_dump(
     with dump_file_path.open("wb") as f:
         f.write(dump_value)
 
-    assert 35800 < len(dump_value) < 36000
+    assert 36000 < len(dump_value) < 37000
 
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])
