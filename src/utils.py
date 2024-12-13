@@ -260,6 +260,8 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
         # If all checked moneyboxes have reached their target, return True
         return True
 
+    endless = False
+
     while not all_targets_reached(
         _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
     ):  # pylint: disable=too-many-nested-blocks
@@ -286,6 +288,12 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
                     distribution_amount,
                     moneybox["savings_target"] - moneybox["balance"],
                 )
+            else:
+                if moneybox["savings_amount"] >= current_savings_amount:
+                    moneybox["balance"] += distribution_amount
+                    endless = True
+                    current_savings_amount -= distribution_amount
+                    break
 
             if distribution_amount > 0:
                 moneybox["balance"] += distribution_amount
@@ -347,7 +355,29 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
                 if overflow_moneybox["balance"] <= 0:
                     break
 
+
         simulated_month += 1
+
+        if endless and not all_targets_reached(
+                _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
+            ):  # not all targets reached but endless
+
+            # postprocess:
+            # - all moneyboxes without any savings will never get a saving, set to undifined (-1)
+            for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
+                if (
+                        moneybox["savings_target"] is not None
+                        and moneybox["balance"] < moneybox["savings_target"]
+                ):
+                    moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
+                        MoneyboxSavingsMonthData(
+                            moneybox_id=moneybox["id"],
+                            savings_amount=-1,
+                            month=-1,
+                        )
+                    )
+
+            break
 
     return moneybox_with_savings_target_distribution_data
 

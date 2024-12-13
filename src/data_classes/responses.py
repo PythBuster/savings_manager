@@ -953,9 +953,11 @@ class MoneyboxReachingSavingsTargetsResponse(BaseModel):
     amount_of_months: Annotated[
         int,
         Field(
-            ge=0,
             validation_alias="amount_of_months",
-            description="The amount of months for reaching the savings target.",
+            description=(
+                "The amount of months for reaching the savings target. If -1, moneybox "
+                "will never reach savings target."
+            ),
         ),
     ]
     """The amount of months for reaching the savings target."""
@@ -978,7 +980,7 @@ class MoneyboxReachingSavingsTargetsResponse(BaseModel):
             ],
         },
     )
-    """The config of the model."""
+    """The config of the8 model."""
 
 
 class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
@@ -1010,6 +1012,10 @@ class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
                         {
                             "moneyboxId": 3,
                             "amountOfMonths": 5,
+                        },
+                        {
+                            "moneyboxId": 7,
+                            "amountOfMonths": -1,
                         },
                     ],
                 },
