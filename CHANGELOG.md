@@ -2,6 +2,15 @@
 
 ## x.y.z (unreleased)
 
+## 2.37.0 (2024-12-13)
+### Changes:
+- adapt response validation model for reaching targets and allow negative months as marker for
+ 'savings target will never been reached (endless)'
+### Fixes:
+- fix calculation for reaching targets, algorithm led to endless loop, when a non target moneybox
+  between moneyboxes got all the rest of savings amount so lower prioritized moneyboxes hat never the
+  change to get savings.
+
 ## 2.36.0 (2024-12-13)
 ### Changes:
 - add description field to moneybox
