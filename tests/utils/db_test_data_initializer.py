@@ -83,7 +83,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_endpoint_update_moneybox__status_200__description_change": self.dataset_test_endpoint_update_moneybox__status_200__description_change,
             "test_endpoint_update_moneybox__status_409__description_none": self.dataset_dataset_test_endpoint_update_moneybox__status_409__description_none,
             "test_endpoint_update_moneybox__status_422__description_not_string_type": self.dataset_test_endpoint_update_moneybox__status_422__description_not_string_type,
-            "test_endpoint_update_moneybox__status_422__savings_amount_non_int_type":self.dataset_test_endpoint_update_moneybox__status_422__savings_amount_non_int_type,
+            "test_endpoint_update_moneybox__status_422__savings_amount_non_int_type": self.dataset_test_endpoint_update_moneybox__status_422__savings_amount_non_int_type,
             "test_endpoint_update_moneybox__status_422__savings_amount_negative": self.dataset_test_endpoint_update_moneybox__status_422__savings_amount_negative,
             "test_endpoint_first_moneybox__modified_at_checks": self.dataset_test_endpoint_first_moneybox__modified_at_checks,
             "test_endpoint_delete_second_moneybox__status_204": self.dataset_test_endpoint_delete_second_moneybox__status_204,
@@ -600,7 +600,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             )
 
     async def dataset_test_endpoint_update_moneybox__status_422__savings_amount_non_int_type(
-            self,
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_endpoint_update_moneybox__status_422__savings_amount_non_int_type`.
@@ -628,9 +628,8 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-
     async def dataset_test_endpoint_update_moneybox__status_422__savings_amount_negative(
-            self,
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_endpoint_update_moneybox__status_422__savings_amount_negative`.
@@ -687,7 +686,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-
     async def dataset_test_endpoint_update_moneybox__status_422__savings_amount_none(
         self,
     ) -> None:
@@ -716,7 +714,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
-
 
     async def dataset_test_endpoint_update_moneybox__status_200__savings_target_none_change(
         self,
@@ -777,7 +774,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             )
 
     async def dataset_test_endpoint_update_moneybox__status_422_savings_target_non_int_type(
-            self,
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_endpoint_update_moneybox__status_422_savings_target_non_int_type`.
@@ -806,7 +803,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             )
 
     async def dataset_test_endpoint_update_moneybox__status_422_savings_target_negative(
-            self,
+        self,
     ) -> None:
         """The data generation function for test_case:
         `test_endpoint_update_moneybox__status_422_savings_target_negative`.

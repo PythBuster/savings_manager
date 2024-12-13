@@ -4,7 +4,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import pytest
-from docutils.nodes import description
 from pydantic import ValidationError
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType

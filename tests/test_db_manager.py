@@ -438,7 +438,7 @@ async def test_update_priorities(db_manager: DBManager) -> None:
 
 @pytest.mark.dependency(depends=["test_update_priorities"])
 @pytest.mark.asyncio
-async def test_update_moneybox(db_manager: DBManager) -> None:
+async def test_update_moneybox(db_manager: DBManager) -> None:  # pylint:disable=too-many-statements
     first_moneybox_id = (
         await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
             async_session=db_manager.async_sessionmaker, name="Test Box 1"
@@ -446,7 +446,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
     )
 
     # success updating NAME
-    moneybox_data = {"name": "Test Box 1 - Updated"}
+    moneybox_data: dict[str, Any] = {"name": "Test Box 1 - Updated"}
     result_moneybox_data = await db_manager.update_moneybox(
         moneybox_id=first_moneybox_id,
         moneybox_data=moneybox_data,

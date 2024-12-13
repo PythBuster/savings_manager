@@ -517,7 +517,7 @@ async def test_endpoint_update_moneybox__status_422__name_not_string_type(
     )
 
     # int as name
-    moneybox_data = {"name": 42}
+    moneybox_data: dict[str, Any] = {"name": 42}
     response = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
         json=moneybox_data,
@@ -686,7 +686,7 @@ async def test_endpoint_update_moneybox__status_409__description_none(
     content = response.json()
     assert len(content["details"]) == 2
     assert content["message"] == "Failed to update moneybox."
-    assert content["details"]["description"] == None
+    assert content["details"]["description"] is None
 
 
 @pytest.mark.dependency
@@ -702,7 +702,7 @@ async def test_endpoint_update_moneybox__status_422__description_not_string_type
     )
 
     # int as name
-    moneybox_data = {"description": 42}
+    moneybox_data: dict[str, Any] = {"description": 42}
     response = await client.patch(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
         json=moneybox_data,
@@ -790,7 +790,7 @@ async def test_endpoint_update_moneybox__status_422__savings_amount_none(
     assert content["message"] == "Validation Error"
     assert len(content["details"]["errors"][0]) == 3
     assert content["details"]["errors"][0]["type"] == "int_type"
-    assert content["details"]["errors"][0]["message"] == 'Input should be a valid integer'
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid integer"
     assert content["details"]["errors"][0]["field"] == "savingsAmount"
 
 
@@ -807,7 +807,7 @@ async def test_endpoint_update_moneybox__status_422__savings_amount_non_int_type
     )
 
     # float type
-    moneybox_data = {
+    moneybox_data: dict[str, Any] = {
         "savingsAmount": 12.3,
     }
     response = await client.patch(
@@ -822,7 +822,7 @@ async def test_endpoint_update_moneybox__status_422__savings_amount_non_int_type
     assert content["message"] == "Validation Error"
     assert len(content["details"]["errors"][0]) == 3
     assert content["details"]["errors"][0]["type"] == "int_type"
-    assert content["details"]["errors"][0]["message"] == 'Input should be a valid integer'
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid integer"
     assert content["details"]["errors"][0]["field"] == "savingsAmount"
 
     # string type
@@ -841,7 +841,7 @@ async def test_endpoint_update_moneybox__status_422__savings_amount_non_int_type
     assert content["message"] == "Validation Error"
     assert len(content["details"]["errors"][0]) == 3
     assert content["details"]["errors"][0]["type"] == "int_type"
-    assert content["details"]["errors"][0]["message"] == 'Input should be a valid integer'
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid integer"
     assert content["details"]["errors"][0]["field"] == "savingsAmount"
 
 
@@ -873,7 +873,9 @@ async def test_endpoint_update_moneybox__status_422__savings_amount_negative(
     assert content["message"] == "Validation Error"
     assert len(content["details"]["errors"][0]) == 3
     assert content["details"]["errors"][0]["type"] == "greater_than_equal"
-    assert content["details"]["errors"][0]["message"] == 'Input should be greater than or equal to 0'
+    assert (
+        content["details"]["errors"][0]["message"] == "Input should be greater than or equal to 0"
+    )
     assert content["details"]["errors"][0]["field"] == "savingsAmount"
 
 
@@ -944,7 +946,7 @@ async def test_endpoint_update_moneybox__status_422_savings_target_non_int_type(
     )
 
     # float type
-    moneybox_data = {
+    moneybox_data: dict[str, Any] = {
         "savingsTarget": 123.4,
     }
     response = await client.patch(
@@ -1013,8 +1015,11 @@ async def test_endpoint_update_moneybox__status_422_savings_target_negative(
     assert content["message"] == "Validation Error"
     assert len(content["details"]["errors"][0]) == 3
     assert content["details"]["errors"][0]["type"] == "greater_than_equal"
-    assert content["details"]["errors"][0]["message"] == 'Input should be greater than or equal to 0'
+    assert (
+        content["details"]["errors"][0]["message"] == "Input should be greater than or equal to 0"
+    )
     assert content["details"]["errors"][0]["field"] == "savingsTarget"
+
 
 @pytest.mark.dependency
 async def test_endpoint_first_moneybox__modified_at_checks(
