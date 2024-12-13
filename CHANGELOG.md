@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.36.0 (2024-12-13)
+### Changes:
+- add description field to moneybox
+- improve/extend unit tests for updating moneybox
+
 ## 2.35.0 (2024-12-08)
 ### Changes:
 - extend endpoint response status codes and improve swagger UI documentation
