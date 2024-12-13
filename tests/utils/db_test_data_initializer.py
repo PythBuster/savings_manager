@@ -69,8 +69,22 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_endpoint_delete_overflow_moneybox__status_405": self.dataset_test_endpoint_delete_overflow_moneybox__status_405,
             "test_endpoint_update_overflow_moneybox__fail_409__modification_not_allowed": self.dataset_test_endpoint_update_overflow_moneybox__fail_409__modification_not_allowed,
             "test_endpoint_update_moneybox__status_422__invalid_priority_0": self.dataset_test_endpoint_update_moneybox__status_422__invalid_priority_0,
+            "test_endpoint_update_moneybox__status_422__name_none": self.dataset_test_endpoint_update_moneybox__status_422__name_none,
+            "test_endpoint_update_moneybox__status_422__name_empty": self.dataset_test_endpoint_update_moneybox__status_422__name_empty,
+            "test_endpoint_update_moneybox__status_422__name_not_string_type": self.dataset_test_endpoint_update_moneybox__status_422__name_not_string_type,
             "test_endpoint_update_moneybox__last_moneybox__namechange": self.dataset_test_endpoint_update_moneybox__last_moneybox__namechange,
+            "test_endpoint_update_moneybox__status_200__savings_amount_change": self.dataset_test_endpoint_update_moneybox__status_200__savings_amount_change,
+            "test_endpoint_update_moneybox__status_422__savings_amount_none": self.dataset_test_endpoint_update_moneybox__status_422__savings_amount_none,
+            "test_endpoint_update_moneybox__status_200__savings_target_none_change": self.dataset_test_endpoint_update_moneybox__status_200__savings_target_none_change,
+            "test_endpoint_update_moneybox__status_200__savings_target_value_change": self.dataset_test_endpoint_update_moneybox__status_200__savings_target_value_change,
+            "test_endpoint_update_moneybox__status_422_savings_target_non_int_type": self.dataset_test_endpoint_update_moneybox__status_422_savings_target_non_int_type,
+            "test_endpoint_update_moneybox__status_422_savings_target_negative": self.dataset_test_endpoint_update_moneybox__status_422_savings_target_negative,
             "test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields": self.dataset_test_endpoint_update_moneybox__first_moneybox__status_422__fail_extra_fields,
+            "test_endpoint_update_moneybox__status_200__description_change": self.dataset_test_endpoint_update_moneybox__status_200__description_change,
+            "test_endpoint_update_moneybox__status_409__description_none": self.dataset_dataset_test_endpoint_update_moneybox__status_409__description_none,
+            "test_endpoint_update_moneybox__status_422__description_not_string_type": self.dataset_test_endpoint_update_moneybox__status_422__description_not_string_type,
+            "test_endpoint_update_moneybox__status_422__savings_amount_non_int_type":self.dataset_test_endpoint_update_moneybox__status_422__savings_amount_non_int_type,
+            "test_endpoint_update_moneybox__status_422__savings_amount_negative": self.dataset_test_endpoint_update_moneybox__status_422__savings_amount_negative,
             "test_endpoint_first_moneybox__modified_at_checks": self.dataset_test_endpoint_first_moneybox__modified_at_checks,
             "test_endpoint_delete_second_moneybox__status_204": self.dataset_test_endpoint_delete_second_moneybox__status_204,
             "test_endpoint_deposit_first_moneybox__status_200": self.dataset_test_endpoint_deposit_first_moneybox__status_200,
@@ -378,6 +392,87 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
+    async def dataset_test_endpoint_update_moneybox__status_422__name_none(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__description_none`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_422__name_empty(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__name_empty`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_422__name_not_string_type(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__name_not_string_type`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
     async def dataset_test_endpoint_update_moneybox__last_moneybox__namechange(
         self,
     ) -> None:
@@ -411,6 +506,326 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "savings_amount": 0,
                 "savings_target": None,
                 "priority": 3,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_200__description_change(self) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_200__description_change`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_dataset_test_endpoint_update_moneybox__status_409__description_none(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__description_none`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_422__description_not_string_type(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__description_not_string_type`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_422__savings_amount_non_int_type(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__savings_amount_non_int_type`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+
+    async def dataset_test_endpoint_update_moneybox__status_422__savings_amount_negative(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__savings_amount_negative`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_200__savings_amount_change(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_200__savings_amount_change`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+
+    async def dataset_test_endpoint_update_moneybox__status_422__savings_amount_none(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422__savings_amount_none`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": None,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+
+    async def dataset_test_endpoint_update_moneybox__status_200__savings_target_none_change(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_200__savings_target_none_change`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": 123,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_200__savings_target_value_change(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_200__savings_target_none_change`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": 123,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_422_savings_target_non_int_type(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422_savings_target_non_int_type`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": 123,
+                "priority": 1,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_endpoint_update_moneybox__status_422_savings_target_negative(
+            self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_endpoint_update_moneybox__status_422_savings_target_negative`.
+        """
+
+        await self.truncate_tables()
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        # create 1 moneybox
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 0,
+                "savings_target": 123,
+                "priority": 1,
             },
         ]
 

@@ -31,3 +31,7 @@
 # Use oauth2 as login?
 --> auth0? clerk?
 --> or implement own system? (e.g. google login, github, twitch, apple,...)
+
+# Revert prioritized distributed saving
+--> e.g. 800€ was distributed but 600 € should be, sub difference of 200 € from last moneyboxes
+--> can be done by collecting informations from transactionlogs from moneyboxes to detect all releated moneyboxes while this specific diestribution

@@ -170,6 +170,14 @@ class Moneybox(SqlBase):  # pylint: disable=too-few-public-methods
     """The current priority of the moneybox. There is only one moneybox with
     a priority of Null (will be the marker for the overflow moneybox)."""
 
+    description: Mapped[str] = mapped_column(  # pylint: disable=unsubscriptable-object
+        nullable=False,
+        default="",
+        server_default="",
+        comment="The description of the moneybox.",
+    )
+    """The description of the moneybox."""
+
     transactions_log: Mapped[List["Transaction"]] = (  # pylint: disable=unsubscriptable-object
         relationship(
             back_populates="moneybox",

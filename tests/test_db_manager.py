@@ -249,6 +249,7 @@ async def test_add_moneybox_success(
             "priority": priority + 1,
             "id": result_moneybox_data["id"],
             "balance": 0,
+            "description": "",
         } | data
         assert result_moneybox_data == expected_moneybox_data
 
@@ -444,6 +445,7 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
         )
     )
 
+    # success updating NAME
     moneybox_data = {"name": "Test Box 1 - Updated"}
     result_moneybox_data = await db_manager.update_moneybox(
         moneybox_id=first_moneybox_id,
@@ -458,20 +460,412 @@ async def test_update_moneybox(db_manager: DBManager) -> None:
 
     expected_moneybox_data = moneybox_data | {
         "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
         "balance": 0,
         "savings_amount": 0,
         "savings_target": None,
         "priority": 1,
+        "description": "",
     }
     assert result_moneybox_data == expected_moneybox_data
 
-    moneybox_data["name"] = "new"
+    # fail updating NAME
+    moneybox_data = {"name": ""}  # empty name is not allowed
+
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+
+    moneybox_data = {"name": None}  # None as name is not allowed
+
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+
+    # success updating DESCRIPTION
+    moneybox_data = {"description": "New Description"}
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+    expected_moneybox_data = {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+        "description": "New Description",
+    }
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"description": ""}  # empty description is allowed
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+    expected_moneybox_data = {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+        "description": "",
+    }
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    assert result_moneybox_data == expected_moneybox_data
+
+    # fail updating DESCRIPTION
+    moneybox_data = {"description": None}  # None as description is not allowed
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        _ = await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+
+    # success updating SAVINGS_TARGET
+    moneybox_data = {"savings_target": 100}
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": 100,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_target": 3.01}  # db also allows floats for int fields
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": 3,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_target": 0}  # 0 is also allowed
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": 0,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_target": True}  # db also allows bools
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": 1,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_target": False}  # db also allows bools
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": 0,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_target": None}  # None is also allowed
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+
+    # fail updating SAVINGS_TARGET
+    moneybox_data = {"savings_target": "100"}  # Strings are not allowed
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        _ = await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+    # ---
+    moneybox_data = {"savings_target": -1}  # negative amount not allowed
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        _ = await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+
+    # success updating SAVINGS_AMOUNT
+    moneybox_data = {"savings_amount": True}  # db also allows bools
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 1,
+        "savings_target": None,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_amount": False}  # db also allows bools
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_amount": 120}
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 120,
+        "savings_target": None,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_amount": 3.99}  # db also allows floats for int fields
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 3,
+        "savings_target": None,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+    # ---
+    moneybox_data = {"savings_amount": 0}  # 0 is allowed
+    result_moneybox_data = await db_manager.update_moneybox(
+        moneybox_id=first_moneybox_id,
+        moneybox_data=moneybox_data,
+    )
+
+    assert isinstance(result_moneybox_data["created_at"], datetime)
+    assert isinstance(result_moneybox_data["modified_at"], datetime)
+
+    del result_moneybox_data["created_at"]
+    del result_moneybox_data["modified_at"]
+
+    expected_moneybox_data = moneybox_data | {
+        "id": first_moneybox_id,
+        "name": "Test Box 1 - Updated",
+        "balance": 0,
+        "savings_amount": 0,
+        "savings_target": None,
+        "priority": 1,
+        "description": "",
+    }
+    assert result_moneybox_data == expected_moneybox_data
+
+    # fail updating SAVINGS_AMOUNT
+    moneybox_data = {"savings_amount": "100"}  # Strings are not allowed
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        _ = await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+    # ---
+    moneybox_data = {"savings_amount": None}  # None is not allowed
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        _ = await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+    # ---
+    moneybox_data = {"savings_amount": -1}  # negative is not allowed
+    with pytest.raises(UpdateInstanceError) as ex_info:
+        _ = await db_manager.update_moneybox(
+            moneybox_id=first_moneybox_id,
+            moneybox_data=moneybox_data,
+        )
+
+    assert isinstance(ex_info.value.details, dict)
+    assert jsonable_encoder(ex_info.value.details) is not None
+    assert ex_info.value.record_id == first_moneybox_id
+
+    # fail updating for not existing moneyboxes
     non_existing_moneybox_ids = [-42, -1, 0, 165485641]
     for moneybox_id in non_existing_moneybox_ids:
         with pytest.raises(UpdateInstanceError) as ex_info:
             await db_manager.update_moneybox(
                 moneybox_id=moneybox_id,
-                moneybox_data=moneybox_data,
+                moneybox_data={},
             )
 
         assert isinstance(ex_info.value.details, dict)
@@ -537,6 +931,7 @@ async def test_get_moneybox(db_manager: DBManager) -> None:
         "savings_amount": 0,
         "savings_target": None,
         "priority": 1,
+        "description": "",
     }
     assert result_moneybox_data == expected_moneybox_data
 
@@ -1521,7 +1916,7 @@ async def test_export_sql_dump(
     with dump_file_path.open("wb") as f:
         f.write(dump_value)
 
-    assert 35800 < len(dump_value) < 36000
+    assert 36000 < len(dump_value) < 37000
 
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])

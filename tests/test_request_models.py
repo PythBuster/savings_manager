@@ -69,7 +69,7 @@ def test_moneybox_create_request_invalid(data: dict[str, Any]) -> None:
 @pytest.mark.parametrize(
     "data",
     [
-        {"name": "Holiday", "savingsAmount": 200, "savingsTarget": 60000},
+        {"name": "Holiday", "savingsAmount": 200, "savingsTarget": 60000, "description": "test"},
         {"savingsAmount": 150, "savingsTarget": None},
         {"name": "Savings", "savingsTarget": None},
     ],
@@ -81,6 +81,24 @@ def test_moneybox_update_request_valid(data: dict[str, Any]) -> None:
 
     for key in data.keys():
         assert getattr(response, to_snake(key)) == data[key]
+
+
+def test_moneybox_update_request_valid__leading_trailing_strings() -> None:
+    """Test valid MoneyboxUpdateRequest creation."""
+
+    data = {
+        "name": "   Holiday",  # leading space
+        "savingsAmount": 200,
+        "savingsTarget": 60000,
+        "description": "   test   ",  # leading + tailing space
+    }
+
+    response = MoneyboxUpdateRequest(**data)
+
+    assert response.name == "Holiday"
+    assert response.savings_amount == 200
+    assert response.savings_target == 60000
+    assert response.description == "test"
 
 
 @pytest.mark.parametrize(

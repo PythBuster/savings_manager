@@ -37,6 +37,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 0,
+                "description": "",
             },
             {
                 "name": "Test Box 1",
@@ -45,6 +46,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 1,  # pylint: disable=duplicate-code
+                "description": "",
             },
             {
                 "name": "Test Box 2",
@@ -53,6 +55,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 2,
+                "description": "",
             },
             {
                 "name": "Test Box 3",
@@ -61,6 +64,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 3,
+                "description": "",
             },
             {
                 "name": "Test Box 4",
@@ -69,6 +73,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 4,
+                "description": "",
             },
             {
                 "name": "Test Box 5",
@@ -77,6 +82,7 @@ async def test_endpoint_get_moneyboxes__status_200__total_6(
                 "savingsAmount": 0,
                 "savingsTarget": None,
                 "priority": 5,
+                "description": "",
             },
         ],
     }
@@ -187,6 +193,7 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -230,6 +237,7 @@ async def test_endpoint_get_moneybox__second_moneybox__status_200_existing__with
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 2,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -263,6 +271,7 @@ async def test_endpoint_add_moneybox__one__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -296,6 +305,7 @@ async def test_endpoint_add_moneybox__two__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response_1.status_code == status.HTTP_200_OK
@@ -323,6 +333,7 @@ async def test_endpoint_add_moneybox__two__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 2,
+        "description": "",
     }
 
     assert response_2.status_code == status.HTTP_200_OK
@@ -432,6 +443,115 @@ async def test_endpoint_update_moneybox__status_422__invalid_priority_0(
 
 
 @pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422__name_none(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "name": None,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "string_type"
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid string"
+    assert content["details"]["errors"][0]["field"] == "name"
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422__name_empty(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "name": "",
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "string_too_short"
+    assert content["details"]["errors"][0]["message"] == "String should have at least 1 character"
+    assert content["details"]["errors"][0]["field"] == "name"
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422__name_not_string_type(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    # int as name
+    moneybox_data = {"name": 42}
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "string_type"
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid string"
+    assert content["details"]["errors"][0]["field"] == "name"
+
+    # float as name
+    moneybox_data = {"name": 1.23}
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "string_type"
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid string"
+    assert content["details"]["errors"][0]["field"] == "name"
+
+
+@pytest.mark.dependency
 async def test_endpoint_update_moneybox__last_moneybox__namechange(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
@@ -455,6 +575,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 3,
+        "description": "",
     }
 
     response_4 = await client.patch(
@@ -481,6 +602,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response_2.status_code == status.HTTP_200_OK
@@ -501,6 +623,7 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 2,
+        "description": "",
     }
 
     assert response_3.status_code == status.HTTP_200_OK
@@ -510,6 +633,388 @@ async def test_endpoint_update_moneybox__last_moneybox__namechange(
         exclude_keys=["createdAt", "modifiedAt"],
     )
 
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_200__description_change(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "description": "New Description",
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["description"] == "New Description"
+    assert content["id"] == first_moneybox_id
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_409__description_none(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "description": None,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_409_CONFLICT
+
+    content = response.json()
+    assert len(content["details"]) == 2
+    assert content["message"] == "Failed to update moneybox."
+    assert content["details"]["description"] == None
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422__description_not_string_type(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    # int as name
+    moneybox_data = {"description": 42}
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "string_type"
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid string"
+    assert content["details"]["errors"][0]["field"] == "description"
+
+    # float as name
+    moneybox_data = {"description": 1.23}
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "string_type"
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid string"
+    assert content["details"]["errors"][0]["field"] == "description"
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_200__savings_amount_change(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "savingsAmount": 123,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["savingsAmount"] == 123
+    assert content["id"] == first_moneybox_id
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422__savings_amount_none(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "savingsAmount": None,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "int_type"
+    assert content["details"]["errors"][0]["message"] == 'Input should be a valid integer'
+    assert content["details"]["errors"][0]["field"] == "savingsAmount"
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422__savings_amount_non_int_type(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    # float type
+    moneybox_data = {
+        "savingsAmount": 12.3,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "int_type"
+    assert content["details"]["errors"][0]["message"] == 'Input should be a valid integer'
+    assert content["details"]["errors"][0]["field"] == "savingsAmount"
+
+    # string type
+    moneybox_data = {
+        "savingsAmount": "12",
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "int_type"
+    assert content["details"]["errors"][0]["message"] == 'Input should be a valid integer'
+    assert content["details"]["errors"][0]["field"] == "savingsAmount"
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422__savings_amount_negative(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    # float type
+    moneybox_data = {
+        "savingsAmount": -1,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "greater_than_equal"
+    assert content["details"]["errors"][0]["message"] == 'Input should be greater than or equal to 0'
+    assert content["details"]["errors"][0]["field"] == "savingsAmount"
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_200__savings_target_none_change(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "savingsTarget": None,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["savingsTarget"] is None
+    assert content["id"] == first_moneybox_id
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_200__savings_target_value_change(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    moneybox_data = {
+        "savingsTarget": 567,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["savingsTarget"] == 567
+    assert content["id"] == first_moneybox_id
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422_savings_target_non_int_type(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    # float type
+    moneybox_data = {
+        "savingsTarget": 123.4,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "int_type"
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid integer"
+    assert content["details"]["errors"][0]["field"] == "savingsTarget"
+
+    # string type
+    moneybox_data = {
+        "savingsTarget": "42",
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "int_type"
+    assert content["details"]["errors"][0]["message"] == "Input should be a valid integer"
+    assert content["details"]["errors"][0]["field"] == "savingsTarget"
+
+
+@pytest.mark.dependency
+async def test_endpoint_update_moneybox__status_422_savings_target_negative(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+    db_manager: DBManager,
+) -> None:
+    first_moneybox_id = (
+        await get_moneybox_id_by_name(  # noqa: typing  # pylint:disable=protected-access
+            async_session=db_manager.async_sessionmaker, name="Test Box 1"
+        )
+    )
+
+    # float type
+    moneybox_data = {
+        "savingsTarget": -1,
+    }
+    response = await client.patch(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOX}/{first_moneybox_id}",
+        json=moneybox_data,
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    content = response.json()
+
+    assert len(content["details"]["errors"]) == 1
+    assert content["message"] == "Validation Error"
+    assert len(content["details"]["errors"][0]) == 3
+    assert content["details"]["errors"][0]["type"] == "greater_than_equal"
+    assert content["details"]["errors"][0]["message"] == 'Input should be greater than or equal to 0'
+    assert content["details"]["errors"][0]["field"] == "savingsTarget"
 
 @pytest.mark.dependency
 async def test_endpoint_first_moneybox__modified_at_checks(
@@ -652,6 +1157,7 @@ async def test_endpoint_deposit_first_moneybox__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK
@@ -802,6 +1308,7 @@ async def test_endpoint_withdraw_first_moneybox__status_200(
         "savingsAmount": 0,
         "savingsTarget": None,
         "priority": 1,
+        "description": "",
     }
 
     assert response.status_code == status.HTTP_200_OK

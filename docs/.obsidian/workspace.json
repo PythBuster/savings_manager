@@ -23,12 +23,14 @@
             "id": "3e263c9449dc1d50",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "ui/draft/SavingsManagerUI_v2.png"
+                "file": "Feauture Requests/Ideas.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "SavingsManagerUI_v2"
+              "icon": "lucide-file",
+              "title": "Ideas"
             }
           }
         ],
@@ -175,6 +177,12 @@
   },
   "active": "3e263c9449dc1d50",
   "lastOpenFiles": [
+    "ui/draft/App_v1_SavingsManagerUI.png",
+    "ui/draft/App Version 2.md",
+    "ui/draft/App Version 1.md",
+    "Feauture Requests/Ideas.md",
+    "Architecture/Endpoints.md",
+    "ui/draft/SavingsManagerUI_v2.png",
     "_changelog_template.md",
     "ui/draft/SavingsManagerUI_v1.png",
     "ui/draft/FullTransactionLogs_v2.png",
@@ -183,18 +191,12 @@
     "ui/draft/App_v2_SavingsManagerUI__UPDATED.png",
     "ui/draft/App_v2_SavingsManagerUI.png",
     "ui/draft/App_v1_SavingsManagerUI__UPDATED.png",
-    "ui/draft/App Version 2.md",
-    "ui/draft/App Version 1.md",
     "Requirements/Requirement Analysis.md",
-    "Feauture Requests/Ideas.md",
     "Architecture/Database App v2.md",
     "Architecture/Database App v1.md",
-    "ui/draft/SavingsManagerUI_v2.png",
-    "ui/draft/App_v1_SavingsManagerUI.png",
     "Diagram 2.svg",
     "Guidelines/Code/Code Style.md",
     "Guidelines/Code/Quality Assurence.md",
-    "Architecture/Endpoints.md",
     "Untitled.canvas",
     "Architecture/Autom. Database Backup.md",
     "Guidelines/Workflow.md",

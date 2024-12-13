@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import pytest
+from docutils.nodes import description
 from pydantic import ValidationError
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
@@ -60,6 +61,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1),
+            "description": "",
         },
         {
             "id": 2,
@@ -70,6 +72,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "priority": 2,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": None,
+            "description": "",
         },
         {
             "id": 3,
@@ -80,6 +83,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1),
+            "description": "",
         },  # Valid datetimes
         {
             "id": 4,
@@ -90,6 +94,7 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "priority": 2,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": None,
+            "description": "",
         },  # None modifiedAt
         {
             "id": 5,
@@ -100,7 +105,19 @@ def test_http_error_response_invalid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc).isoformat(),
             "modified_at": (datetime.now(tz=timezone.utc) + timedelta(days=2)).isoformat(),
+            "description": "",
         },  # ISO format strings for datetimes
+        {
+            "id": 5,
+            "name": "Vacation",
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc).isoformat(),
+            "modified_at": (datetime.now(tz=timezone.utc) + timedelta(days=2)).isoformat(),
+            "description": "test",
+        },
     ],
 )
 def test_moneybox_response_valid(data: dict[str, Any]) -> None:
@@ -112,6 +129,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
     assert response.savings_amount == data["savings_amount"]
     assert response.savings_target == data["savings_target"]
     assert response.priority == data["priority"]
+    assert response.description == data["description"]
 
     if isinstance(data["created_at"], str):
         assert response.created_at == datetime.fromisoformat(data["created_at"])
@@ -136,6 +154,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc),
+            "description": "",
         },  # Negative balance
         {
             "id": 2,
@@ -146,6 +165,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
+            "description": "",
         },  # modified_at before createdAt,
         {
             "id": 3,
@@ -156,6 +176,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": "2024-08-11 13:57:17.941840+00:00",
             "modified_at": "not-a-datetime",
+            "description": "",
         },  # Invalid modified_at format
         {
             "id": 4,
@@ -166,6 +187,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 2,
             "created_at": "not-a-datetime",
             "modified_at": None,
+            "description": "",
         },  # Invalid modified_at format
         {
             "id": 5,
@@ -176,6 +198,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
+            "description": "",
         },  # modified_at before created_at
         {
             "id": 6,
@@ -186,6 +209,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": {},  # incorrect type
             "modified_at": datetime.now(tz=timezone.utc),
+            "description": "",
         },
         {
             "id": 7,
@@ -196,6 +220,7 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": {},  # incorrect type
+            "description": "",
         },
         {
             "id": 8,
@@ -206,16 +231,62 @@ def test_moneybox_response_valid(data: dict[str, Any]) -> None:
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": None,
+            "description": "",
         },
         {
             "id": 9,
-            "name": "Box 1 ",  # trailing whitespace
+            "name": "Box 1",
             "balance": 500,
             "savings_amount": 200,
             "savings_target": 1500,
             "priority": 1,
             "created_at": datetime.now(tz=timezone.utc),
             "modified_at": None,
+            "description": "  test  ",  # leading/tailing whitespace
+        },
+        {
+            "id": 10,
+            "name": 123,  # invalid type
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": None,
+            "description": "",
+        },
+        {
+            "id": 11,
+            "name": "Box 1 ",
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": None,
+            "description": 123,  # invalid type
+        },
+        {
+            "id": 12,
+            "name": None,  # required
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": None,
+            "description": "",
+        },
+        {
+            "id": 13,
+            "name": "Holiday",
+            "balance": 500,
+            "savings_amount": 200,
+            "savings_target": 1500,
+            "priority": 1,
+            "created_at": datetime.now(tz=timezone.utc),
+            "modified_at": None,
+            "description": None,  # required
         },
     ],
 )
@@ -240,6 +311,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "priority": 0,
                     "created_at": datetime.now(tz=timezone.utc),
                     "modified_at": None,
+                    "description": "",
                 },
                 {
                     "id": 1,
@@ -250,6 +322,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "priority": 1,
                     "created_at": datetime.now(tz=timezone.utc),
                     "modified_at": datetime.now(tz=timezone.utc) + timedelta(days=1),
+                    "description": "",
                 },
                 {
                     "id": 2,
@@ -260,6 +333,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "priority": 2,
                     "created_at": datetime.now(tz=timezone.utc),
                     "modified_at": None,
+                    "description": "",
                 },
             ]
         },
@@ -274,6 +348,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "priority": 0,
                     "created_at": datetime.now(tz=timezone.utc),
                     "modified_at": None,
+                    "description": "",
                 },
                 {
                     "id": 1,
@@ -284,6 +359,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "priority": 1,
                     "created_at": (datetime.now(tz=timezone.utc) - timedelta(days=1)).isoformat(),
                     "modified_at": (datetime.now(tz=timezone.utc)).isoformat(),
+                    "description": "",
                 },
                 {
                     "id": 2,
@@ -294,6 +370,7 @@ def test_moneybox_response_invalid(data: dict[str, Any]) -> None:
                     "priority": 2,
                     "created_at": (datetime.now(tz=timezone.utc) - timedelta(days=1)).isoformat(),
                     "modified_at": None,
+                    "description": "",
                 },
             ]
         },  # Valid ISO format datetimes
@@ -324,6 +401,7 @@ def test_moneyboxes_response_valid(data: dict[str, Any]) -> None:
                     "priority": 1,
                     "created_at": "not-a-datetime",
                     "modified_at": datetime.now(tz=timezone.utc),
+                    "description": "",
                 },
             ]
         },  # Invalid created_at format (string not a datetime)
@@ -338,9 +416,24 @@ def test_moneyboxes_response_valid(data: dict[str, Any]) -> None:
                     "priority": 2,
                     "created_at": datetime.now(tz=timezone.utc),
                     "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
+                    "description": "",
                 },
             ]
         },  # Invalid: modified_at is before created_at
+        {
+            "moneyboxes": [
+                {
+                    "id": 2,
+                    "name": "Emergency Fund",
+                    "balance": 200,
+                    "savings_amount": 100,
+                    "savings_target": None,
+                    "priority": 2,
+                    "created_at": datetime.now(tz=timezone.utc),
+                    "modified_at": datetime.now(tz=timezone.utc) - timedelta(days=1),
+                },
+            ]
+        },  # Invalid: description missing
     ],
 )
 def test_moneyboxes_response_invalid(data: dict[str, Any]) -> None:
@@ -768,6 +861,7 @@ def test_validate_multiple_overflow_moneyboxes() -> None:
             priority=0,
             created_at="2024-08-13 02:50:41.837275+00:00",
             modified_at=None,
+            description="",
         ),
         MoneyboxResponse(
             id=2,
@@ -778,6 +872,7 @@ def test_validate_multiple_overflow_moneyboxes() -> None:
             priority=0,
             created_at="2024-08-13 02:50:41.837275+00:00",
             modified_at=None,
+            description="",
         ),
         MoneyboxResponse(
             id=3,
@@ -788,6 +883,7 @@ def test_validate_multiple_overflow_moneyboxes() -> None:
             priority=1,
             created_at="2024-08-13 02:50:41.837275+00:00",
             modified_at=None,
+            description="",
         ),
     ]
 
@@ -807,6 +903,7 @@ def test_validate_missing_overflow_moneybox() -> None:
             priority=1,
             created_at="2024-08-13 02:50:41.837275+00:00",
             modified_at=None,
+            description="",
         ),
         MoneyboxResponse(
             id=2,
@@ -817,6 +914,7 @@ def test_validate_missing_overflow_moneybox() -> None:
             priority=2,
             created_at="2024-08-14 02:50:41.837275+00:00",
             modified_at=None,
+            description="",
         ),
     ]
 
@@ -836,6 +934,7 @@ def test_validate_valid_moneyboxes() -> None:
             priority=0,
             created_at="2024-08-13 02:50:41.837275+00:00",
             modified_at=None,
+            description="",
         ),
         MoneyboxResponse(
             id=2,
@@ -846,6 +945,7 @@ def test_validate_valid_moneyboxes() -> None:
             priority=1,
             created_at="2024-08-15 02:50:41.837275+00:00",
             modified_at=None,
+            description="",
         ),
     ]
 

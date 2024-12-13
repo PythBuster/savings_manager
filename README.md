@@ -99,9 +99,16 @@ We will use SQLAlchemy to manage and access the SQL database.
 
 To create and migrate the database tables, use Alembic with the following command:
 From the project root directory:
-`poetry run alembic upgrade head`
+`poetry run alembic -x ENVIRONMENT=prod upgrade head`
 
-**Note: The database must be reachable.**
+To create a new database migration (alembic migration script), use the following command:
+From the project root directory:
+`alembic -x ENVIRONMENT=prod revision --autogenerate -m "YOUR MIGRATION MESSAGE"`
+
+
+**Notes:**
+1. The database must be reachable.
+2. `-x ENVIRONMENT=prod` controls to which database alembic shall communicate.
 
 ## CI/CD
 

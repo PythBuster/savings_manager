@@ -116,6 +116,12 @@ class MoneyboxResponse(BaseModel):
     """The current priority of the moneybox. There is only one moneybox with
     a priority of Null (will be the marker for the overflow moneybox)."""
 
+    description: Annotated[
+        str,
+        Field(description="The description of the moneybox."),
+    ]
+    """The description of the moneybox."""
+
     created_at: Annotated[
         AwareDatetime,
         Field(
@@ -148,6 +154,7 @@ class MoneyboxResponse(BaseModel):
                     "savingsAmount": 0,
                     "savingsTarget": 50000,
                     "priority": 1,
+                    "description": "The budget for holiday.",
                     "createdAt": "2024-08-11 13:57:17.941840 +00:00",
                     "modifiedAt": "2024-08-11 15:03:17.312860 +00:00",
                 }
@@ -198,13 +205,15 @@ class MoneyboxResponse(BaseModel):
 
         return self
 
-    @field_validator("name")
+    @field_validator("name", "description")
     @classmethod
-    def validate_name_for_leading_trailing_spaces(cls, value: str) -> str:
-        """Check for leading and trailing whitespaces in value."""
+    def validate_name_and_description_for_leading_trailing_spaces(cls, value: str) -> str:
+        """Check for leading and trailing whitespaces in 'name' and 'description'."""
 
         if value != value.strip():
-            raise ValueError("Leading and trailing spaces in name are not allowed.")
+            raise ValueError(
+                "Leading and trailing spaces in 'name' or 'description' are not allowed."
+            )
 
         return value
 
