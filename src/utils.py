@@ -201,6 +201,14 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
     if not moneyboxes or not app_settings["is_automated_saving_active"]:
         return {}
 
+    def get_index_of_lost_moneybox_with_target_none() -> int:
+        for i, moneybox_ in enumerate(reversed(moneyboxes)):
+            if moneybox_["savings_target"] is None:
+                return i
+
+        return -1
+
+    last_non_target_moneybox_index = get_index_of_lost_moneybox_with_target_none()
     moneyboxes_reached_targets: set[int] = set()
     moneybox_with_savings_target_distribution_data: dict[int, list[MoneyboxSavingsMonthData]] = (
         defaultdict(list)
@@ -276,7 +284,7 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
             current_savings_amount = app_settings["savings_amount"]
 
         # distribution algorithm
-        for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
+        for i, moneybox in enumerate(moneyboxes_sorted_by_priority_without_overflow_moneybox):
             if moneybox["id"] in moneyboxes_reached_targets:
                 continue
 
@@ -289,7 +297,7 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
                     moneybox["savings_target"] - moneybox["balance"],
                 )
             else:
-                if moneybox["savings_amount"] >= current_savings_amount:
+                if moneybox["savings_amount"] >= current_savings_amount and i <= last_non_target_moneybox_index:
                     moneybox["balance"] += distribution_amount
                     endless = True
                     current_savings_amount -= distribution_amount
