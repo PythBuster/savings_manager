@@ -201,14 +201,6 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
     if not moneyboxes or not app_settings["is_automated_saving_active"]:
         return {}
 
-    def get_index_of_lost_moneybox_with_target_none() -> int:
-        for i_ in range(len(moneyboxes) - 1, -1, -1):
-            if moneyboxes[i_]["savings_target"] is None:
-                return i_
-
-        return -1
-
-    last_non_target_moneybox_index = get_index_of_lost_moneybox_with_target_none()
     moneyboxes_reached_targets: set[int] = set()
     moneybox_with_savings_target_distribution_data: dict[int, list[MoneyboxSavingsMonthData]] = (
         defaultdict(list)
@@ -240,9 +232,6 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
             )
             moneyboxes_reached_targets.add(moneybox["id"])
 
-    # TODO: write/add unit test!
-    #  -> create testdata, where initially a moneybox has reached his target
-    #    + set savings_amount = 0
     if app_settings["savings_amount"] <= 0:
         return moneybox_with_savings_target_distribution_data
 
@@ -297,7 +286,7 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
                     moneybox["savings_target"] - moneybox["balance"],
                 )
             else:
-                if moneybox["savings_amount"] >= current_savings_amount and i <= last_non_target_moneybox_index:
+                if moneybox["savings_amount"] >= current_savings_amount and i < len(moneyboxes):
                     moneybox["balance"] += distribution_amount
                     endless = True
                     current_savings_amount -= distribution_amount
@@ -366,12 +355,12 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
 
         simulated_month += 1
 
+        # postprocess:
+        # - all moneyboxes without any savings will never get a saving, set to undefined (-1)
         if endless and not all_targets_reached(
                 _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
             ):  # not all targets reached but endless
 
-            # postprocess:
-            # - all moneyboxes without any savings will never get a saving, set to undifined (-1)
             for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
                 if (
                         moneybox["savings_target"] is not None
