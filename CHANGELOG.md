@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.37.2 (2024-12-14)
+### Fixes:
+- fix helper function for finding last None index (last moneybox in list witch savingsTarget=None).
+
 ## 2.37.1 (2024-12-14)
 ### Fixes:
 - fix calculation for reaching targets: check if after the last moneybox with savingsTarget=None in prioritylist 
