@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.37.1 (2024-12-14)
+### Fixes:
+- fix calculation for reaching targets: check if after the last moneybox with savingsTarget=None in prioritylist 
+  may block following moneyboxes ins savings distribution process.
+
 ## 2.37.0 (2024-12-13)
 ### Changes:
 - adapt response validation model for reaching targets and allow negative months as marker for
