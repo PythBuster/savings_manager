@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.37.3 (2024-12-14)
+### Changes:
+- reduce complexity of calculation algorithm (reaching targets)
+- add/adapt further tests tu test this function and have a playground where more
+  specific tests for the calculation can easily be added
+
 ## 2.37.2 (2024-12-14)
 ### Fixes:
 - fix helper function for finding last None index (last moneybox in list witch savingsTarget=None).
