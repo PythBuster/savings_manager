@@ -202,9 +202,9 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
         return {}
 
     def get_index_of_lost_moneybox_with_target_none() -> int:
-        for i, moneybox_ in enumerate(reversed(moneyboxes)):
-            if moneybox_["savings_target"] is None:
-                return i
+        for i_ in range(len(moneyboxes) - 1, -1, -1):
+            if moneyboxes[i_]["savings_target"] is None:
+                return i_
 
         return -1
 
