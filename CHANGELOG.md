@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.37.4 (2024-12-18)
+### Fixes:
+- fix same bug and re-add implementation for finding last index of moneybox with target=None
+
 ## 2.37.3 (2024-12-14)
 ### Changes:
 - reduce complexity of calculation algorithm (reaching targets)
