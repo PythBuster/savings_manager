@@ -202,13 +202,6 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
         return {}
 
 
-    def get_index_of_lost_moneybox_with_target_none() -> int:
-        for i_ in range(len(moneyboxes) - 1, -1, -1):
-            if moneyboxes[i_]["savings_target"] is None:
-                return i_
-        return -1
-
-    last_non_target_moneybox_index = get_index_of_lost_moneybox_with_target_none() - 1  # ignore index of overflow moneybox
     moneyboxes_reached_targets: set[int] = set()
     moneybox_with_savings_target_distribution_data: dict[int, list[MoneyboxSavingsMonthData]] = (
         defaultdict(list)
@@ -222,6 +215,17 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
     overflow_moneybox: dict[str, Any] = moneyboxes_sorted_by_priority[0]
     moneyboxes_sorted_by_priority_without_overflow_moneybox: list[dict[str, Any]] = (
         moneyboxes_sorted_by_priority[1:]
+    )
+
+    def get_index_of_lost_moneybox_with_target_none() -> int:
+        for i_ in range(len(moneyboxes_sorted_by_priority_without_overflow_moneybox) - 1, -1, -1):
+            if moneyboxes_sorted_by_priority_without_overflow_moneybox[i_]["savings_target"] is None:
+                return i_
+        return -1
+
+    last_non_target_moneybox_index = get_index_of_lost_moneybox_with_target_none()
+    last_non_target_has_subsequent_moneyboxes = (
+            last_non_target_moneybox_index < len(moneyboxes_sorted_by_priority_without_overflow_moneybox) - 1
     )
 
     # preprocess:
@@ -294,7 +298,7 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
                     moneybox["savings_target"] - moneybox["balance"],
                 )
             else:
-                if moneybox["savings_amount"] >= current_savings_amount and i < last_non_target_moneybox_index:
+                if last_non_target_has_subsequent_moneyboxes and moneybox["savings_amount"] >= current_savings_amount:
                     moneybox["balance"] += distribution_amount
                     endless = True
                     current_savings_amount -= distribution_amount
