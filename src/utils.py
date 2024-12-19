@@ -178,7 +178,7 @@ def tabulate_str(headers: Sequence, rows: Sequence, show_index: bool = False) ->
     )
 
 
-def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-branches
+def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: disable=line-too-long, too-many-branches,too-many-statements,too-many-locals
     moneyboxes: list[dict[str, Any]],
     app_settings: dict[str, Any],
     overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType,
@@ -201,7 +201,6 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
     if not moneyboxes or not app_settings["is_automated_saving_active"]:
         return {}
 
-
     moneyboxes_reached_targets: set[int] = set()
     moneybox_with_savings_target_distribution_data: dict[int, list[MoneyboxSavingsMonthData]] = (
         defaultdict(list)
@@ -219,13 +218,17 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
 
     def get_index_of_lost_moneybox_with_target_none() -> int:
         for i_ in range(len(moneyboxes_sorted_by_priority_without_overflow_moneybox) - 1, -1, -1):
-            if moneyboxes_sorted_by_priority_without_overflow_moneybox[i_]["savings_target"] is None:
+            if (
+                moneyboxes_sorted_by_priority_without_overflow_moneybox[i_]["savings_target"]
+                is None
+            ):
                 return i_
         return -1
 
     last_non_target_moneybox_index = get_index_of_lost_moneybox_with_target_none()
     last_non_target_has_subsequent_moneyboxes = (
-            last_non_target_moneybox_index < len(moneyboxes_sorted_by_priority_without_overflow_moneybox) - 1
+        last_non_target_moneybox_index
+        < len(moneyboxes_sorted_by_priority_without_overflow_moneybox) - 1
     )
 
     # preprocess:
@@ -285,7 +288,7 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
             current_savings_amount = app_settings["savings_amount"]
 
         # distribution algorithm
-        for i, moneybox in enumerate(moneyboxes_sorted_by_priority_without_overflow_moneybox):
+        for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
             if moneybox["id"] in moneyboxes_reached_targets:
                 continue
 
@@ -298,7 +301,10 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
                     moneybox["savings_target"] - moneybox["balance"],
                 )
             else:
-                if last_non_target_has_subsequent_moneyboxes and moneybox["savings_amount"] >= current_savings_amount:
+                if (
+                    last_non_target_has_subsequent_moneyboxes
+                    and moneybox["savings_amount"] >= current_savings_amount
+                ):
                     moneybox["balance"] += distribution_amount
                     endless = True
                     current_savings_amount -= distribution_amount
@@ -364,19 +370,17 @@ def calculate_months_for_reaching_savings_targets(  # pylint: disable=too-many-b
                 if overflow_moneybox["balance"] <= 0:
                     break
 
-
         simulated_month += 1
 
         # postprocess:
         # - all moneyboxes without any savings will never get a saving, set to undefined (-1)
         if endless and not all_targets_reached(
-                _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
-            ):  # not all targets reached but endless
-
+            _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
+        ):  # not all targets reached but endless
             for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
                 if (
-                        moneybox["savings_target"] is not None
-                        and moneybox["balance"] < moneybox["savings_target"]
+                    moneybox["savings_target"] is not None
+                    and moneybox["balance"] < moneybox["savings_target"]
                 ):
                     moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
                         MoneyboxSavingsMonthData(
