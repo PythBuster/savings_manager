@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.37.5 (2024-12-19)
+### Fixes:
+- re-add all tests for 'calculate_months_for_reaching_savings_targets' and fix implementation
+
 ## 2.37.4 (2024-12-18)
 ### Fixes:
 - fix same bug and re-add implementation for finding last index of moneybox with target=None
