@@ -4,7 +4,6 @@ import os
 import tomllib
 from collections import defaultdict
 from functools import cache
-from operator import truediv
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -217,17 +216,6 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
         moneyboxes_sorted_by_priority[1:]
     )
 
-    def get_index_of_lost_moneybox_with_target_none() -> int:
-        for i_ in range(len(moneyboxes_sorted_by_priority_without_overflow_moneybox) - 1, -1, -1):
-            if (
-                moneyboxes_sorted_by_priority_without_overflow_moneybox[i_]["savings_target"]
-                is None
-            ):
-                return i_
-        return -1
-
-    last_non_target_moneybox_index = get_index_of_lost_moneybox_with_target_none()
-
     # preprocess:
     # - check if there are moneyboxes, that already reached their savings targets
     for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
@@ -269,15 +257,15 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
         # If all checked moneyboxes have reached their target, return True
         return True
 
-    def total_balances_of_moneyboxes_with_savings_targets(_moneyboxes):
+    def total_balances_of_moneyboxes_with_savings_targets(_moneyboxes: list[dict[str, Any]]) -> int:
         return sum(
             _moneybox["balance"]
             for _moneybox in _moneyboxes
             if _moneybox["savings_target"] is not None
         )
 
-    endless = False
-    last_total_balances = -1
+    endless: bool = False
+    last_total_balances: int = -1
 
     while not all_targets_reached(
         _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
@@ -293,8 +281,7 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
             current_savings_amount = app_settings["savings_amount"]
 
         # distribution algorithm
-        old_current_savings_amount = current_savings_amount
-        for i, moneybox in enumerate(moneyboxes_sorted_by_priority_without_overflow_moneybox):
+        for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
             if moneybox["id"] in moneyboxes_reached_targets:
                 continue
 
@@ -307,7 +294,7 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
                     moneybox["savings_target"] - moneybox["balance"],
                 )
             else:
-                total_balances = total_balances_of_moneyboxes_with_savings_targets(
+                total_balances: int = total_balances_of_moneyboxes_with_savings_targets(
                     _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox
                 )
 

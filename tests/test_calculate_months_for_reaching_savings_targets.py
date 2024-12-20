@@ -1,5 +1,6 @@
 """All tests specific to calculate_months_for_reaching_savings_targets are located here.
 This is because the function is essential and has caused numerous issues."""
+
 from typing import Any
 
 import pytest
@@ -230,7 +231,13 @@ from src.utils import calculate_months_for_reaching_savings_targets
         (  # 13
             [
                 {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
-                {"id": 1, "balance": 0, "savings_amount": 10000, "savings_target": None, "priority": 1},
+                {
+                    "id": 1,
+                    "balance": 0,
+                    "savings_amount": 10000,
+                    "savings_target": None,
+                    "priority": 1,
+                },
                 {"id": 2, "balance": 0, "savings_amount": 1, "savings_target": 100, "priority": 2},
                 {
                     "id": 3,
@@ -252,28 +259,34 @@ from src.utils import calculate_months_for_reaching_savings_targets
             {2: 100, 4: -1},
         ),
         (  # 14
-                [
-                    {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
-                    {"id": 1, "balance": 0, "savings_amount": 10000, "savings_target": None, "priority": 1},
-                    {"id": 2, "balance": 0, "savings_amount": 1, "savings_target": 100, "priority": 2},
-                    {
-                        "id": 3,
-                        "balance": 0,
-                        "savings_amount": 100,
-                        "savings_target": None,
-                        "priority": 3,
-                    },
-                    {
-                        "id": 4,
-                        "balance": 0,
-                        "savings_amount": 100,
-                        "savings_target": 100,
-                        "priority": 4,
-                    },
-                ],
-                {"is_automated_saving_active": True, "savings_amount": 10101},
-                OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
-                {2: 100, 4: 200},
+            [
+                {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
+                {
+                    "id": 1,
+                    "balance": 0,
+                    "savings_amount": 10000,
+                    "savings_target": None,
+                    "priority": 1,
+                },
+                {"id": 2, "balance": 0, "savings_amount": 1, "savings_target": 100, "priority": 2},
+                {
+                    "id": 3,
+                    "balance": 0,
+                    "savings_amount": 100,
+                    "savings_target": None,
+                    "priority": 3,
+                },
+                {
+                    "id": 4,
+                    "balance": 0,
+                    "savings_amount": 100,
+                    "savings_target": 100,
+                    "priority": 4,
+                },
+            ],
+            {"is_automated_saving_active": True, "savings_amount": 10101},
+            OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            {2: 100, 4: 200},
         ),
     ],
 )
