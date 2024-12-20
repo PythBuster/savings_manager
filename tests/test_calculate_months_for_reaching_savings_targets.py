@@ -227,6 +227,54 @@ from src.utils import calculate_months_for_reaching_savings_targets
             OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
             {1: 2, 2: 2},
         ),
+        (  # 13
+            [
+                {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
+                {"id": 1, "balance": 0, "savings_amount": 10000, "savings_target": None, "priority": 1},
+                {"id": 2, "balance": 0, "savings_amount": 1, "savings_target": 100, "priority": 2},
+                {
+                    "id": 3,
+                    "balance": 0,
+                    "savings_amount": 100,
+                    "savings_target": None,
+                    "priority": 3,
+                },
+                {
+                    "id": 4,
+                    "balance": 0,
+                    "savings_amount": 100,
+                    "savings_target": 100,
+                    "priority": 4,
+                },
+            ],
+            {"is_automated_saving_active": True, "savings_amount": 10100},
+            OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            {2: 100, 4: -1},
+        ),
+        (  # 14
+                [
+                    {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
+                    {"id": 1, "balance": 0, "savings_amount": 10000, "savings_target": None, "priority": 1},
+                    {"id": 2, "balance": 0, "savings_amount": 1, "savings_target": 100, "priority": 2},
+                    {
+                        "id": 3,
+                        "balance": 0,
+                        "savings_amount": 100,
+                        "savings_target": None,
+                        "priority": 3,
+                    },
+                    {
+                        "id": 4,
+                        "balance": 0,
+                        "savings_amount": 100,
+                        "savings_target": 100,
+                        "priority": 4,
+                    },
+                ],
+                {"is_automated_saving_active": True, "savings_amount": 10101},
+                OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+                {2: 100, 4: 200},
+        ),
     ],
 )
 def test_calculate_months_for_reaching_savings_targets(
