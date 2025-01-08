@@ -40,7 +40,6 @@ jobs:
         python -m pipx ensurepath
         export PATH="$HOME/.local/bin:$PATH"
         pipx install poetry
-        poetry config installer.modern-installation false
         poetry install --with dev
 
     - name: Run tests
