@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# This workflow will install Python dependencies, run tests, and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Python application
@@ -21,20 +21,25 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
         python-version: "3.12"
+
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install gnupg2 wget nano
+        sudo apt install -y gnupg2 wget nano python3-pip python3-venv
         sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
         curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
         sudo apt update
-        sudo apt install postgresql-client-16
+        sudo apt install -y postgresql-client-16
         python -m pip install --upgrade pip
-        pip install poetry
+        python -m pip install pipx
+        python -m pipx ensurepath
+        export PATH="$HOME/.local/bin:$PATH"
+        pipx install poetry
         poetry config installer.modern-installation false
         poetry install --with dev
 
