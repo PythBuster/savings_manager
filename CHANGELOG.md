@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.37.7 (2025-01-08)
+### Fixes:
+- further fix for calculate_months_for_reaching_savings_targets by special handling of 
+    non-target and target-but-with-amount moneyboxes
+
 ## 2.37.6 (2024-12-20)
 ### Fixes:
 - another fix for calculate_months_for_reaching_savings_targets by checking any changes in budgets of moneyboxes
