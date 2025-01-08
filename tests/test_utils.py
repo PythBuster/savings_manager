@@ -181,8 +181,8 @@ def test_calculate_months_for_reaching_savings_targets__success__mode_collect() 
     assert result_1[3][-1].month == 5
     assert result_1[4][-1].month == 15
     assert result_1[5][-1].month == 0
+    assert result_1[6][-1].month == -1
     assert 1 not in result_1
-    assert 6 not in result_1
 
 
 def test_calculate_months_for_reaching_savings_targets__success__mode_add_to_savings_amount() -> (

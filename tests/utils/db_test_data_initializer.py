@@ -243,6 +243,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         )
 
         moneyboxes_data = [
+            # id: 25
             {  # expectation: reached savings target in 5 months
                 "name": "Test Box 3",
                 "priority": 1,
@@ -250,20 +251,23 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "savings_amount": 2500,
                 "savings_target": 10000,
             },
-            {  # takes 1000 from month 6 upwards
+            # id: 26
+            {  # takes 1000 from month 6 upwards, reaching: -1 (never)
                 "name": "Test Box 2",
                 "priority": 2,
                 "balance": 0,
                 "savings_amount": 1000,
                 "savings_target": None,
             },
-            {  # get 1000 from month 6 upwards, expectation: reached target in month 16
+            # id: 27
+            {  # get 1000 from month 6 upwards, expectation: reached target in 15 months
                 "name": "Test Box 4",
                 "priority": 3,
                 "balance": 1000,
                 "savings_amount": 5000,
                 "savings_target": 10500,
             },
+            # id: 28
             {  # expectation: reached target directly (month 0)
                 "name": "Test Box 5",
                 "priority": 4,
@@ -271,7 +275,8 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "savings_amount": 0,
                 "savings_target": 0,
             },
-            {  # expectation: not part of result, will never reach savings target
+            # id: 29
+            {  # expectation: not part of result, will never reach savings target (months: -1)
                 "name": "Test Box 6",
                 "priority": 5,
                 "balance": 0,

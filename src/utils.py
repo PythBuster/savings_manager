@@ -311,14 +311,13 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
             if distribution_amount > 0:
                 moneybox["balance"] += distribution_amount
 
-                if moneybox["savings_target"] is not None:
-                    moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
+                moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
                         MoneyboxSavingsMonthData(
                             moneybox_id=moneybox["id"],
                             month=simulated_month,
                             savings_amount=distribution_amount,
                         )
-                    )
+                )
 
                 # target for moneybox reached
                 if (
@@ -375,16 +374,13 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
             _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox
         )
 
-        # postprocess:
+        # distribution postprocess:
         # - all moneyboxes without any savings will never get a saving, set to undefined (-1)
         if endless and not all_targets_reached(
             _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
-        ):  # not all targets reached but endless
+        ):  # not all targets with a target reached but endless
             for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
-                if (
-                    moneybox["savings_target"] is not None
-                    and moneybox["balance"] < moneybox["savings_target"]
-                ):
+                if moneybox["savings_target"] is not None and moneybox["balance"] < moneybox["savings_target"]:
                     moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
                         MoneyboxSavingsMonthData(
                             moneybox_id=moneybox["id"],
@@ -394,6 +390,36 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
                     )
 
             break
+
+    # postprocess: mark all moneyboxes without a savings_target as non reachable as default
+    #   and mark moneyboxes with savings_amount=0 as unreachable, if savings_target is > 0
+    for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
+        moneybox_distribution_data = moneybox_with_savings_target_distribution_data[moneybox["id"]]
+
+        _non_target = moneybox["savings_target"] is None
+        _non_amount_but_target = not _non_target and (moneybox["savings_target"] > 0 and moneybox["savings_amount"] == 0)
+
+        if _non_target or _non_amount_but_target:
+            # avoid adding -1 marker if already existing as last entry
+            if moneybox_distribution_data and moneybox_distribution_data[-1].month == -1:
+                continue
+
+        if _non_target:
+            moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
+                MoneyboxSavingsMonthData(
+                    moneybox_id=moneybox["id"],
+                    savings_amount=-1,
+                    month=-1,
+                )
+            )
+        elif _non_amount_but_target and len(moneybox_distribution_data) == 0:
+            moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
+                MoneyboxSavingsMonthData(
+                    moneybox_id=moneybox["id"],
+                    savings_amount=-1,
+                    month=-1,
+                )
+            )
 
     return moneybox_with_savings_target_distribution_data
 

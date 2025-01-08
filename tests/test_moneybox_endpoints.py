@@ -1,6 +1,7 @@
 """All moneybox endpoint tests are located here."""
 
 import asyncio
+from collections import Counter
 from datetime import datetime
 from typing import Any
 
@@ -149,16 +150,18 @@ async def test_get_months_for_reaching_savings_targets__status_200__total_3(
     assert response.status_code == status.HTTP_200_OK
 
     content = response.json()
-    assert content["total"] == 3
+    assert content["total"] == 5
 
     calculated_months = [
         reaching_savings_targets["amountOfMonths"]
         for reaching_savings_targets in content["reachingSavingsTargets"]
     ]
 
-    assert 0 in calculated_months
-    assert 5 in calculated_months
-    assert 15 in calculated_months
+    counter = Counter(calculated_months)
+    assert counter[-1] == 2
+    assert counter[0] == 1
+    assert counter[5] == 1
+    assert counter[15] == 1
 
 
 @pytest.mark.dependency

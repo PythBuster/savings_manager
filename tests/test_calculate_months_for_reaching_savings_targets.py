@@ -30,12 +30,12 @@ from src.utils import calculate_months_for_reaching_savings_targets
         (  # 2
             [
                 {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
-                {"id": 1, "balance": 0, "savings_amount": 0, "savings_target": 50, "priority": 1},
-                {"id": 2, "balance": 0, "savings_amount": 0, "savings_target": 100, "priority": 2},
+                {"id": 1, "balance": 0, "savings_amount": 50, "savings_target": 50, "priority": 1},
+                {"id": 2, "balance": 0, "savings_amount": 50, "savings_target": 100, "priority": 2},
             ],
             {"is_automated_saving_active": True, "savings_amount": 50},
             OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
-            {1: 1, 2: 2},
+            {1: 1, 2: 3},
         ),
         (  # 3
             [
@@ -287,6 +287,16 @@ from src.utils import calculate_months_for_reaching_savings_targets
             {"is_automated_saving_active": True, "savings_amount": 10101},
             OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
             {2: 100, 4: 200},
+        ),
+        (  # 15
+            [
+                {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
+                {"id": 1, "balance": 0, "savings_amount": 0, "savings_target": 50, "priority": 1},
+                {"id": 2, "balance": 0, "savings_amount": 0, "savings_target": 100, "priority": 2},
+            ],
+            {"is_automated_saving_active": True, "savings_amount": 50},
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {1: -1, 2: -1},
         ),
     ],
 )
