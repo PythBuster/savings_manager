@@ -21,41 +21,41 @@ class UserRoleType(StrEnum):
 class EndpointRouteType(StrEnum):
     """The endpoint names."""
 
-    APP: str = "app"  # /app
+    APP = "app"  # /app
     """App endpoint path name"""
 
-    APP_ROOT: str = "api"  # /api
+    APP_ROOT = "api"  # /api
     """Root endpoint path name."""
 
-    MONEYBOX: str = "moneybox"  # /moneybox
+    MONEYBOX = "moneybox"  # /moneybox
     """Moneybox endpoint path name."""
 
-    MONEYBOXES: str = "moneyboxes"  # /moneyboxes
+    MONEYBOXES = "moneyboxes"  # /moneyboxes
     """Moneyboxes endpoint path name."""
 
-    PRIORITYLIST: str = "prioritylist"  # /prioritylist
+    PRIORITYLIST = "prioritylist"  # /prioritylist
     """Prioritylist endpoint path name."""
 
-    APP_SETTINGS: str = "settings"  # /settings
+    APP_SETTINGS = "settings"  # /settings
     """Settings endpoint path name."""
 
-    EMAIL_SENDER: str = "email"  # /email
+    EMAIL_SENDER = "email"  # /email
     """Email endpoint path name."""
 
-    USER: str = "user"  # /user
+    USER = "user"  # /user
     """User endpoint path name."""
 
 
 class EnvironmentType(StrEnum):
     """App environment types/names."""
 
-    PROD: str = "prod"
+    PROD = "prod"
     """The Production environment."""
 
-    DEV: str = "dev"
+    DEV = "dev"
     """The Development environment."""
 
-    TEST: str = "test"
+    TEST = "test"
     """The Testing environment."""
 
 
@@ -169,20 +169,20 @@ class AppEnvVariables(BaseSettings):
 class TransactionTrigger(StrEnum):
     """The transaction trigger."""
 
-    MANUALLY: str = "manually"
+    MANUALLY = "manually"
     """Transaction was triggered manually."""
 
-    AUTOMATICALLY: str = "automatically"
+    AUTOMATICALLY = "automatically"
     """Transaction was triggered automatically."""
 
 
 class TransactionType(StrEnum):
     """The transaction type."""
 
-    DIRECT: str = "direct"
+    DIRECT = "direct"
     """Transaction was made in this moneybox directly."""
 
-    DISTRIBUTION: str = "distribution"
+    DISTRIBUTION = "distribution"
     """Transaction caused by distribution strategy."""
 
 
@@ -190,30 +190,30 @@ class ActionType(StrEnum):
     """The action type especially used in context of the automated savings and
     automated savings logs."""
 
-    ACTIVATED_AUTOMATED_SAVING: str = "activated_automated_saving"
+    ACTIVATED_AUTOMATED_SAVING = "activated_automated_saving"
     """Action for activating the automated savings in app settings."""
 
-    DEACTIVATED_AUTOMATED_SAVING: str = "deactivated_automated_saving"
+    DEACTIVATED_AUTOMATED_SAVING = "deactivated_automated_saving"
     """Action for deactivating the automated savings in app settings."""
 
-    APPLIED_AUTOMATED_SAVING: str = "applied_automated_saving"
+    APPLIED_AUTOMATED_SAVING = "applied_automated_saving"
     """Action for executing the automated savings."""
 
-    CHANGED_AUTOMATED_SAVINGS_AMOUNT: str = "changed_automated_savings_amount"
+    CHANGED_AUTOMATED_SAVINGS_AMOUNT = "changed_automated_savings_amount"
     """Action for changing the savings amount in app settings."""
 
 
 class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
     """The transaction type."""
 
-    COLLECT: str = "collect"
+    COLLECT = "collect"
     """Just collect amounts in overflow moneybox.."""
 
-    ADD_TO_AUTOMATED_SAVINGS_AMOUNT: str = "add_to_automated_savings_amount"
+    ADD_TO_AUTOMATED_SAVINGS_AMOUNT = "add_to_automated_savings_amount"
     """Push up the initial automated savings amount and add all balance to
     distributing savings amount."""
 
-    FILL_UP_LIMITED_MONEYBOXES: str = "fill_up_limited_moneyboxes"
+    FILL_UP_LIMITED_MONEYBOXES = "fill_up_limited_moneyboxes"
     """After the automated savings process, the entire balance from the overflow
     moneybox should be distributed to the moneyboxes with upper limits, in the order of
     the priority list. Try to fill them up."""

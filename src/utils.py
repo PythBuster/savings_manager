@@ -312,11 +312,11 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
                 moneybox["balance"] += distribution_amount
 
                 moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
-                        MoneyboxSavingsMonthData(
-                            moneybox_id=moneybox["id"],
-                            month=simulated_month,
-                            savings_amount=distribution_amount,
-                        )
+                    MoneyboxSavingsMonthData(
+                        moneybox_id=moneybox["id"],
+                        month=simulated_month,
+                        savings_amount=distribution_amount,
+                    )
                 )
 
                 # target for moneybox reached
@@ -380,7 +380,10 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
             _moneyboxes=moneyboxes_sorted_by_priority_without_overflow_moneybox,
         ):  # not all targets with a target reached but endless
             for moneybox in moneyboxes_sorted_by_priority_without_overflow_moneybox:
-                if moneybox["savings_target"] is not None and moneybox["balance"] < moneybox["savings_target"]:
+                if (
+                    moneybox["savings_target"] is not None
+                    and moneybox["balance"] < moneybox["savings_target"]
+                ):
                     moneybox_with_savings_target_distribution_data[moneybox["id"]].append(
                         MoneyboxSavingsMonthData(
                             moneybox_id=moneybox["id"],
@@ -397,7 +400,9 @@ def calculate_months_for_reaching_savings_targets(  # noqa: ignore  # pylint: di
         moneybox_distribution_data = moneybox_with_savings_target_distribution_data[moneybox["id"]]
 
         _non_target = moneybox["savings_target"] is None
-        _non_amount_but_target = not _non_target and (moneybox["savings_target"] > 0 and moneybox["savings_amount"] == 0)
+        _non_amount_but_target = not _non_target and (
+            moneybox["savings_target"] > 0 and moneybox["savings_amount"] == 0
+        )
 
         if _non_target or _non_amount_but_target:
             # avoid adding -1 marker if already existing as last entry

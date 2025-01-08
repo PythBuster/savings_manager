@@ -2446,6 +2446,17 @@ shellingham = ">=1.3.0"
 typing-extensions = ">=3.7.4.3"
 
 [[package]]
+name = "types-tabulate"
+version = "0.9.0.20241207"
+description = "Typing stubs for tabulate"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types_tabulate-0.9.0.20241207-py3-none-any.whl", hash = "sha256:b8dad1343c2a8ba5861c5441370c3e35908edd234ff036d4298708a1d4cf8a85"},
+    {file = "types_tabulate-0.9.0.20241207.tar.gz", hash = "sha256:ac1ac174750c0a385dfd248edc6279fa328aaf4ea317915ab879a2ec47833230"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2798,4 +2809,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "9d7b381a9d0f09107795b4385dadd24f55982fad1c8cd16e398aa5cfc2df103c"
+content-hash = "76e59a0c9a82d88b85430abd52aeacced4a5d84749c4f39ce73df5e29e852718"
