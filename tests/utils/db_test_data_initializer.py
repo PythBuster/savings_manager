@@ -1,8 +1,8 @@
 # pylint: disable=too-many-lines
 
 """The database test data initializer."""
-from calendar import month
-from datetime import datetime, timezone, timedelta
+
+from datetime import datetime, timedelta, timezone
 from functools import partial
 from typing import Any
 
@@ -10,9 +10,10 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy import insert
 
 from src.custom_types import (
+    ActionType,
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType, ActionType,
+    TransactionType,
 )
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
@@ -1901,7 +1902,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "details": jsonable_encoder(
                     app_settings_data | {"distribution_amount": distribution_amount}
                 ),
-            }
+            },
         ]
 
         async with self.db_manager.async_sessionmaker.begin() as session:
@@ -1991,7 +1992,8 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "action": ActionType.APPLIED_AUTOMATED_SAVING,
                 "action_at": datetime.now(tz=timezone.utc) - timedelta(days=62),
                 "details": jsonable_encoder(
-                    app_settings_data | {"distribution_amount": distribution_amount, "report_sent": True}
+                    app_settings_data
+                    | {"distribution_amount": distribution_amount, "report_sent": True}
                 ),
             },
             {
@@ -2000,7 +2002,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "details": jsonable_encoder(
                     app_settings_data | {"distribution_amount": distribution_amount}
                 ),
-            }
+            },
         ]
 
         async with self.db_manager.async_sessionmaker.begin() as session:

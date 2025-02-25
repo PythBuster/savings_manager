@@ -1,5 +1,5 @@
 """The Email Sender stuff is located here."""
-import asyncio
+
 from collections.abc import Iterable
 from datetime import datetime, timezone
 from email.message import EmailMessage
@@ -68,9 +68,9 @@ class EmailSender(ReportSender):
         await self._send_message(plain_message=plain_message, receiver=receiver)
 
     async def send_email_automated_savings_done_successfully(
-            self,
-            to: str,
-            subject: str,
+        self,
+        to: str,
+        subject: str,
     ) -> bool:
         """The send email function which will be called after automated savings
         is done successfully.
@@ -102,7 +102,6 @@ class EmailSender(ReportSender):
         )
 
         return "Requested mail action okay, completed: id=" in response_message
-
 
     async def _render_automated_savings_report(  # pylint: disable=too-many-locals
         self,

@@ -7,7 +7,6 @@ from sqlalchemy import (
     JSON,
     CheckConstraint,
     DateTime,
-    Enum,
     ForeignKey,
     Index,
     MetaData,

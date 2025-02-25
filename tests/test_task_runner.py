@@ -1,8 +1,8 @@
 """All tests for the task runner are located here."""
 
 import asyncio
-from typing import Any
 from datetime import datetime
+from typing import Any
 from unittest.mock import patch
 
 from src.custom_types import ActionType
@@ -30,6 +30,7 @@ async def test_task_automated_savings_schedule(
     automated_savings_done_write_log = asyncio.Event()
 
     add_action_log = db_manager.add_action_log
+
     async def mock_write_lock_automated_savings_done(*args, **kwargs) -> None:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
         async with db_manager.async_sessionmaker.begin() as session:
             kwargs["session"] = session
@@ -61,7 +62,7 @@ async def test_task_automated_savings_schedule(
             action_type=ActionType.APPLIED_AUTOMATED_SAVING,
         )
         assert len(action_logs) == 1
-        assert action_logs[0]["details"].get("report_sent", False) == False
+        assert not action_logs[0]["details"].get("report_sent", False)
 
 
 async def test_task_automated_savings_dont_schedule(
@@ -127,7 +128,8 @@ async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many
         await asyncio_sleep_orig(duration)
 
     orig_add_action_log = db_manager.add_action_log
-    async def _add_action_log(*args, **kwargs):
+
+    async def _add_action_log(*args, **kwargs) -> dict[str, Any]:  # type: ignore
         return await orig_add_action_log(*args, **kwargs)
 
     with (
@@ -135,7 +137,7 @@ async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many
         patch(f"{db_manager_module_path}.datetime") as mock_datetime_2,
         patch(
             f"{db_manager_module_path}.{db_manager_path_class_name}.add_action_log",
-            site_effect=_add_action_log
+            site_effect=_add_action_log,
         ) as mock_distribute,
         patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled) as mock_sleep,
     ):
@@ -149,7 +151,7 @@ async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many
             email_sender=email_sender,
         )
 
-        task_runner.task_email_sending = lambda : ()
+        task_runner.task_email_sending = lambda: ()
 
         asyncio.ensure_future(task_runner.run())
         await scheduled.wait()
@@ -200,7 +202,7 @@ async def test_task_automated_savings_no_savings_active(  # pylint: disable=too-
             email_sender=email_sender,
         )
 
-        task_runner.task_email_sending = lambda : ()
+        task_runner.task_email_sending = lambda: ()
 
         asyncio.ensure_future(task_runner.run())
         await scheduled.wait()
@@ -213,16 +215,16 @@ async def test_task_automated_savings_no_savings_active(  # pylint: disable=too-
         assert len(action_logs) == 0
 
 
-async def test_task_email_sending__one_of_one(
+async def test_task_email_sending__one_of_one(  # pylint: disable=too-many-locals
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
-    email_sender: EmailSender
+    email_sender: EmailSender,
 ) -> None:
     action_logs = await db_manager.get_action_logs(
         action_type=ActionType.APPLIED_AUTOMATED_SAVING,
     )
     assert len(action_logs) == 1
-    assert action_logs[0]["details"].get("report_sent", False) == False
+    assert not action_logs[0]["details"].get("report_sent", False)
 
     # Get path to class dynamically
     task_runner_module_path = BackgroundTaskRunner.__module__
@@ -235,6 +237,7 @@ async def test_task_email_sending__one_of_one(
     updated = asyncio.Event()
 
     update_action_log = db_manager.update_action_log
+
     async def mock_email_sent(*args, **kwargs) -> dict[str, Any]:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
         return await update_action_log(*args, **kwargs)
 
@@ -260,7 +263,7 @@ async def test_task_email_sending__one_of_one(
             email_sender=email_sender,
         )
 
-        task_runner.task_automated_savings = lambda : ()
+        task_runner.task_automated_savings = lambda: ()
 
         asyncio.ensure_future(task_runner.run())
         await updated.wait()
@@ -271,21 +274,20 @@ async def test_task_email_sending__one_of_one(
             action_type=ActionType.APPLIED_AUTOMATED_SAVING,
         )
         assert len(action_logs) == 1
-        assert action_logs[0]["details"]["report_sent"] == True
+        assert action_logs[0]["details"]["report_sent"]
 
 
-
-async def test_task_email_sending__two_of_two(
+async def test_task_email_sending__two_of_two(  # pylint: disable=too-many-locals
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
-    email_sender: EmailSender
+    email_sender: EmailSender,
 ) -> None:
     action_logs = await db_manager.get_action_logs(
         action_type=ActionType.APPLIED_AUTOMATED_SAVING,
     )
     assert len(action_logs) == 2
-    assert action_logs[0]["details"].get("report_sent", False) == False
-    assert action_logs[1]["details"].get("report_sent", False) == False
+    assert not action_logs[0]["details"].get("report_sent", False)
+    assert not action_logs[1]["details"].get("report_sent", False)
 
     # Get path to class dynamically
     task_runner_module_path = BackgroundTaskRunner.__module__
@@ -298,6 +300,7 @@ async def test_task_email_sending__two_of_two(
     updated = asyncio.Event()
 
     update_action_log = db_manager.update_action_log
+
     async def mock_email_sent(*args, **kwargs) -> dict[str, Any]:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
         return await update_action_log(*args, **kwargs)
 
@@ -334,21 +337,22 @@ async def test_task_email_sending__two_of_two(
             action_type=ActionType.APPLIED_AUTOMATED_SAVING,
         )
         assert len(action_logs) == 2
-        assert action_logs[0]["details"]["report_sent"] == True
-        assert action_logs[1]["details"]["report_sent"] == True
+        assert action_logs[0]["details"]["report_sent"]
+        assert action_logs[1]["details"]["report_sent"]
 
-async def test_task_email_sending__two_of_three(
+
+async def test_task_email_sending__two_of_three(  # pylint: disable=too-many-locals
     load_test_data: None,  # pylint: disable=unused-argument
     db_manager: DBManager,
-    email_sender: EmailSender
+    email_sender: EmailSender,
 ) -> None:
     action_logs = await db_manager.get_action_logs(
         action_type=ActionType.APPLIED_AUTOMATED_SAVING,
     )
     assert len(action_logs) == 3
-    assert action_logs[0]["details"].get("report_sent", False) == False
-    assert action_logs[1]["details"]["report_sent"] == True
-    assert action_logs[2]["details"].get("report_sent", False) == False
+    assert not action_logs[0]["details"].get("report_sent", False)
+    assert action_logs[1]["details"]["report_sent"]
+    assert not action_logs[2]["details"].get("report_sent", False)
 
     # Get path to class dynamically
     task_runner_module_path = BackgroundTaskRunner.__module__
@@ -362,8 +366,9 @@ async def test_task_email_sending__two_of_three(
 
     update_action_log = db_manager.update_action_log
 
-    async def mock_email_sent(*args, **kwargs) -> dict[
-        str, Any]:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
+    async def mock_email_sent(  # type: ignore
+        *args, **kwargs
+    ) -> dict[str, Any]:  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
         return await update_action_log(*args, **kwargs)
 
     asyncio_sleep_orig = asyncio.sleep
@@ -399,6 +404,6 @@ async def test_task_email_sending__two_of_three(
             action_type=ActionType.APPLIED_AUTOMATED_SAVING,
         )
         assert len(action_logs) == 3
-        assert action_logs[0]["details"]["report_sent"] == True
-        assert action_logs[1]["details"]["report_sent"] == True
-        assert action_logs[2]["details"]["report_sent"] == True
+        assert action_logs[0]["details"]["report_sent"]
+        assert action_logs[1]["details"]["report_sent"]
+        assert action_logs[2]["details"]["report_sent"]

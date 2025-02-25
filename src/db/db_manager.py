@@ -11,7 +11,15 @@ from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
 from passlib.context import CryptContext
-from sqlalchemy import Result, Select, and_, desc, insert, select, update, Delete, delete
+from sqlalchemy import (
+    Result,
+    Select,
+    and_,
+    desc,
+    insert,
+    select,
+    update,
+)
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -59,8 +67,8 @@ from src.db.exceptions import (
     UserNotFoundError,
 )
 from src.db.models import (
-    AppSettings,
     ActionLog,
+    AppSettings,
     Moneybox,
     MoneyboxNameHistory,
     SqlBase,
@@ -1521,10 +1529,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         action_logs: list[ActionLog] = result.scalars().all()  # type: ignore
 
-        return [
-            get_automated_savings_log.asdict()
-            for get_automated_savings_log in action_logs
-        ]
+        return [get_automated_savings_log.asdict() for get_automated_savings_log in action_logs]
 
     async def add_action_log(
         self,
