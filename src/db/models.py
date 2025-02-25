@@ -7,6 +7,7 @@ from sqlalchemy import (
     JSON,
     CheckConstraint,
     DateTime,
+    Enum,
     ForeignKey,
     Index,
     MetaData,
@@ -390,10 +391,10 @@ class AppSettings(SqlBase):  # pylint: disable=too-few-public-methods
     )
 
 
-class AutomatedSavingsLog(SqlBase):  # pylint: disable=too-few-public-methods
-    """The AutomatedSavingsLog ORM."""
+class ActionLog(SqlBase):  # pylint: disable=too-few-public-methods
+    """The ActionLog ORM."""
 
-    __tablename__ = "automated_savings_logs"
+    __tablename__ = "action_logs"
 
     action_at: Mapped[datetime] = mapped_column(  # pylint: disable=unsubscriptable-object
         DateTime(timezone=True),  # type: ignore

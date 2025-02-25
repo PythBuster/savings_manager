@@ -231,6 +231,14 @@ The savings manager into the docker will run on port 8001 and you will reach the
 API documentation: http://localhost:64000/docs
 Code documentation: http://localhost:64000/sphinx
 
+# Tests
+For running tests locally, `postgres-client` is required.
+
+Ubuntu: sudo apt-get install postgresql-client
+Mac: brew install postgresql-client (mac might require sudo at the beginning)
+Windows: https://www.postgresql.org/download/windows/ (install Command Line tools)
+
+
 ## Bug-Report:
 Please join my discord (https://discord.gg/PyqQhJ2d34).
 You can send me bug reports on the following discord text channel: 🐞-bugs-savings-manager

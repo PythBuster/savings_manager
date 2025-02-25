@@ -1,5 +1,5 @@
 """The Email Sender stuff is located here."""
-
+import asyncio
 from collections.abc import Iterable
 from datetime import datetime, timezone
 from email.message import EmailMessage
@@ -67,18 +67,22 @@ class EmailSender(ReportSender):
 
         await self._send_message(plain_message=plain_message, receiver=receiver)
 
-    async def send_email_automated_savings_done_successfully(self, to: str) -> None:
+    async def send_email_automated_savings_done_successfully(
+            self,
+            to: str,
+            subject: str,
+    ) -> bool:
         """The send email function which will be called after automated savings
         is done successfully.
 
         :param to: The email recipient.
         :type to: :class:`str`
+        :param subject: The email subject.
+        :type subject: :class:`str`
+        :return: True, if sending mail was successful, False if not.
+        :rtype: :class:`bool`
         """
 
-        today_dt_str: str = datetime.now(tz=timezone.utc).isoformat(
-            sep=" ",
-            timespec="seconds",
-        )
         message_data: dict[str, list[dict[str, Any]]] = {
             "moneyboxes": await self.db_manager.get_moneyboxes()
         }
@@ -88,14 +92,17 @@ class EmailSender(ReportSender):
         )
         receiver: dict[str, str] = {
             "to": to,
-            "subj": f"Automated savings done ({today_dt_str})",
+            "subj": subject,
         }
 
-        await self._send_message(
+        response_message = await self._send_message(
             plain_message=plain_message,
             html_message=html_message,
             receiver=receiver,
         )
+
+        return "Requested mail action okay, completed: id=" in response_message
+
 
     async def _render_automated_savings_report(  # pylint: disable=too-many-locals
         self,
@@ -178,7 +185,7 @@ class EmailSender(ReportSender):
         receiver: dict[str, Any],
         plain_message: str,
         html_message: str | None = None,
-    ) -> None:
+    ) -> str:
         """Sends a multipart email via smtp client to receiver, if
          html_message is given, if not, keep text/plain only.
 
@@ -188,6 +195,8 @@ class EmailSender(ReportSender):
         :type plain_message: :class:`str`
         :param html_message: The plain text message to send, defaults to None.
         :type html_message: :class:`str`|:class:`None`
+        :return: The status message of email send response.
+        :rtype: :class:`str`
         """
 
         _sender: str | None = self.smtp_settings.smtp_user_name
@@ -215,5 +224,7 @@ class EmailSender(ReportSender):
             password=self.smtp_settings.smtp_password.get_secret_value(),  # type: ignore
             start_tls=self.smtp_settings.smtp_method == "starttls",
             use_tls=self.smtp_settings.smtp_method == "tls",
+            timeout=90,
         ) as client:
-            await client.send_message(email_message, sender=_sender, recipients=to)
+            response = await client.send_message(email_message, sender=_sender, recipients=to)
+            return response[1]

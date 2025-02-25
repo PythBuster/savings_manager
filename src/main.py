@@ -101,10 +101,12 @@ print("Register/override middlewares, exceptions handlers ...", flush=True)
 
 allowed_origins = [
     # production
-    "http://192.168.2.106:64000",
+    "http://192.168.2.100:64000",
     # dev
     "http://127.0.0.1:5173",
     "http://localhost:5173",
+    "http://127.0.0.1:5000",
+    "http://localhost:5000",
 ]
 app.add_middleware(
     CORSMiddleware,  # type: ignore

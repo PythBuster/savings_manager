@@ -11,7 +11,7 @@ from typing import Any, Sequence, cast
 
 from fastapi.encoders import jsonable_encoder
 from passlib.context import CryptContext
-from sqlalchemy import Result, Select, and_, desc, insert, select, update
+from sqlalchemy import Result, Select, and_, desc, insert, select, update, Delete, delete
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -60,7 +60,7 @@ from src.db.exceptions import (
 )
 from src.db.models import (
     AppSettings,
-    AutomatedSavingsLog,
+    ActionLog,
     Moneybox,
     MoneyboxNameHistory,
     SqlBase,
@@ -1114,7 +1114,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     "details": jsonable_encoder(app_settings.asdict()),
                 }
 
-                await self.add_automated_savings_logs(
+                await self.add_action_log(
                     session=session,
                     automated_savings_log_data=automated_savings_log_data,
                 )
@@ -1126,7 +1126,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     "details": jsonable_encoder(app_settings.asdict()),
                 }
 
-                await self.add_automated_savings_logs(
+                await self.add_action_log(
                     session=session,
                     automated_savings_log_data=automated_savings_log_data,
                 )
@@ -1387,7 +1387,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 ),
             }
 
-            await self.add_automated_savings_logs(
+            await self.add_action_log(
                 session=session,
                 automated_savings_log_data=automated_savings_log_data,
             )
@@ -1496,42 +1496,42 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
         return updated_moneyboxes
 
-    async def get_automated_savings_logs(self, action_type: ActionType) -> list[dict[str, Any]]:
-        """Get automated savings logs by action.
+    async def get_action_logs(self, action_type: ActionType) -> list[dict[str, Any]]:
+        """Get action logs by action.
 
         :param action_type: Action type.
         :type action_type: :class:`ActionType`
-        :return: The automated savings logs data.
+        :return: The action logs data.
         :rtype: :class:`list[dict[str, Any]]`
         """
 
         stmt: Select = (
-            select(AutomatedSavingsLog)  # type: ignore
+            select(ActionLog)  # type: ignore
             .where(
                 and_(
-                    AutomatedSavingsLog.action == action_type,
-                    AutomatedSavingsLog.is_active.is_(True),
+                    ActionLog.action == action_type,
+                    ActionLog.is_active.is_(True),
                 )
             )
-            .order_by(AutomatedSavingsLog.action_at.desc())
+            .order_by(ActionLog.action_at.desc())
         )
 
         async with self.async_sessionmaker() as session:
             result: Result = await session.execute(stmt)  # type: ignore
 
-        automated_savings_logs: list[AutomatedSavingsLog] = result.scalars().all()  # type: ignore
+        action_logs: list[ActionLog] = result.scalars().all()  # type: ignore
 
         return [
             get_automated_savings_log.asdict()
-            for get_automated_savings_log in automated_savings_logs
+            for get_automated_savings_log in action_logs
         ]
 
-    async def add_automated_savings_logs(
+    async def add_action_log(
         self,
         session: AsyncSession,
         automated_savings_log_data: dict[str, Any],
     ) -> dict[str, Any]:
-        """Add automated savings logs data into database.
+        """Add action log data into database.
 
         :param session: Database session.
         :type session: :class:`AsyncSession`
@@ -1541,16 +1541,43 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :rtype: :class:`dict[str, Any]`
         """
 
-        automated_savings_logs: AutomatedSavingsLog = cast(
-            AutomatedSavingsLog,
+        action_log: ActionLog = cast(
+            ActionLog,
             await create_instance(
                 async_session=session,
-                orm_model=cast(SqlBase, AutomatedSavingsLog),
+                orm_model=cast(SqlBase, ActionLog),
                 data=automated_savings_log_data,
             ),
         )
 
-        return automated_savings_logs.asdict()  # type: ignore
+        return action_log.asdict()  # type: ignore
+
+    async def update_action_log(
+        self,
+        action_log_id: int,
+        data: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Update action log data in database by id.
+
+        :param action_log_id: The ID of the action log entry.
+        :type action_log_id: :class:`int`
+        :param data: Automated savings log data.
+        :type data: :class:`dict[str, Any]`
+        :return: The created automated savings log data.
+        :rtype: :class:`dict[str, Any]`
+        """
+
+        action_log: ActionLog = cast(
+            ActionLog,
+            await update_instance(
+                async_session=self.async_sessionmaker,
+                orm_model=cast(SqlBase, ActionLog),
+                record_id=action_log_id,
+                data=data,
+            ),
+        )
+
+        return action_log.asdict()  # type: ignore
 
     async def reset_database(self, keep_app_settings: bool) -> None:
         """Reset database data by using alembic upgrade and downgrade logic.

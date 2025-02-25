@@ -19,7 +19,7 @@
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://192.168.2.106:5432/savings_manager</jdbc-url>
+      <jdbc-url>jdbc:postgresql://192.168.2.100:5432/savings_manager</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
