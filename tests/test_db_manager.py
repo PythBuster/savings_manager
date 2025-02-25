@@ -1638,7 +1638,7 @@ async def test_add_automated_savings_log_valid_with_session(
 
     for i, automated_savings_log_data in enumerate(automated_savings_log_data_collection):
         async with db_manager.async_sessionmaker.begin() as session:
-            automated_savings_log = await db_manager.add_automated_savings_logs(
+            automated_savings_log = await db_manager.add_action_log(
                 session=session,
                 automated_savings_log_data=automated_savings_log_data,
             )
@@ -1687,7 +1687,7 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
         ],
     }
 
-    automated_savings_logs = await db_manager.get_automated_savings_logs(
+    automated_savings_logs = await db_manager.get_action_logs(
         action_type=action_type,
     )
 
@@ -1916,7 +1916,7 @@ async def test_export_sql_dump(
     with dump_file_path.open("wb") as f:
         f.write(dump_value)
 
-    assert 36000 < len(dump_value) < 37000
+    assert 35000 < len(dump_value) < 36000
 
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])

@@ -1,6 +1,7 @@
 """All tests for the task runner are located here."""
 
 import asyncio
+from typing import Any
 from datetime import datetime
 from unittest.mock import patch
 
@@ -15,27 +16,32 @@ async def test_task_automated_savings_schedule(
     db_manager: DBManager,
     email_sender: EmailSender,
 ) -> None:
-    no_automated_savings_logs = await db_manager.get_automated_savings_logs(
+    no_action_logs = await db_manager.get_action_logs(
         action_type=ActionType.APPLIED_AUTOMATED_SAVING,
     )
-    assert len(no_automated_savings_logs) == 0
+    assert len(no_action_logs) == 0
 
     # Get path to class dynamically
     module_path = BackgroundTaskRunner.__module__
-    email_sender_path = EmailSender.__module__
-    sender_class_name = EmailSender.__qualname__
+    db_manager_path = DBManager.__module__
+    db_manager_path_class_name = DBManager.__qualname__
 
-    # Event to signal when send_message has been called
-    send_message_called = asyncio.Event()
+    # Event to signal when autom. savings done and write log has been called
+    automated_savings_done_write_log = asyncio.Event()
 
-    async def mock_send_message(*args, **kwargs) -> None:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
-        send_message_called.set()  # Signal that send_message was called
+    add_action_log = db_manager.add_action_log
+    async def mock_write_lock_automated_savings_done(*args, **kwargs) -> None:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
+        async with db_manager.async_sessionmaker.begin() as session:
+            kwargs["session"] = session
+            await add_action_log(*args, **kwargs)
+
+        automated_savings_done_write_log.set()  # Signal that log is written was called
 
     with (
         patch(
-            f"{email_sender_path}.{sender_class_name}._send_message",
-            side_effect=mock_send_message,
-        ) as mock_send,
+            f"{db_manager_path}.{db_manager_path_class_name}.add_action_log",
+            side_effect=mock_write_lock_automated_savings_done,
+        ) as mock_distribute,
         patch(f"{module_path}.datetime") as mock_datetime,
     ):
         fake_today = datetime(2022, 1, 1, 15)
@@ -47,14 +53,15 @@ async def test_task_automated_savings_schedule(
         )
 
         asyncio.ensure_future(task_runner.run())
-        await send_message_called.wait()
+        await automated_savings_done_write_log.wait()
 
-        mock_send.assert_called_once()
+        mock_distribute.assert_called_once()
 
-        automated_savings_logs = await db_manager.get_automated_savings_logs(
+        action_logs = await db_manager.get_action_logs(
             action_type=ActionType.APPLIED_AUTOMATED_SAVING,
         )
-        assert len(automated_savings_logs) == 1
+        assert len(action_logs) == 1
+        assert action_logs[0]["details"].get("report_sent", False) == False
 
 
 async def test_task_automated_savings_dont_schedule(
@@ -62,18 +69,18 @@ async def test_task_automated_savings_dont_schedule(
     db_manager: DBManager,
     email_sender: EmailSender,
 ) -> None:
-    no_automated_savings_logs = await db_manager.get_automated_savings_logs(
+    no_action_logs = await db_manager.get_action_logs(
         action_type=ActionType.APPLIED_AUTOMATED_SAVING,
     )
-    assert len(no_automated_savings_logs) == 0
+    assert len(no_action_logs) == 0
 
     # Get path to class dynamically
     module_path = BackgroundTaskRunner.__module__
-    email_sender_path = EmailSender.__module__
-    sender_class_name = EmailSender.__qualname__
+    db_manager_path = DBManager.__module__
+    db_manager_path_class_name = DBManager.__qualname__
 
     with (
-        patch(f"{email_sender_path}.{sender_class_name}._send_message") as mock_send,
+        patch(f"{db_manager_path}.{db_manager_path_class_name}.add_action_log") as mock_distribute,
         patch(f"{module_path}.datetime") as mock_datetime,
     ):
         fake_today = datetime(2022, 1, 2, 15)
@@ -86,13 +93,13 @@ async def test_task_automated_savings_dont_schedule(
 
         await task_runner.run()
 
-        # Now we can assert that send_message was called
-        mock_send.assert_not_called()
+        # Now we can assert that autom. savings were not applied.
+        mock_distribute.assert_not_called()
 
-        automated_savings_logs = await db_manager.get_automated_savings_logs(
+        action_logs = await db_manager.get_action_logs(
             action_type=ActionType.APPLIED_AUTOMATED_SAVING,
         )
-        assert len(automated_savings_logs) == 0
+        assert len(action_logs) == 0
 
 
 async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many-locals
@@ -100,16 +107,15 @@ async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many
     db_manager: DBManager,
     email_sender: EmailSender,
 ) -> None:
-    no_automated_savings_logs = await db_manager.get_automated_savings_logs(
+    no_action_logs = await db_manager.get_action_logs(
         action_type=ActionType.APPLIED_AUTOMATED_SAVING,
     )
-    assert len(no_automated_savings_logs) == 0
+    assert len(no_action_logs) == 0
 
     # Get path to class dynamically
     task_runner_module_path = BackgroundTaskRunner.__module__
     db_manager_module_path = DBManager.__module__
-    email_sender_path = EmailSender.__module__
-    sender_class_name = EmailSender.__qualname__
+    db_manager_path_class_name = DBManager.__qualname__
 
     # Event to signal when send_message has been called
     scheduled = asyncio.Event()
@@ -120,10 +126,17 @@ async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many
         scheduled.set()
         await asyncio_sleep_orig(duration)
 
+    orig_add_action_log = db_manager.add_action_log
+    async def _add_action_log(*args, **kwargs):
+        return await orig_add_action_log(*args, **kwargs)
+
     with (
         patch(f"{task_runner_module_path}.datetime") as mock_datetime_1,
         patch(f"{db_manager_module_path}.datetime") as mock_datetime_2,
-        patch(f"{email_sender_path}.{sender_class_name}._send_message") as mock_send,
+        patch(
+            f"{db_manager_module_path}.{db_manager_path_class_name}.add_action_log",
+            site_effect=_add_action_log
+        ) as mock_distribute,
         patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled) as mock_sleep,
     ):
         fake_today = datetime(2022, 1, 1, 15)
@@ -136,16 +149,13 @@ async def test_task_automated_savings_no_email_send(  # pylint: disable=too-many
             email_sender=email_sender,
         )
 
+        task_runner.task_email_sending = lambda : ()
+
         asyncio.ensure_future(task_runner.run())
         await scheduled.wait()
 
         mock_sleep.assert_called_once()
-        mock_send.assert_not_called()
-
-        automated_savings_logs = await db_manager.get_automated_savings_logs(
-            action_type=ActionType.APPLIED_AUTOMATED_SAVING,
-        )
-        assert len(automated_savings_logs) == 1
+        mock_distribute.assert_called_once()
 
 
 async def test_task_automated_savings_no_savings_active(  # pylint: disable=too-many-locals
@@ -153,16 +163,15 @@ async def test_task_automated_savings_no_savings_active(  # pylint: disable=too-
     db_manager: DBManager,
     email_sender: EmailSender,
 ) -> None:
-    no_automated_savings_logs = await db_manager.get_automated_savings_logs(
+    no_action_logs = await db_manager.get_action_logs(
         action_type=ActionType.APPLIED_AUTOMATED_SAVING,
     )
-    assert len(no_automated_savings_logs) == 0
+    assert len(no_action_logs) == 0
 
     # Get path to class dynamically
     task_runner_module_path = BackgroundTaskRunner.__module__
     db_manager_module_path = DBManager.__module__
-    email_sender_path = EmailSender.__module__
-    sender_class_name = EmailSender.__qualname__
+    db_manager_path_class_name = DBManager.__qualname__
 
     # Event to signal when send_message has been called
     scheduled = asyncio.Event()
@@ -176,7 +185,9 @@ async def test_task_automated_savings_no_savings_active(  # pylint: disable=too-
     with (
         patch(f"{task_runner_module_path}.datetime") as mock_datetime_1,
         patch(f"{db_manager_module_path}.datetime") as mock_datetime_2,
-        patch(f"{email_sender_path}.{sender_class_name}._send_message") as mock_send,
+        patch(
+            f"{db_manager_module_path}.{db_manager_path_class_name}.add_action_log",
+        ) as mock_distribute,
         patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled),
     ):
         fake_today = datetime(2022, 1, 1, 15)
@@ -189,12 +200,205 @@ async def test_task_automated_savings_no_savings_active(  # pylint: disable=too-
             email_sender=email_sender,
         )
 
+        task_runner.task_email_sending = lambda : ()
+
         asyncio.ensure_future(task_runner.run())
         await scheduled.wait()
 
-        mock_send.assert_not_called()
+        mock_distribute.assert_not_called()
 
-        automated_savings_logs = await db_manager.get_automated_savings_logs(
+        action_logs = await db_manager.get_action_logs(
             action_type=ActionType.APPLIED_AUTOMATED_SAVING,
         )
-        assert len(automated_savings_logs) == 0
+        assert len(action_logs) == 0
+
+
+async def test_task_email_sending__one_of_one(
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
+    email_sender: EmailSender
+) -> None:
+    action_logs = await db_manager.get_action_logs(
+        action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+    )
+    assert len(action_logs) == 1
+    assert action_logs[0]["details"].get("report_sent", False) == False
+
+    # Get path to class dynamically
+    task_runner_module_path = BackgroundTaskRunner.__module__
+    email_sender_path = EmailSender.__module__
+    sender_class_name = EmailSender.__qualname__
+    db_manager_module_path = DBManager.__module__
+    db_manager_path_class_name = DBManager.__qualname__
+
+    # Event to signal when db update has been called
+    updated = asyncio.Event()
+
+    update_action_log = db_manager.update_action_log
+    async def mock_email_sent(*args, **kwargs) -> dict[str, Any]:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
+        return await update_action_log(*args, **kwargs)
+
+    asyncio_sleep_orig = asyncio.sleep
+
+    async def mock_scheduled(duration: int) -> None:
+        updated.set()
+        await asyncio_sleep_orig(duration)
+
+    with (
+        patch(
+            f"{email_sender_path}.{sender_class_name}._send_message",
+            return_value="Requested mail action okay, completed: id=1MPaIK-1tzl112bWE-00NrbF",
+        ),
+        patch(
+            f"{db_manager_module_path}.{db_manager_path_class_name}.update_action_log",
+            side_effect=mock_email_sent,
+        ) as mock_send,
+        patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled),
+    ):
+        task_runner = BackgroundTaskRunner(
+            db_manager=db_manager,
+            email_sender=email_sender,
+        )
+
+        task_runner.task_automated_savings = lambda : ()
+
+        asyncio.ensure_future(task_runner.run())
+        await updated.wait()
+
+        mock_send.assert_called_once()
+
+        action_logs = await db_manager.get_action_logs(
+            action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+        )
+        assert len(action_logs) == 1
+        assert action_logs[0]["details"]["report_sent"] == True
+
+
+
+async def test_task_email_sending__two_of_two(
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
+    email_sender: EmailSender
+) -> None:
+    action_logs = await db_manager.get_action_logs(
+        action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+    )
+    assert len(action_logs) == 2
+    assert action_logs[0]["details"].get("report_sent", False) == False
+    assert action_logs[1]["details"].get("report_sent", False) == False
+
+    # Get path to class dynamically
+    task_runner_module_path = BackgroundTaskRunner.__module__
+    email_sender_path = EmailSender.__module__
+    sender_class_name = EmailSender.__qualname__
+    db_manager_module_path = DBManager.__module__
+    db_manager_path_class_name = DBManager.__qualname__
+
+    # Event to signal when db update has been called
+    updated = asyncio.Event()
+
+    update_action_log = db_manager.update_action_log
+    async def mock_email_sent(*args, **kwargs) -> dict[str, Any]:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
+        return await update_action_log(*args, **kwargs)
+
+    asyncio_sleep_orig = asyncio.sleep
+
+    async def mock_scheduled(duration: int) -> None:
+        updated.set()
+        await asyncio_sleep_orig(duration)
+
+    with (
+        patch(
+            f"{email_sender_path}.{sender_class_name}._send_message",
+            return_value="Requested mail action okay, completed: id=1MPaIK-1tzl112bWE-00NrbF",
+        ),
+        patch(
+            f"{db_manager_module_path}.{db_manager_path_class_name}.update_action_log",
+            side_effect=mock_email_sent,
+        ) as mock_send,
+        patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled),
+    ):
+        task_runner = BackgroundTaskRunner(
+            db_manager=db_manager,
+            email_sender=email_sender,
+        )
+
+        task_runner.task_automated_savings = lambda: ()
+
+        asyncio.ensure_future(task_runner.run())
+        await updated.wait()
+
+        assert mock_send.call_count == 2
+
+        action_logs = await db_manager.get_action_logs(
+            action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+        )
+        assert len(action_logs) == 2
+        assert action_logs[0]["details"]["report_sent"] == True
+        assert action_logs[1]["details"]["report_sent"] == True
+
+async def test_task_email_sending__two_of_three(
+    load_test_data: None,  # pylint: disable=unused-argument
+    db_manager: DBManager,
+    email_sender: EmailSender
+) -> None:
+    action_logs = await db_manager.get_action_logs(
+        action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+    )
+    assert len(action_logs) == 3
+    assert action_logs[0]["details"].get("report_sent", False) == False
+    assert action_logs[1]["details"]["report_sent"] == True
+    assert action_logs[2]["details"].get("report_sent", False) == False
+
+    # Get path to class dynamically
+    task_runner_module_path = BackgroundTaskRunner.__module__
+    email_sender_path = EmailSender.__module__
+    sender_class_name = EmailSender.__qualname__
+    db_manager_module_path = DBManager.__module__
+    db_manager_path_class_name = DBManager.__qualname__
+
+    # Event to signal when db update has been called
+    updated = asyncio.Event()
+
+    update_action_log = db_manager.update_action_log
+
+    async def mock_email_sent(*args, **kwargs) -> dict[
+        str, Any]:  # type: ignore  # noqa: ignore  # pylint: disable=unused-argument, line-too-long
+        return await update_action_log(*args, **kwargs)
+
+    asyncio_sleep_orig = asyncio.sleep
+
+    async def mock_scheduled(duration: int) -> None:
+        updated.set()
+        await asyncio_sleep_orig(duration)
+
+    with (
+        patch(
+            f"{email_sender_path}.{sender_class_name}._send_message",
+            return_value="Requested mail action okay, completed: id=1MPaIK-1tzl112bWE-00NrbF",
+        ),
+        patch(
+            f"{db_manager_module_path}.{db_manager_path_class_name}.update_action_log",
+            side_effect=mock_email_sent,
+        ) as mock_send,
+        patch(f"{task_runner_module_path}.asyncio.sleep", side_effect=mock_scheduled),
+    ):
+        task_runner = BackgroundTaskRunner(
+            db_manager=db_manager,
+            email_sender=email_sender,
+        )
+
+        task_runner.task_automated_savings = lambda: ()
+
+        asyncio.ensure_future(task_runner.run())
+        await updated.wait()
+
+        assert mock_send.call_count == 2
+
+        action_logs = await db_manager.get_action_logs(
+            action_type=ActionType.APPLIED_AUTOMATED_SAVING,
+        )
+        assert len(action_logs) == 3
+        assert action_logs[0]["details"]["report_sent"] == True
+        assert action_logs[1]["details"]["report_sent"] == True
+        assert action_logs[2]["details"]["report_sent"] == True

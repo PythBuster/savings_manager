@@ -1,15 +1,18 @@
 # pylint: disable=too-many-lines
 
 """The database test data initializer."""
-
+from calendar import month
+from datetime import datetime, timezone, timedelta
 from functools import partial
+from typing import Any
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import insert
 
 from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
-    TransactionType,
+    TransactionType, ActionType,
 )
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
@@ -113,6 +116,9 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_task_automated_savings_dont_schedule": self.dataset_test_task_automated_savings_dont_schedule,
             "test_task_automated_savings_no_email_send": self.dataset_test_task_automated_savings_no_email_send,
             "test_task_automated_savings_no_savings_active": self.dataset_test_task_automated_savings_no_savings_active,
+            "test_task_email_sending__one_of_one": self.dataset_test_task_email_sending__one_of_one,
+            "test_task_email_sending__two_of_two": self.dataset_test_task_email_sending__two_of_two,
+            "test_task_email_sending__two_of_three": self.dataset_test_task_email_sending__two_of_three,
             "test_reset_database_keep_app_settings": self.dataset_test_reset_database_keep_app_settings,
             "test_reset_database_delete_app_settings": self.dataset_test_reset_database_delete_app_settings,
             "test_reset_app_keep_app_settings": self.dataset_test_reset_app_keep_app_settings,
@@ -1727,6 +1733,282 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
+
+    async def dataset_test_task_email_sending__one_of_one(self) -> None:
+        """The data generation function for test_case:
+        `test_task_email_sending__one_of_one`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        distribution_amount = 150
+        app_settings_data = {
+            "send_reports_via_email": True,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": distribution_amount,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+        # log automated saving
+        action_logs_data: list[dict[str, Any]] = [
+            {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "action_at": datetime.now(tz=timezone.utc) - timedelta(days=5),
+                "details": jsonable_encoder(
+                    app_settings_data | {"distribution_amount": distribution_amount}
+                ),
+            }
+        ]
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            for action_log_data in action_logs_data:
+                await self.db_manager.add_action_log(
+                    session=session,
+                    automated_savings_log_data=action_log_data,
+                )
+
+    async def dataset_test_task_email_sending__two_of_two(self) -> None:
+        """The data generation function for test_case:
+        `test_task_email_sending__two_of_two`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        distribution_amount = 150
+        app_settings_data = {
+            "send_reports_via_email": True,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": distribution_amount,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+        # log automated saving
+        action_logs_data: list[dict[str, Any]] = [
+            {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "action_at": datetime.now(tz=timezone.utc) - timedelta(days=62),
+                "details": jsonable_encoder(
+                    app_settings_data | {"distribution_amount": distribution_amount}
+                ),
+            },
+            {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "action_at": datetime.now(tz=timezone.utc) - timedelta(days=31),
+                "details": jsonable_encoder(
+                    app_settings_data | {"distribution_amount": distribution_amount}
+                ),
+            }
+        ]
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            for action_log_data in action_logs_data:
+                await self.db_manager.add_action_log(
+                    session=session,
+                    automated_savings_log_data=action_log_data,
+                )
+
+    async def dataset_test_task_email_sending__two_of_three(self) -> None:
+        """The data generation function for test_case:
+        `test_task_email_sending__two_of_three`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        distribution_amount = 150
+        app_settings_data = {
+            "send_reports_via_email": True,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": distribution_amount,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 5,
+                "savings_target": 5,
+                "priority": 1,
+            },
+            {
+                "name": "Test Box 2",
+                "savings_amount": 10,
+                "savings_target": 5,
+                "priority": 2,
+            },
+            {
+                "name": "Test Box 3",
+                "savings_amount": 15,
+                "savings_target": None,
+                "priority": 3,
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,
+                "savings_target": 0,
+                "priority": 6,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+        # log automated saving
+        action_logs_data: list[dict[str, Any]] = [
+            {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "action_at": datetime.now(tz=timezone.utc) - timedelta(days=93),
+                "details": jsonable_encoder(
+                    app_settings_data | {"distribution_amount": distribution_amount}
+                ),
+            },
+            {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "action_at": datetime.now(tz=timezone.utc) - timedelta(days=62),
+                "details": jsonable_encoder(
+                    app_settings_data | {"distribution_amount": distribution_amount, "report_sent": True}
+                ),
+            },
+            {
+                "action": ActionType.APPLIED_AUTOMATED_SAVING,
+                "action_at": datetime.now(tz=timezone.utc) - timedelta(days=31),
+                "details": jsonable_encoder(
+                    app_settings_data | {"distribution_amount": distribution_amount}
+                ),
+            }
+        ]
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            for action_log_data in action_logs_data:
+                await self.db_manager.add_action_log(
+                    session=session,
+                    automated_savings_log_data=action_log_data,
+                )
 
     async def dataset_test_reset_database_keep_app_settings(self) -> None:
         """The data generation function for test_case:
