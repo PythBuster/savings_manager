@@ -2,6 +2,12 @@
 
 ## x.y.z (unreleased)
 
+## 2.38.0 (2025-02-25)
+### Feature:
+- add email report sending task to BackgroundTaskrunner, to send email reports.
+  The task is also enabled to send delayed reports by checking a sent_report flag in aciton_logs table of
+  the related report log.
+
 ## 2.37.7 (2025-01-08)
 ### Fixes:
 - further fix for calculate_months_for_reaching_savings_targets by special handling of 
