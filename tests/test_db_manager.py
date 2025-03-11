@@ -1916,7 +1916,7 @@ async def test_export_sql_dump(
     with dump_file_path.open("wb") as f:
         f.write(dump_value)
 
-    assert 35000 < len(dump_value) < 36000
+    assert 36000 < len(dump_value) < 37000
 
 
 @pytest.mark.dependency(depends=["test_export_sql_dump"])

@@ -164,10 +164,10 @@ Just for documentation: `alembic init -t async alembic` in project root dir will
 
 
 ***dev***:\
-`alembic -x ENVIRONEMNT=dev revision --autogenerate -m "Added account table"`
+`alembic -x ENVIRONMENT=dev revision --autogenerate -m "Added account table"`
 
 ***prod***:\
-`alembic -x ENVIRONEMNT=prod revision --autogenerate -m "Added account table"`
+`alembic -x ENVIRONMENT=prod revision --autogenerate -m "Added account table"`
 
 # RUN
 
@@ -175,7 +175,15 @@ Just for documentation: `alembic init -t async alembic` in project root dir will
 
 To create and migrate the database tables, you need to use alembic 
 by using the command:
-In project root dir `poetry run alembic upgrade head`
+
+In project root dir:
+
+***dev***:\
+`poetry run alembic -x ENVIRONEMNT=dev upgrade head`
+
+***prod***:\
+`poetry run alembic -x ENVIRONEMNT=prod upgrade head`
+
 
 **Hint**: The database must be reachable.
 Savings Manager v2 is able to email you after automated savings is done.

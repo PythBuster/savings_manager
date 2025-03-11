@@ -9,8 +9,8 @@ from datetime import datetime, timezone
 from functools import cached_property
 from typing import Any, Sequence, cast
 
+import bcrypt
 from fastapi.encoders import jsonable_encoder
-from passlib.context import CryptContext
 from sqlalchemy import (
     Result,
     Select,
@@ -91,11 +91,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :param engine_args: The asynch engine args.
         :type engine_args: :class:`dict[str, Any] | None`
         """
-
-        self.pwd_context: CryptContext = CryptContext(
-            schemes=["bcrypt"],
-            deprecated="auto",
-        )
 
         if engine_args is None:
             engine_args = {"echo": False}
@@ -1997,7 +1992,13 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :rtype: :class:`bool`
         """
 
-        return self.pwd_context.verify(plain_password, hashed_password)
+        if isinstance(plain_password, str):
+            plain_password = plain_password.encode("utf-8")
+
+        if isinstance(hashed_password, str):
+            hashed_password = hashed_password.encode("utf-8")
+
+        return bcrypt.checkpw(password=plain_password, hashed_password=hashed_password)
 
     async def get_password_hash(self, password: str | bytes) -> str:
         """Get hashed password.
@@ -2008,4 +2009,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :rtype: :class:`str`
         """
 
-        return self.pwd_context.hash(password)
+        if isinstance(password, str):
+            password = password.encode("utf-8")
+
+        return bcrypt.hashpw(password, bcrypt.gensalt(12)).decode()

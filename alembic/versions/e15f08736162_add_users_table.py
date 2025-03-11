@@ -8,8 +8,8 @@ Create Date: 2024-10-08 10:29:43.678220
 
 from typing import Sequence, Union
 
+import bcrypt
 import sqlalchemy as sa
-from passlib.context import CryptContext
 
 from alembic import op
 from src.custom_types import UserRoleType
@@ -29,23 +29,23 @@ def upgrade() -> None:
     # and create new:
 
     op.create_table('users',
-    sa.Column('user_login', sa.String(), nullable=False, comment='The user login, which is an email address in this case.'),
-    sa.Column('user_password_hash', sa.String(length=60), nullable=False, comment='The hashed user password.'),
-    sa.Column('role', sa.Enum('ADMIN', 'USER', name='userroletype'), server_default='USER', nullable=False, comment='The role type within the user.'),
-    sa.Column('id', sa.Integer(), nullable=False, comment='The primary ID of the row.'),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False, comment='The created utc datetime.'),
-    sa.Column('modified_at', sa.DateTime(timezone=True), nullable=True, comment='The modified utc datetime.'),
-    sa.Column('is_active', sa.Boolean(), server_default=sa.text('true'), nullable=False, comment='Flag to mark instance as deleted.'),
-    sa.Column('note', sa.String(), server_default='', nullable=False, comment='The note of this record'),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_users'))
-    )
-    sa.CheckConstraint(
-        "char_length(user_password_hash) = 60",
-        name=op.f("ck_user_password_hash_total_len_60"),
-    ),
-    sa.CheckConstraint(
-        "char_length(user_login) > 0",
-        name=op.f("ck_user_login_min_len_1"),
+        sa.Column('user_login', sa.String(), nullable=False, comment='The user login, which is an email address in this case.'),
+        sa.Column('user_password_hash', sa.String(length=60), nullable=False, comment='The hashed user password.'),
+        sa.Column('role', sa.Enum('ADMIN', 'USER', name='userroletype'), server_default='USER', nullable=False, comment='The role type within the user.'),
+        sa.Column('id', sa.Integer(), nullable=False, comment='The primary ID of the row.'),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False, comment='The created utc datetime.'),
+        sa.Column('modified_at', sa.DateTime(timezone=True), nullable=True, comment='The modified utc datetime.'),
+        sa.Column('is_active', sa.Boolean(), server_default=sa.text('true'), nullable=False, comment='Flag to mark instance as deleted.'),
+        sa.Column('note', sa.String(), server_default='', nullable=False, comment='The note of this record'),
+        sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
+        sa.CheckConstraint(
+            "char_length(user_password_hash) = 60",
+            name=op.f("ck_user_password_hash_total_len_60"),
+        ),
+        sa.CheckConstraint(
+            "char_length(user_login) > 0",
+            name=op.f("ck_user_login_min_len_1"),
+        )
     )
 
     op.create_index(
@@ -56,18 +56,12 @@ def upgrade() -> None:
         postgresql_where=sa.text("is_active = true"),
     )
 
-    # Insert initial admin user
-    pwd_context: CryptContext = CryptContext(
-        schemes=["bcrypt"],
-        deprecated="auto",
-    )
-
     connection = op.get_bind()
 
     # add initial default admin
     new_admin = {
         "user_login": "admin",
-        "user_password_hash": pwd_context.hash("admin"),
+        "user_password_hash": bcrypt.hashpw("admin".encode(), bcrypt.gensalt()).decode(),
         "role": UserRoleType.ADMIN.value.upper(),
         "note": "The default admin user, initially created (since v.2.30.0).",
     }
