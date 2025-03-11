@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.38.1 (2025-03-12)
+### Changes:
+- migrate to python 3.13 (performance optimizations)
+
 ## 2.38.0 (2025-02-25)
 ### Feature:
 - add email report sending task to BackgroundTaskrunner, to send email reports.
