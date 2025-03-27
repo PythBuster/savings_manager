@@ -938,8 +938,8 @@ class LoginUserResponse(BaseModel):
         return data
 
 
-class MoneyboxReachingSavingsTargetsResponse(BaseModel):
-    """The single moneybox reaching savings target response model."""
+class MoneyboxForecastResponse(BaseModel):
+    """The moneybox with respective savings contributions."""
 
     moneybox_id: Annotated[
         int,
@@ -950,17 +950,27 @@ class MoneyboxReachingSavingsTargetsResponse(BaseModel):
     ]
     """The id of the moneybox."""
 
-    amount_of_months: Annotated[
-        int,
+    monthly_distributions: Annotated[
+        list[dict[str, int]],
         Field(
-            validation_alias="amount_of_months",
+            validation_alias="monthly_distributions",
+            description="The monthly distribution.",
+        ),
+    ]
+    """The monthly distribution."""
+
+    reached_in_months: Annotated[
+        int | None,
+        Field(
+            ge=0,
+            validation_alias="reached_in_months",
             description=(
-                "The amount of months for reaching the savings target. If -1, moneybox "
-                "will never reach savings target."
+                "The month where the savings target of the moneybox will be reached. "
+                "None indicates, that the savings target of the moneybox will be never reached."
             ),
         ),
     ]
-    """The amount of months for reaching the savings target."""
+    """The month where the savings target of the moneybox will be reached."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -971,25 +981,78 @@ class MoneyboxReachingSavingsTargetsResponse(BaseModel):
             "examples": [
                 {
                     "moneyboxId": 1,
-                    "amountOfMonths": 15,
-                },
-                {
-                    "moneyboxId": 3,
-                    "amountOfMonths": 5,
+                    "monthlyDistributions": [
+                        {
+                            "month": 1,
+                            "amount": 100,
+                        },
+                        {
+                            "month": 2,
+                            "amount": 100,
+                        },
+                    ],
+                    "reachedInMonths": 2,
                 },
             ],
         },
     )
-    """The config of the8 model."""
+    """The config of the model."""
+
+    @field_validator("monthly_distributions")
+    @classmethod
+    def validate_monthly_distributions_unique_and_gt_0_month__savings_amount_gt_0(
+        cls, value: list[dict[str, int]]
+    ) -> list[dict[str, int]]:
+        """ASC order by key."""
+
+        orig_months = [val["month"] for val in value]
+        unique_months = set(orig_months)
+
+        if len(orig_months) != len(unique_months):
+            raise ValueError("Redundant month distribution in 'monthly_distributions'.")
+
+        for month in orig_months:
+            if month <= 0:
+                raise ValueError("'month' must be greater than 0.")
+
+        for savings_amount in (val["amount"] for val in value):
+            if savings_amount <= 0:
+                raise ValueError("'amount' must be greater than 0.")
+
+        return value
+
+    @model_validator(mode="after")
+    def transform_monthly_distributions_ordered_asc_by_key(self) -> Self:
+        """ASC order by key."""
+
+        self.monthly_distributions.sort(key=lambda item: item["month"])
+        return self
+
+    @model_validator(mode="after")
+    def validate_reached_in_months_monthly_distributions_mismatch(self) -> Self:
+        """If reached_in_months is greater than 0, there has to be some
+        monthly_distributions data."""
+
+        if (
+            self.reached_in_months is not None
+            and self.reached_in_months > 0
+            and not self.monthly_distributions
+        ):
+            raise ValueError(
+                "'reached_in_months' is greater than 0, but there is no "
+                "'monthly_distributions' data."
+            )
+
+        return self
 
 
-class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
-    """The collection of moneybox reaching savings target response model."""
+class MoneyboxForecastListResponse(BaseModel):
+    """A list of MoneyboxForecastResponse."""
 
-    reaching_savings_targets: Annotated[
-        list[MoneyboxReachingSavingsTargetsResponse],
+    moneybox_forecasts: Annotated[
+        list[MoneyboxForecastResponse],
         Field(
-            validation_alias="reaching_savings_targets",
+            validation_alias="moneybox_forecasts",
             description="A map reaching savings targets (map of moneybox_id and amount of months).",
         ),
     ]
@@ -1003,20 +1066,50 @@ class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
         json_schema_extra={
             "examples": [
                 {
-                    "total": 2,
-                    "reachingSavingsTargets": [
-                        {
-                            "moneyboxId": 1,
-                            "amountOfMonths": 15,
-                        },
-                        {
-                            "moneyboxId": 3,
-                            "amountOfMonths": 5,
-                        },
-                        {
-                            "moneyboxId": 7,
-                            "amountOfMonths": -1,
-                        },
+                    "total": 3,
+                    "moneybox_forecasts": [
+                        MoneyboxForecastResponse(
+                            moneybox_id=1,
+                            monthly_distributions=[
+                                {
+                                    "month": 1,
+                                    "amount": 100,
+                                },
+                                {
+                                    "month": 2,
+                                    "amount": 100,
+                                },
+                            ],
+                            reached_in_months=2,
+                        ).model_dump(),
+                        MoneyboxForecastResponse(
+                            moneybox_id=2,
+                            monthly_distributions=[
+                                {
+                                    "month": 1,
+                                    "amount": 100,
+                                },
+                                {
+                                    "month": 2,
+                                    "amount": 100,
+                                },
+                            ],
+                            reached_in_months=2,
+                        ).model_dump(),
+                        MoneyboxForecastResponse(
+                            moneybox_id=3,
+                            monthly_distributions=[
+                                {
+                                    "month": 4,
+                                    "amount": 100,
+                                },
+                                {
+                                    "month": 5,
+                                    "amount": 20,
+                                },
+                            ],
+                            reached_in_months=2,
+                        ).model_dump(),
                     ],
                 },
             ],
@@ -1029,4 +1122,4 @@ class MoneyboxesReachingSavingsTargetsResponse(BaseModel):
     def total(self) -> int:
         """The count of results."""
 
-        return len(self.reaching_savings_targets)
+        return len(self.moneybox_forecasts)

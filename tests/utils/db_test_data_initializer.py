@@ -57,12 +57,23 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 self.truncate_tables,
                 create_overflow_moneybox=False,
             ),
-            "test_get_months_for_reaching_savings_targets__status_200__total_3": self.dataset_test_get_months_for_reaching_savings_targets__status_200__total_3,
-            "test_get_months_for_reaching_savings_targets__status_204__no_data": partial(
+            "test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_collect": self.dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_collect,
+            "test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_add": self.dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_add,
+            "test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_fill": self.dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_fill,
+            "test_savings_forecast__status_204__no_data": partial(
                 self.truncate_tables,
                 exclude_table_names=["app_settings"],
                 create_overflow_moneybox=True,
             ),
+            "test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_collect": self.dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_collect,
+            "test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_add": self.dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_add,
+            "test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_fill": self.dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_fill,
+            "test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_collect": self.dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_collect,
+            "test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_add": self.dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_add,
+            "test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_fill": self.dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_fill,
+            "test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_collect": self.dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_collect,
+            "test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_add": self.dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_add,
+            "test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_fill": self.dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_fill,
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing,
             "test_endpoint_get_moneybox_status_404_non_existing": self.truncate_tables,
             "test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100": self.dataset_test_endpoint_get_moneybox__second_moneybox__status_200_existing__with_balance_100,
@@ -220,11 +231,11 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_get_months_for_reaching_savings_targets__status_200__total_3(
+    async def dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_collect(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_get_months_for_reaching_savings_targets__status_200__total_4`.
+        `test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_collect`.
         """
 
         await self.truncate_tables()
@@ -283,7 +294,901 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 "savings_target": 0,
             },
             # id: 29
-            {  # expectation: not part of result, will never reach savings target (months: -1)
+            {  # get last 500 in month 15, then nothing because loop is finished. reaching: -1 (never)
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 0,
+                "savings_amount": 600,
+                "savings_target": None,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_add(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_add`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 2000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 31
+            {  # expectation: reached savings target in 5 months
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 32
+            {  # takes 1000 from month 6 upwards, reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 33
+            {  # get 1000 from month 6 upwards, expectation: reached target in 15 months
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            # id: 34
+            {  # expectation: reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            # id: 35
+            {  # get last 500 in month 15, then nothing because loop is finished. reaching: -1 (never)
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 0,
+                "savings_amount": 600,
+                "savings_target": None,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_fill(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_fill`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 2000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 37
+            {  # expectation: reached savings target in 5 months
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 38
+            {  # takes 1000 from month 6 upwards, reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 39
+            {  # get 1000 from month 6 upwards, expectation: reached target in 15 months
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            # id: 40
+            {  # expectation: reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            # id: 41
+            {  # get last 500 in month 15, then nothing because loop is finished. reaching: -1 (never)
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 0,
+                "savings_amount": 600,
+                "savings_target": None,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_collect(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_collect`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 44
+            {  # reaching: -1 (never)
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 45
+            {  # reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 46
+            {  # reaching: -1 (never)
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            # id: 47
+            {  # reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_add(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_add`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 49
+            {  # reaching: -1 (never)
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 50
+            {  # reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 51
+            {  # reaching: -1 (never)
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            # id: 52
+            {  # reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_fill(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_fill`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 54
+            {  # reaching: -1 (never)
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 55
+            {  # reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 56
+            {  # reaching: -1 (never)
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            # id: 57
+            {  # reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_collect(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_collect`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        overflow_moneybox = (
+            await self.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        )
+        await self.db_manager.add_amount(
+            moneybox_id=overflow_moneybox.id,
+            deposit_transaction_data={
+                "amount": 250,
+                "description": "Test Case",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 59
+            {  # reaching: -1 (never)
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 60
+            {  # reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 61
+            {  # reaching: -1 (never)
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            # id: 62
+            {  # reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_add(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_add`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        overflow_moneybox = (
+            await self.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        )
+        await self.db_manager.add_amount(
+            moneybox_id=overflow_moneybox.id,
+            deposit_transaction_data={
+                "amount": 250,
+                "description": "Test Case",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 64
+            {  # reaching: 1 month
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 200,
+                "savings_target": 200,
+            },
+            # id: 65
+            {  # reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 10,
+                "savings_target": None,
+            },
+            # id: 66
+            {  # reaching: 1 month
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 0,
+                "savings_amount": 40,
+                "savings_target": 40,
+            },
+            # id: 67
+            {  # reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            # id: 68
+            {  # reaching: -1 (never)
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 1,
+                "savings_amount": 1,
+                "savings_target": 2,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_fill(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_fill`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        overflow_moneybox = (
+            await self.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        )
+        await self.db_manager.add_amount(
+            moneybox_id=overflow_moneybox.id,
+            deposit_transaction_data={
+                "amount": 250,
+                "description": "Test Case",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 70
+            {  # reaching: 1 month
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 50,
+                "savings_target": 210,
+            },
+            # id: 71
+            {  # reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 10,
+                "savings_target": None,
+            },
+            # id: 72
+            {  # reaching: 1 month
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 0,
+                "savings_amount": 40,
+                "savings_target": 40,
+            },
+            # id: 73
+            {  # reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            # id: 74
+            {  # reaching: -1 (never)
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 1,
+                "savings_amount": 1,
+                "savings_target": 2,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_collect(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_collect`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 2000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        overflow_moneybox = (
+            await self.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        )
+        await self.db_manager.add_amount(
+            moneybox_id=overflow_moneybox.id,
+            deposit_transaction_data={
+                "amount": 3000,
+                "description": "Test Case",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 76
+            {  # expectation: reached savings target in 5 months
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 77
+            {  # takes 1000 from month 6 upwards, reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 78
+            {  # get 1000 from month 6 upwards, expectation: reached target in 15 months
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 1000,
+                "savings_amount": 5000,
+                "savings_target": 10500,
+            },
+            # id: 79
+            {  # expectation: reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            # id: 80
+            {  # reaching: -1 (never)
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 1000,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_add(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_add`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 2000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        overflow_moneybox = (
+            await self.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        )
+        await self.db_manager.add_amount(
+            moneybox_id=overflow_moneybox.id,
+            deposit_transaction_data={
+                "amount": 3000,
+                "description": "Test Case",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 82
+            {  # reached savings target in 4 months
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 8500,
+            },
+            # id: 83
+            {  # takes 100 in month 1, then from month 5 upwards, reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 84
+            {  # takes 1500 in month 1 (rest from overflow moneybox added amount), then gets 1000 from month 5 upwards
+                # reached target in 12 months
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 0,
+                "savings_amount": 5000,
+                "savings_target": 9500,
+            },
+            # id: 85
+            {  # expectation: reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            # id: 86
+            {  # reaching: -1 (never)
+                "name": "Test Box 6",
+                "priority": 5,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 1000,
+            },
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_fill(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_fill`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 2000,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        overflow_moneybox = (
+            await self.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        )
+        await self.db_manager.add_amount(
+            moneybox_id=overflow_moneybox.id,
+            deposit_transaction_data={
+                "amount": 3000,
+                "description": "Test Case",
+            },
+            transaction_type=TransactionType.DIRECT,
+            transaction_trigger=TransactionTrigger.MANUALLY,
+        )
+
+        print(
+            f"Create data for test ({self.test_case})",
+            flush=True,
+        )
+
+        moneyboxes_data = [
+            # id: 88
+            {  # expectation: reached savings target in 4 months
+                "name": "Test Box 3",
+                "priority": 1,
+                "balance": 0,
+                "savings_amount": 2500,
+                "savings_target": 10000,
+            },
+            # id: 89
+            {  # takes 1000 from month 4 upwards, reaching: -1 (never)
+                "name": "Test Box 2",
+                "priority": 2,
+                "balance": 0,
+                "savings_amount": 1000,
+                "savings_target": None,
+            },
+            # id: 90
+            {  # get 1000 from month 5 upwards, expectation: reached target in 10 months
+                "name": "Test Box 4",
+                "priority": 3,
+                "balance": 0,
+                "savings_amount": 5000,
+                "savings_target": 6000,
+            },
+            # id: 91
+            {  # expectation: reached target directly (month 0)
+                "name": "Test Box 5",
+                "priority": 4,
+                "balance": 0,
+                "savings_amount": 0,
+                "savings_target": 0,
+            },
+            # id: 92
+            {  # reaching: -1 (never)
                 "name": "Test Box 6",
                 "priority": 5,
                 "balance": 0,

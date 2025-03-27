@@ -225,9 +225,8 @@ class MoneyboxSavingsMonthData:
     for calculate_months_for_reaching_savings_targets algorithm"""
 
     moneybox_id: int
-    savings_amount: int
+    amount: int | None
     month: int
-    additional_data: str = ""
 
 
 class DBViolationErrorType(StrEnum):

@@ -6,8 +6,8 @@ from starlette import status
 
 from src.data_classes.responses import (
     HTTPErrorResponse,
-    MoneyboxesReachingSavingsTargetsResponse,
     MoneyboxesResponse,
+    MoneyboxForecastListResponse,
 )
 
 GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
@@ -27,6 +27,7 @@ GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
                                 "There has to be one moneybox with "
                                 "priority = 0 as column value!"
                             ),
+                            details=None,
                         )
                     },
                 },
@@ -124,10 +125,10 @@ GET_MONEYBOXES_RESPONSES: dict[status, dict[str, Any]] = {
 """Responses for endpoint GET: /moneyboxes"""
 
 
-GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES: dict[status, dict[str, Any]] = {
+GET_SAVINGS_FORECAST_RESPONSES: dict[status, dict[str, Any]] = {
     status.HTTP_200_OK: {
         "description": "OK",
-        "model": MoneyboxesReachingSavingsTargetsResponse,
+        "model": MoneyboxForecastListResponse,
     },
     status.HTTP_204_NO_CONTENT: {
         "description": "No Content",
@@ -138,6 +139,7 @@ GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES: dict[status, dict[str, Any]] 
             "application/json": {
                 "example": HTTPErrorResponse(
                     message="No app settings found.",
+                    details=None,
                 )
             }
         },
@@ -220,6 +222,5 @@ GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES: dict[status, dict[str, Any]] 
     },
 }
 """Responses for endpoints:
-- GET: /moneyboxes/reaching_savings_targets
-- GET: /moneyboxes/next_automated_savings_moneyboxes
+- GET: /moneyboxes/savings_forecast
 """

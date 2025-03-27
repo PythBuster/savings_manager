@@ -5,7 +5,7 @@ from typing import Any, cast
 from fastapi import APIRouter
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import JSONResponse, Response
+from starlette.responses import Response
 
 from src.custom_types import (
     EndpointRouteType,
@@ -13,16 +13,17 @@ from src.custom_types import (
     OverflowMoneyboxAutomatedSavingsModeType,
 )
 from src.data_classes.responses import (
-    MoneyboxesReachingSavingsTargetsResponse,
     MoneyboxesResponse,
+    MoneyboxForecastListResponse,
+    MoneyboxForecastResponse,
 )
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
 from src.routes.responses.moneyboxes import (
-    GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES,
     GET_MONEYBOXES_RESPONSES,
+    GET_SAVINGS_FORECAST_RESPONSES,
 )
-from src.utils import calculate_months_for_reaching_savings_targets
+from src.utils import calculate_savings_forecast
 
 moneyboxes_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOXES}",
@@ -62,22 +63,25 @@ async def get_moneyboxes_endpoint(
 
 
 @moneyboxes_router.get(
-    "/reaching_savings_targets",
-    response_model=MoneyboxesReachingSavingsTargetsResponse,
-    responses=GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES,
+    "/savings_forecast",
+    response_model=MoneyboxForecastListResponse,
+    responses=GET_SAVINGS_FORECAST_RESPONSES,
 )
-async def get_reaching_savings_targets(
+async def get_savings_forecast_endpoint(
     request: Request,
-) -> MoneyboxesReachingSavingsTargetsResponse | Response:
-    """Endpoint for getting the number of months for reaching savings targets of the moneyboxes, if
-    a savings target is set.
+) -> MoneyboxForecastListResponse | Response:
+    """Returns a forecast of monthly savings distributions for each moneybox.
+
+    This endpoint provides a projection of which moneyboxes will receive distributions
+    in the upcoming months, including the expected amount for each. The forecast
+    is based on current budget rules, savings priorities, and available funds.
+
+    The Overflow Moneybox is not a part of the results.
     \f
 
     :param request: The current request object.
-    :return: A map of moneybox_id to number of months for reaching
-        the savings target. Only moneyboxes with a savings target are included
-        in the response.
-    :rtype: :class:`MoneyboxesReachingSavingsTargetsResponse`
+    :return: A list of moneyboxes and their respective savings distributions.
+    :rtype: :class:`MoneyboxForecastListResponse`
     """
 
     db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
@@ -95,7 +99,7 @@ async def get_reaching_savings_targets(
     )
 
     reaching_savings_targets: dict[int, list[MoneyboxSavingsMonthData]] = (
-        calculate_months_for_reaching_savings_targets(
+        calculate_savings_forecast(
             moneyboxes=moneyboxes_data,
             app_settings=app_settings.asdict(),
             overflow_moneybox_mode=overflow_moneybox_mode,
@@ -103,64 +107,23 @@ async def get_reaching_savings_targets(
     )
 
     if reaching_savings_targets:
-        return {  # type: ignore
-            "reaching_savings_targets": [
-                {"moneybox_id": moneybox_id, "amount_of_months": list_of_distributions[-1].month}
-                for moneybox_id, list_of_distributions in reaching_savings_targets.items()
+        return MoneyboxForecastListResponse(
+            moneybox_forecasts=[
+                MoneyboxForecastResponse(
+                    moneybox_id=moneybox_id,
+                    monthly_distributions=[
+                        {"month": data.month, "amount": data.amount}
+                        for data in moneybox_savings_month_data
+                        if data.month > 0
+                    ],
+                    reached_in_months=(
+                        moneybox_savings_month_data[-1].month  # can be 0 or >0
+                        if moneybox_savings_month_data[-1].month != -1
+                        else None  # if -1, reached: never
+                    ),
+                )
+                for moneybox_id, moneybox_savings_month_data in reaching_savings_targets.items()
             ]
-        }
-
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@moneyboxes_router.get(
-    "/next_automated_savings_moneyboxes",
-    response_model=MoneyboxesReachingSavingsTargetsResponse,
-    responses=GET_MONEYBOXES_REACHING_SAVINGS_TARGETS_RESPONSES,
-)
-async def get_next_automated_savings_moneyboxes(
-    request: Request,
-) -> Response:
-    """Collect and return a list of moneybox IDs that would receive
-    savings next month (automated saving).
-    \f
-
-    :param request: The current request object.
-    :return: A list of moneybox IDs.
-    :rtype: :class:`Response`
-    """
-
-    db_manager: DBManager = cast(DBManager, request.app.state.db_manager)
-    moneyboxes_data: list[dict[str, Any]] = await db_manager.get_moneyboxes()
-
-    # validate before continuing
-    _ = MoneyboxesResponse(moneyboxes=moneyboxes_data)
-
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # pylint: disable=protected-access
-    )
-
-    overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType = (
-        app_settings.overflow_moneybox_automated_savings_mode
-    )
-
-    next_month_moneyboxes: dict[int, list[MoneyboxSavingsMonthData]] = (
-        calculate_months_for_reaching_savings_targets(
-            moneyboxes=moneyboxes_data,
-            app_settings=app_settings.asdict(),
-            overflow_moneybox_mode=overflow_moneybox_mode,
-        )
-    )
-
-    if next_month_moneyboxes:
-        return JSONResponse(
-            content={
-                "moneyboxIds": [
-                    moneybox_id
-                    for moneybox_id, list_of_distributions in next_month_moneyboxes.items()
-                    if list_of_distributions[0].month == 1
-                ]
-            }
         )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

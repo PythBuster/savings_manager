@@ -119,9 +119,9 @@ class DBManager:  # pylint: disable=too-many-public-methods
         return get_database_url(db_settings=self.db_settings)
 
     async def get_moneyboxes(self) -> list[dict[str, Any]]:
-        """DB Function to get all moneyboxes.
+        """DB Function to get all moneyboxes sorted by priority.
 
-        :return: The requested moneybox data.
+        :return: The requested moneybox data sorted by priority.
         :rtype: :class:`list[dict[str, Any]]`
         """
 
@@ -130,7 +130,10 @@ class DBManager:  # pylint: disable=too-many-public-methods
             orm_model=cast(SqlBase, Moneybox),
         )
 
-        return [moneybox.asdict() for moneybox in moneyboxes]
+        return [
+            moneybox.asdict()
+            for moneybox in sorted(moneyboxes, key=lambda moneybox: moneybox.priority)
+        ]
 
     async def get_moneybox(
         self,
