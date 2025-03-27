@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 
 from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
-from src.utils import calculate_months_for_reaching_savings_targets
+from src.utils import calculate_savings_forecast
 
 
 @pytest.mark.parametrize(
@@ -306,9 +306,7 @@ def test_calculate_months_for_reaching_savings_targets(
     overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType,
     expected: dict[str, Any],
 ) -> None:
-    result = calculate_months_for_reaching_savings_targets(
-        moneyboxes, app_settings, overflow_moneybox_mode
-    )
+    result = calculate_savings_forecast(moneyboxes, app_settings, overflow_moneybox_mode)
     for moneybox in moneyboxes[1:]:
         if moneybox["savings_target"] is not None:
             if moneybox["id"] in result and result[moneybox["id"]]:

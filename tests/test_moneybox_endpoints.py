@@ -1,7 +1,6 @@
 """All moneybox endpoint tests are located here."""
 
 import asyncio
-from collections import Counter
 from datetime import datetime
 from typing import Any
 
@@ -138,42 +137,381 @@ async def test_endpoint_get_moneyboxes__fail__missing_overflow_moneybox(
 
 
 @pytest.mark.dependency
-async def test_get_months_for_reaching_savings_targets__status_200__total_3(
+async def test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_collect(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/reaching_savings_targets",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
     )
 
-    # there should be always at least one moneybox: the overflow moneybox
     assert response.status_code == status.HTTP_200_OK
 
     content = response.json()
     assert content["total"] == 5
 
-    calculated_months = [
-        reaching_savings_targets["amountOfMonths"]
-        for reaching_savings_targets in content["reachingSavingsTargets"]
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 28, "reachedInMonths": 0},
+        {"moneyboxId": 25, "reachedInMonths": 5},
+        {"moneyboxId": 26, "reachedInMonths": None},
+        {"moneyboxId": 27, "reachedInMonths": 15},
+        {"moneyboxId": 29, "reachedInMonths": None},
     ]
 
-    counter = Counter(calculated_months)
-    assert counter[-1] == 2
-    assert counter[0] == 1
-    assert counter[5] == 1
-    assert counter[15] == 1
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 1
 
 
 @pytest.mark.dependency
-async def test_get_months_for_reaching_savings_targets__status_204__no_data(
+async def test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_add(
     load_test_data: None,  # pylint: disable=unused-argument
     client: AsyncClient,
 ) -> None:
     response = await client.get(
-        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/reaching_savings_targets",
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
     )
 
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 5
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 34, "reachedInMonths": 0},
+        {"moneyboxId": 31, "reachedInMonths": 5},
+        {"moneyboxId": 32, "reachedInMonths": None},
+        {"moneyboxId": 33, "reachedInMonths": 15},
+        {"moneyboxId": 35, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 1
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__with_savings_amount__overflow_balance_0__mode_fill(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 5
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 40, "reachedInMonths": 0},
+        {"moneyboxId": 37, "reachedInMonths": 5},
+        {"moneyboxId": 38, "reachedInMonths": None},
+        {"moneyboxId": 39, "reachedInMonths": 15},
+        {"moneyboxId": 41, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 1
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_204__no_data(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_collect(  # noqa: E501  # pylint: disable=line-too-long
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 4
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 47, "reachedInMonths": 0},
+        {"moneyboxId": 44, "reachedInMonths": None},
+        {"moneyboxId": 45, "reachedInMonths": None},
+        {"moneyboxId": 46, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_add(  # noqa: E501  # pylint: disable=line-too-long
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 4
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 52, "reachedInMonths": 0},
+        {"moneyboxId": 49, "reachedInMonths": None},
+        {"moneyboxId": 50, "reachedInMonths": None},
+        {"moneyboxId": 51, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_0__mode_fill(  # noqa: E501  # pylint: disable=line-too-long
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 4
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 57, "reachedInMonths": 0},
+        {"moneyboxId": 54, "reachedInMonths": None},
+        {"moneyboxId": 55, "reachedInMonths": None},
+        {"moneyboxId": 56, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_collect(  # noqa: E501  # pylint: disable=line-too-long
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 4
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 62, "reachedInMonths": 0},
+        {"moneyboxId": 59, "reachedInMonths": None},
+        {"moneyboxId": 60, "reachedInMonths": None},
+        {"moneyboxId": 61, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_add(  # noqa: E501  # pylint: disable=line-too-long
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 5
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 67, "reachedInMonths": 0},
+        {"moneyboxId": 64, "reachedInMonths": 1},
+        {"moneyboxId": 65, "reachedInMonths": None},
+        {"moneyboxId": 66, "reachedInMonths": 1},
+        {"moneyboxId": 68, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox_250__mode_fill(  # noqa: E501  # pylint: disable=line-too-long
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 5
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 73, "reachedInMonths": 0},
+        {"moneyboxId": 70, "reachedInMonths": 1},
+        {"moneyboxId": 72, "reachedInMonths": 1},
+        {"moneyboxId": 71, "reachedInMonths": None},
+        {"moneyboxId": 74, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_collect(  # noqa: E501  # pylint: disable=line-too-long
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 5
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 79, "reachedInMonths": 0},
+        {"moneyboxId": 76, "reachedInMonths": 5},
+        {"moneyboxId": 77, "reachedInMonths": None},
+        {"moneyboxId": 78, "reachedInMonths": 15},
+        {"moneyboxId": 80, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_add(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 5
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 85, "reachedInMonths": 0},
+        {"moneyboxId": 82, "reachedInMonths": 4},
+        {"moneyboxId": 83, "reachedInMonths": None},
+        {"moneyboxId": 84, "reachedInMonths": 12},
+        {"moneyboxId": 86, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 4
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 9
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 9
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
+
+
+@pytest.mark.dependency
+async def test_savings_forecast__status_200__with_savings_amount__overflow_balance_3000__mode_fill(
+    load_test_data: None,  # pylint: disable=unused-argument
+    client: AsyncClient,
+) -> None:
+    response = await client.get(
+        f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.MONEYBOXES}/savings_forecast",
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    content = response.json()
+    assert content["total"] == 5
+
+    expected_result: list[dict[str, int | None]] = [
+        {"moneyboxId": 91, "reachedInMonths": 0},
+        {"moneyboxId": 88, "reachedInMonths": 4},
+        {"moneyboxId": 89, "reachedInMonths": None},
+        {"moneyboxId": 90, "reachedInMonths": 10},
+        {"moneyboxId": 92, "reachedInMonths": None},
+    ]
+
+    for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
+        assert equal_dict(dict_1, dict_2, exclude_keys=["monthlyDistributions"])
+
+    assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 4
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 7
+    assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 6
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
 
 
 @pytest.mark.dependency

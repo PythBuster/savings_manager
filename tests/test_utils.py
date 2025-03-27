@@ -6,7 +6,7 @@ import pytest
 
 from src.custom_types import AppEnvVariables, OverflowMoneyboxAutomatedSavingsModeType
 from src.utils import (
-    calculate_months_for_reaching_savings_targets,
+    calculate_savings_forecast,
     equal_dict,
     get_app_data,
     get_database_url,
@@ -120,346 +120,136 @@ def test_equal_dict(
     assert equal_dict(dict_1, dict_2, exclude_keys) == expected_result
 
 
-def test_calculate_months_for_reaching_savings_targets__success__mode_collect() -> None:
-    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.COLLECT
-    savings_amount = 2000
-
-    moneyboxes: list[dict[str, Any]] = [
-        {  # expectation: reached savings target in 5 months
-            "id": 3,
-            "priority": 1,
-            "balance": 0,
-            "savings_amount": 2500,
-            "savings_target": 10000,
+def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
+    return [
+        {  # overflow moneybox
+            "id": 1,
+            "priority": 0,
+            "balance": overflow_balance,
+            "savings_amount": 0,
+            "savings_target": None,
         },
-        {  # takes 1000 from month 6 upwards
+        {  # reached at init
             "id": 2,
+            "priority": 1,
+            "balance": 1000,
+            "savings_amount": 500,
+            "savings_target": 1000,
+        },
+        {  # will reach target over time: needs 3 × 1000 => last payment in month 2 (0-based)
+            "id": 3,
             "priority": 2,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": 3000,
+        },
+        {  # no target
+            "id": 4,
+            "priority": 3,
             "balance": 0,
             "savings_amount": 1000,
             "savings_target": None,
         },
-        {  # get 1000 from month 6 upwards, expectation: reached target in month 16
-            "id": 4,
-            "priority": 3,
-            "balance": 1000,
-            "savings_amount": 5000,
-            "savings_target": 10500,
-        },
-        {  # overflow moneybox
-            "id": 1,
-            "priority": 0,
-            "balance": 0,
-            "savings_amount": 0,
-            "savings_target": None,
-        },
-        {  # expectation: reached target directly (month 0)
+        {  # unreachable
             "id": 5,
             "priority": 4,
-            "balance": 0,
-            "savings_amount": 0,
-            "savings_target": 0,
-        },
-        {  # expectation: not part of result, will never reach savings target
-            "id": 6,
-            "priority": 5,
             "balance": 0,
             "savings_amount": 0,
             "savings_target": 1000,
         },
     ]
 
-    result_1 = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes,
-        app_settings={
-            "is_automated_saving_active": True,
-            "savings_amount": savings_amount,
-        },
-        overflow_moneybox_mode=overflow_moneybox_mode,
-    )
 
-    assert result_1[3][-1].month == 5
-    assert result_1[4][-1].month == 15
-    assert result_1[5][-1].month == 0
-    assert result_1[6][-1].month == -1
-    assert 1 not in result_1
-
-
-def test_calculate_months_for_reaching_savings_targets__success__mode_add_to_savings_amount() -> (
-    None
+@pytest.mark.parametrize(
+    "savings_amount, overflow_balance, mode, expected",
+    [
+        # COLLECT
+        (1000, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: 3, 4: None, 5: None}),
+        (0, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: None, 4: None, 5: None}),
+        (
+            0,
+            250,
+            OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            1000,
+            3000,
+            OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        # ADD
+        (
+            1000,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        (
+            0,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            0,
+            250,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            1000,
+            3000,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        # FILL
+        (
+            1000,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        (
+            0,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            0,
+            250,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            1000,
+            3000,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: 1, 4: None, 5: None},
+        ),
+    ],
+)
+def test_calculate_savings_forecast__all_combinations(
+    savings_amount, overflow_balance, mode, expected
 ):
-    overflow_moneybox_mode = (
-        OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT
-    )
-    savings_amount = 5000
-    moneyboxes: list[dict[str, Any]] = [
-        {  # expectation: reached savings target in 1 month
-            "id": 3,
-            "priority": 1,
-            "balance": 0,
-            "savings_amount": 10000,
-            "savings_target": 10000,
-        },
-        {  # takes 1000 from month 1 upwards
-            "id": 2,
-            "priority": 2,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": None,
-        },
-        {  # expectation: reached savings target in 4 months
-            "id": 4,
-            "priority": 3,
-            "balance": 0,
-            "savings_amount": 3000,
-            "savings_target": 8000,
-        },
-        {  # overflow moneybox
-            # add 10000 to savings_amount for month 1
-            "id": 1,
-            "priority": 0,
-            "balance": 10000,
-            "savings_amount": 0,
-            "savings_target": None,
-        },
-    ]
-
-    result_1 = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes,
+    result = calculate_savings_forecast(
+        moneyboxes=create_test_moneyboxes(overflow_balance),
         app_settings={
             "is_automated_saving_active": True,
             "savings_amount": savings_amount,
         },
-        overflow_moneybox_mode=overflow_moneybox_mode,
+        overflow_moneybox_mode=mode,
     )
 
-    assert result_1[3][-1].month == 1
-    assert 1 not in result_1
-    assert result_1[4][-1].month == 3
+    assert 1 not in result  # overflow moneybox is excluded from result
 
-
-def test_calculate_months_for_reaching_savings_targets__success__mode_fill_up() -> None:
-    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-    savings_amount = 10000
-    moneyboxes: list[dict[str, Any]] = [
-        {  # expectation: reached savings target in 1 month
-            "id": 3,
-            "priority": 1,
-            "balance": 0,
-            "savings_amount": 10000,
-            "savings_target": 10000,
-        },
-        {  # takes 1000 from month 2 upwards
-            "id": 2,
-            "priority": 2,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": None,
-        },
-        {  # expectation: reached savings target in 1 month (filled up from overflow moneybox)
-            "id": 4,
-            "priority": 3,
-            "balance": 0,
-            "savings_amount": 2000,
-            "savings_target": 10000,
-        },
-        {  # expectation: reached savings target in 3 months
-            "id": 5,
-            "priority": 4,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": 5000,
-        },
-        {  # overflow moneybox
-            # fill up moneybox 4
-            "id": 1,
-            "priority": 0,
-            "balance": 10000,
-            "savings_amount": 0,
-            "savings_target": None,
-        },
-    ]
-
-    result_1 = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes,
-        app_settings={
-            "is_automated_saving_active": True,
-            "savings_amount": savings_amount,
-        },
-        overflow_moneybox_mode=overflow_moneybox_mode,
-    )
-
-    assert result_1[3][-1].month == 1
-    assert 1 not in result_1
-    assert result_1[4][-1].month == 1
-    assert result_1[5][-1].month == 2
-
-
-def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_empty_moneyboxes() -> (  # noqa: E501  # pylint: disable=line-too-long
-    None
-):
-    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-    savings_amount = 10000
-    moneyboxes: list[dict[str, Any]] = []
-
-    result = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes,
-        app_settings={
-            "is_automated_saving_active": True,
-            "savings_amount": savings_amount,
-        },
-        overflow_moneybox_mode=overflow_moneybox_mode,
-    )
-    assert result == {}
-
-
-def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_savings_amount_of_zero() -> (  # noqa: E501  # pylint: disable=line-too-long
-    None
-):
-    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-    savings_amount = 0
-    moneyboxes: list[dict[str, Any]] = [
-        {  # expectation: reached savings target in 1 month
-            "id": 3,
-            "priority": 1,
-            "balance": 0,
-            "savings_amount": 10000,
-            "savings_target": 10000,
-        },
-        {  # takes 1000 from month 2 upwards
-            "id": 2,
-            "priority": 2,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": None,
-        },
-        {  # expectation: reached savings target in 1 month (filled up from overflow moneybox)
-            "id": 4,
-            "priority": 3,
-            "balance": 0,
-            "savings_amount": 2000,
-            "savings_target": 10000,
-        },
-        {  # expectation: reached savings target in 3 months
-            "id": 5,
-            "priority": 4,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": 5000,
-        },
-        {  # overflow moneybox
-            # fill up moneybox 4
-            "id": 1,
-            "priority": 0,
-            "balance": 10000,
-            "savings_amount": 0,
-            "savings_target": None,
-        },
-    ]
-
-    result = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes,
-        app_settings={
-            "is_automated_saving_active": True,
-            "savings_amount": savings_amount,
-        },
-        overflow_moneybox_mode=overflow_moneybox_mode,
-    )
-    assert result == {}
-
-
-def test_calculate_months_for_reaching_savings_targets__success__empty_result_caused_by_negative_savings_amount() -> (  # noqa: E501  # pylint: disable=line-too-long
-    None
-):
-    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-    savings_amount = -1
-    moneyboxes: list[dict[str, Any]] = [
-        {  # expectation: reached savings target in 1 month
-            "id": 3,
-            "priority": 1,
-            "balance": 0,
-            "savings_amount": 10000,
-            "savings_target": 10000,
-        },
-        {  # takes 1000 from month 2 upwards
-            "id": 2,
-            "priority": 2,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": None,
-        },
-        {  # expectation: reached savings target in 1 month (filled up from overflow moneybox)
-            "id": 4,
-            "priority": 3,
-            "balance": 0,
-            "savings_amount": 2000,
-            "savings_target": 10000,
-        },
-        {  # expectation: reached savings target in 3 months
-            "id": 5,
-            "priority": 4,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": 5000,
-        },
-        {  # overflow moneybox
-            # fill up moneybox 4
-            "id": 1,
-            "priority": 0,
-            "balance": 10000,
-            "savings_amount": 0,
-            "savings_target": None,
-        },
-    ]
-
-    result = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes,
-        app_settings={
-            "is_automated_saving_active": True,
-            "savings_amount": savings_amount,
-        },
-        overflow_moneybox_mode=overflow_moneybox_mode,
-    )
-    assert result == {}
-
-
-def test_calculate_months_for_reaching_savings_targets__success__monthly_savings_amount_0__init_reached_target() -> (  # noqa: E501  # pylint: disable=line-too-long
-    None
-):
-    overflow_moneybox_mode = OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-    savings_amount = 0
-    moneyboxes: list[dict[str, Any]] = [
-        {  # expectation: reached savings target in 1 month
-            "id": 3,
-            "priority": 1,
-            "balance": 10000,  # initial full
-            "savings_amount": 500,
-            "savings_target": 10000,
-        },
-        {  # takes 1000 from month 2 upwards
-            "id": 2,
-            "priority": 2,
-            "balance": 0,
-            "savings_amount": 1000,
-            "savings_target": None,
-        },
-        {  # overflow moneybox
-            "id": 1,
-            "priority": 0,
-            "balance": 0,
-            "savings_amount": 0,
-            "savings_target": None,
-        },
-    ]
-
-    result = calculate_months_for_reaching_savings_targets(
-        moneyboxes=moneyboxes,
-        app_settings={
-            "is_automated_saving_active": True,
-            "savings_amount": savings_amount,
-        },
-        overflow_moneybox_mode=overflow_moneybox_mode,
-    )
-
-    assert result[3][-1].month == 0
-    assert 2 not in result
+    for moneybox_id, expected_month in expected.items():
+        assert moneybox_id in result
+        last_month = result[moneybox_id][-1].month
+        if expected_month is None:
+            assert last_month == -1
+        else:
+            assert (
+                last_month == expected_month
+            ), f"Moneybox {moneybox_id}: expected month {expected_month}, got {last_month}"
