@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.39.0 (2025-03-28)
+### Changes:
+- refactor calculation function for savings forecast of moneyboxes
+- remove endpoint for next month savings and adapt forecast endpoint to map both logics (forecast and next month)
+
 ## 2.38.1 (2025-03-12)
 ### Changes:
 - migrate to python 3.13 (performance optimizations)
