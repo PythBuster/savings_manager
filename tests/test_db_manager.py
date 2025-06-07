@@ -1591,7 +1591,6 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
             exclude_keys=["created_at", "modified_at", "id", "action_at"],
         )
 
-@pytest.mark.order(after="tests/test_calculate_months_for_reaching_savings_targets.py::test_automated_savings_overflow_moneybox_mode_fill_up")
 @pytest.mark.asyncio
 async def test_reset_database_keep_app_settings(
     load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
@@ -1627,8 +1626,6 @@ async def test_reset_database_keep_app_settings(
 
         mock_main.assert_called()
 
-
-@pytest.mark.order(after="tests/test_calculate_months_for_reaching_savings_targets.py::test_automated_savings_overflow_moneybox_mode_fill_up")
 @pytest.mark.asyncio
 async def test_reset_database_delete_app_settings(
     load_test_data: None,  # pylint: disable=unused-argument
