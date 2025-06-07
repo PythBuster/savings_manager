@@ -16,7 +16,7 @@ from src.custom_types import EnvironmentType
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
 from src.fastapi_metadata import tags_metadata
-from src.fastapi_utils import create_pgpass, handle_requests, register_router
+from src.fastapi_utils import handle_requests, register_router
 from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data, get_app_env_variables
@@ -37,9 +37,6 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator:
     """
 
     environment, app_env_variables = get_app_env_variables()  # pylint: disable=redefined-outer-name
-
-    print("Create .pgpass for sql import/export functionality ...", flush=True)
-    create_pgpass(app_env_variables=app_env_variables)
 
     print(f"Register routers (id={id(fastapi_app)}) ...", flush=True)
     register_router(fastapi_app=fastapi_app)

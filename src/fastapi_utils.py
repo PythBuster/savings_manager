@@ -89,25 +89,3 @@ def register_router(fastapi_app: FastAPI) -> None:
         app=StaticFiles(directory=WEB_UI_DIR_PATH, html=True),
         name="static",
     )
-
-
-def create_pgpass(app_env_variables: AppEnvVariables) -> None:
-    """Create a .pgpass file in PGPASS_FILE_PATH dir and export
-    file path to ENVIRONMENT `PGPASSFILE`. pg_dump and pg_restore
-    will need this file for connecting the database.
-
-    :param app_env_variables: The env settings.
-    :type app_env_variables: :class:`AppEnvVariables`
-    """
-
-    port: int = app_env_variables.db_port
-    db: str = app_env_variables.db_name
-    user: str = app_env_variables.db_user
-    pw: SecretType = app_env_variables.db_password.get_secret_value()
-    host: str = app_env_variables.db_host
-
-    pass_data: str = f"{host}:{port}:{db}:{user}:{pw}"
-    PGPASS_FILE_PATH.write_text(pass_data, encoding="utf-8")
-    PGPASS_FILE_PATH.chmod(0o600)
-
-    os.environ["PGPASSFILE"] = str(PGPASS_FILE_PATH)

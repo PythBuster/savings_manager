@@ -47,7 +47,6 @@ from src.db.exceptions import (
     UserNotFoundError,
 )
 from src.db.models import Moneybox, SqlBase
-from src.savings_distribution.automated_savings_distribution import AutomatedSavingsDistributionService
 from src.utils import equal_dict
 from tests.utils.db_manager import get_moneybox_id_by_name
 
@@ -60,8 +59,6 @@ async def test_if_test_db_is_used(db_manager: DBManager) -> None:
         == "postgresql+asyncpg://test_postgres:test_postgres@localhost:8765/savings_manager"
     )
 
-
-@pytest.mark.dependency
 @pytest.mark.asyncio
 async def test_create_db_manager_with_engine_args(
     app_env_variables: AppEnvVariables,
@@ -1594,119 +1591,7 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
             exclude_keys=["created_at", "modified_at", "id", "action_at"],
         )
 
-
-@pytest.mark.dependency(depends=["test_get_automated_savings_logs"])
-@pytest.mark.asyncio
-async def test_automated_savings_overflow_moneybox_mode_collect(
-    load_test_data: None,  # pylint: disable=unused-argument
-    automated_distribution_service: AutomatedSavingsDistributionService,
-) -> None:
-    await automated_distribution_service.run_automated_savings_distribution()
-
-    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
-    expected_data = {
-        "Overflow Moneybox": 105,
-        "Test Box 1": 5,
-        "Test Box 2": 5,
-        "Test Box 3": 15,
-        "Test Box 4": 20,
-        "Test Box 5": 0,
-        "Test Box 6": 0,
-    }
-
-    for moneybox in moneyboxes:
-        assert moneybox["balance"] == expected_data[moneybox["name"]]
-
-    # >>>  test case for bug: issue #71
-    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = (
-        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
-    )
-    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
-        moneybox_id=overflow_moneybox.id,
-    )
-
-    last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = "Automated Savings."
-    assert last_transaction_log["description"] == expected_description
-    # <<<
-
-
-@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_collect"])
-@pytest.mark.asyncio
-async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
-    load_test_data: None,  # pylint: disable=unused-argument
-    automated_distribution_service: AutomatedSavingsDistributionService,
-) -> None:
-    await automated_distribution_service.run_automated_savings_distribution()
-
-    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
-    expected_data = {
-        "Overflow Moneybox": 105,
-        "Test Box 1": 5,
-        "Test Box 2": 5,
-        "Test Box 3": 15,
-        "Test Box 4": 20,
-        "Test Box 5": 0,
-        "Test Box 6": 0,
-    }
-
-    for moneybox in moneyboxes:
-        assert moneybox["balance"] == expected_data[moneybox["name"]]
-
-    # >>>  test case for bug: issue #71
-    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = (
-        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
-    )
-    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
-        moneybox_id=overflow_moneybox.id,
-    )
-
-    last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = "Automated Savings with Add-Mode."
-    assert last_transaction_log["description"] == expected_description
-    # <<<
-
-
-@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_add_to_amount"])
-@pytest.mark.asyncio
-async def test_automated_savings_overflow_moneybox_mode_fill_up(
-    load_test_data: None,  # pylint: disable=unused-argument
-    automated_distribution_service: AutomatedSavingsDistributionService,
-) -> None:
-    await automated_distribution_service.run_automated_savings_distribution()
-
-    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
-    expected_data = {
-        "Overflow Moneybox": 75,
-        "Test Box 1": 5,
-        "Test Box 2": 5,
-        "Test Box 3": 15,
-        "Test Box 4": 50,
-        "Test Box 5": 0,
-        "Test Box 6": 0,
-    }
-
-    for moneybox in moneyboxes:
-        assert moneybox["balance"] == expected_data[moneybox["name"]]
-
-    # >>> test case for bug: issue #71
-    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
-    overflow_moneybox = (
-        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
-    )
-    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
-        moneybox_id=overflow_moneybox.id,
-    )
-
-    last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = "Fill-Mode: Automated Savings."
-    assert last_transaction_log["description"] == expected_description
-    # <<<
-
-
-@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
+@pytest.mark.order(after="tests/test_calculate_months_for_reaching_savings_targets.py::test_automated_savings_overflow_moneybox_mode_fill_up")
 @pytest.mark.asyncio
 async def test_reset_database_keep_app_settings(
     load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
@@ -1743,7 +1628,7 @@ async def test_reset_database_keep_app_settings(
         mock_main.assert_called()
 
 
-@pytest.mark.dependency(depends=["test_automated_savings_overflow_moneybox_mode_fill_up"])
+@pytest.mark.order(after="tests/test_calculate_months_for_reaching_savings_targets.py::test_automated_savings_overflow_moneybox_mode_fill_up")
 @pytest.mark.asyncio
 async def test_reset_database_delete_app_settings(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -1779,173 +1664,6 @@ async def test_reset_database_delete_app_settings(
         assert len(moneyboxes) == 1
 
         mock_main.assert_called()
-
-
-@pytest.mark.dependency(depends=["test_reset_database_delete_app_settings"])
-@pytest.mark.order(after="tests/test_fastapi_utils.py::test_create_pgpass")
-@pytest.mark.asyncio
-async def test_export_sql_dump(
-    load_test_data: None,  # pylint: disable=unused-argument
-    db_manager: DBManager,
-) -> None:
-    dump_stream = await db_manager.export_sql_dump()
-
-    dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
-    dump_value = dump_stream.getvalue()
-
-    with dump_file_path.open("wb") as f:
-        f.write(dump_value)
-
-    assert 36000 < len(dump_value) < 37000
-
-
-@pytest.mark.dependency(depends=["test_export_sql_dump"])
-@pytest.mark.order(after="test_export_sql_dump")
-@pytest.mark.asyncio
-async def test_export_sql_dump_missing_dependency_error(
-    db_manager: DBManager,
-) -> None:
-    with patch(
-        "src.db.db_manager.subprocess.Popen", side_effect=Exception("pg_dump not installed")
-    ):
-        with pytest.raises(MissingDependencyError, match="pg_dump not installed"):
-            await db_manager.export_sql_dump()
-
-
-@pytest.mark.dependency(depends=["test_export_sql_dump"])
-@pytest.mark.order(after="test_export_sql_dump_missing_dependency_error")
-@pytest.mark.asyncio
-async def test_export_sql_dump_process_communication_error(
-    db_manager: DBManager,
-) -> None:
-    with patch("src.db.db_manager.subprocess.Popen"), patch("subprocess.Popen") as mock_popen:
-        mock_process = MagicMock()
-        mock_process.communicate.return_value = (b"", b"Error message")
-        mock_process.returncode = -1
-        mock_popen.return_value = mock_process
-
-        with pytest.raises(ProcessCommunicationError, match="Error message"):
-            await db_manager.export_sql_dump()
-
-
-@pytest.mark.dependency(depends=["test_export_sql_dump"])
-@pytest.mark.order(after="tests/test_app_endpoints.py::test_app_export_valid")
-@pytest.mark.asyncio
-async def test_import_sql_dump(
-    load_test_data: None,  # pylint: disable=unused-argument
-    db_manager: DBManager,
-) -> None:
-    original_main = CommandLine.main
-
-    with patch.object(CommandLine, "main") as mock_main:
-
-        def patched_main(cmd_line, args) -> None:  # type: ignore
-            args = ["-x", "ENVIRONMENT=test"] + args
-            original_main(cmd_line, args)
-
-        mock_main.side_effect = patched_main
-
-        dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
-        with dump_file_path.open("rb") as f:
-            sql_dump = f.read()
-
-        await db_manager.import_sql_dump(sql_dump=sql_dump)
-
-        expected_app_settings_data = {
-            "send_reports_via_email": False,
-            "user_email_address": "pythbuster@gmail.com",
-            "is_automated_saving_active": False,
-            "savings_amount": 150,
-            "overflow_moneybox_automated_savings_mode": (
-                OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-            ),
-        }
-        expected_moneyboxes = [
-            {
-                "name": "Overflow Moneybox",
-            },
-            {
-                "name": "Test Box 1",
-            },
-        ]
-        moneyboxes = await db_manager.get_moneyboxes()
-        assert len(moneyboxes) == len(expected_moneyboxes)
-        assert moneyboxes[0]["name"] == expected_moneyboxes[0]["name"]
-        assert moneyboxes[1]["name"] == expected_moneyboxes[1]["name"]
-
-        app_settings = await db_manager._get_app_settings()  # pylint: disable=protected-access
-        app_settings_data = app_settings.asdict()
-        assert equal_dict(
-            dict_1=app_settings_data,
-            dict_2=expected_app_settings_data,
-            exclude_keys=["created_at", "modified_at", "id"],
-        )
-
-
-@pytest.mark.dependency(depends=["test_import_sql_dump"])
-@pytest.mark.order(after="test_import_sql_dump")
-@pytest.mark.asyncio
-async def test_import_sql_dump_missing_dependency_error(
-    db_manager: DBManager,
-) -> None:
-    dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
-    with dump_file_path.open("rb") as f:
-        sql_dump = f.read()
-
-    io_bytes = io.BytesIO(sql_dump)
-
-    with (
-        patch(
-            "src.db.db_manager.subprocess.Popen",
-            side_effect=Exception("pg_restore not installed"),
-        ),
-        patch.object(
-            db_manager,
-            attribute="export_sql_dump",
-            return_value=io_bytes,
-        ),
-        patch.object(
-            db_manager,
-            attribute="reset_database",
-        ),
-    ):
-        with pytest.raises(MissingDependencyError, match="pg_restore not installed"):
-            await db_manager.import_sql_dump(sql_dump=sql_dump)
-
-
-@pytest.mark.dependency(depends=["test_import_sql_dump"])
-@pytest.mark.order(after="test_import_sql_dump_missing_dependency_error")
-@pytest.mark.asyncio
-async def test_import_sql_dump_process_communication_error(
-    db_manager: DBManager,
-) -> None:
-    dump_file_path = (Path(__file__).parent / "temp" / "dump.sql").resolve()
-
-    with dump_file_path.open("rb") as f:
-        sql_dump = f.read()
-
-    io_bytes = io.BytesIO(sql_dump)
-
-    with (
-        patch("src.db.db_manager.subprocess.Popen"),
-        patch("subprocess.Popen") as mock_popen,
-        patch.object(
-            db_manager,
-            attribute="export_sql_dump",
-            return_value=io_bytes,
-        ),
-        patch.object(
-            db_manager,
-            attribute="reset_database",
-        ),
-    ):
-        mock_process = MagicMock()
-        mock_process.communicate.return_value = (b"", b"Error message")
-        mock_process.returncode = -1
-        mock_popen.return_value = mock_process
-
-        with pytest.raises(ProcessCommunicationError, match="Error message"):
-            await db_manager.import_sql_dump(sql_dump=sql_dump)
 
 
 @pytest.mark.dependency

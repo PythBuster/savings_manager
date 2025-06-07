@@ -7,6 +7,111 @@ from src.savings_distribution.automated_savings_distribution import AutomatedSav
 
 
 @pytest.mark.asyncio
+async def test_automated_savings_overflow_moneybox_mode_collect(
+    load_test_data: None,  # pylint: disable=unused-argument
+    automated_distribution_service: AutomatedSavingsDistributionService,
+) -> None:
+    await automated_distribution_service.run_automated_savings_distribution()
+
+    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
+    expected_data = {
+        "Overflow Moneybox": 105,
+        "Test Box 1": 5,
+        "Test Box 2": 5,
+        "Test Box 3": 15,
+        "Test Box 4": 20,
+        "Test Box 5": 0,
+        "Test Box 6": 0,
+    }
+
+    for moneybox in moneyboxes:
+        assert moneybox["balance"] == expected_data[moneybox["name"]]
+
+    # >>>  test case for bug: issue #71
+    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
+    overflow_moneybox = (
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    )
+    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
+        moneybox_id=overflow_moneybox.id,
+    )
+
+    last_transaction_log = overflow_moneybox_transaction_logs[-1]
+    expected_description = "Automated Savings."
+    assert last_transaction_log["description"] == expected_description
+    # <<<
+
+@pytest.mark.asyncio
+async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
+    load_test_data: None,  # pylint: disable=unused-argument
+    automated_distribution_service: AutomatedSavingsDistributionService,
+) -> None:
+    await automated_distribution_service.run_automated_savings_distribution()
+
+    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
+    expected_data = {
+        "Overflow Moneybox": 105,
+        "Test Box 1": 5,
+        "Test Box 2": 5,
+        "Test Box 3": 15,
+        "Test Box 4": 20,
+        "Test Box 5": 0,
+        "Test Box 6": 0,
+    }
+
+    for moneybox in moneyboxes:
+        assert moneybox["balance"] == expected_data[moneybox["name"]]
+
+    # >>>  test case for bug: issue #71
+    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
+    overflow_moneybox = (
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    )
+    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
+        moneybox_id=overflow_moneybox.id,
+    )
+
+    last_transaction_log = overflow_moneybox_transaction_logs[-1]
+    expected_description = "Automated Savings with Add-Mode."
+    assert last_transaction_log["description"] == expected_description
+    # <<<
+
+@pytest.mark.asyncio
+async def test_automated_savings_overflow_moneybox_mode_fill_up(
+    load_test_data: None,  # pylint: disable=unused-argument
+    automated_distribution_service: AutomatedSavingsDistributionService,
+) -> None:
+    await automated_distribution_service.run_automated_savings_distribution()
+
+    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
+    expected_data = {
+        "Overflow Moneybox": 75,
+        "Test Box 1": 5,
+        "Test Box 2": 5,
+        "Test Box 3": 15,
+        "Test Box 4": 50,
+        "Test Box 5": 0,
+        "Test Box 6": 0,
+    }
+
+    for moneybox in moneyboxes:
+        assert moneybox["balance"] == expected_data[moneybox["name"]]
+
+    # >>> test case for bug: issue #71
+    # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
+    overflow_moneybox = (
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    )
+    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
+        moneybox_id=overflow_moneybox.id,
+    )
+
+    last_transaction_log = overflow_moneybox_transaction_logs[-1]
+    expected_description = "Fill-Mode: Automated Savings."
+    assert last_transaction_log["description"] == expected_description
+    # <<<
+
+@pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__amount_0(
     load_test_data: None,  # pylint: disable=unused-argument
     automated_distribution_service: AutomatedSavingsDistributionService,
