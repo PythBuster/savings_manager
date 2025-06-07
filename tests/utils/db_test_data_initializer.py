@@ -128,6 +128,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_task_automated_savings_dont_schedule": self.dataset_test_task_automated_savings_dont_schedule,
             "test_task_automated_savings_no_email_send": self.dataset_test_task_automated_savings_no_email_send,
             "test_task_automated_savings_no_savings_active": self.dataset_test_task_automated_savings_no_savings_active,
+            "test_send_testemail_success": self.dataset_test_send_testemail_success,
             "test_task_email_sending__one_of_one": self.dataset_test_task_email_sending__one_of_one,
             "test_task_email_sending__two_of_two": self.dataset_test_task_email_sending__two_of_two,
             "test_task_email_sending__two_of_three": self.dataset_test_task_email_sending__two_of_three,
@@ -2639,6 +2640,29 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
+
+    async def dataset_test_send_testemail_success(self) -> None:
+        """The data generation function for test_case:
+        `test_send_testemail_success`.
+        """
+
+        self.truncate_tables()
+
+        # create app settings
+        distribution_amount = 150
+        app_settings_data = {
+            "send_reports_via_email": True,
+            "user_email_address": "pythbuster@gmail.com",
+            "is_automated_saving_active": False,
+            "savings_amount": distribution_amount,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
 
     async def dataset_test_task_email_sending__one_of_one(self) -> None:
         """The data generation function for test_case:

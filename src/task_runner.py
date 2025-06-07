@@ -9,6 +9,7 @@ from src.custom_types import ActionType
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
 from src.decorators import every
+from src.savings_distribution.automated_savings_distribution import AutomatedSavingsDistributionService
 from src.report_sender.email_sender.sender import EmailSender
 
 
@@ -21,10 +22,14 @@ class BackgroundTaskRunner:
     :class:`asyncio.Task` instances.
 
     Each task_ method has to implement its own endless loop and sleep (->self.sleep_time)
-     (if endless task is wanted) and its own date trigger.
+    (if an endless task is wanted) and its own date trigger.
     """
 
-    def __init__(self, db_manager: DBManager, email_sender: EmailSender) -> None:
+    def __init__(
+            self,
+            db_manager: DBManager,
+            email_sender: EmailSender,
+    ) -> None:
         """Initialize the BackgroundTaskRunner instance.
 
         :param db_manager: The DBManager instance.
@@ -34,6 +39,7 @@ class BackgroundTaskRunner:
         """
 
         self.db_manager: DBManager = db_manager
+        self.automated_distribution_service = AutomatedSavingsDistributionService(self.db_manager)
         self.email_sender: EmailSender = email_sender
         self.sleep_time: int = 60 * 60  # each hour
         self.background_tasks: set[asyncio.Task] = set()
@@ -144,7 +150,7 @@ class BackgroundTaskRunner:
                     already_done = True
 
             if not already_done:
-                result: bool = await self.db_manager.automated_savings()
+                result: bool = await self.automated_distribution_service.run_automated_savings_distribution()
 
                 if result:
                     await self.print_task(

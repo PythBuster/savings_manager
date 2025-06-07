@@ -151,11 +151,11 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 28, "reachedInMonths": 0},
-        {"moneyboxId": 25, "reachedInMonths": 5},
-        {"moneyboxId": 26, "reachedInMonths": None},
-        {"moneyboxId": 27, "reachedInMonths": 15},
-        {"moneyboxId": 29, "reachedInMonths": None},
+        {"moneyboxId": 17, "reachedInMonths": 0},
+        {"moneyboxId": 14, "reachedInMonths": 5},
+        {"moneyboxId": 15, "reachedInMonths": None},
+        {"moneyboxId": 16, "reachedInMonths": 15},
+        {"moneyboxId": 18, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -183,11 +183,11 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 34, "reachedInMonths": 0},
-        {"moneyboxId": 31, "reachedInMonths": 5},
-        {"moneyboxId": 32, "reachedInMonths": None},
-        {"moneyboxId": 33, "reachedInMonths": 15},
-        {"moneyboxId": 35, "reachedInMonths": None},
+        {"moneyboxId": 23, "reachedInMonths": 0},
+        {"moneyboxId": 20, "reachedInMonths": 5},
+        {"moneyboxId": 21, "reachedInMonths": None},
+        {"moneyboxId": 22, "reachedInMonths": 15},
+        {"moneyboxId": 24, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -215,11 +215,11 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 40, "reachedInMonths": 0},
-        {"moneyboxId": 37, "reachedInMonths": 5},
-        {"moneyboxId": 38, "reachedInMonths": None},
-        {"moneyboxId": 39, "reachedInMonths": 15},
-        {"moneyboxId": 41, "reachedInMonths": None},
+        {"moneyboxId": 29, "reachedInMonths": 0},
+        {"moneyboxId": 26, "reachedInMonths": 5},
+        {"moneyboxId": 27, "reachedInMonths": None},
+        {"moneyboxId": 28, "reachedInMonths": 15},
+        {"moneyboxId": 30, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -257,10 +257,10 @@ async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox
     assert content["total"] == 4
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 47, "reachedInMonths": 0},
-        {"moneyboxId": 44, "reachedInMonths": None},
-        {"moneyboxId": 45, "reachedInMonths": None},
-        {"moneyboxId": 46, "reachedInMonths": None},
+        {"moneyboxId": 36, "reachedInMonths": 0},
+        {"moneyboxId": 33, "reachedInMonths": None},
+        {"moneyboxId": 34, "reachedInMonths": None},
+        {"moneyboxId": 35, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -286,10 +286,10 @@ async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox
     assert content["total"] == 4
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 52, "reachedInMonths": 0},
-        {"moneyboxId": 49, "reachedInMonths": None},
-        {"moneyboxId": 50, "reachedInMonths": None},
-        {"moneyboxId": 51, "reachedInMonths": None},
+        {"moneyboxId": 41, "reachedInMonths": 0},
+        {"moneyboxId": 38, "reachedInMonths": None},
+        {"moneyboxId": 39, "reachedInMonths": None},
+        {"moneyboxId": 40, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -315,10 +315,10 @@ async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox
     assert content["total"] == 4
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 57, "reachedInMonths": 0},
-        {"moneyboxId": 54, "reachedInMonths": None},
-        {"moneyboxId": 55, "reachedInMonths": None},
-        {"moneyboxId": 56, "reachedInMonths": None},
+        {"moneyboxId": 46, "reachedInMonths": 0},
+        {"moneyboxId": 43, "reachedInMonths": None},
+        {"moneyboxId": 44, "reachedInMonths": None},
+        {"moneyboxId": 45, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -344,10 +344,10 @@ async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox
     assert content["total"] == 4
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 62, "reachedInMonths": 0},
-        {"moneyboxId": 59, "reachedInMonths": None},
-        {"moneyboxId": 60, "reachedInMonths": None},
-        {"moneyboxId": 61, "reachedInMonths": None},
+        {"moneyboxId": 51, "reachedInMonths": 0},
+        {"moneyboxId": 48, "reachedInMonths": None},
+        {"moneyboxId": 49, "reachedInMonths": None},
+        {"moneyboxId": 50, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -373,11 +373,11 @@ async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 67, "reachedInMonths": 0},
-        {"moneyboxId": 64, "reachedInMonths": 1},
-        {"moneyboxId": 65, "reachedInMonths": None},
-        {"moneyboxId": 66, "reachedInMonths": 1},
-        {"moneyboxId": 68, "reachedInMonths": None},
+        {"moneyboxId": 56, "reachedInMonths": 0},
+        {"moneyboxId": 53, "reachedInMonths": 1},
+        {"moneyboxId": 54, "reachedInMonths": None},
+        {"moneyboxId": 55, "reachedInMonths": 1},
+        {"moneyboxId": 57, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -404,11 +404,11 @@ async def test_savings_forecast__status_200__savings_amount_0__overflow_moneybox
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 73, "reachedInMonths": 0},
-        {"moneyboxId": 70, "reachedInMonths": 1},
-        {"moneyboxId": 72, "reachedInMonths": 1},
-        {"moneyboxId": 71, "reachedInMonths": None},
-        {"moneyboxId": 74, "reachedInMonths": None},
+        {"moneyboxId": 62, "reachedInMonths": 0},
+        {"moneyboxId": 59, "reachedInMonths": 1},
+        {"moneyboxId": 61, "reachedInMonths": 1},
+        {"moneyboxId": 60, "reachedInMonths": None},
+        {"moneyboxId": 63, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -435,11 +435,11 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 79, "reachedInMonths": 0},
-        {"moneyboxId": 76, "reachedInMonths": 5},
-        {"moneyboxId": 77, "reachedInMonths": None},
-        {"moneyboxId": 78, "reachedInMonths": 15},
-        {"moneyboxId": 80, "reachedInMonths": None},
+        {"moneyboxId": 68, "reachedInMonths": 0},
+        {"moneyboxId": 65, "reachedInMonths": 5},
+        {"moneyboxId": 66, "reachedInMonths": None},
+        {"moneyboxId": 67, "reachedInMonths": 15},
+        {"moneyboxId": 69, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -466,11 +466,11 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 85, "reachedInMonths": 0},
-        {"moneyboxId": 82, "reachedInMonths": 4},
-        {"moneyboxId": 83, "reachedInMonths": None},
-        {"moneyboxId": 84, "reachedInMonths": 12},
-        {"moneyboxId": 86, "reachedInMonths": None},
+        {"moneyboxId": 74, "reachedInMonths": 0},
+        {"moneyboxId": 71, "reachedInMonths": 4},
+        {"moneyboxId": 72, "reachedInMonths": None},
+        {"moneyboxId": 73, "reachedInMonths": 12},
+        {"moneyboxId": 75, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -497,11 +497,11 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
     assert content["total"] == 5
 
     expected_result: list[dict[str, int | None]] = [
-        {"moneyboxId": 91, "reachedInMonths": 0},
-        {"moneyboxId": 88, "reachedInMonths": 4},
-        {"moneyboxId": 89, "reachedInMonths": None},
-        {"moneyboxId": 90, "reachedInMonths": 10},
-        {"moneyboxId": 92, "reachedInMonths": None},
+        {"moneyboxId": 80, "reachedInMonths": 0},
+        {"moneyboxId": 77, "reachedInMonths": 4},
+        {"moneyboxId": 78, "reachedInMonths": None},
+        {"moneyboxId": 79, "reachedInMonths": 10},
+        {"moneyboxId": 81, "reachedInMonths": None},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):

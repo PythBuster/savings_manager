@@ -25,6 +25,7 @@ from src.custom_types import (
 )
 from src.db.db_manager import DBManager
 from src.db.models import Base
+from src.savings_distribution.automated_savings_distribution import AutomatedSavingsDistributionService
 from src.main import app, register_router
 from src.report_sender.email_sender.sender import EmailSender
 from src.singleton import limiter
@@ -362,6 +363,9 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
         ]
     )
 
+@pytest_asyncio.fixture(scope="session", name="automated_distribution_service")
+async def mocked_automated_distribution_service(db_manager: DBManager) -> AutomatedSavingsDistributionService:
+    yield AutomatedSavingsDistributionService(db_manager=db_manager)
 
 @pytest_asyncio.fixture(scope="function")
 async def admin_role_authed_client(

@@ -29,7 +29,6 @@ from src.db.core import create_instance
 from src.db.db_manager import DBManager
 from src.db.exceptions import (
     AppSettingsNotFoundError,
-    AutomatedSavingsError,
     BalanceResultIsNegativeError,
     CreateInstanceError,
     DeleteInstanceError,
@@ -47,7 +46,8 @@ from src.db.exceptions import (
     UserNameAlreadyExistError,
     UserNotFoundError,
 )
-from src.db.models import AppSettings, Moneybox, SqlBase
+from src.db.models import Moneybox, SqlBase
+from src.savings_distribution.automated_savings_distribution import AutomatedSavingsDistributionService
 from src.utils import equal_dict
 from tests.utils.db_manager import get_moneybox_id_by_name
 
@@ -68,117 +68,6 @@ async def test_create_db_manager_with_engine_args(
 ) -> None:
     db_manager = DBManager(db_settings=app_env_variables, engine_args={"echo": True})
     assert db_manager is not None
-
-
-@pytest.mark.asyncio
-async def test_overflow_moneybox_add_amount_success(
-    load_test_data: None,  # pylint:disable=unused-argument
-    db_manager: DBManager,
-) -> None:
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-    overflow_moneybox: Moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        update_overflow_moneybox = await db_manager._overflow_moneybox_add_amount(  # noqa: ignore  # pylint: disable=protected-access
-            app_settings=app_settings.asdict(),
-            overflow_moneybox=overflow_moneybox.asdict(),
-            amount=5,
-            session=session,
-        )
-
-    assert update_overflow_moneybox["balance"] == 5
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        update_overflow_moneybox = await db_manager._overflow_moneybox_add_amount(  # noqa: ignore  # pylint: disable=protected-access
-            app_settings=app_settings.asdict(),
-            overflow_moneybox=update_overflow_moneybox,
-            amount=-1,  # should not have any effect, 'falltrough' inserted moneybox
-            session=session,
-        )
-    assert update_overflow_moneybox["balance"] == 5
-
-
-@pytest.mark.asyncio
-async def test_overflow_moneybox_add_amount_fail(
-    db_manager: DBManager,
-) -> None:
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-    overflow_moneybox: Moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    overflow_moneybox_data: dict[str, Any] = overflow_moneybox.asdict()
-    overflow_moneybox_data["id"] = 1234
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        with pytest.raises(AutomatedSavingsError):
-            await db_manager._overflow_moneybox_add_amount(  # noqa: ignore  # pylint: disable=protected-access
-                app_settings=app_settings.asdict(),
-                overflow_moneybox=overflow_moneybox_data,  # with non-existing id
-                amount=5,
-                session=session,
-            )
-
-
-@pytest.mark.asyncio
-async def test_overflow_moneybox_sub_amount_success(
-    db_manager: DBManager,
-) -> None:
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-    overflow_moneybox: Moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        update_overflow_moneybox = await db_manager._overflow_moneybox_sub_amount(  # noqa: ignore  # pylint: disable=protected-access
-            app_settings=app_settings.asdict(),
-            overflow_moneybox=overflow_moneybox.asdict(),
-            amount=3,
-            session=session,
-        )
-
-    assert update_overflow_moneybox["balance"] == 2
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        update_overflow_moneybox = await db_manager._overflow_moneybox_sub_amount(  # noqa: ignore  # pylint: disable=protected-access
-            app_settings=app_settings.asdict(),
-            overflow_moneybox=update_overflow_moneybox,
-            amount=-1,  # should not have any effect, 'falltrough' inserted moneybox
-            session=session,
-        )
-    assert update_overflow_moneybox["balance"] == 2
-
-
-@pytest.mark.asyncio
-async def test_overflow_moneybox_sub_amount_fail(
-    db_manager: DBManager,
-) -> None:
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-    overflow_moneybox: Moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    overflow_moneybox_data: dict[str, Any] = overflow_moneybox.asdict()
-    overflow_moneybox_data["id"] = 1234
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        with pytest.raises(AutomatedSavingsError):
-            await db_manager._overflow_moneybox_sub_amount(  # noqa: ignore  # pylint: disable=protected-access
-                app_settings=app_settings.asdict(),
-                overflow_moneybox=overflow_moneybox_data,  # with non-existing id
-                amount=5,
-                session=session,
-            )
 
 
 @pytest.mark.asyncio
@@ -1526,7 +1415,7 @@ async def test_get_app_settings_valid(db_manager: DBManager) -> None:
 
     expected_data = {
         "is_automated_saving_active": True,
-        "savings_amount": 0,
+        "savings_amount": 150,
         "id": _app_settings.id,
         "send_reports_via_email": False,
         "user_email_address": None,
@@ -1710,11 +1599,11 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
 @pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_collect(
     load_test_data: None,  # pylint: disable=unused-argument
-    db_manager: DBManager,
+    automated_distribution_service: AutomatedSavingsDistributionService,
 ) -> None:
-    await db_manager.automated_savings()
+    await automated_distribution_service.run_automated_savings_distribution()
 
-    moneyboxes = await db_manager.get_moneyboxes()
+    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
     expected_data = {
         "Overflow Moneybox": 105,
         "Test Box 1": 5,
@@ -1731,17 +1620,14 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
     # >>>  test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
     overflow_moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
     )
-    overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
+    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
 
     last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = (
-        "Automated Savings with Overflow Moneybox Mode: "
-        f"{OverflowMoneyboxAutomatedSavingsModeType.COLLECT}"
-    )
+    expected_description = "Automated Savings."
     assert last_transaction_log["description"] == expected_description
     # <<<
 
@@ -1750,11 +1636,11 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
 @pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
     load_test_data: None,  # pylint: disable=unused-argument
-    db_manager: DBManager,
+    automated_distribution_service: AutomatedSavingsDistributionService,
 ) -> None:
-    await db_manager.automated_savings()
+    await automated_distribution_service.run_automated_savings_distribution()
 
-    moneyboxes = await db_manager.get_moneyboxes()
+    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
     expected_data = {
         "Overflow Moneybox": 105,
         "Test Box 1": 5,
@@ -1771,17 +1657,14 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
     # >>>  test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
     overflow_moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
     )
-    overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
+    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
 
     last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = (
-        "Automated Savings with Overflow Moneybox Mode: "
-        f"{OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT}"
-    )
+    expected_description = "Automated Savings with Add-Mode."
     assert last_transaction_log["description"] == expected_description
     # <<<
 
@@ -1790,11 +1673,11 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
 @pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_fill_up(
     load_test_data: None,  # pylint: disable=unused-argument
-    db_manager: DBManager,
+    automated_distribution_service: AutomatedSavingsDistributionService,
 ) -> None:
-    await db_manager.automated_savings()
+    await automated_distribution_service.run_automated_savings_distribution()
 
-    moneyboxes = await db_manager.get_moneyboxes()
+    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
     expected_data = {
         "Overflow Moneybox": 75,
         "Test Box 1": 5,
@@ -1811,17 +1694,14 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
     # >>> test case for bug: issue #71
     # - test if correct overflow moneybox mode is set in transaction log of overflow moneybox
     overflow_moneybox = (
-        await db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
     )
-    overflow_moneybox_transaction_logs = await db_manager.get_transaction_logs(
+    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
         moneybox_id=overflow_moneybox.id,
     )
 
     last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = (
-        "Automated Savings with Overflow Moneybox Mode: "
-        f"{OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES}"
-    )
+    expected_description = "Fill-Mode: Automated Savings."
     assert last_transaction_log["description"] == expected_description
     # <<<
 
@@ -2353,114 +2233,6 @@ async def test_user_by_credentials_fail(
         user_password=user_data["user_password"],
     )
     assert user is None
-
-
-@pytest.mark.asyncio
-async def test_distribute_automated_savings_amount__amount_0(
-    load_test_data: None,  # pylint: disable=unused-argument
-    db_manager: DBManager,
-) -> None:
-    distribute_amount: int = 0
-    moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
-    sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
-        moneyboxes, key=lambda item: item["priority"]
-    )
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
-            session=session,
-            distribute_amount=distribute_amount,
-            sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
-            fill_mode=False,
-            app_settings=app_settings.asdict(),
-        )
-
-    assert updated_moneyboxes == sorted_by_priority_moneyboxes
-
-
-@pytest.mark.asyncio
-async def test_distribute_automated_savings_amount__amount_negative(db_manager: DBManager) -> None:
-    distribute_amount: int = -20
-    moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
-    sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
-        moneyboxes, key=lambda item: item["priority"]
-    )
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
-            session=session,
-            distribute_amount=distribute_amount,
-            sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
-            fill_mode=False,
-            app_settings=app_settings.asdict(),
-        )
-
-    assert updated_moneyboxes == sorted_by_priority_moneyboxes
-
-
-@pytest.mark.asyncio
-async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none(  # noqa: ignore  # pylint: disable=line-too-long
-    load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
-) -> None:
-    moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
-    sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
-        moneyboxes, key=lambda item: item["priority"]
-    )
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
-            session=session,
-            distribute_amount=app_settings.savings_amount,  # 150
-            sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
-            fill_mode=True,
-            app_settings=app_settings.asdict(),
-        )
-
-    assert updated_moneyboxes[0]["balance"] == 140
-    assert updated_moneyboxes[1]["balance"] == 5
-    assert updated_moneyboxes[2]["balance"] == 5  # savings_amount = 0 but ignored in fill_mode
-    assert (
-        updated_moneyboxes[3]["balance"] == 0
-    )  # target: None and wants 10, but fill mode ignores wises
-
-
-@pytest.mark.asyncio
-async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0(
-    load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
-) -> None:
-    moneyboxes: list[dict[str, Any]] = await db_manager.get_moneyboxes()
-    sorted_by_priority_moneyboxes: list[dict[str, Any]] = sorted(
-        moneyboxes, key=lambda item: item["priority"]
-    )
-    app_settings: AppSettings = (
-        await db_manager._get_app_settings()  # noqa: ignore  # pylint: disable=protected-access
-    )
-
-    async with db_manager.async_sessionmaker.begin() as session:
-        updated_moneyboxes = await db_manager._distribute_automated_savings_amount(  # noqa: ignore  # pylint: disable=protected-access
-            session=session,
-            distribute_amount=app_settings.savings_amount,  # 150
-            sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
-            fill_mode=False,
-            app_settings=app_settings.asdict(),
-        )
-
-    assert updated_moneyboxes[0]["balance"] == 135
-    assert updated_moneyboxes[1]["balance"] == 5
-    assert updated_moneyboxes[2]["balance"] == 0  # savings_amount = 0 and respected in normal mode
-    assert (
-        updated_moneyboxes[3]["balance"] == 10
-    )  # savings_target=None, but respected savings_amount=10
-
 
 @pytest.mark.dependency
 @pytest.mark.asyncio
