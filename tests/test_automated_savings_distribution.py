@@ -112,6 +112,43 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
     # <<<
 
 @pytest.mark.asyncio
+async def test_automated_savings_overflow_moneybox_mode_ratio(
+    load_test_data: None,  # pylint: disable=unused-argument
+    automated_distribution_service: AutomatedSavingsDistributionService,
+) -> None:
+    await automated_distribution_service.run_automated_savings_distribution()
+
+    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
+    expected_data = {
+        "Overflow Moneybox": 57,
+        "Test Box 1": 5,
+        "Test Box 2": 5,
+        "Test Box 3": 36,
+        "Test Box 4": 47,
+        "Test Box 5": 0,
+        "Test Box 6": 0,
+    }
+
+    # rest: 105 for Overflow Moneybox RATIO distribution available
+    # total savings amount: 75
+    # Overflow Moneybox: 105 ratio distribution
+    # -> 105 - (16+28) = 61 rest in overflow moneybox
+
+    for moneybox in moneyboxes:
+        assert moneybox["balance"] == expected_data[moneybox["name"]]
+
+    overflow_moneybox = (
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: typing  # pylint:disable=protected-access
+    )
+    overflow_moneybox_transaction_logs = await automated_distribution_service.db_manager.get_transaction_logs(
+        moneybox_id=overflow_moneybox.id,
+    )
+
+    last_transaction_log = overflow_moneybox_transaction_logs[-1]
+    expected_description = "Ratio-Mode: Automated Savings."
+    assert last_transaction_log["description"] == expected_description
+
+@pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__amount_0(
     load_test_data: None,  # pylint: disable=unused-argument
     automated_distribution_service: AutomatedSavingsDistributionService,

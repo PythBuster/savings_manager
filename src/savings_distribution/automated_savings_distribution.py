@@ -1,4 +1,5 @@
 import math
+from functools import partial
 from typing import Any, Callable
 from datetime import datetime, timezone
 
@@ -349,27 +350,51 @@ class AutomatedSavingsDistributionService:
         if total_savings_amount <= 0:
             return {}
 
-        def _ratio_calculation(savings_amount: int):
-            """Calculates the proportion amount for the moneybox as integer to the total_savings_amount.
-            :param savings_amount: The savings amount of the current moneybox.
-            :type savings_amount: :class:`int`
-            :return: The proportion amount.
-            :rtype: :class:`int`
-            """
+        first_calculation_done: bool = False
+        moneybox_distribute_amounts: dict[int, int] = {}
+        overflow_moneybox_id: int = sorted_by_priority_moneyboxes[0]["id"]
 
-            return math.trunc(distribute_amount * (savings_amount / total_savings_amount))
+        def ratio_mode_fn(
+                reversed_sorted_by_priority_moneyboxes: list[dict[str, Any]],
+                moneybox: dict[str, Any],
+                _: int,
+        ) -> int:
+            nonlocal first_calculation_done
+            nonlocal moneybox_distribute_amounts
 
-        moneybox_distribute_amounts: dict[int, int] = {
-            moneybox["id"]: _ratio_calculation(savings_amount=moneybox["savings_amount"])
-            for moneybox in sorted_by_priority_moneyboxes[1:]
-        }
-        moneybox_distribute_amounts[0] = total_savings_amount - sum(moneybox_distribute_amounts.values())
+            # calculate the ratio amount for all moneyboxes on first call
+            if not first_calculation_done:
+                def _ratio_calculation(savings_amount: int):
+                    """Calculates the proportion amount for the moneybox as integer to the total_savings_amount.
+                    :param savings_amount: The savings amount of the current moneybox.
+                    :type savings_amount: :class:`int`
+                    :return: The proportion amount.
+                    :rtype: :class:`int`
+                    """
 
-        def ratio_mode_fn(moneybox: dict[str, Any], available_amount: int) -> int:
-            return moneybox_distribute_amounts[moneybox["id"]]
+                    moneybox_ratio = math.trunc(savings_amount * 100 / total_savings_amount)
+                    return math.trunc(distribute_amount/100*moneybox_ratio)
+
+                moneybox_distribute_amounts = {
+                    moneybox["id"]: _ratio_calculation(savings_amount=moneybox["savings_amount"])
+                    for moneybox in reversed_sorted_by_priority_moneyboxes[:-1]
+                }
+                moneybox_distribute_amounts[overflow_moneybox_id] = distribute_amount
+                first_calculation_done = True
+
+            ratio_amount: int = moneybox_distribute_amounts[moneybox["id"]]
+
+            if moneybox["id"] == overflow_moneybox_id or moneybox["savings_target"] is None:
+                moneybox_distribute_amounts[overflow_moneybox_id] -= ratio_amount
+                return ratio_amount
+
+            real_ratio_amount = min(ratio_amount, max(0, moneybox["savings_target"] - moneybox["balance"]))
+            moneybox_distribute_amounts[overflow_moneybox_id] -= real_ratio_amount
+            return real_ratio_amount
 
         return await self._calculate_distribution_by_mode(
             sorted_by_priority_moneyboxes,
             distribute_amount,
-            ratio_mode_fn,
+            partial(ratio_mode_fn, list(reversed(sorted_by_priority_moneyboxes))),
+            # for ratio mode, overflow moneybox has to be the latest one, pass reversed list
         )
