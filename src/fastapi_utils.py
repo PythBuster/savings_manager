@@ -1,16 +1,14 @@
 """The FastAPI helper functions for initializing etc.,..."""
 
-import os
 from typing import Callable
 
 from fastapi import FastAPI
-from pydantic.types import SecretType
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.staticfiles import StaticFiles
 
-from src.constants import PGPASS_FILE_PATH, WEB_UI_DIR_PATH
-from src.custom_types import AppEnvVariables, EndpointRouteType
+from src.constants import WEB_UI_DIR_PATH
+from src.custom_types import EndpointRouteType
 from src.exception_handler import response_exception
 from src.routes.app import app_router
 from src.routes.app_settings import app_settings_router

@@ -1,8 +1,5 @@
 """All app endpoints test are located here."""
 
-import asyncio
-import io
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -144,6 +141,7 @@ async def test_reset_app_delete_app_settings(
             dict_2=app_settings,
             exclude_keys=["createdAt", "modifiedAt"],
         )
+
 
 @pytest.mark.order(after="tests/test_db_manager.py::test_add_user_success")
 async def test_app_login_fail__invalid_password(

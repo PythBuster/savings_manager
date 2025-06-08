@@ -2409,7 +2409,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         moneyboxes_data = [
             {
                 "name": "Test Box 1",
-                "savings_amount": 5, # ratio: 6 -> 6 extra BUT REFUSED (-> in overflow), result 5
+                "savings_amount": 5,  # ratio: 6 -> 6 extra BUT REFUSED (-> in overflow), result 5
                 "savings_target": 5,
                 "priority": 1,
             },
@@ -2549,8 +2549,6 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         async with self.db_manager.async_sessionmaker.begin() as session:
             stmt = insert(AppSettings).values(**app_settings_data)
             await session.execute(stmt)
-
-
 
     async def dataset_test_task_automated_savings_schedule(self) -> None:
         """The data generation function for test_case:
@@ -2821,7 +2819,7 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         `test_send_testemail_success`.
         """
 
-        self.truncate_tables()
+        await self.truncate_tables()
 
         # create app settings
         distribution_amount = 150

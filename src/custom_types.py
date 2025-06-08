@@ -220,10 +220,11 @@ class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
 
     RATIO = "ratio"
     """Mode RATIO distributes the overflow proportionally to the configured monthly savings amounts
-    of all moneyboxes with a savings rate greater than 0. Any portion that cannot be assigned due to a
-    reached savings_target is returned to the overflow moneybox and carried forward into the
+    of all moneyboxes with a savings rate greater than 0. Any portion that cannot be assigned due
+    to a reached savings_target is returned to the overflow moneybox and carried forward into the
     next savings_distribution cycle.
     """
+
 
 @dataclass(frozen=True)
 class MoneyboxSavingsMonthData:

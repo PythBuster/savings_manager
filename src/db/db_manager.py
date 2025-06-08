@@ -32,7 +32,6 @@ from alembic.config import CommandLine
 from src.custom_types import (
     ActionType,
     AppEnvVariables,
-    OverflowMoneyboxAutomatedSavingsModeType,
     TransactionTrigger,
     TransactionType,
     UserRoleType,
@@ -46,7 +45,6 @@ from src.db.core import (
 )
 from src.db.exceptions import (
     AppSettingsNotFoundError,
-    AutomatedSavingsError,
     BalanceResultIsNegativeError,
     CreateInstanceError,
     DeleteInstanceError,
@@ -76,6 +74,7 @@ from src.db.models import (
     User,
 )
 from src.utils import get_database_url
+
 
 class DBManager:  # pylint: disable=too-many-public-methods
     """All db manager logic is located here."""

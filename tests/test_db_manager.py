@@ -1,11 +1,9 @@
 # pylint: disable=too-many-lines
 
 """All db_manager tests are located here."""
-import io
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from typing import Any, cast
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from fastapi.encoders import jsonable_encoder
@@ -34,13 +32,11 @@ from src.db.exceptions import (
     DeleteInstanceError,
     HasBalanceError,
     InconsistentDatabaseError,
-    MissingDependencyError,
     MoneyboxNameNotFoundError,
     MoneyboxNotFoundError,
     NonPositiveAmountError,
     OverflowMoneyboxNotFoundError,
     OverflowMoneyboxUpdatedError,
-    ProcessCommunicationError,
     TransferEqualMoneyboxError,
     UpdateInstanceError,
     UserNameAlreadyExistError,
@@ -58,6 +54,7 @@ async def test_if_test_db_is_used(db_manager: DBManager) -> None:
         db_manager.db_connection_string
         == "postgresql+asyncpg://test_postgres:test_postgres@localhost:8765/savings_manager"
     )
+
 
 @pytest.mark.asyncio
 async def test_create_db_manager_with_engine_args(
@@ -1591,6 +1588,7 @@ async def test_get_automated_savings_logs(db_manager: DBManager, action_type: Ac
             exclude_keys=["created_at", "modified_at", "id", "action_at"],
         )
 
+
 @pytest.mark.asyncio
 async def test_reset_database_keep_app_settings(
     load_test_data: None, db_manager: DBManager  # pylint: disable=unused-argument
@@ -1625,6 +1623,7 @@ async def test_reset_database_keep_app_settings(
         assert len(moneyboxes) == 1
 
         mock_main.assert_called()
+
 
 @pytest.mark.asyncio
 async def test_reset_database_delete_app_settings(
@@ -1948,6 +1947,7 @@ async def test_user_by_credentials_fail(
         user_password=user_data["user_password"],
     )
     assert user is None
+
 
 @pytest.mark.dependency
 @pytest.mark.asyncio

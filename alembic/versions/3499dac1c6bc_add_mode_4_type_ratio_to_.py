@@ -1,7 +1,8 @@
 """Redefine overflowmoneyboxautomatedsavingsmodetype enum with RATIO"""
 
-from alembic import op
 from typing import Sequence, Union
+
+from alembic import op
 
 # Revision identifiers
 revision: str = '3499dac1c6bc'

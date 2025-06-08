@@ -1,28 +1,23 @@
 """The general/basic root routes."""
 
-import io
-from datetime import datetime
 from typing import Annotated, Any, cast
 
 from async_fastapi_jwt_auth import AuthJWT
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.requests import Request
-from starlette.responses import JSONResponse, Response, StreamingResponse
+from starlette.responses import JSONResponse, Response
 
 from src.auth.jwt_auth import UserAuthJWTBearer
 from src.custom_types import EndpointRouteType
 from src.data_classes.requests import LoginUserRequest, ResetDataRequest
 from src.data_classes.responses import AppInfoResponse, LoginUserResponse
 from src.db.db_manager import DBManager
-from src.db.exceptions import InvalidFileError
 from src.routes.exceptions import BadUsernameOrPasswordError
 from src.routes.responses.app import (
     DELETE_APP_LOGOUT_RESPONSES,
-    GET_APP_EXPORT_RESPONSES,
     GET_APP_METADATA_RESPONSES,
-    POST_APP_IMPORT_RESPONSES,
     POST_APP_LOGIN_RESPONSES,
     POST_APP_RESET_RESPONSES,
 )
@@ -84,6 +79,7 @@ async def post_app_reset_endpoint(
     )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 
 @app_router.post(
     "/login",

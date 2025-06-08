@@ -9,8 +9,10 @@ from src.custom_types import ActionType
 from src.db.db_manager import DBManager
 from src.db.models import AppSettings
 from src.decorators import every
-from src.savings_distribution.automated_savings_distribution import AutomatedSavingsDistributionService
 from src.report_sender.email_sender.sender import EmailSender
+from src.savings_distribution.automated_savings_distribution import (
+    AutomatedSavingsDistributionService,
+)
 
 
 class BackgroundTaskRunner:
@@ -26,9 +28,9 @@ class BackgroundTaskRunner:
     """
 
     def __init__(
-            self,
-            db_manager: DBManager,
-            email_sender: EmailSender,
+        self,
+        db_manager: DBManager,
+        email_sender: EmailSender,
     ) -> None:
         """Initialize the BackgroundTaskRunner instance.
 
@@ -150,7 +152,9 @@ class BackgroundTaskRunner:
                     already_done = True
 
             if not already_done:
-                result: bool = await self.automated_distribution_service.run_automated_savings_distribution()
+                result: bool = (
+                    await self.automated_distribution_service.run_automated_savings_distribution()
+                )
 
                 if result:
                     await self.print_task(

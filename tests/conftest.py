@@ -25,9 +25,11 @@ from src.custom_types import (
 )
 from src.db.db_manager import DBManager
 from src.db.models import Base
-from src.savings_distribution.automated_savings_distribution import AutomatedSavingsDistributionService
 from src.main import app, register_router
 from src.report_sender.email_sender.sender import EmailSender
+from src.savings_distribution.automated_savings_distribution import (
+    AutomatedSavingsDistributionService,
+)
 from src.singleton import limiter
 from tests.utils.db_test_data_initializer import DBTestDataInitializer
 
@@ -263,7 +265,15 @@ async def mocked_email_sender(
     db_manager: DBManager,
     app_env_variables: AppEnvVariables,
 ) -> AsyncGenerator:
-    """The email sender fixture."""
+    """The email sender fixture.
+
+    :param db_manager: The database manager.
+    :type db_manager: :class:`DBManager`
+    :param app_env_variables: The app env variables.
+    :type app_env_variables: :class:`AppEnvVariables`
+    :return: The email sender.
+    :rtype: AsyncGenerator
+    """
 
     email_sender = EmailSender(
         db_manager=db_manager,
@@ -277,6 +287,10 @@ async def mocked_email_sender(
 async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> AsyncGenerator:
     """A fixture that creates a fastapi test client.
 
+    :param db_manager: The database manager.
+    :type db_manager: :class:`DBManager`
+    :param email_sender: The email sender.
+    :type email_sender: :class:`EmailSender`
     :return: A test client.
     :rtype: AsyncGenerator
     """
@@ -299,6 +313,8 @@ async def mocked_client(db_manager: DBManager, email_sender: EmailSender) -> Asy
 async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  # type: ignore
     """A fixture to create the db_manager.
 
+    :param app_env_variables: The app env variables.
+    :type app_env_variables: :class:`AppEnvVariables`
     :return: The DBManager connected to the test database.
     :rtype: AsyncGenerator
     """
@@ -363,9 +379,21 @@ async def mocked_db_manager(app_env_variables: AppEnvVariables) -> DBManager:  #
         ]
     )
 
+
 @pytest_asyncio.fixture(scope="session", name="automated_distribution_service")
-async def mocked_automated_distribution_service(db_manager: DBManager) -> AutomatedSavingsDistributionService:
+async def mocked_automated_distribution_service(
+    db_manager: DBManager,
+) -> AsyncGenerator:
+    """A fixture to create the automated_distribution_service.
+
+    :param db_manager: The database manager.
+    :type db_manager: :class:`DBManager`
+    :return: The AsyncGenerator.
+    :rtype: :class:`AsyncGenerator`
+    """
+
     yield AutomatedSavingsDistributionService(db_manager=db_manager)
+
 
 @pytest_asyncio.fixture(scope="function")
 async def admin_role_authed_client(

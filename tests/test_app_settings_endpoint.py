@@ -14,6 +14,7 @@ async def test_get_app_settings_status_200(
     client: AsyncClient,
 ) -> None:
     """Test the get_app_settings endpoint with a valid app_settings_id."""
+
     response = await client.get(
         f"/{EndpointRouteType.APP_ROOT}/{EndpointRouteType.APP_SETTINGS}",
     )

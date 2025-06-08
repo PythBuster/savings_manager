@@ -20,7 +20,6 @@ from src.fastapi_utils import handle_requests, register_router
 from src.report_sender.email_sender.sender import EmailSender
 from src.task_runner import BackgroundTaskRunner
 from src.utils import get_app_data, get_app_env_variables
-from src.savings_distribution.automated_savings_distribution import AutomatedSavingsDistributionService
 
 # load general environments (postgres_server.env.general file)
 load_dotenv(dotenv_path=GENERAL_ENV_FILE_PATH)

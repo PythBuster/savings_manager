@@ -231,8 +231,11 @@ def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
     ],
 )
 def test_calculate_savings_forecast__all_combinations(
-    savings_amount, overflow_balance, mode, expected
-):
+    savings_amount: int,
+    overflow_balance: int,
+    mode: OverflowMoneyboxAutomatedSavingsModeType,
+    expected: dict[int, int | None],
+) -> None:
     result = calculate_savings_forecast(
         moneyboxes=create_test_moneyboxes(overflow_balance),
         app_settings={
