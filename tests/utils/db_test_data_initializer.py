@@ -125,6 +125,10 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_automated_savings_overflow_moneybox_mode_add_to_amount": self.dataset_test_automated_savings_overflow_moneybox_mode_add_to_amount,
             "test_automated_savings_overflow_moneybox_mode_fill_up": self.dataset_test_automated_savings_overflow_moneybox_mode_fill_up,
             "test_automated_savings_overflow_moneybox_mode_ratio": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio,
+            "test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox,
+            "test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox,
+            "test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox,
+            "test_automated_savings_overflow_moneybox_mode_fill__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_fill__only_overflow_moneybox,
             "test_task_automated_savings_schedule": self.dataset_test_task_automated_savings_schedule,
             "test_task_automated_savings_dont_schedule": self.dataset_test_task_automated_savings_dont_schedule,
             "test_task_automated_savings_no_email_send": self.dataset_test_task_automated_savings_no_email_send,
@@ -2449,6 +2453,104 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
+
+    async def dataset_test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+    async def dataset_test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+    async def dataset_test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+    async def dataset_test_automated_savings_overflow_moneybox_mode_fill__only_overflow_moneybox(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_automated_savings_overflow_moneybox_mode_fill__only_overflow_moneybox`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+
 
     async def dataset_test_task_automated_savings_schedule(self) -> None:
         """The data generation function for test_case:

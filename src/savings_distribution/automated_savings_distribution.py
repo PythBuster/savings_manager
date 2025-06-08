@@ -63,10 +63,7 @@ class AutomatedSavingsDistributionService:
             distribution_amount: int = app_settings.savings_amount
 
             # for MODE 2: ADD
-            if action is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT:
-                # remove balance from overflow moneybox
-                overflow_moneybox_amount: int = sorted_moneyboxes[0]["balance"]
-
+            if action is OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT and (overflow_moneybox_amount:=sorted_moneyboxes[0]["balance"]) > 0:
                 withdraw_transaction_data: dict[str, int | str] = {
                     "amount": overflow_moneybox_amount,
                     "description": transaction_description,
@@ -103,10 +100,7 @@ class AutomatedSavingsDistributionService:
             # Mode 3: FILL and Mode 4: RATIO
             # -> if overflow moneybox has balance to distribute
             # -> empty overflow moneybox balance and distribute it
-            if action in POST_DISTRIBUTION_MODES and updated_moneyboxes[0]["balance"] > 0:
-                # remove balance from overflow moneybox
-                overflow_moneybox_amount = updated_moneyboxes[0]["balance"]
-
+            if action in POST_DISTRIBUTION_MODES and (overflow_moneybox_amount:=updated_moneyboxes[0]["balance"]) > 0:
                 withdraw_transaction_data: dict[str, int | str] = {
                     "amount": overflow_moneybox_amount,
                     "description": transaction_description,
@@ -345,14 +339,14 @@ class AutomatedSavingsDistributionService:
         :rtype: :class:`dict[int, int]`
         """
 
+        overflow_moneybox_id: int = sorted_by_priority_moneyboxes[0]["id"]
         total_savings_amount: int = sum(item["savings_amount"] for item in sorted_by_priority_moneyboxes)
 
-        if total_savings_amount <= 0:
-            return {}
+        if total_savings_amount <= 0:  # at least, only overflow moneybox can get something
+            return {overflow_moneybox_id: distribute_amount}
 
         first_calculation_done: bool = False
         moneybox_distribute_amounts: dict[int, int] = {}
-        overflow_moneybox_id: int = sorted_by_priority_moneyboxes[0]["id"]
 
         def ratio_mode_fn(
                 reversed_sorted_by_priority_moneyboxes: list[dict[str, Any]],
