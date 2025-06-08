@@ -23,7 +23,9 @@ from src.routes.responses.moneyboxes import (
     GET_MONEYBOXES_RESPONSES,
     GET_SAVINGS_FORECAST_RESPONSES,
 )
-from src.utils import calculate_savings_forecast
+from src.savings_distribution.automated_savings_distribution import (
+    AutomatedSavingsDistributionService,
+)
 
 moneyboxes_router: APIRouter = APIRouter(
     prefix=f"/{EndpointRouteType.MONEYBOXES}",
@@ -99,7 +101,7 @@ async def get_savings_forecast_endpoint(
     )
 
     reaching_savings_targets: dict[int, list[MoneyboxSavingsMonthData]] = (
-        calculate_savings_forecast(
+        await AutomatedSavingsDistributionService.calculate_savings_forecast(
             moneyboxes=moneyboxes_data,
             app_settings=app_settings.asdict(),
             overflow_moneybox_mode=overflow_moneybox_mode,

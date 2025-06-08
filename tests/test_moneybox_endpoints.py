@@ -163,9 +163,9 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
 
     assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
     assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
-    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 11
     assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
-    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 2
 
 
 @pytest.mark.dependency
@@ -195,9 +195,9 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
 
     assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
     assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
-    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 11
     assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
-    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 2
 
 
 @pytest.mark.dependency
@@ -227,9 +227,9 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
 
     assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
     assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
-    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 11
     assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
-    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 1
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 2
 
 
 @pytest.mark.dependency
@@ -447,7 +447,7 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
 
     assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
     assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 5
-    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 11
     assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 10
     assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
 
@@ -478,7 +478,7 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
 
     assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
     assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 4
-    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 9
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 10
     assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 9
     assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
 
@@ -501,7 +501,7 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
         {"moneyboxId": 76, "reachedInMonths": 4},
         {"moneyboxId": 77, "reachedInMonths": None},
         {"moneyboxId": 78, "reachedInMonths": 10},
-        {"moneyboxId": 80, "reachedInMonths": None},
+        {"moneyboxId": 80, "reachedInMonths": 11},
     ]
 
     for dict_1, dict_2 in zip(content["moneyboxForecasts"], expected_result):
@@ -509,9 +509,9 @@ async def test_savings_forecast__status_200__with_savings_amount__overflow_balan
 
     assert len(content["moneyboxForecasts"][0]["monthlyDistributions"]) == 0
     assert len(content["moneyboxForecasts"][1]["monthlyDistributions"]) == 4
-    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 7
+    assert len(content["moneyboxForecasts"][2]["monthlyDistributions"]) == 9
     assert len(content["moneyboxForecasts"][3]["monthlyDistributions"]) == 6
-    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 0
+    assert len(content["moneyboxForecasts"][4]["monthlyDistributions"]) == 1
 
 
 @pytest.mark.dependency

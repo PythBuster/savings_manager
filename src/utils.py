@@ -2,7 +2,6 @@
 
 import os
 import tomllib
-from collections import defaultdict
 from functools import cache
 from pathlib import Path
 from typing import Any, Sequence
@@ -16,8 +15,6 @@ from src.custom_types import (
     AppEnvVariables,
     DBViolationErrorType,
     EnvironmentType,
-    MoneyboxSavingsMonthData,
-    OverflowMoneyboxAutomatedSavingsModeType,
 )
 
 
@@ -176,180 +173,6 @@ def tabulate_str(headers: Sequence, rows: Sequence, show_index: bool = False) ->
         tablefmt="plain",
         showindex=show_index,
     )
-
-
-def calculate_savings_forecast(  # noqa: E501  # pylint: disable=line-too-long, too-many-locals, too-many-branches, too-many-statements
-    moneyboxes: list[dict[str, Any]],
-    app_settings: dict[str, Any],
-    overflow_moneybox_mode: OverflowMoneyboxAutomatedSavingsModeType,
-) -> dict[int, list[MoneyboxSavingsMonthData]]:
-    """Calculates a forecast for each moneybox, including the estimated month the savings target
-    will be reached and the monthly allocated amounts over the next months.
-
-    :param moneyboxes: The moneyboxes the calculation will be work with.
-    :param app_settings: The settings data of the app.
-    :param overflow_moneybox_mode: The current overflow moneybox mode.
-    :return: The calculated months for reaching savings amount. The Overflow Moneybox
-        is not a part of the results.
-    :raises: ValueError: if overflow mode is unknown.
-    """
-
-    if not moneyboxes or not app_settings["is_automated_saving_active"]:
-        return {}
-
-    def _get_active_moneyboxes_with_targets(
-        _moneyboxes: list[dict[str, Any]],
-    ) -> list[dict[str, Any]]:
-        return [
-            mb
-            for mb in _moneyboxes
-            if mb["savings_target"] is not None
-            and mb["balance"] < mb["savings_target"]
-            and (
-                mb["savings_amount"] > 0
-                or (
-                    overflow_moneybox_mode
-                    == OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-                    and overflow_moneybox["balance"] > 0
-                )
-            )
-            and mb["id"] != overflow_moneybox["id"]
-        ]
-
-    def _total_balances_with_targets(_moneyboxes: list[dict[str, Any]]) -> int:
-        return sum(mb["balance"] for mb in _moneyboxes if mb["savings_target"] is not None)
-
-    def _amount_until_target(mb: dict[str, Any]) -> int:
-        return max(0, mb["savings_target"] - mb["balance"])
-
-    def _distribute_amount(mb: dict[str, Any], amount: int, month: int) -> None:
-        mb["balance"] += amount
-        history = moneybox_with_savings_target_distribution_data[mb["id"]]
-
-        if history and history[-1].month == month:
-            prev_amount = history[-1].amount or 0
-            history[-1] = MoneyboxSavingsMonthData(
-                moneybox_id=mb["id"], month=month, amount=prev_amount + amount
-            )
-        else:
-            history.append(
-                MoneyboxSavingsMonthData(moneybox_id=mb["id"], month=month, amount=amount)
-            )
-
-    moneyboxes_reached_targets: set[int] = set()
-    moneybox_with_savings_target_distribution_data: dict[int, list[MoneyboxSavingsMonthData]] = (
-        defaultdict(list)
-    )
-    moneyboxes_sorted = sorted(moneyboxes, key=lambda item: item["priority"])
-    overflow_moneybox = moneyboxes_sorted[0]
-    moneyboxes_main = moneyboxes_sorted[1:]
-
-    for mb in moneyboxes_main:
-        if mb["savings_target"] is not None and mb["balance"] >= mb["savings_target"]:
-            moneybox_with_savings_target_distribution_data[mb["id"]].append(
-                MoneyboxSavingsMonthData(moneybox_id=mb["id"], amount=None, month=0)
-            )
-            moneyboxes_reached_targets.add(mb["id"])
-
-    additive_modes = {
-        OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
-        OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
-    }
-
-    has_amount = (
-        (overflow_moneybox["balance"] + app_settings["savings_amount"])
-        if overflow_moneybox_mode in additive_modes
-        else app_settings["savings_amount"]
-    ) > 0
-
-    if not has_amount:
-        for mb in moneyboxes_main:
-            if mb["id"] not in moneyboxes_reached_targets:
-                moneybox_with_savings_target_distribution_data[mb["id"]].append(
-                    MoneyboxSavingsMonthData(moneybox_id=mb["id"], amount=None, month=-1)
-                )
-        return moneybox_with_savings_target_distribution_data
-
-    simulated_month = 1
-    last_known_total_balances = -1
-
-    while _get_active_moneyboxes_with_targets(moneyboxes_main):
-        match overflow_moneybox_mode:
-            case OverflowMoneyboxAutomatedSavingsModeType.COLLECT:
-                current_savings_amount = app_settings["savings_amount"]
-            case OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT:
-                current_savings_amount = (
-                    app_settings["savings_amount"] + overflow_moneybox["balance"]
-                )
-                overflow_moneybox["balance"] = 0
-            case OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES:
-                current_savings_amount = app_settings["savings_amount"]
-            case _:
-                raise ValueError(f"Unsupported overflow moneybox mode {overflow_moneybox_mode=}")
-
-        for mb in moneyboxes_main:
-            if mb["id"] in moneyboxes_reached_targets:
-                continue
-
-            dist_amount = min(current_savings_amount, mb["savings_amount"])
-
-            if mb["savings_target"] is not None:
-                dist_amount = min(dist_amount, _amount_until_target(mb))
-
-            if dist_amount > 0:
-                _distribute_amount(mb, dist_amount, simulated_month)
-
-                if mb["savings_target"] is not None and mb["balance"] >= mb["savings_target"]:
-                    moneyboxes_reached_targets.add(mb["id"])
-
-                current_savings_amount -= dist_amount
-
-            if current_savings_amount <= 0:
-                break
-
-        if current_savings_amount > 0:
-            overflow_moneybox["balance"] += current_savings_amount
-
-        if (
-            overflow_moneybox_mode
-            is OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
-        ):
-            for mb in _get_active_moneyboxes_with_targets(moneyboxes_main):
-                dist_amount = min(_amount_until_target(mb), overflow_moneybox["balance"])
-
-                if dist_amount > 0:
-                    _distribute_amount(mb, dist_amount, simulated_month)
-                    overflow_moneybox["balance"] -= dist_amount
-
-                    if mb["savings_target"] is not None and mb["balance"] >= mb["savings_target"]:
-                        moneyboxes_reached_targets.add(mb["id"])
-
-                    if overflow_moneybox["balance"] <= 0:
-                        break
-
-        simulated_month += 1
-        current_total_balances = _total_balances_with_targets(moneyboxes_main)
-
-        if current_total_balances == last_known_total_balances:
-            break
-
-        last_known_total_balances = current_total_balances
-
-    non_target_reached_moneybox_ids = [
-        mb["id"] for mb in _get_active_moneyboxes_with_targets(moneyboxes_main)
-    ]
-
-    for mb in moneyboxes_main:
-        if (
-            mb["savings_target"] is None
-            or (mb["savings_target"] > 0 and mb["savings_amount"] == 0)
-            or mb["id"] in non_target_reached_moneybox_ids
-        ):
-            moneybox_with_savings_target_distribution_data[mb["id"]].append(
-                MoneyboxSavingsMonthData(moneybox_id=mb["id"], amount=None, month=-1)
-            )
-
-    return moneybox_with_savings_target_distribution_data
 
 
 async def extract_database_violation_error(error_message: str) -> DBViolationErrorType:

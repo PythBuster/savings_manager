@@ -4,6 +4,7 @@ from typing import Any
 
 import pytest
 
+from src.custom_types import OverflowMoneyboxAutomatedSavingsModeType
 from src.db.models import AppSettings
 from src.savings_distribution.automated_savings_distribution import (
     AutomatedSavingsDistributionService,
@@ -379,3 +380,142 @@ async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_wi
     assert (
         updated_moneyboxes[3]["balance"] == 10
     )  # savings_target=None, but respected savings_amount=10
+
+
+
+def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
+    return [
+        {  # overflow moneybox
+            "id": 1,
+            "priority": 0,
+            "balance": overflow_balance,
+            "savings_amount": 0,
+            "savings_target": None,
+        },
+        {  # reached at init
+            "id": 2,
+            "priority": 1,
+            "balance": 1000,
+            "savings_amount": 500,
+            "savings_target": 1000,
+        },
+        {  # will reach target over time: needs 3 × 1000 => last payment in month 2 (0-based)
+            "id": 3,
+            "priority": 2,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": 3000,
+        },
+        {  # no target
+            "id": 4,
+            "priority": 3,
+            "balance": 0,
+            "savings_amount": 1000,
+            "savings_target": None,
+        },
+        {  # unreachable
+            "id": 5,
+            "priority": 4,
+            "balance": 0,
+            "savings_amount": 0,
+            "savings_target": 1000,
+        },
+    ]
+
+
+@pytest.mark.parametrize(
+    "savings_amount, overflow_balance, mode, expected",
+    [
+        # COLLECT
+        (1000, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: 3, 4: None, 5: None}),
+        (0, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: None, 4: None, 5: None}),
+        (
+            0,
+            250,
+            OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            1000,
+            3000,
+            OverflowMoneyboxAutomatedSavingsModeType.COLLECT,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        # ADD
+        (
+            1000,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        (
+            0,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            0,
+            250,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            1000,
+            3000,
+            OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        # FILL
+        (
+            1000,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        (
+            0,
+            0,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            0,
+            250,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+            1000,
+            3000,
+            OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
+            {2: 0, 3: 1, 4: None, 5: 1},
+        ),
+    ],
+)
+async def test_calculate_savings_forecast__all_combinations(
+    savings_amount: int,
+    overflow_balance: int,
+    mode: OverflowMoneyboxAutomatedSavingsModeType,
+    expected: dict[int, int | None],
+) -> None:
+    result = await AutomatedSavingsDistributionService.calculate_savings_forecast(
+        moneyboxes=create_test_moneyboxes(overflow_balance),
+        app_settings={
+            "is_automated_saving_active": True,
+            "savings_amount": savings_amount,
+        },
+        overflow_moneybox_mode=mode,
+    )
+
+    assert 1 not in result  # overflow moneybox is excluded from result
+
+    for moneybox_id, expected_month in expected.items():
+        assert moneybox_id in result
+        last_month = result[moneybox_id][-1].month
+        if expected_month is None:
+            assert last_month == -1, f"Moneybox {moneybox_id}: expected month {expected_month}, got {last_month}"
+        else:
+            assert (
+                last_month == expected_month
+            ), f"Moneybox {moneybox_id}: expected month {expected_month}, got {last_month}"
