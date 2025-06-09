@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.40.2 (2025-06-09)
+### Fixes:
+- remove flag to deactivate transaction log, set created_at for each transaction log manually
+
 ## 2.40.1 (2025-06-09)
 ### Fixes:
 - implement flag to deactivate transaction log, is used for overflow moneybox in automated distribution mode
