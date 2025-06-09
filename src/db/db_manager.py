@@ -849,7 +849,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
             return counterparty_moneybox_name
 
-        return [
+        transactions: list[dict[str, Any]] = sorted([
             transaction.asdict(exclude=["modified_at"])
             | {
                 "counterparty_moneybox_name": await resolve_moneybox_name(
@@ -858,7 +858,17 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 )
             }
             for transaction in moneybox.transactions_log
-        ]
+        ], key=lambda item: (item["created_at"]), reverse=True)
+
+        # The tricky part: Automated savings distribution will write more than 1 log at
+        #   the same time. especially in Overflow Moneybox modes != COLLECT.
+        #   To list the transaction logs in the correct order and to understand the
+        #   history of balance changes, we need to sort the transaction logs by balance
+        #   change for Moneyboxes and the Overflow Moneybox in different ways:
+        if moneybox_id == _overflow_moneybox.id:
+            return sorted(transactions, key=lambda item: item["balance"], reverse=False)
+
+        return sorted(transactions, key=lambda item: item["balance"], reverse=True)
 
     async def _get_historical_moneybox_name(self, moneybox_id: int, from_datetime: datetime) -> str:
         """Get historical moneybox name for the given moneybox id within given datetime.

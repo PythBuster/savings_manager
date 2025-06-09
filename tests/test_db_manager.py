@@ -938,8 +938,8 @@ async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
         "description": "Bonus.",
         "transaction_type": TransactionType.DIRECT,
         "transaction_trigger": TransactionTrigger.MANUALLY,
-        "amount": 1,
-        "balance": 1,
+        "amount": 10,
+        "balance": 11,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
         "moneybox_id": first_moneybox_id,
@@ -948,8 +948,8 @@ async def test_add_amount_to_first_moneybox(db_manager: DBManager) -> None:
         "description": "Bonus.",
         "transaction_type": TransactionType.DIRECT,
         "transaction_trigger": TransactionTrigger.MANUALLY,
-        "amount": 10,
-        "balance": 11,
+        "amount": 1,
+        "balance": 1,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
         "moneybox_id": first_moneybox_id,
@@ -1071,7 +1071,6 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
         "counterparty_moneybox_name": None,
         "moneybox_id": first_moneybox_id,
     }
-
     expected_withdraw_dict_2 = {
         "description": "",
         "transaction_type": TransactionType.DIRECT,
@@ -1084,7 +1083,7 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
     }
 
     assert len(transaction_logs) == 4
-    assert transaction_logs[2] == expected_withdraw_dict_1
+    assert transaction_logs[1] == expected_withdraw_dict_1
     assert transaction_logs[3] == expected_withdraw_dict_2
 
     # expected exception tests
@@ -1227,8 +1226,8 @@ async def test_transfer_amount(db_manager: DBManager) -> None:
 
     assert len(transaction_logs_moneybox_1) == 5
     assert len(transaction_logs_moneybox_2) == 1
-    assert expected_transfer_dict_moneybox_1 == transaction_logs_moneybox_1[-1]
-    assert expected_transfer_dict_moneybox_2 == transaction_logs_moneybox_2[-1]
+    assert expected_transfer_dict_moneybox_1 == transaction_logs_moneybox_1[0]
+    assert expected_transfer_dict_moneybox_2 == transaction_logs_moneybox_2[0]
 
     # expected exception tests
     with pytest.raises(ValidationError):
@@ -1398,7 +1397,7 @@ async def test_transactions_logs_between_overflow_moneybox(
 
     transaction_logs = await db_manager.get_transaction_logs(moneybox_id=first_moneybox_id)
     assert len(transaction_logs) == 6
-    assert transaction_logs[-1]["counterparty_moneybox_name"] == "Overflow Moneybox"
+    assert transaction_logs[1]["counterparty_moneybox_name"] == "Overflow Moneybox"
 
 
 @pytest.mark.dependency(depends=["test_transactions_logs_between_overflow_moneybox"])

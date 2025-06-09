@@ -102,8 +102,12 @@ allowed_origins = [
     # dev
     "http://127.0.0.1:5173",
     "http://localhost:5173",
+
     "http://127.0.0.1:5000",
     "http://localhost:5000",
+
+    "http://127.0.0.1:8001",
+    "http://localhost:8001",
 ]
 app.add_middleware(
     CORSMiddleware,  # type: ignore
