@@ -520,12 +520,6 @@ class AutomatedSavingsDistributionService:
                 )
             )
 
-            if (
-                len(moneybox_distribution_amounts) == 1
-                and overflow_moneybox_id in moneybox_distribution_amounts
-            ):
-                break
-
             for mb in moneyboxes_sorted_by_priority:
                 dist_amount: int = moneybox_distribution_amounts.get(mb["id"], 0)
 
@@ -571,13 +565,17 @@ class AutomatedSavingsDistributionService:
 
         for mb in moneyboxes_sorted_by_priority:
             if (
-                    mb["id"] not in distributed_moneybox_ids or  # not ever distributed
+                    mb["id"] not in distributed_moneybox_ids or  # never got distributed savings
                     mb["savings_target"] is None or  # will never be full
                     mb["balance"] < mb["savings_target"]  # could be full but no more distributions
             ):
-                moneybox_with_savings_target_distribution_data[mb["id"]].append(
-                    MoneyboxSavingsMonthData(moneybox_id=mb["id"], amount=None, month=-1)
-                )
+                # only add -1 marker if the last entry is not set already with -1
+                if not moneybox_with_savings_target_distribution_data[mb["id"]] or (
+                        moneybox_with_savings_target_distribution_data[mb["id"]][-1].month != -1
+                ):
+                    moneybox_with_savings_target_distribution_data[mb["id"]].append(
+                        MoneyboxSavingsMonthData(moneybox_id=mb["id"], amount=None, month=-1)
+                    )
 
         if overflow_moneybox_id in moneybox_with_savings_target_distribution_data:
             del moneybox_with_savings_target_distribution_data[overflow_moneybox_id]

@@ -113,7 +113,7 @@ from src.savings_distribution.automated_savings_distribution import (
             ],
             {"is_automated_saving_active": True, "savings_amount": 50},
             OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
-            {1: 2, 2: -1},
+            {1: 2, 2: 3},
         ),
         (  # 8
             [
@@ -175,7 +175,7 @@ from src.savings_distribution.automated_savings_distribution import (
             ],
             {"is_automated_saving_active": True, "savings_amount": 100},
             OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
-            {1: 1, 3: 2},
+            {1: 1, 2: -1, 3: 2},
         ),
         (  # 11
             [
@@ -299,6 +299,36 @@ from src.savings_distribution.automated_savings_distribution import (
             {"is_automated_saving_active": True, "savings_amount": 50},
             OverflowMoneyboxAutomatedSavingsModeType.ADD_TO_AUTOMATED_SAVINGS_AMOUNT,
             {1: -1, 2: -1},
+        ),
+        (  # 16
+                [
+                    {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
+                    {"id": 1, "balance": 0, "savings_amount": 1, "savings_target": 50, "priority": 1},
+                    {"id": 2, "balance": 0, "savings_amount": 1, "savings_target": 50, "priority": 2},
+                ],
+                {"is_automated_saving_active": True, "savings_amount": 50},
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+                {1: 2, 2: 2},
+        ),
+        (  # 17
+                [
+                    {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
+                    {"id": 1, "balance": 0, "savings_amount": 0, "savings_target": 50, "priority": 1},
+                    {"id": 2, "balance": 0, "savings_amount": 0, "savings_target": 50, "priority": 2},
+                ],
+                {"is_automated_saving_active": True, "savings_amount": 50},
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+                {1: -1, 2: -1},
+        ),
+        (  # 18
+                [
+                    {"id": 0, "balance": 0, "savings_amount": 0, "savings_target": None, "priority": 0},
+                    {"id": 1, "balance": 0, "savings_amount": 1, "savings_target": 50, "priority": 1},
+                    {"id": 2, "balance": 0, "savings_amount": 0, "savings_target": 50, "priority": 2},
+                ],
+                {"is_automated_saving_active": True, "savings_amount": 50},
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+                {1: 1, 2: -1},
         ),
     ],
 )
