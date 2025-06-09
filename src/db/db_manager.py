@@ -398,7 +398,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
         deposit_transaction_data: dict[str, Any],
         transaction_type: TransactionType,
         transaction_trigger: TransactionTrigger,
-        without_transaction_log: bool = False,
         session: AsyncSession | None = None,
     ) -> dict[str, Any]:
         """DB Function to add amount to moneybox by moneybox_id.
@@ -411,9 +410,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :type transaction_type: :class:`TransactionType`
         :param transaction_trigger: The transaction trigger for the transaction.
         :type transaction_trigger: :class:`TransactionTrigger`
-        :param without_transaction_log: If True, then the transaction will not be logged,
-            default is False.
-        :type without_transaction_log: :class:`bool`
         :param session: The current session of the db creation.
         :type session: :class:`AsyncSession`
 
@@ -461,16 +457,15 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     ),
                 )
 
-                if not without_transaction_log:
-                    await self._add_transfer_log(
-                        moneybox_id=moneybox_id,
-                        description=deposit_transaction_data["description"],
-                        transaction_type=transaction_type,
-                        transaction_trigger=transaction_trigger,
-                        amount=deposit_transaction_data["amount"],
-                        balance=updated_moneybox.balance,  # type: ignore
-                        session=session,
-                    )
+                await self._add_transfer_log(
+                    moneybox_id=moneybox_id,
+                    description=deposit_transaction_data["description"],
+                    transaction_type=transaction_type,
+                    transaction_trigger=transaction_trigger,
+                    amount=deposit_transaction_data["amount"],
+                    balance=updated_moneybox.balance,  # type: ignore
+                    session=session,
+                )
         else:
             moneybox = cast(
                 Moneybox,
@@ -497,16 +492,15 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 ),
             )
 
-            if not without_transaction_log:
-                await self._add_transfer_log(
-                    moneybox_id=moneybox_id,
-                    description=deposit_transaction_data["description"],
-                    transaction_type=transaction_type,
-                    transaction_trigger=transaction_trigger,
-                    amount=deposit_transaction_data["amount"],
-                    balance=updated_moneybox.balance,  # type: ignore
-                    session=session,
-                )
+            await self._add_transfer_log(
+                moneybox_id=moneybox_id,
+                description=deposit_transaction_data["description"],
+                transaction_type=transaction_type,
+                transaction_trigger=transaction_trigger,
+                amount=deposit_transaction_data["amount"],
+                balance=updated_moneybox.balance,  # type: ignore
+                session=session,
+            )
 
         return updated_moneybox.asdict()  # type: ignore
 
@@ -516,7 +510,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
         withdraw_transaction_data: dict[str, Any],
         transaction_type: TransactionType,
         transaction_trigger: TransactionTrigger,
-        without_transaction_log: bool = False,
         session: AsyncSession | None = None,
     ) -> dict[str, Any]:
         """DB Function to sub given amount from moneybox by moneybox_id.
@@ -529,9 +522,6 @@ class DBManager:  # pylint: disable=too-many-public-methods
         :type transaction_type: :class:`TransactionType`
         :param transaction_trigger: The transaction trigger for the transaction.
         :type transaction_trigger: :class:`TransactionTrigger`
-        :param without_transaction_log: If True, then the transaction will not be logged,
-            default is False.
-        :type without_transaction_log: :class:`bool`
         :param session: The current session of the db creation.
         :type session: :class:`AsyncSession`
         :return: The updated moneybox data.
@@ -593,16 +583,15 @@ class DBManager:  # pylint: disable=too-many-public-methods
                     ),
                 )
 
-                if not without_transaction_log:
-                    await self._add_transfer_log(
-                        moneybox_id=moneybox_id,
-                        description=withdraw_transaction_data["description"],
-                        transaction_type=transaction_type,
-                        transaction_trigger=transaction_trigger,
-                        amount=-amount,  # negate, withdrawals need to be negative in log data
-                        balance=updated_moneybox.balance,  # type: ignore
-                        session=session,
-                    )
+                await self._add_transfer_log(
+                    moneybox_id=moneybox_id,
+                    description=withdraw_transaction_data["description"],
+                    transaction_type=transaction_type,
+                    transaction_trigger=transaction_trigger,
+                    amount=-amount,  # negate, withdrawals need to be negative in log data
+                    balance=updated_moneybox.balance,  # type: ignore
+                    session=session,
+                )
         else:
             session.expunge(moneybox)
 
@@ -616,16 +605,15 @@ class DBManager:  # pylint: disable=too-many-public-methods
                 ),
             )
 
-            if not without_transaction_log:
-                await self._add_transfer_log(
-                    session=session,
-                    moneybox_id=moneybox_id,
-                    description=withdraw_transaction_data["description"],
-                    transaction_type=transaction_type,
-                    transaction_trigger=transaction_trigger,
-                    amount=-amount,  # negate, withdrawals need to be negative in log data
-                    balance=updated_moneybox.balance,  # type: ignore
-                )
+            await self._add_transfer_log(
+                session=session,
+                moneybox_id=moneybox_id,
+                description=withdraw_transaction_data["description"],
+                transaction_type=transaction_type,
+                transaction_trigger=transaction_trigger,
+                amount=-amount,  # negate, withdrawals need to be negative in log data
+                balance=updated_moneybox.balance,  # type: ignore
+            )
 
         return updated_moneybox.asdict()  # type: ignore
 
@@ -801,6 +789,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             "amount": amount,
             "balance": balance,
             "counterparty_moneybox_id": counterparty_moneybox_id,
+            "created_at": datetime.now(tz=timezone.utc),
         }
 
         stmt = insert(Transaction).values(transaction_log_data)
@@ -1232,7 +1221,7 @@ class DBManager:  # pylint: disable=too-many-public-methods
             await create_instance(
                 async_session=session,
                 orm_model=cast(SqlBase, ActionLog),
-                data=automated_savings_log_data,
+                data=automated_savings_log_data | {"created_at": datetime.now(tz=timezone.utc)},
             ),
         )
 
