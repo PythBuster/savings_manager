@@ -2,6 +2,17 @@
 
 ## x.y.z (unreleased)
 
+## 2.40.0 (2025-06-09)
+### Feature:
+- add a new overflow moneybox mode: RATIO for automated savings distribution related to moneybox savings amounts
+
+### Changes:
+- replace automated savings distribution algorithm by refactoring code and more readable code
+- replace forecast algorithm by refactoring code and more readable code
+
+### Fixes:
+- fix automated savings distributed issue for overflow moneybox FILL mode
+
 ## 2.39.0 (2025-03-28)
 ### Changes:
 - refactor calculation function for savings forecast of moneyboxes
