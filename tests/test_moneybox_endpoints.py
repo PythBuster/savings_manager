@@ -2075,17 +2075,6 @@ async def test_endpoint_get_transactions_log_moneybox_second__status_200(  # noq
 
     expected_logs = [
         {
-            "id": 5,
-            "counterpartyMoneyboxName": None,
-            "description": "",
-            "transactionType": "direct",
-            "transactionTrigger": "manually",
-            "amount": 5000,
-            "balance": 9900,
-            "counterpartyMoneyboxId": None,
-            "moneyboxId": second_moneybox_id,
-        },
-        {
             "id": 18,
             "counterpartyMoneyboxName": None,
             "description": "",
@@ -2097,13 +2086,24 @@ async def test_endpoint_get_transactions_log_moneybox_second__status_200(  # noq
             "moneyboxId": second_moneybox_id,
         },
         {
-            "id": 2,
+            "id": 5,
             "counterpartyMoneyboxName": None,
             "description": "",
             "transactionType": "direct",
             "transactionTrigger": "manually",
-            "amount": 6000,
-            "balance": 6000,
+            "amount": 5000,
+            "balance": 9900,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": second_moneybox_id,
+        },
+        {
+            "id": 4,
+            "counterpartyMoneyboxName": None,
+            "description": "",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
+            "amount": -600,
+            "balance": 4900,
             "counterpartyMoneyboxId": None,
             "moneyboxId": second_moneybox_id,
         },
@@ -2119,13 +2119,13 @@ async def test_endpoint_get_transactions_log_moneybox_second__status_200(  # noq
             "moneyboxId": second_moneybox_id,
         },
         {
-            "id": 4,
+            "id": 2,
             "counterpartyMoneyboxName": None,
             "description": "",
             "transactionType": "direct",
             "transactionTrigger": "manually",
-            "amount": -600,
-            "balance": 4900,
+            "amount": 6000,
+            "balance": 6000,
             "counterpartyMoneyboxId": None,
             "moneyboxId": second_moneybox_id,
         },
@@ -2180,18 +2180,8 @@ async def test_endpoint_get_transactions_log_moneybox_third__status_200(  # noqa
             "description": "",
             "transactionType": "direct",
             "transactionTrigger": "manually",
-            "amount": 10000,
-            "balance": 13000,
-            "counterpartyMoneyboxId": None,
-            "moneyboxId": third_moneybox_id,
-        },
-        {
-            "counterpartyMoneyboxName": None,
-            "description": "",
-            "transactionType": "direct",
-            "transactionTrigger": "manually",
             "amount": -900,
-            "balance": 12100,
+            "balance": 6200,
             "counterpartyMoneyboxId": None,
             "moneyboxId": third_moneybox_id,
         },
@@ -2211,7 +2201,17 @@ async def test_endpoint_get_transactions_log_moneybox_third__status_200(  # noqa
             "transactionType": "direct",
             "transactionTrigger": "manually",
             "amount": -900,
-            "balance": 6200,
+            "balance": 12100,
+            "counterpartyMoneyboxId": None,
+            "moneyboxId": third_moneybox_id,
+        },
+        {
+            "counterpartyMoneyboxName": None,
+            "description": "",
+            "transactionType": "direct",
+            "transactionTrigger": "manually",
+            "amount": 10000,
+            "balance": 13000,
             "counterpartyMoneyboxId": None,
             "moneyboxId": third_moneybox_id,
         },
@@ -2265,7 +2265,7 @@ async def test_endpoint_get_transactions_log_moneybox_fourth__status_404__delete
         async_session=db_manager.async_sessionmaker, name="Moneybox 3"
     )
 
-    # Calculate id of moneybox 4. Fourth moneybox is deleted, db call would raise a NotFound
+    # Calculate id of moneybox 4. The fourth moneybox is deleted, db call would raise a NotFound
     fourth_moneybox_id = third_moneybox_id + 1
 
     response = await client.get(
@@ -2285,7 +2285,7 @@ async def test_endpoint_get_transactions_log_moneybox_sixth__status_404__not_exi
         async_session=db_manager.async_sessionmaker, name="Moneybox 5"
     )
 
-    # Calculate id of moneybox 6. moneybox six does not exist,
+    # Calculate id of moneybox 6. Moneybox six does not exist,
     #   db call would raise a NotFound
     sith_moneybox_id = fifth_moneybox_id + 1
 

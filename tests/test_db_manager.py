@@ -1065,8 +1065,8 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
         "description": "",
         "transaction_type": TransactionType.DIRECT,
         "transaction_trigger": TransactionTrigger.MANUALLY,
-        "amount": -1,
-        "balance": 10,
+        "amount": -10,
+        "balance": 0,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
         "moneybox_id": first_moneybox_id,
@@ -1075,16 +1075,16 @@ async def test_sub_amount_from_moneybox(  # pylint: disable=too-many-statements
         "description": "",
         "transaction_type": TransactionType.DIRECT,
         "transaction_trigger": TransactionTrigger.MANUALLY,
-        "amount": -10,
-        "balance": 0,
+        "amount": -1,
+        "balance": 10,
         "counterparty_moneybox_id": None,
         "counterparty_moneybox_name": None,
         "moneybox_id": first_moneybox_id,
     }
 
     assert len(transaction_logs) == 4
-    assert transaction_logs[1] == expected_withdraw_dict_1
-    assert transaction_logs[3] == expected_withdraw_dict_2
+    assert transaction_logs[0] == expected_withdraw_dict_1
+    assert transaction_logs[1] == expected_withdraw_dict_2
 
     # expected exception tests
     with pytest.raises(ValidationError):
@@ -1397,7 +1397,7 @@ async def test_transactions_logs_between_overflow_moneybox(
 
     transaction_logs = await db_manager.get_transaction_logs(moneybox_id=first_moneybox_id)
     assert len(transaction_logs) == 6
-    assert transaction_logs[1]["counterparty_moneybox_name"] == "Overflow Moneybox"
+    assert transaction_logs[0]["counterparty_moneybox_name"] == "Overflow Moneybox"
 
 
 @pytest.mark.dependency(depends=["test_transactions_logs_between_overflow_moneybox"])

@@ -43,9 +43,7 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
         )
     )
 
-    last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = "Automated Savings."
-    assert last_transaction_log["description"] == expected_description
+    assert not overflow_moneybox_transaction_logs
     # <<<
 
 
@@ -81,8 +79,10 @@ async def test_automated_savings_overflow_moneybox_mode_add_to_amount(
         )
     )
 
-    last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = "Automated Savings with Add-Mode."
+    assert len(overflow_moneybox_transaction_logs) == 1
+
+    last_transaction_log = overflow_moneybox_transaction_logs[0]
+    expected_description = "Test Case"
     assert last_transaction_log["description"] == expected_description
     # <<<
 
@@ -119,9 +119,7 @@ async def test_automated_savings_overflow_moneybox_mode_fill_up(
         )
     )
 
-    last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = "Fill-Mode: Automated Savings."
-    assert last_transaction_log["description"] == expected_description
+    assert not overflow_moneybox_transaction_logs
     # <<<
 
 
@@ -155,9 +153,7 @@ async def test_automated_savings_overflow_moneybox_mode_ratio(
         )
     )
 
-    last_transaction_log = overflow_moneybox_transaction_logs[-1]
-    expected_description = "Ratio-Mode: Automated Savings."
-    assert last_transaction_log["description"] == expected_description
+    assert not overflow_moneybox_transaction_logs
 
 
 @pytest.mark.asyncio
