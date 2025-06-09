@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.40.1 (2025-06-09)
+### Fixes:
+- implement flag to deactivate transaction log, is used for overflow moneybox in automated distribution mode
+
 ## 2.40.0 (2025-06-09)
 ### Feature:
 - add a new overflow moneybox mode: RATIO for automated savings distribution related to moneybox savings amounts
