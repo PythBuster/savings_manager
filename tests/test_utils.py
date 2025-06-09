@@ -4,10 +4,7 @@ from typing import Any
 
 import pytest
 
-from src.custom_types import AppEnvVariables, OverflowMoneyboxAutomatedSavingsModeType
-from src.savings_distribution.automated_savings_distribution import (
-    AutomatedSavingsDistributionService,
-)
+from src.custom_types import AppEnvVariables
 from src.utils import (
     equal_dict,
     get_app_data,
@@ -120,4 +117,3 @@ def test_equal_dict(
     expected_result: bool,
 ) -> None:
     assert equal_dict(dict_1, dict_2, exclude_keys) == expected_result
-

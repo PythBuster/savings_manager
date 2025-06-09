@@ -382,7 +382,6 @@ async def test_distribute_automated_savings_amount__normal_mode__one_moneybox_wi
     )  # savings_target=None, but respected savings_amount=10
 
 
-
 def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
     return [
         {  # overflow moneybox
@@ -514,7 +513,9 @@ async def test_calculate_savings_forecast__all_combinations(
         assert moneybox_id in result
         last_month = result[moneybox_id][-1].month
         if expected_month is None:
-            assert last_month == -1, f"Moneybox {moneybox_id}: expected month {expected_month}, got {last_month}"
+            assert (
+                last_month == -1
+            ), f"Moneybox {moneybox_id}: expected month {expected_month}, got {last_month}"
         else:
             assert (
                 last_month == expected_month
