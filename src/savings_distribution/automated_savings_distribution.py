@@ -227,7 +227,8 @@ class AutomatedSavingsDistributionService:
                     deposit_transaction_data=deposit_transaction_data,
                     transaction_type=TransactionType.DISTRIBUTION,
                     # no log for overflow moneybox
-                    without_transaction_log=moneybox["id"] == sorted_by_priority_moneyboxes[0]["id"],
+                    without_transaction_log=moneybox["id"]
+                    == sorted_by_priority_moneyboxes[0]["id"],
                     transaction_trigger=TransactionTrigger.AUTOMATICALLY,
                 )
                 updated_moneyboxes.append(updated_moneybox)
