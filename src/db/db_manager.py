@@ -849,16 +849,20 @@ class DBManager:  # pylint: disable=too-many-public-methods
 
             return counterparty_moneybox_name
 
-        transactions: list[dict[str, Any]] = sorted([
-            transaction.asdict(exclude=["modified_at"])
-            | {
-                "counterparty_moneybox_name": await resolve_moneybox_name(
-                    counterparty_moneybox_id_=transaction.counterparty_moneybox_id,
-                    from_datetime=transaction.created_at,
-                )
-            }
-            for transaction in moneybox.transactions_log
-        ], key=lambda item: (item["created_at"]), reverse=True)
+        transactions: list[dict[str, Any]] = sorted(
+            [
+                transaction.asdict(exclude=["modified_at"])
+                | {
+                    "counterparty_moneybox_name": await resolve_moneybox_name(
+                        counterparty_moneybox_id_=transaction.counterparty_moneybox_id,
+                        from_datetime=transaction.created_at,
+                    )
+                }
+                for transaction in moneybox.transactions_log
+            ],
+            key=lambda item: (item["created_at"]),
+            reverse=True,
+        )
 
         # The tricky part: Automated savings distribution will write more than 1 log at
         #   the same time. especially in Overflow Moneybox modes != COLLECT.
