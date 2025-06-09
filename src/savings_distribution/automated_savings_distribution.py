@@ -112,7 +112,9 @@ class AutomatedSavingsDistributionService:
                     sorted_by_priority_moneyboxes=sorted_moneyboxes,
                     distribution_amounts=distribution_amounts,
                     # use "normal" distribution description
-                    distribution_description=MODE_TO_LOG_DESCRIPTION[OverflowMoneyboxAutomatedSavingsModeType.COLLECT],
+                    distribution_description=MODE_TO_LOG_DESCRIPTION[
+                        OverflowMoneyboxAutomatedSavingsModeType.COLLECT
+                    ],
                 )
             )
 

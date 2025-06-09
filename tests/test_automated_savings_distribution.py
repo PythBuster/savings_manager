@@ -43,7 +43,6 @@ async def test_automated_savings_overflow_moneybox_mode_collect(
         )
     )
 
-
     last_transaction_log = overflow_moneybox_transaction_logs[-1]
     expected_description = "Automated Savings."
     assert last_transaction_log["description"] == expected_description
