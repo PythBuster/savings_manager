@@ -167,7 +167,7 @@ async def test_automated_savings_overflow_moneybox_mode_ratio(
 @pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_ratio_prioritized(
     load_test_data: None,  # pylint: disable=unused-argument
-    automated_distribution_service,
+    automated_distribution_service: AutomatedSavingsDistributionService,
 ) -> None:
     """
     Test the RATIO_PRIORITIZED overflow moneybox mode.
@@ -192,7 +192,7 @@ async def test_automated_savings_overflow_moneybox_mode_ratio_prioritized(
         ), f"{moneybox['name']} has unexpected balance"
 
     overflow_moneybox = (
-        await automated_distribution_service.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: E501  # pylint: disable=line-too-long, protected-access
     )
     overflow_moneybox_transaction_logs = (
         await automated_distribution_service.db_manager.get_transaction_logs(
@@ -210,7 +210,7 @@ async def test_automated_savings_overflow_moneybox_mode_ratio_prioritized(
 @pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution(
     load_test_data: None,  # pylint: disable=unused-argument
-    automated_distribution_service,
+    automated_distribution_service: AutomatedSavingsDistributionService,
 ) -> None:
     """
     Test the RATIO_PRIORITIZED mode when savings_amount is 0.
@@ -234,7 +234,7 @@ async def test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_
         ), f"{moneybox['name']} has unexpected balance for zero distribution"
 
     overflow_moneybox = (
-        await automated_distribution_service.db_manager._get_overflow_moneybox()  # pylint: disable=protected-access
+        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: E501  # pylint: disable=line-too-long, protected-access
     )
     overflow_moneybox_transaction_logs = (
         await automated_distribution_service.db_manager.get_transaction_logs(
