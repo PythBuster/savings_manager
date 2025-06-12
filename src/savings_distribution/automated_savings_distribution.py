@@ -28,11 +28,15 @@ MODE_TO_LOG_DESCRIPTION: dict[OverflowMoneyboxAutomatedSavingsModeType, str] = {
         "Fill-Mode: Automated Savings."
     ),
     OverflowMoneyboxAutomatedSavingsModeType.RATIO: "Ratio-Mode: Automated Savings.",
+    OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED: (
+        "Ratio-Prioritized-Mode: Automated Savings."
+    ),
 }
 
 POST_DISTRIBUTION_MODES: tuple[OverflowMoneyboxAutomatedSavingsModeType, ...] = (
     OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
     OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+    OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
 )
 
 
@@ -148,8 +152,14 @@ class AutomatedSavingsDistributionService:
                         distribute_amount=overflow_moneybox_amount,
                     )
                 # RATIO:
-                else:
+                elif action is OverflowMoneyboxAutomatedSavingsModeType.RATIO:
                     distribution_amounts = await AutomatedSavingsDistributionService.calculate_moneybox_amounts_ratio_distribution(  # noqa: E501  # pylint: disable=line-too-long
+                        sorted_by_priority_moneyboxes=updated_moneyboxes,
+                        distribute_amount=overflow_moneybox_amount,
+                    )
+                # RATIO_PRIORITIZED:
+                else:
+                    distribution_amounts = await AutomatedSavingsDistributionService.calculate_moneybox_amounts_ratio_prioritized_distribution(  # noqa: E501  # pylint: disable=line-too-long
                         sorted_by_priority_moneyboxes=updated_moneyboxes,
                         distribute_amount=overflow_moneybox_amount,
                     )
@@ -438,6 +448,58 @@ class AutomatedSavingsDistributionService:
             partial(ratio_mode_fn, list(reversed(sorted_by_priority_moneyboxes))),
             # for ratio mode, overflow moneybox has to be the latest one, pass reversed list
         )
+
+    @staticmethod
+    async def calculate_moneybox_amounts_ratio_prioritized_distribution(
+        sorted_by_priority_moneyboxes: list[dict[str, Any]],
+        distribute_amount: int,
+    ) -> dict[int, int]:
+        """Helper function to calculate the moneybox amounts in the current savings_distribution
+        cycle based on the RATIO_PRIORITIZED overflow moneybox mode.
+
+        :param sorted_by_priority_moneyboxes: The moneyboxes.
+        :type sorted_by_priority_moneyboxes: :class:`list[dict[str, Any]]`
+        :param distribute_amount: The amount to distribute.
+        :type distribute_amount: :class:`int`
+        :return: A dictionary mapping moneybox IDs to their allocated amounts in
+            this savings_distribution cycle using the RATIO strategy. Moneyboxes that receive
+            no savings are excluded.
+        :rtype: :class:`dict[int, int]`
+        """
+
+        moneybox_distribute_amounts_by_ratio = (
+            await AutomatedSavingsDistributionService.calculate_moneybox_amounts_ratio_distribution(
+                sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
+                distribute_amount=distribute_amount,
+            )
+        )
+
+        n_moneyboxes = len(sorted_by_priority_moneyboxes) - 1
+        total_priorities = n_moneyboxes * (n_moneyboxes + 1) // 2
+
+        moneybox_distribute_amounts_prio_factors = {
+            moneybox["id"]: (n_moneyboxes - moneybox["priority"] + 1) / total_priorities
+            for moneybox in sorted_by_priority_moneyboxes[1:]
+        }
+
+        mb_distribute_amounts_ratio_prioritized_factor = {
+            _mb_id: _distribute_amount * moneybox_distribute_amounts_prio_factors[_mb_id]
+            for _mb_id, _distribute_amount in moneybox_distribute_amounts_by_ratio.items()
+            if _mb_id != sorted_by_priority_moneyboxes[0]["id"]
+        }
+        total_factors = sum(mb_distribute_amounts_ratio_prioritized_factor.values())
+
+        moneybox_distribute_amounts_by_ratio_prioritized = {
+            _mb_id: math.trunc(_distribute_factor / total_factors * distribute_amount)
+            for _mb_id, _distribute_factor in mb_distribute_amounts_ratio_prioritized_factor.items()
+        }
+        rest_amount = distribute_amount - sum(
+            moneybox_distribute_amounts_by_ratio_prioritized.values()
+        )
+        moneybox_distribute_amounts_by_ratio_prioritized[sorted_by_priority_moneyboxes[0]["id"]] = (
+            rest_amount
+        )
+        return moneybox_distribute_amounts_by_ratio_prioritized
 
     @staticmethod
     async def calculate_savings_forecast(

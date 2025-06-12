@@ -230,11 +230,12 @@ class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
     monthly savings amounts of all moneyboxes with a savings rate greater than 0. Unlike
     the standard RATIO mode, this variant additionally considers the priority order of the
     moneyboxes, favoring those with higher priority.
-    
+
     If a moneybox reaches its savings_target and cannot receive its full share, the
     remaining portion is returned to the overflow moneybox and carried over to the next
     savings_distribution cycle.
     """
+
 
 @dataclass(frozen=True)
 class MoneyboxSavingsMonthData:
