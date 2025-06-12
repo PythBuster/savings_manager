@@ -467,6 +467,11 @@ class AutomatedSavingsDistributionService:
         :rtype: :class:`dict[int, int]`
         """
 
+        sorted_moneyboxes_by_id = {
+            moneybox["id"]: moneybox
+            for moneybox in sorted_by_priority_moneyboxes
+        }
+
         moneybox_distribute_amounts_by_ratio = (
             await AutomatedSavingsDistributionService.calculate_moneybox_amounts_ratio_distribution(
                 sorted_by_priority_moneyboxes=sorted_by_priority_moneyboxes,
@@ -489,8 +494,20 @@ class AutomatedSavingsDistributionService:
         }
         total_factors = sum(mb_distribute_amounts_ratio_prioritized_factor.values())
 
+        def _respect_savings_target(moneybox: dict[str, Any], calcluated_amount: int) -> int:
+            if moneybox["savings_target"] is None:
+                return calcluated_amount
+
+            return min(
+                calcluated_amount,
+                max(0, moneybox["savings_target"] - moneybox["balance"])
+            )
+
         moneybox_distribute_amounts_by_ratio_prioritized = {
-            _mb_id: math.trunc(_distribute_factor / total_factors * distribute_amount)
+            _mb_id: _respect_savings_target(
+                sorted_moneyboxes_by_id[_mb_id],
+                math.trunc(_distribute_factor / total_factors * distribute_amount),
+            )
             for _mb_id, _distribute_factor in mb_distribute_amounts_ratio_prioritized_factor.items()
         }
         rest_amount = distribute_amount - sum(
