@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.41.1 (2025-06-12)
+### Fixes:
+- adapt the ratio_prioritized algorithm and respect saving_target limits
+
 ## 2.41.0 (2025-06-12)
 ### Feature:
 - add additional overflow moneybox mode for RATIO: called RATIO_PRIORITIZED, which distributes proportionally based on
