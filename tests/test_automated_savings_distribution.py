@@ -575,6 +575,56 @@ def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
             OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES,
             {2: 0, 3: 1, 4: None, 5: 1},
         ),
+        # RATIO
+        (
+                1000,
+                0,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+                {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        (
+                0,
+                0,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+                {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+                0,
+                250,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+                {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+                1000,
+                3000,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO,
+                {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        # RATIO_PRIORITIZED
+        (
+                1000,
+                0,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
+                {2: 0, 3: 3, 4: None, 5: None},
+        ),
+        (
+                0,
+                0,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
+                {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+                0,
+                250,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
+                {2: 0, 3: None, 4: None, 5: None},
+        ),
+        (
+                1000,
+                3000,
+                OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
+                {2: 0, 3: 3, 4: None, 5: None},
+        ),
     ],
 )
 async def test_calculate_savings_forecast__all_combinations(

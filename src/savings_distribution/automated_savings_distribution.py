@@ -573,6 +573,8 @@ class AutomatedSavingsDistributionService:
                     current_savings_amount = app_settings["savings_amount"]
                 case OverflowMoneyboxAutomatedSavingsModeType.RATIO:
                     current_savings_amount = app_settings["savings_amount"]
+                case OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED:
+                    current_savings_amount = app_settings["savings_amount"]
                 case _:
                     raise ValueError(
                         f"Unsupported overflow moneybox mode {overflow_moneybox_mode=}"
@@ -602,6 +604,12 @@ class AutomatedSavingsDistributionService:
                         moneyboxes_sorted_by_priority[0]["balance"] = 0
                     case OverflowMoneyboxAutomatedSavingsModeType.RATIO:
                         moneybox_distribution_amounts = await AutomatedSavingsDistributionService.calculate_moneybox_amounts_ratio_distribution(  # noqa: E501
+                            sorted_by_priority_moneyboxes=moneyboxes_sorted_by_priority,
+                            distribute_amount=current_savings_amount,
+                        )
+                        moneyboxes_sorted_by_priority[0]["balance"] = 0
+                    case OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED:
+                        moneybox_distribution_amounts = await AutomatedSavingsDistributionService.calculate_moneybox_amounts_ratio_prioritized_distribution(  # noqa: E501
                             sorted_by_priority_moneyboxes=moneyboxes_sorted_by_priority,
                             distribute_amount=current_savings_amount,
                         )
