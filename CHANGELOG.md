@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.41.0 (2025-06-12)
+### Feature:
+- add additional overflow moneybox mode for RATIO: called RATIO_PRIORITIZED, which distributes proportionally based on
+    savings amount and weights results by moneybox priority
+
 ## 2.40.2 (2025-06-09)
 ### Fixes:
 - remove flag to deactivate transaction log, set created_at for each transaction log manually

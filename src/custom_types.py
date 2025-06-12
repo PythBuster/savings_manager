@@ -219,10 +219,21 @@ class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
     the priority list. Try to fill them up."""
 
     RATIO = "ratio"
-    """Mode RATIO distributes the overflow proportionally to the configured monthly savings amounts
-    of all moneyboxes with a savings rate greater than 0. Any portion that cannot be assigned due
-    to a reached savings_target is returned to the overflow moneybox and carried forward into the
-    next savings_distribution cycle.
+    """Mode RATIO distributes the overflow proportionally to the configured monthly savings
+    amounts of all moneyboxes with a savings rate greater than 0. Any portion that cannot be
+    assigned due to a reached savings_target is returned to the overflow moneybox and carried
+    forward into the next savings_distribution cycle.
+    """
+
+    RATIO_PRIORITIZED = "ratio_prioritized"
+    """Mode RATIO_PRIORITIZED distributes the overflow proportionally to the configured
+    monthly savings amounts of all moneyboxes with a savings rate greater than 0. Unlike
+    the standard RATIO mode, this variant additionally considers the priority order of the
+    moneyboxes, favoring those with higher priority.
+
+    If a moneybox reaches its savings_target and cannot receive its full share, the
+    remaining portion is returned to the overflow moneybox and carried over to the next
+    savings_distribution cycle.
     """
 
 

@@ -125,6 +125,8 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_automated_savings_overflow_moneybox_mode_add_to_amount": self.dataset_test_automated_savings_overflow_moneybox_mode_add_to_amount,
             "test_automated_savings_overflow_moneybox_mode_fill_up": self.dataset_test_automated_savings_overflow_moneybox_mode_fill_up,
             "test_automated_savings_overflow_moneybox_mode_ratio": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio,
+            "test_automated_savings_overflow_moneybox_mode_ratio_prioritized": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized,
+            "test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution,
             "test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox,
             "test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox,
             "test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox,
@@ -2453,6 +2455,88 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
+
+    async def dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_automated_savings_overflow_moneybox_mode_ratio_prioritized`.
+        """
+
+        await self.truncate_tables()
+
+        # create app settings
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 13,  # -> will distribute 12, rest 1 in overflow moneybox
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {
+                "name": "Test Box 1",
+                "savings_amount": 1,
+                "savings_target": 5,
+                "priority": 1,
+            },  # -> balance: 1 normal + 2 ratio_prio = 3
+            {
+                "name": "Test Box 2",
+                "savings_amount": 2,
+                "savings_target": 5,
+                "priority": 2,
+            },  # -> balance: 2 normal + 2 ratio_prio = 4
+            {
+                "name": "Test Box 3",
+                "savings_amount": 3,
+                "savings_target": None,
+                "priority": 3,
+            },  # -> balance: 3 normal + 2 ratio_prio = 5
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(
+                moneybox_data=moneybox_data,
+            )
+
+    async def dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution(
+        self,
+    ) -> None:
+        """The data generation function for test_case:
+        `test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution`.
+        """
+
+        await self.truncate_tables()
+
+        app_settings_data = {
+            "send_reports_via_email": False,
+            "user_email_address": None,
+            "is_automated_saving_active": True,
+            "savings_amount": 0,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
+            "is_active": True,
+            "note": "",
+        }
+
+        async with self.db_manager.async_sessionmaker.begin() as session:
+            stmt = insert(AppSettings).values(**app_settings_data)
+            await session.execute(stmt)
+
+        moneyboxes_data = [
+            {"name": "Test Box 1", "savings_amount": 1, "savings_target": 5, "priority": 1},
+            {"name": "Test Box 2", "savings_amount": 2, "savings_target": 5, "priority": 2},
+            {"name": "Test Box 3", "savings_amount": 3, "savings_target": None, "priority": 3},
+        ]
+
+        for moneybox_data in moneyboxes_data:
+            await self.db_manager.add_moneybox(moneybox_data=moneybox_data)
 
     async def dataset_test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox(
         self,
