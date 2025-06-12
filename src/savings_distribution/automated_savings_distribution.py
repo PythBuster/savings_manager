@@ -468,8 +468,7 @@ class AutomatedSavingsDistributionService:
         """
 
         sorted_moneyboxes_by_id = {
-            moneybox["id"]: moneybox
-            for moneybox in sorted_by_priority_moneyboxes
+            moneybox["id"]: moneybox for moneybox in sorted_by_priority_moneyboxes
         }
 
         moneybox_distribute_amounts_by_ratio = (
@@ -498,10 +497,7 @@ class AutomatedSavingsDistributionService:
             if moneybox["savings_target"] is None:
                 return calcluated_amount
 
-            return min(
-                calcluated_amount,
-                max(0, moneybox["savings_target"] - moneybox["balance"])
-            )
+            return min(calcluated_amount, max(0, moneybox["savings_target"] - moneybox["balance"]))
 
         moneybox_distribute_amounts_by_ratio_prioritized = {
             _mb_id: _respect_savings_target(
