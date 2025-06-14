@@ -225,7 +225,7 @@ class OverflowMoneyboxAutomatedSavingsModeType(StrEnum):
     forward into the next savings_distribution cycle.
     """
 
-    RATIO_PRIORITIZED = "ratio_prioritized"
+    EQUAL = "equal"
     """Mode RATIO_PRIORITIZED distributes the overflow proportionally to the configured
     monthly savings amounts of all moneyboxes with a savings rate greater than 0. Unlike
     the standard RATIO mode, this variant additionally considers the priority order of the

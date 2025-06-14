@@ -138,11 +138,11 @@ async def test_automated_savings_overflow_moneybox_mode_ratio(
 
     moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
     expected_data = {
-        "Overflow Moneybox": 57,
+        "Overflow Moneybox": 30,
         "Test Box 1": 5,
         "Test Box 2": 5,
-        "Test Box 3": 36,
-        "Test Box 4": 47,
+        "Test Box 3": 60,
+        "Test Box 4": 50,
         "Test Box 5": 0,
         "Test Box 6": 0,
     }
@@ -162,87 +162,6 @@ async def test_automated_savings_overflow_moneybox_mode_ratio(
     last_transaction_log = overflow_moneybox_transaction_logs[0]
     expected_description = "Ratio-Mode: Automated Savings."
     assert last_transaction_log["description"] == expected_description
-
-
-@pytest.mark.asyncio
-async def test_automated_savings_overflow_moneybox_mode_ratio_prioritized(
-    load_test_data: None,  # pylint: disable=unused-argument
-    automated_distribution_service: AutomatedSavingsDistributionService,
-) -> None:
-    """
-    Test the RATIO_PRIORITIZED overflow moneybox mode.
-    Ensures savings are distributed by ratio and adjusted by priority,
-    with respect to savings_target constraints.
-    """
-
-    await automated_distribution_service.run_automated_savings_distribution()
-
-    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
-
-    expected_data = {
-        "Overflow Moneybox": 1,
-        "Test Box 1": 3,
-        "Test Box 2": 4,
-        "Test Box 3": 5,
-    }
-
-    for moneybox in moneyboxes:
-        assert (
-            moneybox["balance"] == expected_data[moneybox["name"]]
-        ), f"{moneybox['name']} has unexpected balance"
-
-    overflow_moneybox = (
-        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: E501  # pylint: disable=line-too-long, protected-access
-    )
-    overflow_moneybox_transaction_logs = (
-        await automated_distribution_service.db_manager.get_transaction_logs(
-            moneybox_id=overflow_moneybox.id,
-        )
-    )
-
-    last_transaction_log = overflow_moneybox_transaction_logs[0]
-    expected_description = "Ratio-Prioritized-Mode: Automated Savings."
-    assert (
-        last_transaction_log["description"] == expected_description
-    ), f"Unexpected transaction description: {last_transaction_log['description']}"
-
-
-@pytest.mark.asyncio
-async def test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution(
-    load_test_data: None,  # pylint: disable=unused-argument
-    automated_distribution_service: AutomatedSavingsDistributionService,
-) -> None:
-    """
-    Test the RATIO_PRIORITIZED mode when savings_amount is 0.
-    No distribution should occur; all balances should remain unchanged.
-    """
-
-    await automated_distribution_service.run_automated_savings_distribution()
-
-    moneyboxes = await automated_distribution_service.db_manager.get_moneyboxes()
-
-    expected_data = {
-        "Overflow Moneybox": 0,
-        "Test Box 1": 0,
-        "Test Box 2": 0,
-        "Test Box 3": 0,
-    }
-
-    for moneybox in moneyboxes:
-        assert (
-            moneybox["balance"] == expected_data[moneybox["name"]]
-        ), f"{moneybox['name']} has unexpected balance for zero distribution"
-
-    overflow_moneybox = (
-        await automated_distribution_service.db_manager._get_overflow_moneybox()  # noqa: E501  # pylint: disable=line-too-long, protected-access
-    )
-    overflow_moneybox_transaction_logs = (
-        await automated_distribution_service.db_manager.get_transaction_logs(
-            moneybox_id=overflow_moneybox.id,
-        )
-    )
-
-    assert len(overflow_moneybox_transaction_logs) == 0
 
 
 @pytest.mark.asyncio
@@ -510,7 +429,7 @@ def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
 @pytest.mark.parametrize(
     "savings_amount, overflow_balance, mode, expected",
     [
-        # COLLECT
+       # COLLECT
         (1000, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: 3, 4: None, 5: None}),
         (0, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: None, 4: None, 5: None}),
         (
@@ -598,32 +517,7 @@ def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
             1000,
             3000,
             OverflowMoneyboxAutomatedSavingsModeType.RATIO,
-            {2: 0, 3: 3, 4: None, 5: None},
-        ),
-        # RATIO_PRIORITIZED
-        (
-            1000,
-            0,
-            OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
-            {2: 0, 3: 3, 4: None, 5: None},
-        ),
-        (
-            0,
-            0,
-            OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
-            {2: 0, 3: None, 4: None, 5: None},
-        ),
-        (
-            0,
-            250,
-            OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
-            {2: 0, 3: None, 4: None, 5: None},
-        ),
-        (
-            1000,
-            3000,
-            OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
-            {2: 0, 3: 3, 4: None, 5: None},
+            {2: 0, 3: 2, 4: None, 5: None},
         ),
     ],
 )

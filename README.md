@@ -103,12 +103,12 @@ From the project root directory:
 
 To create a new database migration (alembic migration script), use the following command:
 From the project root directory:
-`alembic -x ENVIRONMENT=prod revision --autogenerate -m "YOUR MIGRATION MESSAGE"`
+`alembic -x ENVIRONMENT=dev|prod revision --autogenerate -m "YOUR MIGRATION MESSAGE"`
 
 
 **Notes:**
 1. The database must be reachable.
-2. `-x ENVIRONMENT=prod` controls to which database alembic shall communicate.
+2. `-x ENVIRONMENT=dev|prod` controls to which database alembic shall communicate.
 
 ## CI/CD
 
