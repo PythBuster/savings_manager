@@ -2,6 +2,16 @@
 
 ## x.y.z (unreleased)
 
+## 2.42.0 (2025-06-15)
+### Feature:
+- add EQUAL mode, which distributes overflow moneybox balance equally to moneyboxes
+
+### Changes:
+- remove RATIO_PRIORITIZED mode
+
+### Fixes:
+- fix modes: fill and ratio and removed some bugs
+
 ## 2.41.1 (2025-06-12)
 ### Fixes:
 - adapt the ratio_prioritized algorithm and respect saving_target limits
