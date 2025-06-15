@@ -125,12 +125,11 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_automated_savings_overflow_moneybox_mode_add_to_amount": self.dataset_test_automated_savings_overflow_moneybox_mode_add_to_amount,
             "test_automated_savings_overflow_moneybox_mode_fill_up": self.dataset_test_automated_savings_overflow_moneybox_mode_fill_up,
             "test_automated_savings_overflow_moneybox_mode_ratio": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio,
-            "test_automated_savings_overflow_moneybox_mode_ratio_prioritized": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized,
-            "test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution,
-            "test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox,
+            "test_automated_savings_overflow_moneybox_mode_equal": self.dataset_test_automated_savings_overflow_moneybox_mode_equal,
             "test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_collect__only_overflow_moneybox,
             "test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_add__only_overflow_moneybox,
             "test_automated_savings_overflow_moneybox_mode_fill__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_fill__only_overflow_moneybox,
+            "test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox": self.dataset_test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox,
             "test_task_automated_savings_schedule": self.dataset_test_task_automated_savings_schedule,
             "test_task_automated_savings_dont_schedule": self.dataset_test_task_automated_savings_dont_schedule,
             "test_task_automated_savings_no_email_send": self.dataset_test_task_automated_savings_no_email_send,
@@ -147,8 +146,8 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "test_import_sql_dump": self.dataset_test_import_sql_dump,
             "test_get_users_empty": self.truncate_tables,
             "test_distribute_automated_savings_amount__amount_0": self.dataset_test_distribute_automated_savings_amount__amount_0,
-            "test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0": (
-                self.dataset_test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0
+            "test_distribute_automated_savings_amount__collect_mode__one_moneybox_with_savings_amount_0": (
+                self.dataset_test_distribute_automated_savings_amount__collect_mode__one_moneybox_with_savings_amount_0
             ),
             "test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none": (
                 self.dataset_test_distribute_automated_savings_amount__fill_mode__one_moneybox_with_savings_target_none
@@ -2411,44 +2410,44 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         moneyboxes_data = [
             {
                 "name": "Test Box 1",
-                "savings_amount": 5,  # ratio: 6 -> 6 extra BUT REFUSED (-> in overflow), result 5
+                "savings_amount": 5,  # 5, full in 1 month, no part of RATIO
                 "savings_target": 5,
                 "priority": 1,
             },
             {
                 "name": "Test Box 2",
-                "savings_amount": 10,  # ratio: 13 -> 13 extra BUT REFUSED (-> in overflow), result 5
+                "savings_amount": 10,  # 5, full in 1 month, no part of RATIO
                 "savings_target": 5,
                 "priority": 2,
             },
             {
                 "name": "Test Box 3",
-                "savings_amount": 15,  # ratio: 20 -> 21 extra, result 36
+                "savings_amount": 15,  # 15, never full, IS part of RATIO
                 "savings_target": None,
                 "priority": 3,
             },
             {
                 "name": "Test Box 4",
-                "savings_amount": 20,  # ratio: 26 -> 27 extra, result 47
+                "savings_amount": 20,  # 20, in firth month, not full, IS part of RATIO
                 "savings_target": 50,
                 "priority": 4,
             },
             {
                 "name": "Test Box 5",
-                "savings_amount": 0,  # ratio: 0 -> no extra
+                "savings_amount": 0,  # 0, full initially, no part of RATIO
                 "savings_target": 0,
                 "priority": 5,
             },
             {
                 "name": "Test Box 6",
-                "savings_amount": 25,  # ratio: 33 -> 34 extra BUT REFUSED (-> in overflow), result 0
+                "savings_amount": 25,  # 0, full initially, no part of RATIO
                 "savings_target": 0,
                 "priority": 6,
             },
-            # rest: 105 for Overflow Moneybox RATIO distribution available
-            # total savings amount: 75
-            # Overflow Moneybox: 105 ratio distribution
-            # -> 105 - (21+27) = 57 rest in overflow moneybox
+            # rest in overflow moneybox: 105 -> distribution amount for RATIO
+            # total savings_amounts = 35
+            # Test Box 3: ratio amount: 15/35 -> RATIO amount: [45]
+            # Test Box 4: ratio amount: 20/35 -> RATIO amount: 60 -> [30] because full
         ]
 
         for moneybox_data in moneyboxes_data:
@@ -2456,11 +2455,11 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized(
+    async def dataset_test_automated_savings_overflow_moneybox_mode_equal(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_automated_savings_overflow_moneybox_mode_ratio_prioritized`.
+        `test_automated_savings_overflow_moneybox_mode_equal`.
         """
 
         await self.truncate_tables()
@@ -2470,8 +2469,8 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
             "send_reports_via_email": False,
             "user_email_address": None,
             "is_automated_saving_active": True,
-            "savings_amount": 13,  # -> will distribute 12, rest 1 in overflow moneybox
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
+            "savings_amount": 150,
+            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.EQUAL,
             "is_active": True,
             "note": "",
         }
@@ -2483,60 +2482,50 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
         moneyboxes_data = [
             {
                 "name": "Test Box 1",
-                "savings_amount": 1,
+                "savings_amount": 5,  # 5, full in 1 month, no part of EQUAL
                 "savings_target": 5,
                 "priority": 1,
-            },  # -> balance: 1 normal + 2 ratio_prio = 3
+            },
             {
                 "name": "Test Box 2",
-                "savings_amount": 2,
+                "savings_amount": 10,  # 5, full in 1 month, no part of EQUAL
                 "savings_target": 5,
                 "priority": 2,
-            },  # -> balance: 2 normal + 2 ratio_prio = 4
+            },
             {
                 "name": "Test Box 3",
-                "savings_amount": 3,
+                "savings_amount": 15,  # 15, never full, IS part of EQUAL
                 "savings_target": None,
                 "priority": 3,
-            },  # -> balance: 3 normal + 2 ratio_prio = 5
+            },
+            {
+                "name": "Test Box 4",
+                "savings_amount": 20,  # 20, in firth month, not full, IS part of EQUAL
+                "savings_target": 50,
+                "priority": 4,
+            },
+            {
+                "name": "Test Box 5",
+                "savings_amount": 0,  # 0, full initially, no part of EQUAL
+                "savings_target": 0,
+                "priority": 5,
+            },
+            {
+                "name": "Test Box 6",
+                "savings_amount": 25,  # 0, full initially, no part of EQUAL
+                "savings_target": 0,
+                "priority": 6,
+            },
+            # rest in overflow moneybox: 105 -> distribution amount for EQUAL
+            # free moneyboxes: 2 (MB 3 + MB 4)
+            # Test Box 3: equal amount: 52,5 -> 52, 15 + 52 -> 67
+            # Test Box 4: ratio amount: 52,5 -> 52, but full with 30, rest 22 in Overflow MB
         ]
 
         for moneybox_data in moneyboxes_data:
             await self.db_manager.add_moneybox(
                 moneybox_data=moneybox_data,
             )
-
-    async def dataset_test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution(
-        self,
-    ) -> None:
-        """The data generation function for test_case:
-        `test_automated_savings_overflow_moneybox_mode_ratio_prioritized__zero_distribution`.
-        """
-
-        await self.truncate_tables()
-
-        app_settings_data = {
-            "send_reports_via_email": False,
-            "user_email_address": None,
-            "is_automated_saving_active": True,
-            "savings_amount": 0,
-            "overflow_moneybox_automated_savings_mode": OverflowMoneyboxAutomatedSavingsModeType.RATIO_PRIORITIZED,
-            "is_active": True,
-            "note": "",
-        }
-
-        async with self.db_manager.async_sessionmaker.begin() as session:
-            stmt = insert(AppSettings).values(**app_settings_data)
-            await session.execute(stmt)
-
-        moneyboxes_data = [
-            {"name": "Test Box 1", "savings_amount": 1, "savings_target": 5, "priority": 1},
-            {"name": "Test Box 2", "savings_amount": 2, "savings_target": 5, "priority": 2},
-            {"name": "Test Box 3", "savings_amount": 3, "savings_target": None, "priority": 3},
-        ]
-
-        for moneybox_data in moneyboxes_data:
-            await self.db_manager.add_moneybox(moneybox_data=moneybox_data)
 
     async def dataset_test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_moneybox(
         self,
@@ -3486,11 +3475,11 @@ class DBTestDataInitializer:  # pylint: disable=too-many-public-methods
                 moneybox_data=moneybox_data,
             )
 
-    async def dataset_test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0(
+    async def dataset_test_distribute_automated_savings_amount__collect_mode__one_moneybox_with_savings_amount_0(
         self,
     ) -> None:
         """The data generation function for test_case:
-        `test_distribute_automated_savings_amount__normal_mode__one_moneybox_with_savings_amount_0`.
+        `test_distribute_automated_savings_amount__collect_mode__one_moneybox_with_savings_amount_0`.
         """
 
         await self.truncate_tables()
