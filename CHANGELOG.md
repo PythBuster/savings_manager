@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.43.0 (2025-10-24)
+### Feature:
+- return index.html for unknown routes (SPA fallback)
+
 ## 2.42.0 (2025-06-15)
 ### Feature:
 - add EQUAL mode, which distributes overflow moneybox balance equally to moneyboxes
