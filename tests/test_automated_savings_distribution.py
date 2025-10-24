@@ -163,6 +163,7 @@ async def test_automated_savings_overflow_moneybox_mode_ratio(
     expected_description = "Ratio-Mode: Automated Savings."
     assert last_transaction_log["description"] == expected_description
 
+
 @pytest.mark.asyncio
 async def test_automated_savings_overflow_moneybox_mode_equal(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -274,7 +275,6 @@ async def test_automated_savings_overflow_moneybox_mode_ratio__only_overflow_mon
     assert moneyboxes[0]["balance"] == 150
 
 
-
 @pytest.mark.asyncio
 async def test_distribute_automated_savings_amount__collect_mode__one_moneybox_with_savings_amount_0(
     load_test_data: None,  # pylint: disable=unused-argument
@@ -313,7 +313,6 @@ async def test_distribute_automated_savings_amount__collect_mode__one_moneybox_w
     assert (
         updated_moneyboxes[3]["balance"] == 10
     )  # savings_target=None, but respected savings_amount=10
-
 
 
 @pytest.mark.asyncio
@@ -422,7 +421,6 @@ async def test_distribute_automated_savings_amount__fill_mode__one_moneybox_with
     )  # target: None and wants 10, but fill mode ignores wises
 
 
-
 def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
     return [
         {  # overflow moneybox
@@ -466,7 +464,7 @@ def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
 @pytest.mark.parametrize(
     "savings_amount, overflow_balance, mode, expected",
     [
-       # COLLECT
+        # COLLECT
         (1000, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: 3, 4: None, 5: None}),
         (0, 0, OverflowMoneyboxAutomatedSavingsModeType.COLLECT, {2: 0, 3: None, 4: None, 5: None}),
         (
@@ -561,7 +559,7 @@ def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
             3000,
             0,
             OverflowMoneyboxAutomatedSavingsModeType.EQUAL,
-            {2: 0, 3: 2, 4: None, 5:None},
+            {2: 0, 3: 2, 4: None, 5: None},
         ),
         (
             0,
@@ -579,7 +577,7 @@ def create_test_moneyboxes(overflow_balance: int) -> list[dict[str, Any]]:
             1000,
             4000,
             OverflowMoneyboxAutomatedSavingsModeType.EQUAL,
-            {2: 0, 3: 1, 4: None, 5:None},
+            {2: 0, 3: 1, 4: None, 5: None},
         ),
     ],
 )
@@ -651,6 +649,7 @@ def create_test_moneyboxes_refusing(overflow_balance: int) -> list[dict[str, Any
             "savings_target": 1000,
         },
     ]
+
 
 @pytest.mark.parametrize(
     "savings_amount, overflow_balance, mode, expected",

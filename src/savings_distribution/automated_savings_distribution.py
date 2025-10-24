@@ -28,9 +28,7 @@ MODE_TO_LOG_DESCRIPTION: dict[OverflowMoneyboxAutomatedSavingsModeType, str] = {
         "Fill-Mode: Automated Savings."
     ),
     OverflowMoneyboxAutomatedSavingsModeType.RATIO: "Ratio-Mode: Automated Savings.",
-    OverflowMoneyboxAutomatedSavingsModeType.EQUAL: (
-        "Equal-Mode: Automated Savings."
-    ),
+    OverflowMoneyboxAutomatedSavingsModeType.EQUAL: ("Equal-Mode: Automated Savings."),
 }
 
 POST_DISTRIBUTION_MODES: tuple[OverflowMoneyboxAutomatedSavingsModeType, ...] = (
@@ -130,12 +128,11 @@ class AutomatedSavingsDistributionService:
             # -> empty overflow moneybox balance and distribute it
 
             if action in POST_DISTRIBUTION_MODES:
-                last_overflow_moneybox_amount: int = - 1
+                last_overflow_moneybox_amount: int = -1
 
                 while (
-                        (overflow_moneybox_amount := updated_moneyboxes[0]["balance"]) > 0
-                    and overflow_moneybox_amount != last_overflow_moneybox_amount
-                ):
+                    overflow_moneybox_amount := updated_moneyboxes[0]["balance"]
+                ) > 0 and overflow_moneybox_amount != last_overflow_moneybox_amount:
                     withdraw_transaction_data = {
                         "amount": overflow_moneybox_amount,
                         "description": transaction_description,
@@ -150,7 +147,10 @@ class AutomatedSavingsDistributionService:
 
                     # calculate savings_distribution amounts for modes 3 and 4
                     # FILL:
-                    if action is OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES:
+                    if (
+                        action
+                        is OverflowMoneyboxAutomatedSavingsModeType.FILL_UP_LIMITED_MONEYBOXES
+                    ):
                         distribution_amounts = await AutomatedSavingsDistributionService.calculate_moneybox_amounts_fill_distribution(  # noqa: E501  # pylint: disable=line-too-long
                             sorted_by_priority_moneyboxes=updated_moneyboxes,
                             distribute_amount=overflow_moneybox_amount,
@@ -306,7 +306,6 @@ class AutomatedSavingsDistributionService:
 
         return moneybox_amount_distributions
 
-
     @staticmethod
     async def calculate_moneybox_amounts_normal_distribution(
         sorted_by_priority_moneyboxes: list[dict[str, Any]],
@@ -326,11 +325,9 @@ class AutomatedSavingsDistributionService:
         """
 
         def normal_mode_fn(moneybox: dict[str, Any], available_amount: int) -> int:
-            if (
-                    moneybox["savings_amount"] <= 0
-                    or (moneybox["savings_target"] is not None and
-                        moneybox["balance"] >= moneybox["savings_target"]
-                    )
+            if moneybox["savings_amount"] <= 0 or (
+                moneybox["savings_target"] is not None
+                and moneybox["balance"] >= moneybox["savings_target"]
             ):
                 return 0
 
@@ -369,7 +366,10 @@ class AutomatedSavingsDistributionService:
         """
 
         def fill_mode_fn(moneybox: dict[str, Any], available_amount: int) -> int:
-            if moneybox["savings_target"] is None or moneybox["balance"] >= moneybox["savings_target"]:
+            if (
+                moneybox["savings_target"] is None
+                or moneybox["balance"] >= moneybox["savings_target"]
+            ):
                 return 0
 
             missing_amount = moneybox["savings_target"] - moneybox["balance"]
@@ -401,9 +401,12 @@ class AutomatedSavingsDistributionService:
 
         overflow_moneybox_id: int = sorted_by_priority_moneyboxes[0]["id"]
         filtered_sorted_by_priority_moneyboxes: list[dict[str, Any]] = [
-            moneybox for moneybox in sorted_by_priority_moneyboxes
-            if moneybox["savings_amount"] > 0 and (
-                moneybox["savings_target"] is None or moneybox["balance"] < moneybox["savings_target"]
+            moneybox
+            for moneybox in sorted_by_priority_moneyboxes
+            if moneybox["savings_amount"] > 0
+            and (
+                moneybox["savings_target"] is None
+                or moneybox["balance"] < moneybox["savings_target"]
             )
         ]
         filtered_moneybox_ids: set[int] = {
@@ -432,6 +435,7 @@ class AutomatedSavingsDistributionService:
 
             # calculate the ratio amount for all moneyboxes on the first call
             if not first_calculation_done:
+
                 def _ratio_calculation(_moneybox: dict[str, Any]) -> int:
                     """Calculates the proportion amount for the moneybox as integer to the
                         total_savings_amount.
@@ -446,7 +450,7 @@ class AutomatedSavingsDistributionService:
                     _savings_target = _moneybox["savings_target"]
                     _balance = _moneybox["balance"]
 
-                    _moneybox_ratio = _savings_amount  / total_savings_amount
+                    _moneybox_ratio = _savings_amount / total_savings_amount
                     _ratio_amount = math.trunc(distribute_amount * _moneybox_ratio)
 
                     if _savings_target is not None:
@@ -473,8 +477,8 @@ class AutomatedSavingsDistributionService:
 
     @staticmethod
     async def calculate_moneybox_amounts_equal_distribution(
-            sorted_by_priority_moneyboxes: list[dict[str, Any]],
-            distribute_amount: int,
+        sorted_by_priority_moneyboxes: list[dict[str, Any]],
+        distribute_amount: int,
     ) -> dict[int, int]:
         """Helper function to calculate the moneybox amounts in the current savings_distribution
         cycle using EQUAL mode.
@@ -492,9 +496,12 @@ class AutomatedSavingsDistributionService:
 
         overflow_moneybox_id: int = sorted_by_priority_moneyboxes[0]["id"]
         filtered_sorted_by_priority_moneyboxes: list[dict[str, Any]] = [
-            moneybox for moneybox in sorted_by_priority_moneyboxes
-            if moneybox["savings_amount"] > 0 and (
-                moneybox["savings_target"] is None or moneybox["balance"] < moneybox["savings_target"]
+            moneybox
+            for moneybox in sorted_by_priority_moneyboxes
+            if moneybox["savings_amount"] > 0
+            and (
+                moneybox["savings_target"] is None
+                or moneybox["balance"] < moneybox["savings_target"]
             )
         ]
 
@@ -503,7 +510,9 @@ class AutomatedSavingsDistributionService:
         if len_distributable_moneyboxes == 0:
             return {overflow_moneybox_id: distribute_amount}
 
-        distribution_amount_for_each_moneybox: int = distribute_amount // len_distributable_moneyboxes
+        distribution_amount_for_each_moneybox: int = (
+            distribute_amount // len_distributable_moneyboxes
+        )
         moneybox_distribute_amounts: dict[int, int] = {
             moneybox["id"]: distribution_amount_for_each_moneybox
             for moneybox in filtered_sorted_by_priority_moneyboxes

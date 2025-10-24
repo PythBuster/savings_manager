@@ -3,6 +3,8 @@
 from fastapi import APIRouter
 from starlette.responses import FileResponse
 
+from src.constants import WEB_UI_DIR_PATH
+
 web_ui_router: APIRouter = APIRouter(
     prefix="",
     include_in_schema=False,
@@ -20,4 +22,4 @@ async def index() -> FileResponse:
     :rtype: :class:`FileResponse`
     """
 
-    return FileResponse("static/index.html", media_type="text/html")
+    return FileResponse(WEB_UI_DIR_PATH / "index.html", media_type="text/html")
