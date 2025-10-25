@@ -93,6 +93,10 @@ SMTP_PASSWORD=
 ```
 The SMTP settings will be explained later.
 
+**Note:** `ENVIRONMENT` must be set to `prod` to enable automated savings distribution.  
+Background tasks are only created in this mode.  
+When `ENVIRONMENT=dev`, background tasks such as email sending and automated
+savings will not work.
 
 ###### SqlAlchemy (ORM)
 We will use SQLAlchemy to manage and access the SQL database.
@@ -186,12 +190,13 @@ In project root dir:
 
 
 **Hint**: The database must be reachable.
-Savings Manager v2 is able to email you after automated savings is done.
+Savings Manager v2 is able to email you after automated savings is done
+(only for `ENVIRONMENT=prod` in `.env.dev`)
 
 If you want to receiver an email you have to use your email outgoing SMTP server, so the app will be able to send you an email.
 You can obtain the outgoing SMTP email server data from your provider.
 
-To use the email sender of the app, you need to add the smtp data in `/envs/.env`, like:
+To use the email sender of the app, you need to add the smtp data in `/envs/.env.dev`, like:
 
 ```# smtp - the outgoing SMTP email server data
 # -> SMTP_METHOD: only STARTTLS and TLS supported
@@ -202,7 +207,7 @@ SMTP_USER_NAME=your.email@address.com
 SMTP_PASSWORD=your-email-password
 ```
 
-**Note: make sure that only you have access to your .env file !!!** 
+**Note: make sure that only you have access to your .env files !!!** 
 
 ## Run savings manager in python environment:
 If poetry environment is initialized and all dependencies are initially installed
@@ -222,10 +227,12 @@ To see the API documentation or use the API via SwaggerUI, visit:
 
 
 ## Run savings manager as docker:
-ou can start the Savings Manager as a Docker container. After cloning the main repository and adding/adapting your `.env` file in `savings_manager/envs/`, you will be able to start the Docker service using the following command:
+### LINUX
+You can run the Savings Manager as a Docker container. After cloning the main repository and adding/adapting the mentioned `.env` files 
+in `savings_manager/envs/`, you will be able to start the Docker service using the following command:
 
 Navigate to `savings_manager/docker` and run:
-`docker compose up --build -d` 
+`docker compose up --build -d app` 
 This will rebuild your container if necessary and start the container as a daemon (in the background).
 
 Alternatively you can use the `START_SAVINGS_MANAGER.sh` script to start the savings manager into as a Docker container:
@@ -238,6 +245,9 @@ The savings manager into the docker will run on port 8001 and you will reach the
 
 API documentation: http://localhost:64000/docs
 Code documentation: http://localhost:64000/sphinx
+
+## WINDOWS
+On Windows, you’ll unfortunately have to help yourselves at this point. 🙂
 
 # Tests
 For running tests locally, `postgres-client` is required.
