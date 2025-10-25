@@ -1,23 +1,4 @@
 services:
-  postgres_database_backup:
-    container_name: docker_postgres_database_backup
-    build:
-      context: ../
-      dockerfile: docker/deploy-postgres-database-backup.Dockerfile
-    volumes:
-      - /mnt/nas/savings_manager/db_backups:/postgres_backup
-      #- /home/david/dev/test:/postgres_backup
-    depends_on:
-      postgres_database:
-        condition: service_healthy
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_DB: ${DB_NAME}
-      BACKUP_DIR: /postgres_backup
-    networks:
-      - savings_manager_network
-
   postgres_database:
     container_name: docker_postgres_database
     image: postgres:16
@@ -29,7 +10,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
-      BACKUP_DIR: /postgres_backup
     networks:
       - savings_manager_network
     healthcheck:
@@ -62,8 +42,6 @@ services:
     depends_on:
       postgres_database:
         condition: service_healthy
-      postgres_database_backup:
-        condition: service_started
     links:
       - postgres_database
     ports:
