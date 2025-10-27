@@ -2,6 +2,11 @@
 
 ## x.y.z (unreleased)
 
+## 2.43.1 (2025-10-27)
+### Changes
+- small refactoring issues
+- increase test coverage
+
 ## 2.43.0 (2025-10-24)
 ### Feature:
 - return index.html for unknown routes (SPA fallback)
