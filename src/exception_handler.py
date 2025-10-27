@@ -33,14 +33,14 @@ from src.utils import extract_database_violation_error
 
 
 async def response_exception(  # pylint: disable=too-many-return-statements, too-many-branches
-    _: Request,
+    request: Request,
     exception: Exception,
 ) -> JSONResponse | FileResponse:
     """Maps `exception` to a :class:`JSONResponse` or
     :class:`FileResponse` and returns it.
 
-    :param _: The current request instance, not used.
-    :type _: :class:`Starlette.request.Request`
+    :param request: The current request instance.
+    :type request: :class:`Starlette.request.Request`
     :param exception: The caught exception.
     :type exception: :class:`int` | :class:`Exception`
     :return: The exception as a json response.
@@ -52,6 +52,11 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
     app_logger.exception(exception)
 
     if isinstance(exception, HTTPException) and exception.status_code == status.HTTP_404_NOT_FOUND:
+        if request.url.path.startswith("/api") or request.url.path.endswith((".js", ".css", ".png", ".jpg", ".ico")):
+            return JSONResponse(
+                status_code=404,
+                content={"detail": "Not Found"},
+            )
         return FileResponse(WEB_UI_DIR_PATH / "index.html", media_type="text/html")
 
     if isinstance(exception, MissingTokenError):
