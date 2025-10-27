@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from aiosmtplib import SMTPException
 from async_fastapi_jwt_auth.exceptions import (
@@ -31,6 +33,7 @@ from src.exception_handler import response_exception
 from src.routes.exceptions import BadUsernameOrPasswordError, MissingSMTPSettingsError
 
 
+
 @pytest.mark.asyncio
 async def test_404_returns_file_response(monkeypatch):
     fake_path = "/fake/index.html"
@@ -42,10 +45,27 @@ async def test_404_returns_file_response(monkeypatch):
     monkeypatch.setattr("src.exception_handler.FileResponse", DummyFileResponse)
     monkeypatch.setattr("src.constants.WEB_UI_DIR_PATH", "/fake")
 
-    result = await response_exception(None, HTTPException(status_code=status.HTTP_404_NOT_FOUND))
+    request = mock.MagicMock()
+    request.url = mock.MagicMock()
+
+    with mock.patch.object(request.url, "path", "/some_url"):
+        result = await response_exception(request, HTTPException(status_code=status.HTTP_404_NOT_FOUND))
+
     assert isinstance(result, FileResponse)
     assert result.path.endswith("index.html")
     assert result.media_type == "text/html"
+
+
+@pytest.mark.asyncio
+async def test_404_api_returns_not_found():
+    request = mock.MagicMock()
+    request.url = mock.MagicMock()
+
+    with mock.patch.object(request.url, "path", "/api/some_api"):
+        result = await response_exception(request, HTTPException(status_code=status.HTTP_404_NOT_FOUND))
+
+    assert isinstance(result, JSONResponse)
+    assert result.status_code == status.HTTP_404_NOT_FOUND
 
 
 # ---------------------------------------------------------------------------
