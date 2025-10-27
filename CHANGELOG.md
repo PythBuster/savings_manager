@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.43.2 (2025-10-27)
+### Fixes
+- revert handling of status codes in `response_exception` from v2.43.1
+
 ## 2.43.1 (2025-10-27)
 ### Changes
 - small refactoring issues
