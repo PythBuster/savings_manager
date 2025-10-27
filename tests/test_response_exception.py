@@ -42,7 +42,7 @@ async def test_404_returns_file_response(monkeypatch):
     monkeypatch.setattr("src.exception_handler.FileResponse", DummyFileResponse)
     monkeypatch.setattr("src.constants.WEB_UI_DIR_PATH", "/fake")
 
-    result = await response_exception(None, status.HTTP_404_NOT_FOUND)
+    result = await response_exception(None, HTTPException(status_code=status.HTTP_404_NOT_FOUND))
     assert isinstance(result, FileResponse)
     assert result.path.endswith("index.html")
     assert result.media_type == "text/html"

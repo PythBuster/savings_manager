@@ -37,7 +37,7 @@ async def handle_requests(
     try:
         return await call_next(request)
     except Exception as ex:  # pylint:disable=broad-exception-caught
-        return await response_exception(request, exc_class_or_status_code=ex)
+        return await response_exception(request, exception=ex)
 
 
 def register_router(fastapi_app: FastAPI) -> None:
