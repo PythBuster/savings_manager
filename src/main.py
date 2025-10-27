@@ -8,11 +8,10 @@ from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from dotenv import load_dotenv
 from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.cors import CORSMiddleware
 
-from src.constants import GENERAL_ENV_FILE_PATH, WEB_UI_DIR_PATH
+from src.constants import GENERAL_ENV_FILE_PATH
 from src.custom_types import EnvironmentType
 from src.db.db_manager import DBManager
 from src.exception_handler import response_exception
@@ -122,10 +121,7 @@ app.add_middleware(
 app.add_exception_handler(RateLimitExceeded, response_exception)
 app.add_exception_handler(RequestValidationError, response_exception)
 app.add_exception_handler(AuthJWTException, response_exception)
-app.add_exception_handler(
-    status.HTTP_404_NOT_FOUND,
-    lambda request, exc: FileResponse(WEB_UI_DIR_PATH / "index.html", media_type="text/html"),
-)
+app.add_exception_handler(status.HTTP_404_NOT_FOUND, response_exception)
 
 # handle requests and all other exceptions
 app.middleware("http")(handle_requests)
