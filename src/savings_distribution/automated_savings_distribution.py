@@ -123,7 +123,7 @@ class AutomatedSavingsDistributionService:
             del sorted_moneyboxes
 
             # POST-distributions
-            # Mode 3: FILL and Mode 4: RATIO
+            # Mode 3: FILL, Mode 4: RATIO, Mode 5: EQUAL
             # -> if overflow moneybox has balance to distribute
             # -> empty overflow moneybox balance and distribute it
 

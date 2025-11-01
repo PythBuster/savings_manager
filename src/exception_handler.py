@@ -52,11 +52,10 @@ async def response_exception(  # pylint: disable=too-many-return-statements, too
     app_logger.exception(exception)
 
     if isinstance(exception, HTTPException) and exception.status_code == status.HTTP_404_NOT_FOUND:
-        if request.url.path.startswith("/api") or request.url.path.endswith((".js", ".css", ".png", ".jpg", ".ico")):
-            return JSONResponse(
-                status_code=404,
-                content={"detail": "Not Found"},
-            )
+        static_suffixes = (".js", ".css", ".png", ".jpg", ".ico", ".svg", ".map")
+        if request.url.path.startswith("/api") or request.url.path.endswith(static_suffixes):
+            return JSONResponse(status_code=404, content={"detail": "Not Found"})
+        # let SPA handle unknown routes
         return FileResponse(WEB_UI_DIR_PATH / "index.html", media_type="text/html")
 
     if isinstance(exception, MissingTokenError):
