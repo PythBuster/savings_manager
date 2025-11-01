@@ -2,6 +2,10 @@
 
 ## x.y.z (unreleased)
 
+## 2.44.0 (2025-11-01)
+### Changes
+- update dependencies and fix code/tests
+
 ## 2.43.3 (2025-10-27)
 ### Fixes
 - 404 responses from non-API routes now return the frontend’s index.html to let Vue handle client-side routing.
